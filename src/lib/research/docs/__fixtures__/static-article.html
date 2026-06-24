@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Introduction to Widgets</title>
+  </head>
+  <body>
+    <main>
+      <article>
+        <h1>Introduction to Widgets</h1>
+        <p>Widgets are the fundamental building block of the framework. A widget describes what its
+        view should look like given its current configuration and state. When a widget's state
+        changes, the widget rebuilds its description, which the framework diffs against the previous
+        description to determine the minimal changes needed in the underlying render tree.</p>
+        <p>Every widget is immutable. Its properties are final and can only be set once when the
+        widget is constructed. To build interactive applications you compose widgets together,
+        nesting them to form a tree. The framework walks this tree to lay out and paint the result.</p>
+        <h2>Creating a widget</h2>
+        <p>To create a widget, extend the base class and override the build method. The build method
+        returns a new subtree of widgets. Keep build methods pure and free of side effects so the
+        framework can call them as often as it needs without surprising behavior.</p>
+        <p>Composition over inheritance is the guiding principle. Rather than subclassing to add
+        behavior, you wrap widgets in other widgets that provide the behavior you need.</p>
+      </article>
+    </main>
+  </body>
+</html>

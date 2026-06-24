@@ -8,6 +8,14 @@ describe('url validation and normalization', () => {
     expect(normalizeUrl('http://example.com:80/docs')).toBe('http://example.com/docs');
   });
 
+  it('preserves SPA hash routes (Docsify) but strips plain anchors', () => {
+    expect(normalizeUrl('https://docsify.js.org/#/configuration')).toBe(
+      'https://docsify.js.org/#/configuration'
+    );
+    expect(normalizeUrl('https://docsify.js.org/#!/guide')).toBe('https://docsify.js.org/#!/guide');
+    expect(normalizeUrl('https://example.com/docs#section-2')).toBe('https://example.com/docs');
+  });
+
   it('preserves custom ports and path trailing slashes', () => {
     expect(normalizeUrl('https://example.com:8443/docs/')).toBe('https://example.com:8443/docs/');
     expect(normalizeUrl('https://example.com:8443/docs')).toBe('https://example.com:8443/docs');

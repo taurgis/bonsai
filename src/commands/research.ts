@@ -8,11 +8,18 @@ import { deriveCacheKey } from '../lib/research/cache-key.js';
 import { findArtifact, writeArtifact, getArtifactPath } from '../lib/research/storage.js';
 import { evaluateFreshness, parseTtlToMs, checkMaxAgeExpired } from '../lib/research/freshness.js';
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
-import { fetchStaticHtml } from '../lib/research/fetcher.js';
-import { extractHtmlContent } from '../lib/research/extract.js';
+import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
 import { fetchRenderedHtml } from '../lib/research/browser.js';
+import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
+import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
 import { detectSite } from '../sites/index.js';
 import type { SiteFetchResult } from '../sites/types.js';
+
+const CAPTURE_DEPS: CaptureDeps = {
+  fetchStatic: (url) => fetchStaticHtml(url),
+  fetchRendered: (url) => fetchRenderedHtml(url),
+  fetchText: (url) => fetchText(url),
+};
 
 export default class Research extends BaseCommand<typeof Research> {
   static id = 'research';
@@ -140,13 +147,14 @@ export default class Research extends BaseCommand<typeof Research> {
 
     let fetchResult: SiteFetchResult['fetchResult'];
     let extraction: SiteFetchResult['extraction'];
+    let capture: Awaited<ReturnType<typeof capturePage>> | null = null;
     if (siteModule?.fetchPage) {
+      // Custom site modules own their fetch/extract strategy; the generic capture path is skipped.
       ({ fetchResult, extraction } = await siteModule.fetchPage(normalizedUrl));
     } else {
-      fetchResult = useRendered
-        ? await fetchRenderedHtml(normalizedUrl)
-        : await fetchStaticHtml(normalizedUrl);
-      extraction = extractHtmlContent(fetchResult.content, fetchResult.finalUrl);
+      capture = await capturePage(normalizedUrl, { forceRendered: useRendered }, CAPTURE_DEPS);
+      fetchResult = capture.fetchResult;
+      extraction = capture.extraction;
     }
 
     const artifact = createArtifactFromFetch(
@@ -163,7 +171,9 @@ export default class Research extends BaseCommand<typeof Research> {
     artifact.metadata.topic = topic || null;
     artifact.metadata.tags = tags || [];
     artifact.metadata.site_module_id = siteModule?.id ?? null;
-    if (useRendered) {
+    if (capture) {
+      applyCaptureMetadata(artifact, capture);
+    } else if (useRendered) {
       artifact.metadata.capture_method = 'browser_fallback';
     }
 
@@ -204,6 +214,11 @@ export default class Research extends BaseCommand<typeof Research> {
         validatedAt: artifact.metadata.validated_at,
         staleAfter: artifact.metadata.stale_after,
       },
+      artifactType: artifact.metadata.artifact_type,
+      docsEngine: artifact.metadata.docs_engine,
+      docsFramework: artifact.metadata.docs_framework,
+      sourceDocUrl: artifact.metadata.source_doc_url,
+      searchProvider: artifact.metadata.search_provider,
       format,
       tokenEstimate:
         format === 'compressed'
@@ -213,22 +228,59 @@ export default class Research extends BaseCommand<typeof Research> {
     };
   }
 
+  // Validates the duration flags up front, exiting with code 2 on a malformed value.
+  private validateDurationFlags(ttl?: string, maxAge?: string): void {
+    for (const [label, value] of [
+      ['TTL', ttl],
+      ['max-age', maxAge],
+    ] as const) {
+      if (!value) continue;
+      try {
+        parseTtlToMs(value);
+      } catch (err) {
+        this.error(`Invalid ${label}: ${(err as Error).message}`, { exit: 2 });
+      }
+    }
+  }
+
+  // Serves the cache when a fresh/revalidatable entry exists, otherwise fetches fresh. Returns the
+  // resolved artifact plus its cache/freshness state.
+  private async resolveArtifact(
+    normalizedUrl: string,
+    cacheKey: string,
+    targetDir: string,
+    dataDir: string,
+    currentTime: Date
+  ): Promise<{ cacheStatus: any; freshnessState: any; artifact: any }> {
+    const cached = findArtifact(dataDir, cacheKey);
+    if (cached && !this.flags.force) {
+      return this.executeCacheHit(cached, targetDir, currentTime);
+    }
+    const artifact = await this.executeCacheMiss(normalizedUrl, targetDir, currentTime, cacheKey);
+    return { cacheStatus: 'miss', freshnessState: 'stale_expired', artifact };
+  }
+
+  // Long references are split into searchable/inspectable section children whenever the page artifact
+  // is freshly written (T-22). Best-effort: never let chunking break the main result.
+  private persistSectionsIfFresh(
+    targetDir: string,
+    artifact: any,
+    currentTime: Date,
+    cacheStatus: any
+  ): void {
+    if (cacheStatus !== 'miss' && cacheStatus !== 'refreshed') return;
+    try {
+      persistSectionArtifacts(targetDir, artifact, currentTime);
+    } catch {
+      /* section generation is non-essential; ignore failures */
+    }
+  }
+
   async execute(): Promise<unknown> {
     const { url } = this.args;
-    const { format, ttl, 'max-age': maxAge, force, 'dry-run': dryRun } = this.flags;
+    const { format, ttl, 'max-age': maxAge, 'dry-run': dryRun } = this.flags;
 
-    if (ttl)
-      try {
-        parseTtlToMs(ttl);
-      } catch (err) {
-        this.error(`Invalid TTL: ${(err as Error).message}`, { exit: 2 });
-      }
-    if (maxAge)
-      try {
-        parseTtlToMs(maxAge);
-      } catch (err) {
-        this.error(`Invalid max-age: ${(err as Error).message}`, { exit: 2 });
-      }
+    this.validateDurationFlags(ttl, maxAge);
 
     let normalizedUrl: string;
     let cacheKey: string;
@@ -244,19 +296,15 @@ export default class Research extends BaseCommand<typeof Research> {
     const currentTime = new Date();
 
     try {
-      const cached = findArtifact(dataDir, cacheKey);
-      let cacheStatus: any = 'miss';
-      let freshnessState: any = 'stale_expired';
-      let artifact: any;
+      const { cacheStatus, freshnessState, artifact } = await this.resolveArtifact(
+        normalizedUrl,
+        cacheKey,
+        targetDir,
+        dataDir,
+        currentTime
+      );
 
-      if (cached && !force) {
-        const res = await this.executeCacheHit(cached, targetDir, currentTime);
-        cacheStatus = res.cacheStatus;
-        freshnessState = res.freshnessState;
-        artifact = res.artifact;
-      } else {
-        artifact = await this.executeCacheMiss(normalizedUrl, targetDir, currentTime, cacheKey);
-      }
+      this.persistSectionsIfFresh(targetDir, artifact, currentTime, cacheStatus);
 
       const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
       const resultData = this.buildResultData(
@@ -282,6 +330,23 @@ export default class Research extends BaseCommand<typeof Research> {
         rmSync(targetDir, { recursive: true, force: true });
       }
     }
+  }
+}
+
+// Copies Phase 2 capability provenance from a capture outcome onto the artifact metadata.
+function applyCaptureMetadata(
+  artifact: any,
+  capture: Awaited<ReturnType<typeof capturePage>>
+): void {
+  const meta = artifact.metadata;
+  meta.capture_method = capture.captureMethod;
+  meta.docs_engine = capture.capabilities.docsEngine ?? null;
+  meta.docs_framework = capture.capabilities.framework ?? null;
+  meta.source_doc_url = capture.sourceDocUrl;
+  meta.search_provider = capture.capabilities.search?.provider ?? null;
+  if (capture.extraction.isIndexHub) meta.artifact_type = 'index';
+  if (capture.sourceDocUrl && !meta.source_urls.includes(capture.sourceDocUrl)) {
+    meta.source_urls.push(capture.sourceDocUrl);
   }
 }
 

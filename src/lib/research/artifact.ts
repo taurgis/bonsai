@@ -50,6 +50,13 @@ export function serializeMetadata(meta: ResearchArtifactMetadata): string {
   serializeScalarField(lines, '  detailed', meta.token_estimate.detailed);
   serializeScalarField(lines, 'status', meta.status);
   serializeScalarField(lines, 'site_module_id', meta.site_module_id);
+  serializeScalarField(lines, 'docs_engine', meta.docs_engine);
+  serializeScalarField(lines, 'docs_framework', meta.docs_framework);
+  serializeScalarField(lines, 'source_doc_url', meta.source_doc_url);
+  serializeScalarField(lines, 'search_provider', meta.search_provider);
+  serializeScalarField(lines, 'parent_cache_key', meta.parent_cache_key);
+  serializeScalarField(lines, 'section_anchor', meta.section_anchor);
+  serializeScalarField(lines, 'section_heading_path', meta.section_heading_path);
   lines.push('---');
 
   return lines.join('\n');
@@ -168,6 +175,13 @@ export function parseMetadata(lines: string[]): ResearchArtifactMetadata {
       token_estimate: { compressed: null, detailed: null },
       status: 'active',
       site_module_id: null,
+      docs_engine: null,
+      docs_framework: null,
+      source_doc_url: null,
+      search_provider: null,
+      parent_cache_key: null,
+      section_anchor: null,
+      section_heading_path: null,
     },
     currentArrayKey: null,
     currentObjectKey: null,

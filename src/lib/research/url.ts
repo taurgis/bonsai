@@ -112,8 +112,11 @@ export function normalizeUrl(input: string): string {
     url.port = '';
   }
 
-  // Strip fragment
-  url.hash = '';
+  // Strip plain anchor fragments, but PRESERVE SPA hash routes (e.g. Docsify "#/guide/intro",
+  // "#!/path") so client-rendered docs get a distinct, consistent cache key per page (T-28).
+  if (!/^#!?\//.test(url.hash)) {
+    url.hash = '';
+  }
 
   // Sort query parameters
   const params = Array.from(url.searchParams.entries()).sort(

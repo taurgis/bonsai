@@ -276,5 +276,332 @@
       "ordered-steps",
       "images"
     ]
+  },
+  {
+    "id": "vue-introduction",
+    "url": "https://vuejs.org/guide/introduction.html",
+    "expectEngine": "vitepress",
+    "focus": [
+      "route-markdown",
+      "code-blocks",
+      "no-nav-chrome"
+    ]
+  },
+  {
+    "id": "vite-guide",
+    "url": "https://vite.dev/guide/",
+    "expectEngine": "vitepress",
+    "focus": [
+      "route-markdown",
+      "links"
+    ]
+  },
+  {
+    "id": "mdn-array-map",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map",
+    "focus": [
+      "source-markdown",
+      "code-blocks",
+      "tables"
+    ]
+  },
+  {
+    "id": "mdn-html-input",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input",
+    "focus": [
+      "source-markdown",
+      "html-table-conversion",
+      "empty-section-drop"
+    ]
+  },
+  {
+    "id": "mdn-css-display",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/display",
+    "focus": [
+      "css-reference",
+      "value-table",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "mdn-fetch",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch",
+    "focus": [
+      "source-markdown",
+      "web-api",
+      "parameters"
+    ]
+  },
+  {
+    "id": "node-path",
+    "url": "https://nodejs.org/api/path.html",
+    "focus": [
+      "source-markdown",
+      "long-reference",
+      "sections"
+    ]
+  },
+  {
+    "id": "react-usestate",
+    "url": "https://react.dev/reference/react/useState",
+    "focus": [
+      "html-extraction",
+      "code-blocks",
+      "no-nav-chrome"
+    ]
+  },
+  {
+    "id": "tailwind-vite-install",
+    "url": "https://tailwindcss.com/docs/installation/using-vite",
+    "focus": [
+      "code-blocks",
+      "command-line-fidelity"
+    ]
+  },
+  {
+    "id": "redux-getting-started",
+    "url": "https://redux-toolkit.js.org/introduction/getting-started",
+    "expectEngine": "docusaurus",
+    "focus": [
+      "code-blocks",
+      "multi-command"
+    ]
+  },
+  {
+    "id": "astro-getting-started",
+    "url": "https://docs.astro.build/en/getting-started/",
+    "expectEngine": "starlight",
+    "focus": [
+      "landing-cleanup",
+      "no-avatar-grid"
+    ]
+  },
+  {
+    "id": "mkdocs-material-getting-started",
+    "url": "https://squidfunk.github.io/mkdocs-material/getting-started/",
+    "expectFramework": "material-mkdocs",
+    "focus": [
+      "html-extraction",
+      "tabs"
+    ]
+  },
+  {
+    "id": "nestjs-first-steps",
+    "url": "https://docs.nestjs.com/first-steps",
+    "focus": [
+      "rendered-fallback",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "typescript-everyday-types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html",
+    "focus": [
+      "chrome-cleanup",
+      "base64-logo",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "prisma-quickstart",
+    "url": "https://www.prisma.io/docs/getting-started/quickstart-sqlite",
+    "focus": [
+      "next-docs",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "tanstack-query-overview",
+    "url": "https://tanstack.com/query/latest/docs/framework/react/overview",
+    "focus": [
+      "source-markdown",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "svelte-overview",
+    "url": "https://svelte.dev/docs/svelte/overview",
+    "focus": [
+      "spa",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "python-tutorial-intro",
+    "url": "https://docs.python.org/3/tutorial/introduction.html",
+    "expectFramework": "sphinx",
+    "focus": [
+      "html-extraction",
+      "long-reference"
+    ]
+  },
+  {
+    "id": "gitbook-docs",
+    "url": "https://docs.gitbook.com/",
+    "expectFramework": "gitbook",
+    "focus": [
+      "managed-platform",
+      "image-noise",
+      "llms-txt"
+    ]
+  },
+  {
+    "id": "mintlify-quickstart",
+    "url": "https://mintlify.com/docs/quickstart",
+    "expectFramework": "mintlify",
+    "focus": [
+      "managed-platform",
+      "landing-cleanup"
+    ]
+  },
+  {
+    "id": "just-the-docs-configuration",
+    "url": "https://just-the-docs.com/docs/configuration/",
+    "expectFramework": "just-the-docs",
+    "focus": [
+      "jekyll",
+      "chrome-cleanup"
+    ]
+  },
+  {
+    "id": "docsify-configuration",
+    "url": "https://docsify.js.org/#/configuration",
+    "expectFramework": "docsify",
+    "focus": [
+      "hash-route",
+      "rendered-or-source"
+    ]
+  },
+  {
+    "id": "node-fs-reference",
+    "url": "https://nodejs.org/api/fs.html",
+    "focus": [
+      "source-markdown",
+      "huge-reference",
+      "sections",
+      "tables",
+      "many-code-blocks"
+    ]
+  },
+  {
+    "id": "react-useeffect",
+    "url": "https://react.dev/reference/react/useEffect",
+    "focus": [
+      "html-extraction",
+      "long-reference",
+      "many-code-examples",
+      "no-nav-chrome"
+    ]
+  },
+  {
+    "id": "tanstack-usequery-reference",
+    "url": "https://tanstack.com/query/latest/docs/framework/react/reference/useQuery",
+    "focus": [
+      "source-markdown",
+      "options-list",
+      "api-reference"
+    ]
+  },
+  {
+    "id": "tanstack-usequeries-reference",
+    "url": "https://tanstack.com/query/v5/docs/framework/react/reference/useQueries",
+    "focus": [
+      "source-markdown",
+      "code-blocks",
+      "api-reference"
+    ]
+  },
+  {
+    "id": "docusaurus-jest-getting-started",
+    "url": "https://jestjs.io/docs/getting-started",
+    "focus": [
+      "docusaurus",
+      "code-blocks",
+      "headings"
+    ]
+  },
+  {
+    "id": "nextjs-layouts-and-pages",
+    "url": "https://nextjs.org/docs/app/getting-started/layouts-and-pages",
+    "focus": [
+      "next",
+      "code-blocks",
+      "rsc"
+    ]
+  },
+  {
+    "id": "mdbook-rust-ownership",
+    "url": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html",
+    "focus": [
+      "mdbook",
+      "code-blocks",
+      "long-prose"
+    ]
+  },
+  {
+    "id": "docsy-kubernetes-pods",
+    "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+    "focus": [
+      "docsy",
+      "yaml-code",
+      "feature-state-table"
+    ]
+  },
+  {
+    "id": "sphinx-pandas-groupby",
+    "url": "https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html",
+    "focus": [
+      "sphinx",
+      "parameter-table",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "vite-server-options",
+    "url": "https://vite.dev/config/server-options",
+    "expectEngine": "vitepress",
+    "focus": [
+      "route-markdown",
+      "long-options-reference",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "vue-reactivity-core-api",
+    "url": "https://vuejs.org/api/reactivity-core.html",
+    "expectEngine": "vitepress",
+    "focus": [
+      "route-markdown",
+      "api-reference",
+      "typescript-signatures"
+    ]
+  },
+  {
+    "id": "mdn-promise",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "focus": [
+      "source-markdown",
+      "complex-reference",
+      "methods",
+      "tables"
+    ]
+  },
+  {
+    "id": "tailwind-grid-template-columns",
+    "url": "https://tailwindcss.com/docs/grid-template-columns",
+    "focus": [
+      "html-extraction",
+      "utility-tables",
+      "code-blocks"
+    ]
+  },
+  {
+    "id": "typescript-generics",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html",
+    "focus": [
+      "long-reference",
+      "many-code-blocks",
+      "chrome-cleanup"
+    ]
   }
 ]

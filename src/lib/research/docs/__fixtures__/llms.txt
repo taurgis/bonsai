@@ -1,0 +1,12 @@
+# Example Docs
+
+> Documentation for the Example project, formatted for LLM consumption.
+
+## Guides
+
+- [Introduction](https://example.com/docs/introduction.md): What the project is.
+- [Getting Started](https://example.com/docs/getting-started.md): Install and first steps.
+
+## Reference
+
+- [API](https://example.com/docs/api.md): Full API reference.

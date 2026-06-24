@@ -9,7 +9,9 @@ import { SITES, getSiteModuleById } from '../../src/sites/index.js';
 
 interface Fixture {
   id: string;
-  site: string;
+  // Custom-integration fixtures set a site-module id; generic-pipeline fixtures (most docs sites)
+  // omit it and are captured through capturePage.
+  site?: string;
   url: string;
   focus?: string[];
 }
@@ -29,10 +31,13 @@ describe('regression fixtures manifest', () => {
       expect(ids.has(fixture.id), `duplicate fixture id "${fixture.id}"`).toBe(false);
       ids.add(fixture.id);
       expect(() => new URL(fixture.url), `invalid url for "${fixture.id}"`).not.toThrow();
-      expect(
-        getSiteModuleById(fixture.site),
-        `unknown site "${fixture.site}" in "${fixture.id}"`
-      ).toBeDefined();
+      // A `site` is optional (generic-pipeline fixtures omit it); when present it must resolve.
+      if (fixture.site) {
+        expect(
+          getSiteModuleById(fixture.site),
+          `unknown site "${fixture.site}" in "${fixture.id}"`
+        ).toBeDefined();
+      }
     }
   });
 

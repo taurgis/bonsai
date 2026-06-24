@@ -62,6 +62,13 @@ function buildMetadata(
     },
     status: 'active',
     site_module_id: null,
+    docs_engine: null,
+    docs_framework: null,
+    source_doc_url: null,
+    search_provider: null,
+    parent_cache_key: null,
+    section_anchor: null,
+    section_heading_path: null,
   };
 }
 
@@ -120,6 +127,11 @@ function preserveUserMetadata(
   target.metadata.topic = source.topic;
   target.metadata.tags = [...source.tags];
   target.metadata.site_module_id = source.site_module_id;
+  // Carry forward docs-engine capability provenance so revalidation doesn't drop it.
+  target.metadata.docs_engine = source.docs_engine;
+  target.metadata.docs_framework = source.docs_framework;
+  target.metadata.search_provider = source.search_provider;
+  target.metadata.source_doc_url = source.source_doc_url;
   if (rendered) target.metadata.capture_method = 'browser_fallback';
 }
 

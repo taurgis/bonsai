@@ -2,6 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": ["bin/cli.mjs"],
 
+  // Test fixtures are sample HTML/JSON docs, not source: their <script>/<link> refs are intentional
+  // page markup, not real imports. Excluded from all analysis (matches health/duplicates ignores).
+  "ignorePatterns": ["**/__fixtures__/**"],
+
 
   "health": {
     "maxCyclomatic": 20,

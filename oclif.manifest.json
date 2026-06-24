@@ -507,7 +507,9 @@
           "multiple": false,
           "options": [
             "source",
-            "research_note"
+            "research_note",
+            "index",
+            "section"
           ],
           "type": "option"
         },
@@ -528,6 +530,13 @@
         "domain": {
           "description": "Search a documentation site directly (e.g. help.salesforce.com) instead of the local cache. Requires a site module that implements search.",
           "name": "domain",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "remote": {
+          "description": "Discover uncached docs via a site’s public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs index). Pass a docs page URL; falls back to local cache search if no connector applies.",
+          "name": "remote",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"

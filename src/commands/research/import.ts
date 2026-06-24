@@ -274,6 +274,13 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       },
       status: 'active',
       site_module_id: null,
+      docs_engine: null,
+      docs_framework: null,
+      source_doc_url: null,
+      search_provider: null,
+      parent_cache_key: null,
+      section_anchor: null,
+      section_heading_path: null,
     };
 
     return {

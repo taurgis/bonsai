@@ -40,4 +40,16 @@ describe('htmlToMarkdown GFM tables', () => {
     expect(tableLines).toHaveLength(3);
     expect(md).toContain('| A | B |');
   });
+
+  it('drops text-less anchor links but keeps images and real links', () => {
+    const md = htmlToMarkdown(
+      '<p><a href="https://x/#h"></a>Heading</p>' +
+        '<p><a href="https://x/y">Real</a></p>' +
+        '<p><img src="https://x/i.png" alt=""></p>'
+    );
+    expect(md).not.toMatch(/(?<!!)\[\s*\]\(/);
+    expect(md).toContain('[Real](https://x/y)');
+    expect(md).toContain('![](https://x/i.png)');
+    expect(md).toContain('Heading');
+  });
 });

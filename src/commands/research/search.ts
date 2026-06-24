@@ -4,6 +4,23 @@ import { BaseCommand } from '../../base-command.js';
 import { getArtifactPath, scanCacheDir } from '../../lib/research/storage.js';
 import { evaluateFreshness } from '../../lib/research/freshness.js';
 import { detectSite } from '../../sites/index.js';
+import { fetchStaticHtml, fetchText, postJson } from '../../lib/research/fetcher.js';
+import {
+  runRemoteDocsSearch,
+  type RemoteSearchDeps,
+} from '../../lib/research/docs/remote-search-runner.js';
+
+const REMOTE_SEARCH_DEPS: RemoteSearchDeps = {
+  fetchStatic: async (url) => {
+    const res = await fetchStaticHtml(url);
+    return { content: res.content, finalUrl: res.finalUrl };
+  },
+  fetchText: async (url) => {
+    const res = await fetchText(url);
+    return { content: res.content, status: res.status };
+  },
+  postJson: (url, body, headers) => postJson(url, body, headers),
+};
 
 const FRESHNESS_BONUS: Record<string, number> = { fresh: 30, stale_grace: 10 };
 
@@ -32,7 +49,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     }),
     'artifact-type': Flags.option({
       description: 'Filter results by artifact type.',
-      options: ['source', 'research_note'] as const,
+      options: ['source', 'research_note', 'index', 'section'] as const,
     })(),
     limit: Flags.integer({
       description: 'Maximum number of results to return (default 10, max 50).',
@@ -45,6 +62,10 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     domain: Flags.string({
       description:
         'Search a documentation site directly (e.g. help.salesforce.com) instead of the local cache. Requires a site module that implements search.',
+    }),
+    remote: Flags.string({
+      description:
+        'Discover uncached docs via a site’s public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs index). Pass a docs page URL; falls back to local cache search if no connector applies.',
     }),
   };
 
@@ -188,7 +209,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
         )
       )
         return null;
-      const score = this.calculateScore(
+      let score = this.calculateScore(
         artifact.metadata,
         artifact.summary,
         artifact.compressed,
@@ -196,6 +217,9 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
         freshness
       );
       if (score <= 0) return null;
+      // Section children are more precise than the whole page, so rank a section hit slightly
+      // above its parent for the same query (T-22).
+      if (artifact.metadata.artifact_type === 'section') score += 15;
       const snippetText = [artifact.summary, artifact.compressed].filter(Boolean).join('\n');
       return {
         cacheKey: artifact.metadata.cache_key,
@@ -225,6 +249,21 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     });
   }
 
+  // Prints a numbered result list to stdout for human (non-JSON) output. Shared by site and remote
+  // search so the two paths can't drift in formatting.
+  private printResults(
+    heading: string,
+    results: ReadonlyArray<{ title: string; url: string; snippet?: string }>
+  ): void {
+    if (this.requestedJson()) return;
+    this.log(heading);
+    results.forEach((r, i) => {
+      this.log(`${i + 1}. ${r.title}`);
+      this.log(`   URL: ${r.url}`);
+      if (r.snippet) this.log(`   ${r.snippet}`);
+    });
+  }
+
   private async executeSiteSearch(query: string, domain: string): Promise<unknown> {
     const siteModule = detectSite(`https://${domain}`);
     if (!siteModule) {
@@ -234,23 +273,35 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       this.error(`Site module '${siteModule.id}' does not implement search.`, { exit: 2 });
     }
     const results = await siteModule.search(query);
-    if (!this.requestedJson()) {
-      this.log(`Found ${results.length} results from ${siteModule.name}:\n`);
-      results.forEach((r, i) => {
-        this.log(`${i + 1}. ${r.title}`);
-        this.log(`   URL: ${r.url}`);
-        if (r.snippet) this.log(`   ${r.snippet}`);
-      });
-    }
+    this.printResults(`Found ${results.length} results from ${siteModule.name}:\n`, results);
     return results.map((r) => ({ ...r, site_module_id: siteModule.id }));
+  }
+
+  // Remote docs discovery. On any connector failure, degrade to local cache search with a warning
+  // (T-20). Returns discovery results tagged remote: true so callers can tell them from cache hits.
+  private async executeRemoteSearch(query: string, docsUrl: string): Promise<unknown> {
+    try {
+      const { provider, results } = await runRemoteDocsSearch(docsUrl, query, REMOTE_SEARCH_DEPS);
+      this.printResults(`Found ${results.length} remote results via ${provider}:\n`, results);
+      return results.map((r) => ({ ...r, remote: true }));
+    } catch (err) {
+      this.warn(`Remote docs search unavailable, using local cache: ${(err as Error).message}`);
+      return undefined;
+    }
   }
 
   async execute(): Promise<unknown> {
     const { query } = this.args;
-    const { domain } = this.flags;
+    const { domain, remote } = this.flags;
 
     if (domain) {
       return this.executeSiteSearch(query, domain);
+    }
+
+    if (remote) {
+      const remoteResults = await this.executeRemoteSearch(query, remote);
+      if (remoteResults !== undefined) return remoteResults;
+      // else: fall through to local cache search
     }
 
     this.validateSearchFlags();

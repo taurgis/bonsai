@@ -71,3 +71,46 @@ export function contentMetrics(markdown: string): ContentMetrics {
     headings: (markdown.match(/^#{1,6}\s+/gm) || []).length,
   };
 }
+
+// Noise patterns that should NOT survive extraction into the cached Markdown. Each leaked match
+// wastes agent tokens (raw chrome, nav menus, theme widgets, app-shell placeholders). Kept separate
+// from contentMetrics because these are "too much", not "too little".
+const LEAKAGE_PATTERNS: Array<{ label: string; re: RegExp }> = [
+  // Genuine page-chrome HTML surviving Turndown: structural chrome tags, or ANY tag carrying a
+  // class/id/role/aria attribute (the signature of a UI element, not a code-example tag like a bare
+  // <button>/<label> in JSX). Code blocks are already excluded by stripCode().
+  {
+    label: 'raw-html',
+    re: /<(?:nav|header|footer|aside|svg|path)\b|<[a-z][a-z0-9]*\s[^>]*\b(?:class|id|role|aria-[a-z]+)\s*=/i,
+  },
+  { label: 'base64-image', re: /data:image\/[a-z]+;base64,/i },
+  { label: 'skip-to-content', re: /skip to (?:main )?content/i },
+  { label: 'on-this-page', re: /^on this page$/im },
+  { label: 'theme-toggle', re: /(?:toggle|switch to) (?:dark|light|the)? ?(?:mode|theme)/i },
+  {
+    label: 'cookie-consent',
+    re: /(?:accept all cookies|we use cookies|cookie (?:policy|preferences|settings))/i,
+  },
+  { label: 'loading-shell', re: /^\s*loading[.…]*\s*$/im },
+  { label: 'search-placeholder', re: /^\s*search(?:\.{3}|…|\s+docs)?\s*$/im },
+  // Text-less anchor links carry no content and only waste tokens (icon/permalink leftovers).
+  { label: 'empty-link', re: /(?<!!)\[\s*\]\([^)]*\)/ },
+  // Unrendered template/KumaScript macros, e.g. {{jsxref("…")}} or {{EmbedInteractiveExample(…)}}.
+  // Function-call form only, so Vue/Angular `{{ count }}` interpolation is never flagged.
+  { label: 'template-macro', re: /\{\{\s*[A-Za-z]\w*\s*\(/ },
+];
+
+function stripFenced(markdown: string): string {
+  return markdown.replace(/```[\s\S]*?```/g, '').replace(/~~~[\s\S]*?~~~/g, '');
+}
+
+// Most leak checks must ignore code entirely (a Vue/HTML snippet is not chrome). The empty-link
+// check is the exception: stripping inline code would turn a real `[`code`](url)` link into a
+// bogus `[](url)`, so it scans with inline code intact (only fenced blocks removed).
+export function leakageSignals(markdown: string): string[] {
+  const fenced = stripFenced(markdown);
+  const noCode = fenced.replace(/`[^`]*`/g, '');
+  return LEAKAGE_PATTERNS.filter(({ label, re }) =>
+    re.test(label === 'empty-link' ? fenced : noCode)
+  ).map(({ label }) => label);
+}

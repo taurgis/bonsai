@@ -117,6 +117,7 @@ Agents working in this codebase or utilizing this plugin must run the compiled C
 * **Status Checklist**: `node bin/cli.mjs research status <url> [--json]`
 * **Inspect Metadata**: `node bin/cli.mjs research inspect <url> [--json]`
 * **Search Cache**: `node bin/cli.mjs research search "<query>" [--json]`
+* **Remote Docs Search (discovery)**: `node bin/cli.mjs research search "<query>" --remote <docs-url> [--json]` — discovers uncached pages via a site's public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes); selected URLs are then captured through `research <url>`. Degrades to local cache search when no connector applies.
 * **List Database**: `node bin/cli.mjs research list [filters] [--json]`
 * **Prune Database**: `node bin/cli.mjs research prune [filters] --yes [--json]`
 

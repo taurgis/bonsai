@@ -1,0 +1,23 @@
+{
+  "0": {
+    "doc": 0,
+    "title": "Home",
+    "content": "Just the Docs gives your documentation a jumpstart.",
+    "url": "/",
+    "relUrl": "/"
+  },
+  "1": {
+    "doc": 1,
+    "title": "Configuration",
+    "content": "Just the Docs has some specific configuration parameters for the theme.",
+    "url": "/docs/configuration/",
+    "relUrl": "/docs/configuration/"
+  },
+  "2": {
+    "doc": 2,
+    "title": "Search",
+    "content": "Just the Docs uses lunr.js to add a search function powered by search-data.json.",
+    "url": "/docs/search/#enable-search",
+    "relUrl": "/docs/search/#enable-search"
+  }
+}

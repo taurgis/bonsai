@@ -1,0 +1,20 @@
+{
+  "config": { "lang": ["en"], "separator": "[\\s\\-]+" },
+  "docs": [
+    {
+      "location": "",
+      "title": "Home",
+      "text": "Welcome to the project home page. Overview of features."
+    },
+    {
+      "location": "configuration/",
+      "title": "Configuration",
+      "text": "Configure the project using a YAML file. Set the theme and plugins."
+    },
+    {
+      "location": "configuration/#themes",
+      "title": "Themes",
+      "text": "Choose a theme for your documentation site. Material is popular."
+    }
+  ]
+}

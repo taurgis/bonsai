@@ -1,12 +1,17 @@
 import { parseHTML } from 'linkedom';
 import { Readability } from '@mozilla/readability';
 import { htmlToMarkdown } from './markdown.js';
+import { normalizeCodeBlocks } from './docs/code-blocks.js';
+import { cleanDocsChrome } from './docs/clean-dom.js';
+import { analyzeMarkdownQuality } from './docs/quality-gates.js';
 
 export interface ExtractionResult {
   title: string;
   detailedMarkdown: string;
   confidence: 'high' | 'medium' | 'low';
   qualityNotes: string[];
+  // True when the page is a navigation hub rather than an article (stored as an `index` artifact).
+  isIndexHub?: boolean;
 }
 
 function resolveRelativeLinks(document: any, finalUrl: string): void {
@@ -69,8 +74,13 @@ export function extractHtmlContent(html: string, finalUrl: string): ExtractionRe
 
   resolveRelativeLinks(document, finalUrl);
   cleanUnsafeElements(document);
+  // Strip decorative docs chrome and base64 images, then rebuild highlighted code blocks, before
+  // Readability runs so per-line spans don't collapse (T-21, T-17).
+  cleanDocsChrome(document);
+  normalizeCodeBlocks(document);
 
-  const reader = new Readability(document as any);
+  // keepClasses preserves the `language-x` class on <code> so Turndown emits a fenced language tag.
+  const reader = new Readability(document as any, { keepClasses: true });
   const article = reader.parse();
 
   if (!article || !article.content) {
@@ -83,11 +93,13 @@ export function extractHtmlContent(html: string, finalUrl: string): ExtractionRe
   const detailedMarkdown = htmlToMarkdown(article.content);
   const textLength = article.textContent ? article.textContent.trim().length : 0;
   const { confidence, notes } = determineConfidence(textLength);
+  const quality = analyzeMarkdownQuality(detailedMarkdown, article.title || '');
 
   return {
     title: article.title || 'Untitled',
     detailedMarkdown,
     confidence,
-    qualityNotes: notes,
+    qualityNotes: [...notes, ...quality.codes],
+    isIndexHub: quality.isIndexHub,
   };
 }

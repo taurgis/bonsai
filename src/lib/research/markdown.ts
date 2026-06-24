@@ -52,6 +52,13 @@ function addGfmTableRule(service: TurndownService): void {
  * Converts HTML content to clean, deterministic Markdown.
  * Configured to use ATX-style headings (#) and fenced code blocks (```), with GFM tables.
  */
+// Icon-only/empty anchors (e.g. a heading's "#" permalink, a ReadMe query-param chip) convert to a
+// text-less link `[](url)` that carries no information and just wastes tokens. Drop them, but never
+// match images `![](url)` (empty alt is still a real image).
+export function dropEmptyLinks(markdown: string): string {
+  return markdown.replace(/(?<!!)\[\s*\]\([^)]*\)/g, '');
+}
+
 export function htmlToMarkdown(html: string): string {
   const turndownService = new TurndownService({
     headingStyle: 'atx',
@@ -59,5 +66,5 @@ export function htmlToMarkdown(html: string): string {
   });
   addGfmTableRule(turndownService);
 
-  return turndownService.turndown(html);
+  return dropEmptyLinks(turndownService.turndown(html));
 }

@@ -38,10 +38,14 @@ describe('site modules', () => {
   });
 
   it('JS-rendered sites default to rendered fetch', () => {
-    expect(getSiteModuleById('tanstack')?.defaults?.rendered).toBe(true);
     expect(getSiteModuleById('salesforce')?.defaults?.rendered).toBe(true);
     expect(getSiteModuleById('salesforce-developer')?.defaults?.rendered).toBe(true);
     expect(getSiteModuleById('react')?.defaults?.rendered).toBeUndefined();
+  });
+
+  it('TanStack does not force rendered so source-Markdown capture keeps code blocks', () => {
+    // Regression: forcing rendered bypassed source resolution and dropped fenced code samples.
+    expect(getSiteModuleById('tanstack')?.defaults?.rendered).toBeUndefined();
   });
 
   it('salesforce help exposes fetchPage and search', () => {

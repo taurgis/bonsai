@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-24)
 
 ## Corpus Check
-- 359 files · ~217,718 words
+- 506 files · ~454,468 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2673 nodes · 2829 edges · 305 communities (268 shown, 37 thin omitted)
+- 4496 nodes · 4890 edges · 422 communities (373 shown, 49 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6293fc79`
+- Built from commit: `1f3dad96`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -316,35 +316,145 @@
 - [[_COMMUNITY_Community 302|Community 302]]
 - [[_COMMUNITY_Community 303|Community 303]]
 - [[_COMMUNITY_Community 304|Community 304]]
+- [[_COMMUNITY_Community 305|Community 305]]
+- [[_COMMUNITY_Community 306|Community 306]]
+- [[_COMMUNITY_Community 307|Community 307]]
+- [[_COMMUNITY_Community 308|Community 308]]
+- [[_COMMUNITY_Community 309|Community 309]]
+- [[_COMMUNITY_Community 310|Community 310]]
+- [[_COMMUNITY_Community 311|Community 311]]
+- [[_COMMUNITY_Community 312|Community 312]]
+- [[_COMMUNITY_Community 313|Community 313]]
+- [[_COMMUNITY_Community 314|Community 314]]
+- [[_COMMUNITY_Community 315|Community 315]]
+- [[_COMMUNITY_Community 316|Community 316]]
+- [[_COMMUNITY_Community 317|Community 317]]
+- [[_COMMUNITY_Community 318|Community 318]]
+- [[_COMMUNITY_Community 319|Community 319]]
+- [[_COMMUNITY_Community 320|Community 320]]
+- [[_COMMUNITY_Community 321|Community 321]]
+- [[_COMMUNITY_Community 322|Community 322]]
+- [[_COMMUNITY_Community 323|Community 323]]
+- [[_COMMUNITY_Community 324|Community 324]]
+- [[_COMMUNITY_Community 325|Community 325]]
+- [[_COMMUNITY_Community 326|Community 326]]
+- [[_COMMUNITY_Community 327|Community 327]]
+- [[_COMMUNITY_Community 328|Community 328]]
+- [[_COMMUNITY_Community 329|Community 329]]
+- [[_COMMUNITY_Community 330|Community 330]]
+- [[_COMMUNITY_Community 331|Community 331]]
+- [[_COMMUNITY_Community 332|Community 332]]
+- [[_COMMUNITY_Community 333|Community 333]]
+- [[_COMMUNITY_Community 334|Community 334]]
+- [[_COMMUNITY_Community 335|Community 335]]
+- [[_COMMUNITY_Community 336|Community 336]]
+- [[_COMMUNITY_Community 337|Community 337]]
+- [[_COMMUNITY_Community 338|Community 338]]
+- [[_COMMUNITY_Community 339|Community 339]]
+- [[_COMMUNITY_Community 340|Community 340]]
+- [[_COMMUNITY_Community 341|Community 341]]
+- [[_COMMUNITY_Community 342|Community 342]]
+- [[_COMMUNITY_Community 343|Community 343]]
+- [[_COMMUNITY_Community 344|Community 344]]
+- [[_COMMUNITY_Community 345|Community 345]]
+- [[_COMMUNITY_Community 346|Community 346]]
+- [[_COMMUNITY_Community 347|Community 347]]
+- [[_COMMUNITY_Community 348|Community 348]]
+- [[_COMMUNITY_Community 349|Community 349]]
+- [[_COMMUNITY_Community 350|Community 350]]
+- [[_COMMUNITY_Community 351|Community 351]]
+- [[_COMMUNITY_Community 352|Community 352]]
+- [[_COMMUNITY_Community 353|Community 353]]
+- [[_COMMUNITY_Community 354|Community 354]]
+- [[_COMMUNITY_Community 355|Community 355]]
+- [[_COMMUNITY_Community 356|Community 356]]
+- [[_COMMUNITY_Community 357|Community 357]]
+- [[_COMMUNITY_Community 358|Community 358]]
+- [[_COMMUNITY_Community 359|Community 359]]
+- [[_COMMUNITY_Community 360|Community 360]]
+- [[_COMMUNITY_Community 361|Community 361]]
+- [[_COMMUNITY_Community 362|Community 362]]
+- [[_COMMUNITY_Community 363|Community 363]]
+- [[_COMMUNITY_Community 364|Community 364]]
+- [[_COMMUNITY_Community 365|Community 365]]
+- [[_COMMUNITY_Community 366|Community 366]]
+- [[_COMMUNITY_Community 367|Community 367]]
+- [[_COMMUNITY_Community 368|Community 368]]
+- [[_COMMUNITY_Community 369|Community 369]]
+- [[_COMMUNITY_Community 370|Community 370]]
+- [[_COMMUNITY_Community 371|Community 371]]
+- [[_COMMUNITY_Community 372|Community 372]]
+- [[_COMMUNITY_Community 373|Community 373]]
+- [[_COMMUNITY_Community 374|Community 374]]
+- [[_COMMUNITY_Community 375|Community 375]]
+- [[_COMMUNITY_Community 376|Community 376]]
+- [[_COMMUNITY_Community 377|Community 377]]
+- [[_COMMUNITY_Community 378|Community 378]]
+- [[_COMMUNITY_Community 379|Community 379]]
+- [[_COMMUNITY_Community 380|Community 380]]
+- [[_COMMUNITY_Community 381|Community 381]]
+- [[_COMMUNITY_Community 382|Community 382]]
+- [[_COMMUNITY_Community 383|Community 383]]
+- [[_COMMUNITY_Community 384|Community 384]]
+- [[_COMMUNITY_Community 385|Community 385]]
+- [[_COMMUNITY_Community 386|Community 386]]
+- [[_COMMUNITY_Community 387|Community 387]]
+- [[_COMMUNITY_Community 388|Community 388]]
+- [[_COMMUNITY_Community 389|Community 389]]
+- [[_COMMUNITY_Community 390|Community 390]]
+- [[_COMMUNITY_Community 391|Community 391]]
+- [[_COMMUNITY_Community 392|Community 392]]
+- [[_COMMUNITY_Community 393|Community 393]]
+- [[_COMMUNITY_Community 394|Community 394]]
+- [[_COMMUNITY_Community 395|Community 395]]
+- [[_COMMUNITY_Community 396|Community 396]]
+- [[_COMMUNITY_Community 397|Community 397]]
+- [[_COMMUNITY_Community 398|Community 398]]
+- [[_COMMUNITY_Community 399|Community 399]]
+- [[_COMMUNITY_Community 400|Community 400]]
+- [[_COMMUNITY_Community 401|Community 401]]
+- [[_COMMUNITY_Community 402|Community 402]]
+- [[_COMMUNITY_Community 403|Community 403]]
+- [[_COMMUNITY_Community 404|Community 404]]
+- [[_COMMUNITY_Community 405|Community 405]]
+- [[_COMMUNITY_Community 406|Community 406]]
+- [[_COMMUNITY_Community 407|Community 407]]
+- [[_COMMUNITY_Community 408|Community 408]]
+- [[_COMMUNITY_Community 409|Community 409]]
+- [[_COMMUNITY_Community 410|Community 410]]
+- [[_COMMUNITY_Community 411|Community 411]]
+- [[_COMMUNITY_Community 412|Community 412]]
+- [[_COMMUNITY_Community 413|Community 413]]
+- [[_COMMUNITY_Community 414|Community 414]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Fallow: Critical Gotchas` - 35 edges
-2. `Fallow CLI Reference` - 31 edges
-3. `Common Workflows` - 22 edges
-4. `ResearchImport` - 20 edges
-5. `BaseCommand` - 17 edges
-6. `Fallow: codebase intelligence for JavaScript and TypeScript` - 17 edges
-7. `Fallow: Common Workflow Patterns & Recipes` - 17 edges
-8. `CI Pipeline Setup` - 17 edges
-9. `normalizeUrl()` - 16 edges
-10. `compilerOptions` - 16 edges
+1. `Callback API` - 55 edges
+2. `Callback API` - 55 edges
+3. `Synchronous API` - 49 edges
+4. `Synchronous API` - 49 edges
+5. `Fallow: Critical Gotchas` - 35 edges
+6. `Promises API` - 35 edges
+7. `Promises API` - 35 edges
+8. `Fallow CLI Reference` - 31 edges
+9. `Class: `fs.Stats`` - 31 edges
+10. `Class: `fs.Stats`` - 31 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
+  testing/regression/run-suite.mjs → src/sites/index.ts
+- `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
+  testing/regression/run-suite.mjs → src/lib/research/capture.ts
 - `Research` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/research.ts → src/base-command.ts
 - `ResearchImport` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/research/import.ts → src/base-command.ts
 - `ResearchInspect` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/research/inspect.ts → src/base-command.ts
-- `ResearchSearch` --inherits--> `BaseCommand`  [EXTRACTED]
-  src/commands/research/search.ts → src/base-command.ts
-- `ResearchStatus` --inherits--> `BaseCommand`  [EXTRACTED]
-  src/commands/research/status.ts → src/base-command.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (305 total, 37 thin omitted)
+## Communities (422 total, 49 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -407,8 +517,8 @@ Cohesion: 0.10
 Nodes (19): Behavior, CI Integration, `ci`: Provider-Aware Review Automation, Combined Mode Flags, `config-schema`: Config JSON Schema, Environment Variables, Fallow CLI Reference, Flags (+11 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.22
-Nodes (8): deriveCacheKey(), ResearchInspect, ResearchStatus, isSafeIp(), isSafeIpv4(), isSafeIpv6(), normalizeUrl(), validateHostname()
+Cohesion: 0.18
+Nodes (10): deriveCacheKey(), ResearchInspect, SectionSummary, ResearchStatus, getArtifactPath(), isSafeIp(), isSafeIpv4(), isSafeIpv6() (+2 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.11
@@ -459,12 +569,12 @@ Cohesion: 0.13
 Nodes (14): 1. Network Constraints & Crawler Limits, 2. DNS Safety & Private IP Blocklist (SSRF Protection), 3. Client-Side Hydration (SPA) Limitations, 4. Exit Codes & Common Errors, Blocked Target Blocks (RFC1918 & Localhost), Common Failure Symptoms, Crawler Limits, Exit Code Directory (+6 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.15
+Cohesion: 0.14
 Nodes (3): ResearchList, ResearchPrune, BaseCommand
 
 ### Community 29 - "Community 29"
-Cohesion: 0.36
-Nodes (7): checkDnsSafety(), FetchOptions, FetchResult, fetchStaticHtml(), looksLikeHtml(), processFetchResponse(), readBodyWithLimit()
+Cohesion: 0.19
+Nodes (19): defaultFetcher(), assertOk(), checkDnsSafety(), FetchOptions, fetchStaticHtml(), fetchText(), fetchWithRedirects(), headerMeta() (+11 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.14
@@ -484,11 +594,11 @@ Nodes (13): All Options (applicable to all flag types unless noted), Complex (us
 
 ### Community 34 - "Community 34"
 Cohesion: 0.15
-Nodes (12): Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, PR Dead Code Check, Production audit (+4 more)
+Nodes (12): Combined Dead Code + Duplication, Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, Production audit (+4 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.19
-Nodes (16): extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseMetadata(), ParserState (+8 more)
+Cohesion: 0.17
+Nodes (20): extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseMetadata(), ParserState (+12 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -505,10 +615,6 @@ Nodes (15): scripts, build, format, format:check, lint, lint:health, lint:line-c
 ### Community 39 - "Community 39"
 Cohesion: 0.17
 Nodes (11): Current Package Facts, Delivery Decision: Optional Plugin Developed Here, Existing Command Pattern, Exit-Code Expectations, JSON Contract, oclif Shape, Output and Streams, References (+3 more)
-
-### Community 40 - "Community 40"
-Cohesion: 0.19
-Nodes (6): FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), ResearchSearch, scoreSingleTerm(), detectSite()
 
 ### Community 41 - "Community 41"
 Cohesion: 0.17
@@ -639,8 +745,8 @@ Cohesion: 0.22
 Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
 ### Community 74 - "Community 74"
-Cohesion: 0.26
-Nodes (6): cleanUnsafeElements(), determineConfidence(), extractHtmlContent(), resolveRelativeLinks(), addGfmTableRule(), htmlToMarkdown()
+Cohesion: 0.07
+Nodes (40): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, detectLanguage(), normalizeCodeBlocks(), reconstructLines() (+32 more)
 
 ### Community 75 - "Community 75"
 Cohesion: 0.22
@@ -707,8 +813,8 @@ Cohesion: 0.29
 Nodes (6): Default Workflow, Guardrails, Primary Objective, Reporting Format, Review Checklist, Senior Release Manager Agent
 
 ### Community 91 - "Community 91"
-Cohesion: 0.11
-Nodes (15): args, BASELINE_DIR, CURRENT_DIR, fixtures, FIXTURES_PATH, INFO_LOSS_KEYS, promote, results (+7 more)
+Cohesion: 0.09
+Nodes (21): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, CURRENT_DIR, filters, FIXTURES_PATH, flags (+13 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.29
@@ -783,12 +889,12 @@ Cohesion: 0.10
 Nodes (20): Advanced full-text search, Cache Retrieval Workflows, Check status or inspect metadata, How to Use, Import Custom Research Notes, Installation, Issue: Fetch throws hostname safety error, Issue: Plugin commands not found (+12 more)
 
 ### Community 110 - "Community 110"
-Cohesion: 0.15
-Nodes (12): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+4 more)
+Cohesion: 0.06
+Nodes (48): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+40 more)
 
 ### Community 111 - "Community 111"
-Cohesion: 0.22
-Nodes (15): handleStaleRevalidationResult(), Research, checkMaxAgeExpired(), evaluateFreshness(), FreshnessPolicy, getPolicy(), parseTtlToMs(), buildMetadata() (+7 more)
+Cohesion: 0.29
+Nodes (11): compressMarkdown(), evaluateFreshness(), FreshnessPolicy, getPolicy(), buildMetadata(), createArtifactFromFetch(), handleRevalidateResponse(), persistRefreshedArtifact() (+3 more)
 
 ### Community 112 - "Community 112"
 Cohesion: 0.40
@@ -975,8 +1081,8 @@ Cohesion: 0.40
 Nodes (4): B-10: Add File-Based Import, Goal, Implementation Status, Scope
 
 ### Community 174 - "Community 174"
-Cohesion: 0.22
-Nodes (13): waitForContentReady(), ExtractionResult, CONTENT_SELECTORS, fetchDeveloperPage(), BASE_REMOVE_SELECTORS, buildCaptureScript(), confidenceFor(), ERROR_PATTERNS (+5 more)
+Cohesion: 0.15
+Nodes (21): MachineReadableArtifact, SiteCapabilities, MachineReadableResult, captureFixture(), CaptureDeps, CaptureOptions, CaptureOutcome, capturePage() (+13 more)
 
 ### Community 175 - "Community 175"
 Cohesion: 0.40
@@ -987,8 +1093,8 @@ Cohesion: 0.40
 Nodes (4): If You Fetched a Page Directly, Mandatory Pre-Step, Web Research Workflow, When This Does Not Apply
 
 ### Community 177 - "Community 177"
-Cohesion: 0.20
-Nodes (13): ALLOWED_DOC_HOSTS, buildCoveoPayload(), CoveoRaw, CoveoResult, extractCoveoResults(), isAllowedDocHost(), normalizeHelpDocContentUrl(), resultUrl() (+5 more)
+Cohesion: 0.04
+Nodes (51): Callback API, `fs.access(path[, mode], callback)`, `fs.appendFile(path, data[, options], callback)`, `fs.chown(path, uid, gid, callback)`, `fs.close(fd[, callback])`, `fs.copyFile(src, dest[, mode], callback)`, `fs.cp(src, dest[, options], callback)`, `fs.createReadStream(path[, options])` (+43 more)
 
 ### Community 178 - "Community 178"
 Cohesion: 0.13
@@ -1027,8 +1133,8 @@ Cohesion: 0.17
 Nodes (11): 1. Some Source/Search Claims Were Too Confident, 2. Search Support Needs a Discovery Contract Before Connectors, 3. Source Markdown Mapping Needs Proof Per Site, 4. Ticket Pack Needed a Stronger Fixture Policy, 5. Selection Rationale Is Good Enough for Scope, Not a Popularity Ranking, Audit Date, Findings and Fixes, Remaining Risks (+3 more)
 
 ### Community 187 - "Community 187"
-Cohesion: 0.30
-Nodes (6): Fixture, fixtures, salesforceDeveloper, salesforce, SITES, SiteModule
+Cohesion: 0.43
+Nodes (5): Fixture, fixtures, detectSite(), getSiteModuleById(), SITES
 
 ### Community 188 - "Community 188"
 Cohesion: 0.18
@@ -1059,8 +1165,8 @@ Cohesion: 0.20
 Nodes (9): CDP Page Domain: Load Completion Detection, Events, Notes, Page.domContentEventFired, Page.enable (method), Page.frameStartedNavigating (experimental), Page.frameStoppedLoading, Page.loadEventFired (+1 more)
 
 ### Community 195 - "Community 195"
-Cohesion: 0.40
-Nodes (7): findArtifact(), getArtifactPath(), hasArtifact(), isResearchFile(), processFileForLookup(), readArtifact(), scanCacheDir()
+Cohesion: 0.20
+Nodes (11): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading() (+3 more)
 
 ### Community 196 - "Community 196"
 Cohesion: 0.22
@@ -1087,8 +1193,8 @@ Cohesion: 0.22
 Nodes (8): Basic Steps for Authentication and Authorization, Calling the Shop or Data API, OCAPI OAuth 2.0, Requesting an Access Token Using a JWT and Key Pair, Requesting an Access Token With the Client ID and Password, Supported Grant Types, Token Expiration, Token Response
 
 ### Community 202 - "Community 202"
-Cohesion: 0.44
-Nodes (8): waitForLoad(), cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), buildSearchPageUrl()
+Cohesion: 0.04
+Nodes (51): Callback API, `fs.access(path[, mode], callback)`, `fs.appendFile(path, data[, options], callback)`, `fs.chown(path, uid, gid, callback)`, `fs.close(fd[, callback])`, `fs.copyFile(src, dest[, mode], callback)`, `fs.cp(src, dest[, options], callback)`, `fs.createReadStream(path[, options])` (+43 more)
 
 ### Community 203 - "Community 203"
 Cohesion: 0.25
@@ -1335,8 +1441,8 @@ Cohesion: 0.33
 Nodes (5): Export a Site, Import a Site, Required Editions, Required Editions, Using Site Import/Export to Copy Instances and Development Testing in B2C Commerce
 
 ### Community 264 - "Community 264"
-Cohesion: 0.33
-Nodes (5): Layout, Regression suite, The "semi requirement", Usage, Workflow when output changes
+Cohesion: 0.29
+Nodes (6): Coverage, Layout, Regression suite, The "semi requirement", Usage, Workflow when output changes
 
 ### Community 265 - "Community 265"
 Cohesion: 0.40
@@ -1399,25 +1505,421 @@ Cohesion: 0.50
 Nodes (3): Site Selection Rationale, Why Not Only "Top N" Usage, Why These Sites
 
 ### Community 291 - "Community 291"
+Cohesion: 0.04
+Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
+
+### Community 305 - "Community 305"
+Cohesion: 0.04
+Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
+
+### Community 306 - "Community 306"
+Cohesion: 0.05
+Nodes (36): [alias](https://docsify.js.org/#/configuration?id=alias), [auto2top](https://docsify.js.org/#/configuration?id=auto2top), [basePath](https://docsify.js.org/#/configuration?id=basepath), [catchPluginErrors](https://docsify.js.org/#/configuration?id=catchpluginerrors), [cornerExternalLinkTarget](https://docsify.js.org/#/configuration?id=cornerexternallinktarget), [coverpage](https://docsify.js.org/#/configuration?id=coverpage), [el](https://docsify.js.org/#/configuration?id=el), [executeScript](https://docsify.js.org/#/configuration?id=executescript) (+28 more)
+
+### Community 307 - "Community 307"
+Cohesion: 0.05
+Nodes (36): [alias](https://docsify.js.org/#/configuration?id=alias), [auto2top](https://docsify.js.org/#/configuration?id=auto2top), [basePath](https://docsify.js.org/#/configuration?id=basepath), [catchPluginErrors](https://docsify.js.org/#/configuration?id=catchpluginerrors), [cornerExternalLinkTarget](https://docsify.js.org/#/configuration?id=cornerexternallinktarget), [coverpage](https://docsify.js.org/#/configuration?id=coverpage), [el](https://docsify.js.org/#/configuration?id=el), [executeScript](https://docsify.js.org/#/configuration?id=executescript) (+28 more)
+
+### Community 308 - "Community 308"
+Cohesion: 0.06
+Nodes (34): `fsPromises.access(path[, mode])`, `fsPromises.appendFile(path, data[, options])`, `fsPromises.chmod(path, mode)`, `fsPromises.chown(path, uid, gid)`, `fsPromises.constants`, `fsPromises.copyFile(src, dest[, mode])`, `fsPromises.cp(src, dest[, options])`, `fsPromises.glob(pattern[, options])` (+26 more)
+
+### Community 309 - "Community 309"
+Cohesion: 0.06
+Nodes (33): Adding state to a component, Avoiding recreating the initial state, Basic useState examples, Caveats, Caveats, Counter (number), Deep Dive, Examples of objects and arrays in state (+25 more)
+
+### Community 310 - "Community 310"
+Cohesion: 0.06
+Nodes (34): `fsPromises.access(path[, mode])`, `fsPromises.appendFile(path, data[, options])`, `fsPromises.chmod(path, mode)`, `fsPromises.chown(path, uid, gid)`, `fsPromises.constants`, `fsPromises.copyFile(src, dest[, mode])`, `fsPromises.cp(src, dest[, options])`, `fsPromises.glob(pattern[, options])` (+26 more)
+
+### Community 311 - "Community 311"
+Cohesion: 0.06
+Nodes (33): Adding state to a component, Avoiding recreating the initial state, Basic useState examples, Caveats, Caveats, Counter (number), Deep Dive, Examples of objects and arrays in state (+25 more)
+
+### Community 312 - "Community 312"
+Cohesion: 0.06
+Nodes (32): [Accessibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#accessibility), [Animating display](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#animating_display), [Box](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#box), [Browser compatibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#browser_compatibility), CSS, [CSS Flow Layout (display: block, display: inline)](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#css_flow_layout_display_block_display_inline), [Description](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#description), [display: contents](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#display_contents) (+24 more)
+
+### Community 313 - "Community 313"
+Cohesion: 0.06
+Nodes (32): Caveats, Connecting to a chat server, Connecting to an external system, Controlling a non-React widget, Custom `useChatRoom` Hook, Deep Dive, Displaying different content on the server and the client, Examples of connecting to an external system (+24 more)
+
+### Community 314 - "Community 314"
+Cohesion: 0.06
+Nodes (32): [Accessibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#accessibility), [Animating display](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#animating_display), [Box](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#box), [Browser compatibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#browser_compatibility), CSS, [CSS Flow Layout (display: block, display: inline)](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#css_flow_layout_display_block_display_inline), [Description](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#description), [display: contents](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#display_contents) (+24 more)
+
+### Community 315 - "Community 315"
+Cohesion: 0.06
+Nodes (32): Caveats, Connecting to a chat server, Connecting to an external system, Controlling a non-React widget, Custom `useChatRoom` Hook, Deep Dive, Displaying different content on the server and the client, Examples of connecting to an external system (+24 more)
+
+### Community 316 - "Community 316"
+Cohesion: 0.06
+Nodes (31): Class: `fs.Stats`, Stat time values, `stats.atime`, `stats.atimeMs`, `stats.atimeNs`, `stats.birthtime`, `stats.birthtimeMs`, `stats.birthtimeNs` (+23 more)
+
+### Community 317 - "Community 317"
+Cohesion: 0.06
+Nodes (31): Class: `fs.Stats`, Stat time values, `stats.atime`, `stats.atimeMs`, `stats.atimeNs`, `stats.birthtime`, `stats.birthtimeMs`, `stats.birthtimeNs` (+23 more)
+
+### Community 318 - "Community 318"
+Cohesion: 0.07
+Nodes (30): Class: `FileHandle`, Event: `'close'`, `filehandle.appendFile(data[, options])`, `filehandle.chmod(mode)`, `filehandle.chown(uid, gid)`, `filehandle.close()`, `filehandle.createReadStream([options])`, `filehandle.createWriteStream([options])` (+22 more)
+
+### Community 319 - "Community 319"
+Cohesion: 0.07
+Nodes (29): Anonymous Functions, `any`, Arrays, `bigint`, Defining a Union Type, Differences Between Type Aliases and Interfaces, Enums, Functions (+21 more)
+
+### Community 320 - "Community 320"
+Cohesion: 0.07
+Nodes (30): Class: `FileHandle`, Event: `'close'`, `filehandle.appendFile(data[, options])`, `filehandle.chmod(mode)`, `filehandle.chown(uid, gid)`, `filehandle.close()`, `filehandle.createReadStream([options])`, `filehandle.createWriteStream([options])` (+22 more)
+
+### Community 321 - "Community 321"
+Cohesion: 0.07
+Nodes (29): Anonymous Functions, `any`, Arrays, `bigint`, Defining a Union Type, Differences Between Type Aliases and Interfaces, Enums, Functions (+21 more)
+
+### Community 322 - "Community 322"
+Cohesion: 0.07
+Nodes (28): Accessibility, Additional features, Associated labels, Attribute selectors, Attributes, caret-color, Client-side validation, CSS (+20 more)
+
+### Community 323 - "Community 323"
+Cohesion: 0.07
+Nodes (28): Accessibility, Additional features, Associated labels, Attribute selectors, Attributes, caret-color, Client-side validation, CSS (+20 more)
+
+### Community 324 - "Community 324"
+Cohesion: 0.07
+Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
+
+### Community 325 - "Community 325"
+Cohesion: 0.07
+Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
+
+### Community 326 - "Community 326"
+Cohesion: 0.13
+Nodes (25): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SourceHint, DetectContext (+17 more)
+
+### Community 327 - "Community 327"
+Cohesion: 0.09
+Nodes (22): Container probes, Direct Status Updates, {{% heading "whatsnext" %}}, Indirect Status Updates, Pod generation, Pod networking, Pod OS, Pod security settings {#pod-security} (+14 more)
+
+### Community 328 - "Community 328"
+Cohesion: 0.09
+Nodes (22): Container probes, Direct Status Updates, {{% heading "whatsnext" %}}, Indirect Status Updates, Pod generation, Pod networking, Pod OS, Pod security settings {#pod-security} (+14 more)
+
+### Community 329 - "Community 329"
+Cohesion: 0.09
+Nodes (21): server.allowedHosts, server.cors, server.forwardConsole, server.fs.allow, server.fs.deny, server.fs.strict, server.headers, server.hmr (+13 more)
+
+### Community 330 - "Community 330"
+Cohesion: 0.09
+Nodes (21): server.allowedHosts, server.cors, server.forwardConsole, server.fs.allow, server.fs.deny, server.fs.strict, server.headers, server.hmr (+13 more)
+
+### Community 331 - "Community 331"
+Cohesion: 0.21
+Nodes (18): SearchProvider, getText(), RemoteSearchOutcome, staticIndexSearch(), collectDocIndices(), DocsSearchResult, parseSphinxObject(), queryTerms() (+10 more)
+
+### Community 332 - "Community 332"
+Cohesion: 0.18
+Nodes (13): advertisesRouteMarkdown(), llmsTxtCandidates(), probeLlmsTxt(), probeRouteMarkdown(), FIXTURES, TextFetcher, tryFetchValidText(), ArtifactValidation (+5 more)
+
+### Community 333 - "Community 333"
+Cohesion: 0.11
+Nodes (18): Advanced Example, Basic Example, Chained Promises, Constructor, Description, Example with diverse situations, Examples, HTML (+10 more)
+
+### Community 334 - "Community 334"
+Cohesion: 0.11
+Nodes (18): Path, `path.basename(path[, suffix])`, `path.delimiter`, `path.dirname(path)`, `path.extname(path)`, `path.format(pathObject)`, `path.isAbsolute(path)`, `path.join([...paths])` (+10 more)
+
+### Community 335 - "Community 335"
+Cohesion: 0.11
+Nodes (18): Advanced Example, Basic Example, Chained Promises, Constructor, Description, Example with diverse situations, Examples, HTML (+10 more)
+
+### Community 336 - "Community 336"
+Cohesion: 0.11
+Nodes (18): Path, `path.basename(path[, suffix])`, `path.delimiter`, `path.dirname(path)`, `path.extname(path)`, `path.format(pathObject)`, `path.isAbsolute(path)`, `path.join([...paths])` (+10 more)
+
+### Community 337 - "Community 337"
+Cohesion: 0.15
+Nodes (12): AlgoliaConfig, algoliaQueryUrl(), extractAlgoliaConfig(), parseAlgoliaResponse(), RemoteSearchDeps, runRemoteDocsSearch(), FIXTURES, scoreVitePressDoc() (+4 more)
+
+### Community 338 - "Community 338"
+Cohesion: 0.25
+Nodes (6): applyCaptureMetadata(), CAPTURE_DEPS, handleStaleRevalidationResult(), Research, checkMaxAgeExpired(), parseTtlToMs()
+
+### Community 339 - "Community 339"
+Cohesion: 0.13
+Nodes (14): Aux links, Callouts, Color scheme, Document collections, External navigation links, Footer content, Google Analytics, Heading anchor links (+6 more)
+
+### Community 340 - "Community 340"
+Cohesion: 0.13
+Nodes (14): Keyboard shortcuts, [Memory and Allocation](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#memory-and-allocation), [Ownership and Functions](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-and-functions), [Ownership Rules](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-rules), [Return Values and Scope](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#return-values-and-scope), [Scope and Assignment](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#scope-and-assignment), [Stack-Only Data: Copy](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy), The Rust Programming Language (+6 more)
+
+### Community 341 - "Community 341"
+Cohesion: 0.13
+Nodes (13): Calling map() on non-array objects, Description, Examples, Mapped array contains undefined, Mapping an array of numbers to an array of square roots, Parameters, Return value, See also (+5 more)
+
+### Community 342 - "Community 342"
+Cohesion: 0.13
+Nodes (14): An Existing App[​](https://redux-toolkit.js.org/introduction/getting-started#an-existing-app "Direct link to An Existing App"), Create a React Redux App[​](https://redux-toolkit.js.org/introduction/getting-started#create-a-react-redux-app "Direct link to Create a React Redux App"), Help and Discussion[​](https://redux-toolkit.js.org/introduction/getting-started#help-and-discussion "Direct link to Help and Discussion"), Installation[​](https://redux-toolkit.js.org/introduction/getting-started#installation "Direct link to Installation"), Learn Modern Redux Livestream[​](https://redux-toolkit.js.org/introduction/getting-started#learn-modern-redux-livestream "Direct link to Learn Modern Redux Livestream"), Learn Redux[​](https://redux-toolkit.js.org/introduction/getting-started#learn-redux "Direct link to Learn Redux"), Purpose[​](https://redux-toolkit.js.org/introduction/getting-started#purpose "Direct link to Purpose"), Redux Essentials Tutorial[​](https://redux-toolkit.js.org/introduction/getting-started#redux-essentials-tutorial "Direct link to Redux Essentials Tutorial") (+6 more)
+
+### Community 343 - "Community 343"
+Cohesion: 0.13
+Nodes (14): Aux links, Callouts, Color scheme, Document collections, External navigation links, Footer content, Google Analytics, Heading anchor links (+6 more)
+
+### Community 344 - "Community 344"
+Cohesion: 0.13
+Nodes (14): Keyboard shortcuts, [Memory and Allocation](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#memory-and-allocation), [Ownership and Functions](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-and-functions), [Ownership Rules](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-rules), [Return Values and Scope](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#return-values-and-scope), [Scope and Assignment](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#scope-and-assignment), [Stack-Only Data: Copy](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy), The Rust Programming Language (+6 more)
+
+### Community 345 - "Community 345"
+Cohesion: 0.13
+Nodes (13): Calling map() on non-array objects, Description, Examples, Mapped array contains undefined, Mapping an array of numbers to an array of square roots, Parameters, Return value, See also (+5 more)
+
+### Community 346 - "Community 346"
+Cohesion: 0.13
+Nodes (14): An Existing App[​](https://redux-toolkit.js.org/introduction/getting-started#an-existing-app "Direct link to An Existing App"), Create a React Redux App[​](https://redux-toolkit.js.org/introduction/getting-started#create-a-react-redux-app "Direct link to Create a React Redux App"), Help and Discussion[​](https://redux-toolkit.js.org/introduction/getting-started#help-and-discussion "Direct link to Help and Discussion"), Installation[​](https://redux-toolkit.js.org/introduction/getting-started#installation "Direct link to Installation"), Learn Modern Redux Livestream[​](https://redux-toolkit.js.org/introduction/getting-started#learn-modern-redux-livestream "Direct link to Learn Modern Redux Livestream"), Learn Redux[​](https://redux-toolkit.js.org/introduction/getting-started#learn-redux "Direct link to Learn Redux"), Purpose[​](https://redux-toolkit.js.org/introduction/getting-started#purpose "Direct link to Purpose"), Redux Essentials Tutorial[​](https://redux-toolkit.js.org/introduction/getting-started#redux-essentials-tutorial "Direct link to Redux Essentials Tutorial") (+6 more)
+
+### Community 347 - "Community 347"
+Cohesion: 0.14
+Nodes (13): Additional Configuration, Generate a basic configuration file, Running from command line, Type definitions, Using Babel, Using ESLint, Using Parcel, Using TypeScript (+5 more)
+
+### Community 348 - "Community 348"
+Cohesion: 0.14
+Nodes (13): Additional Configuration, Generate a basic configuration file, Running from command line, Type definitions, Using Babel, Using ESLint, Using Parcel, Using TypeScript (+5 more)
+
+### Community 349 - "Community 349"
+Cohesion: 0.15
+Nodes (12): 1. Create a new project, 2. Install required dependencies, 3. Configure ESM support, 4. Initialize Prisma ORM, 5. Define your data model, 6. Create and apply your first migration, 7. Instantiate Prisma Client, 8. Write your first query (+4 more)
+
+### Community 350 - "Community 350"
+Cohesion: 0.15
+Nodes (12): Browser Support, Command Line Interface, Community, Community Templates, Getting Started, `index.html` and Project Root, Manual Installation, Overview (+4 more)
+
+### Community 351 - "Community 351"
+Cohesion: 0.15
+Nodes (12): 1. Create a new project, 2. Install required dependencies, 3. Configure ESM support, 4. Initialize Prisma ORM, 5. Define your data model, 6. Create and apply your first migration, 7. Instantiate Prisma Client, 8. Write your first query (+4 more)
+
+### Community 352 - "Community 352"
+Cohesion: 0.15
+Nodes (12): Browser Support, Command Line Interface, Community, Community Templates, Getting Started, `index.html` and Project Root, Manual Installation, Overview (+4 more)
+
+### Community 353 - "Community 353"
+Cohesion: 0.18
+Nodes (11): Class: `fs.Dir`, `dir.close()`, `dir.close(callback)`, `dir.closeSync()`, `dir.path`, `dir.read()`, `dir.read(callback)`, `dir.readSync()` (+3 more)
+
+### Community 354 - "Community 354"
+Cohesion: 0.18
+Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
+
+### Community 355 - "Community 355"
+Cohesion: 0.18
+Nodes (10): computed() {#computed}, onWatcherCleanup()  {#onwatchercleanup}, reactive() {#reactive}, Reactivity API: Core {#reactivity-api-core}, readonly() {#readonly}, ref() {#ref}, watch() {#watch}, watchEffect() {#watcheffect} (+2 more)
+
+### Community 356 - "Community 356"
+Cohesion: 0.18
+Nodes (11): Class: `fs.Dir`, `dir.close()`, `dir.close(callback)`, `dir.closeSync()`, `dir.path`, `dir.read()`, `dir.read(callback)`, `dir.readSync()` (+3 more)
+
+### Community 357 - "Community 357"
+Cohesion: 0.18
+Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
+
+### Community 358 - "Community 358"
+Cohesion: 0.18
+Nodes (10): computed() {#computed}, onWatcherCleanup()  {#onwatchercleanup}, reactive() {#reactive}, Reactivity API: Core {#reactivity-api-core}, readonly() {#readonly}, ref() {#ref}, watch() {#watch}, watchEffect() {#watcheffect} (+2 more)
+
+### Community 359 - "Community 359"
+Cohesion: 0.20
+Nodes (9): Creating a dynamic segment, Creating a layout, Creating a nested route, Creating a page, Linking between pages, Nesting layouts, Rendering with search params, Route Props Helpers (+1 more)
+
+### Community 360 - "Community 360"
+Cohesion: 0.20
+Nodes (9): Callback example, File descriptors, File system, File system flags, Notes, Ordering of callback and promise-based operations, Promise example, Synchronous example (+1 more)
+
+### Community 361 - "Community 361"
+Cohesion: 0.20
+Nodes (10): Class: `fs.Dirent`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isDirectory()`, `dirent.isFIFO()`, `dirent.isFile()`, `dirent.isSocket()`, `dirent.isSymbolicLink()` (+2 more)
+
+### Community 362 - "Community 362"
+Cohesion: 0.20
+Nodes (9): Generic Classes, Generic Constraints, Generic Parameter Defaults, Generic Types, Hello World of Generics, Using Class Types in Generics, Using Type Parameters in Generic Constraints, Variance Annotations (+1 more)
+
+### Community 363 - "Community 363"
+Cohesion: 0.20
+Nodes (9): Creating a dynamic segment, Creating a layout, Creating a nested route, Creating a page, Linking between pages, Nesting layouts, Rendering with search params, Route Props Helpers (+1 more)
+
+### Community 364 - "Community 364"
+Cohesion: 0.20
+Nodes (9): Callback example, File descriptors, File system, File system flags, Notes, Ordering of callback and promise-based operations, Promise example, Synchronous example (+1 more)
+
+### Community 365 - "Community 365"
+Cohesion: 0.20
+Nodes (10): Class: `fs.Dirent`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isDirectory()`, `dirent.isFIFO()`, `dirent.isFile()`, `dirent.isSocket()`, `dirent.isSymbolicLink()` (+2 more)
+
+### Community 366 - "Community 366"
+Cohesion: 0.20
+Nodes (9): Generic Classes, Generic Constraints, Generic Parameter Defaults, Generic Types, Hello World of Generics, Using Class Types in Generics, Using Type Parameters in Generic Constraints, Variance Annotations (+1 more)
+
+### Community 367 - "Community 367"
+Cohesion: 0.22
+Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`, `statfs.bsize`, `statfs.ffree`, `statfs.files`, `statfs.frsize` (+1 more)
+
+### Community 368 - "Community 368"
+Cohesion: 0.22
+Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`, `statfs.bsize`, `statfs.ffree`, `statfs.files`, `statfs.frsize` (+1 more)
+
+### Community 369 - "Community 369"
+Cohesion: 0.33
+Nodes (6): PageMapEntry, dedupe(), extractNextRscData(), NextRscData, FIXTURES, unescapeFlight()
+
+### Community 370 - "Community 370"
+Cohesion: 0.22
+Nodes (8): Design choice: generic-first, no new site modules, Live validation (testing/regression), New JSON / frontmatter fields, Phase 2 Implementation Status, Security, Signal-only (recorded, not trusted as working), Ticket status, Unsupported
+
+### Community 371 - "Community 371"
+Cohesion: 0.25
+Nodes (7): First steps, Language[#](https://docs.nestjs.com/first-steps#language), Linting and formatting[#](https://docs.nestjs.com/first-steps#linting-and-formatting), Platform[#](https://docs.nestjs.com/first-steps#platform), Prerequisites[#](https://docs.nestjs.com/first-steps#prerequisites), Running the application[#](https://docs.nestjs.com/first-steps#running-the-application), Setup[#](https://docs.nestjs.com/first-steps#setup)
+
+### Community 372 - "Community 372"
+Cohesion: 0.25
+Nodes (8): Class: `fs.WriteStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `writeStream.bytesWritten`, `writeStream.close([callback])`, `writeStream.path`, `writeStream.pending`
+
+### Community 373 - "Community 373"
+Cohesion: 0.25
+Nodes (7): Configure the Vite plugin, Create your project, Import Tailwind CSS, Install Tailwind CSS, Installing Tailwind CSS as a Vite plugin, Start using Tailwind in your HTML, Start your build process
+
+### Community 374 - "Community 374"
+Cohesion: 0.25
+Nodes (7): API Styles {#api-styles}, Composition API {#composition-api}, Introduction {#introduction}, Options API {#options-api}, Single-File Components {#single-file-components}, The Progressive Framework {#the-progressive-framework}, What is Vue? {#what-is-vue}
+
+### Community 375 - "Community 375"
+Cohesion: 0.25
+Nodes (7): First steps, Language[#](https://docs.nestjs.com/first-steps#language), Linting and formatting[#](https://docs.nestjs.com/first-steps#linting-and-formatting), Platform[#](https://docs.nestjs.com/first-steps#platform), Prerequisites[#](https://docs.nestjs.com/first-steps#prerequisites), Running the application[#](https://docs.nestjs.com/first-steps#running-the-application), Setup[#](https://docs.nestjs.com/first-steps#setup)
+
+### Community 376 - "Community 376"
+Cohesion: 0.25
+Nodes (8): Class: `fs.WriteStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `writeStream.bytesWritten`, `writeStream.close([callback])`, `writeStream.path`, `writeStream.pending`
+
+### Community 377 - "Community 377"
+Cohesion: 0.25
+Nodes (7): Configure the Vite plugin, Create your project, Import Tailwind CSS, Install Tailwind CSS, Installing Tailwind CSS as a Vite plugin, Start using Tailwind in your HTML, Start your build process
+
+### Community 378 - "Community 378"
+Cohesion: 0.25
+Nodes (7): API Styles {#api-styles}, Composition API {#composition-api}, Introduction {#introduction}, Options API {#options-api}, Single-File Components {#single-file-components}, The Progressive Framework {#the-progressive-framework}, What is Vue? {#what-is-vue}
+
+### Community 379 - "Community 379"
+Cohesion: 0.50
+Nodes (6): GithubSource, mapMdnSource(), mapNodeApiSource(), mapUrlToSource(), parseGithubSourceLink(), vitepressRouteMarkdown()
+
+### Community 380 - "Community 380"
+Cohesion: 0.29
+Nodes (6): Examples, Exceptions, Parameters, Return value, See also, Syntax
+
+### Community 381 - "Community 381"
+Cohesion: 0.29
+Nodes (7): Class: `fs.ReadStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `readStream.bytesRead`, `readStream.path`, `readStream.pending`
+
+### Community 382 - "Community 382"
+Cohesion: 0.29
+Nodes (7): File access constants, File copy constants, File mode constants, File open constants, File type constants, `fs.constants`, FS constants
+
+### Community 383 - "Community 383"
+Cohesion: 0.29
+Nodes (6): Examples, Exceptions, Parameters, Return value, See also, Syntax
+
+### Community 384 - "Community 384"
+Cohesion: 0.29
+Nodes (7): Class: `fs.ReadStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `readStream.bytesRead`, `readStream.path`, `readStream.pending`
+
+### Community 385 - "Community 385"
+Cohesion: 0.29
+Nodes (7): File access constants, File copy constants, File mode constants, File open constants, File type constants, `fs.constants`, FS constants
+
+### Community 386 - "Community 386"
+Cohesion: 0.29
+Nodes (5): detectDocsEngine(), getMetaGenerator(), FIXTURES, discoverLlmsTxt(), runStaticPhase()
+
+### Community 387 - "Community 387"
+Cohesion: 0.33
+Nodes (5): Before you begin, Deploy your documentation site, Make your first change, Next steps, View your deployed site
+
+### Community 388 - "Community 388"
+Cohesion: 0.33
+Nodes (5): Getting started, Installation, with docker, with git, with pip <small>recommended</small> { #with-pip data-toc-label="with pip" }
+
+### Community 389 - "Community 389"
+Cohesion: 0.33
+Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
+
+### Community 390 - "Community 390"
+Cohesion: 0.33
+Nodes (5): 3.1.1. Numbers[¶](https://docs.python.org/3/tutorial/introduction.html#numbers "Link to this heading"), 3.1.2. Text[¶](https://docs.python.org/3/tutorial/introduction.html#text "Link to this heading"), 3.1.3. Lists[¶](https://docs.python.org/3/tutorial/introduction.html#lists "Link to this heading"), 3.1. Using Python as a Calculator[¶](https://docs.python.org/3/tutorial/introduction.html#using-python-as-a-calculator "Link to this heading"), 3.2. First Steps Towards Programming[¶](https://docs.python.org/3/tutorial/introduction.html#first-steps-towards-programming "Link to this heading")
+
+### Community 391 - "Community 391"
+Cohesion: 0.33
+Nodes (5): [Examples](https://tailwindcss.com/docs/grid-template-columns#examples), [Implementing a subgrid](https://tailwindcss.com/docs/grid-template-columns#implementing-a-subgrid), [Responsive design](https://tailwindcss.com/docs/grid-template-columns#responsive-design), [Specifying the grid columns](https://tailwindcss.com/docs/grid-template-columns#specifying-the-grid-columns), [Using a custom value](https://tailwindcss.com/docs/grid-template-columns#using-a-custom-value)
+
+### Community 392 - "Community 392"
+Cohesion: 0.33
+Nodes (5): Before you begin, Deploy your documentation site, Make your first change, Next steps, View your deployed site
+
+### Community 393 - "Community 393"
+Cohesion: 0.33
+Nodes (5): Getting started, Installation, with docker, with git, with pip <small>recommended</small> { #with-pip data-toc-label="with pip" }
+
+### Community 394 - "Community 394"
+Cohesion: 0.33
+Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
+
+### Community 395 - "Community 395"
+Cohesion: 0.33
+Nodes (5): 3.1.1. Numbers[¶](https://docs.python.org/3/tutorial/introduction.html#numbers "Link to this heading"), 3.1.2. Text[¶](https://docs.python.org/3/tutorial/introduction.html#text "Link to this heading"), 3.1.3. Lists[¶](https://docs.python.org/3/tutorial/introduction.html#lists "Link to this heading"), 3.1. Using Python as a Calculator[¶](https://docs.python.org/3/tutorial/introduction.html#using-python-as-a-calculator "Link to this heading"), 3.2. First Steps Towards Programming[¶](https://docs.python.org/3/tutorial/introduction.html#first-steps-towards-programming "Link to this heading")
+
+### Community 396 - "Community 396"
+Cohesion: 0.33
+Nodes (5): [Examples](https://tailwindcss.com/docs/grid-template-columns#examples), [Implementing a subgrid](https://tailwindcss.com/docs/grid-template-columns#implementing-a-subgrid), [Responsive design](https://tailwindcss.com/docs/grid-template-columns#responsive-design), [Specifying the grid columns](https://tailwindcss.com/docs/grid-template-columns#specifying-the-grid-columns), [Using a custom value](https://tailwindcss.com/docs/grid-template-columns#using-a-custom-value)
+
+### Community 397 - "Community 397"
+Cohesion: 0.40
+Nodes (5): Availability, Caveats, Filename argument, `fs.watch(filename[, options][, listener])`, Inodes
+
+### Community 398 - "Community 398"
+Cohesion: 0.40
+Nodes (5): Availability, Caveats, Filename argument, `fs.watch(filename[, options][, listener])`, Inodes
+
+### Community 399 - "Community 399"
+Cohesion: 0.50
+Nodes (3): Enough talk, show me some code already!, Motivation, You talked me into it, so what now?
+
+### Community 400 - "Community 400"
+Cohesion: 0.50
+Nodes (3): Enough talk, show me some code already!, Motivation, You talked me into it, so what now?
+
+### Community 402 - "Community 402"
 Cohesion: 0.67
-Nodes (3): Combined Dead Code + Duplication, Step 1: Run combined analysis, Step 2: Prioritize cleanup
+Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
+
+### Community 405 - "Community 405"
+Cohesion: 0.67
+Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
+
+### Community 407 - "Community 407"
+Cohesion: 0.67
+Nodes (3): PR Dead Code Check, Step 1: Analyze changed files, Step 2: If issues found, show specifics
 
 ## Knowledge Gaps
-- **1774 isolated node(s):** `husky.sh script`, `version`, `notes`, `__dirname`, `name` (+1769 more)
+- **3131 isolated node(s):** `husky.sh script`, `version`, `notes`, `__dirname`, `name` (+3126 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **49 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getSiteModuleById()` connect `Community 111` to `Community 91`, `Community 187`?**
+- **Why does `File system` connect `Community 360` to `Community 177`, `Community 354`, `Community 291`, `Community 308`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `Synchronous API` connect `Community 291` to `Community 360`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `BaseCommand` connect `Community 28` to `Community 56`, `Community 40`, `Community 15`, `Community 111`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `ResearchSearch` connect `Community 40` to `Community 28`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
+- **Why does `Common Objects` connect `Community 354` to `Community 353`, `Community 324`, `Community 360`, `Community 361`, `Community 367`, `Community 372`, `Community 316`, `Community 381`, `Community 382`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `husky.sh script`, `version`, `notes` to the rest of the system?**
-  _1774 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _3131 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

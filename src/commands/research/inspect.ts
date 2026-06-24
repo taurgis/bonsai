@@ -1,8 +1,16 @@
 import { Args } from '@oclif/core';
+import { join } from 'node:path';
 import { BaseCommand } from '../../base-command.js';
 import { normalizeUrl } from '../../lib/research/url.js';
 import { deriveCacheKey } from '../../lib/research/cache-key.js';
-import { findArtifact, getArtifactPath } from '../../lib/research/storage.js';
+import { findArtifact, getArtifactPath, scanCacheDir } from '../../lib/research/storage.js';
+
+interface SectionSummary {
+  cacheKey: string;
+  anchor: string | null;
+  headingPath: string | null;
+  tokenEstimate: { compressed: number | null; detailed: number | null };
+}
 
 export default class ResearchInspect extends BaseCommand<typeof ResearchInspect> {
   static id = 'research inspect';
@@ -45,6 +53,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     }
 
     const artifactPath = getArtifactPath(dataDir, cacheKey);
+    const sections = this.findSections(dataDir, cacheKey);
 
     if (!this.requestedJson()) {
       this.log(`Cache Key: ${cacheKey}`);
@@ -57,12 +66,35 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
           this.log(`${key}: ${val}`);
         }
       }
+      if (sections.length) {
+        this.log(`--- Sections (${sections.length}) ---`);
+        for (const s of sections) {
+          this.log(
+            `${s.headingPath} [${s.anchor}] (${s.tokenEstimate.detailed} tokens) ${s.cacheKey}`
+          );
+        }
+      }
     }
 
     return {
       cacheKey,
       cachePath: artifactPath,
       metadata: cached.metadata,
+      sections,
     };
+  }
+
+  // Section children link back via parent_cache_key; list the active ones for this page (T-22).
+  private findSections(dataDir: string, parentKey: string): SectionSummary[] {
+    return scanCacheDir<SectionSummary>(join(dataDir, 'research'), (artifact) => {
+      const meta = artifact.metadata;
+      if (meta.parent_cache_key !== parentKey || meta.status !== 'active') return null;
+      return {
+        cacheKey: meta.cache_key,
+        anchor: meta.section_anchor,
+        headingPath: meta.section_heading_path,
+        tokenEstimate: meta.token_estimate,
+      };
+    }).sort((a, b) => (a.headingPath ?? '').localeCompare(b.headingPath ?? ''));
   }
 }

@@ -10,7 +10,10 @@ export const SITES: SiteModule[] = [
   { id: 'react', name: 'React', domains: ['react.dev', 'legacy.reactjs.org'] },
   salesforce,
   salesforceDeveloper,
-  { id: 'tanstack', name: 'TanStack', domains: ['tanstack.com'], defaults: { rendered: true } },
+  // TanStack docs embed a GitHub "edit this page" link, so capture resolves the page's source
+  // Markdown (code blocks intact) and only falls back to the browser when no source is found.
+  // Forcing rendered here bypassed that and dropped fenced code samples (e.g. useQueries).
+  { id: 'tanstack', name: 'TanStack', domains: ['tanstack.com'] },
 ];
 
 export function detectSite(url: string): SiteModule | undefined {

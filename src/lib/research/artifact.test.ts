@@ -31,6 +31,13 @@ describe('artifact serialization and parsing', () => {
       token_estimate: { compressed: 123, detailed: 456 },
       status: 'active',
       site_module_id: null,
+      docs_engine: null,
+      docs_framework: null,
+      source_doc_url: null,
+      search_provider: null,
+      parent_cache_key: null,
+      section_anchor: null,
+      section_heading_path: null,
     },
     summary: 'This is the summary.',
     compressed: 'This is compressed content.',
@@ -59,6 +66,23 @@ describe('artifact serialization and parsing', () => {
     };
     const parsed = parseArtifact(serializeArtifact(withModule));
     expect(parsed.metadata.site_module_id).toBe('react');
+  });
+
+  it('roundtrips populated Phase 2 metadata fields (colons, ">" in values)', () => {
+    const withPhase2 = {
+      ...sampleArtifact,
+      metadata: {
+        ...sampleArtifact.metadata,
+        artifact_type: 'section' as const,
+        docs_engine: 'vitepress',
+        source_doc_url: 'https://raw.githubusercontent.com/vuejs/docs/main/src/guide/intro.md',
+        search_provider: 'vitepress-local',
+        parent_cache_key: 'abc123',
+        section_anchor: 'class-url',
+        section_heading_path: 'URL > The WHATWG URL API > Class: URL',
+      },
+    };
+    expect(parseArtifact(serializeArtifact(withPhase2))).toEqual(withPhase2);
   });
 
   it('parses legacy frontmatter without site_module_id as null', () => {

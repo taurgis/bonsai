@@ -1,0 +1,16 @@
+{
+  "hits": [
+    {
+      "url": "https://vuejs.org/guide/essentials/reactivity-fundamentals.html",
+      "hierarchy": { "lvl0": "Guide", "lvl1": "Reactivity Fundamentals" },
+      "content": "ref() takes an inner value and returns a reactive ref object."
+    },
+    {
+      "url": "https://vuejs.org/api/reactivity-core.html#ref",
+      "hierarchy": { "lvl0": "API", "lvl1": "Reactivity: Core", "lvl2": "ref()" },
+      "content": "Takes an inner value and returns a reactive and mutable ref object."
+    }
+  ],
+  "nbHits": 2,
+  "query": "reactivity"
+}
