@@ -1,9 +1,9 @@
 import { Args, Flags } from '@oclif/core';
-import { BaseCommand } from '../../base-command.js';
-import { getArtifactPath } from '../../lib/research/storage.js';
-import { evaluateFreshness, checkMaxAgeExpired } from '../../lib/research/freshness.js';
-import { resolveResearchTarget } from '../../lib/research/resolve-target.js';
-import type { ResearchArtifact } from '../../lib/research/schema.js';
+import { BaseCommand } from '../base-command.js';
+import { getArtifactPath } from '../lib/research/storage.js';
+import { evaluateFreshness, checkMaxAgeExpired } from '../lib/research/freshness.js';
+import { resolveResearchTarget } from '../lib/research/resolve-target.js';
+import type { ResearchArtifact } from '../lib/research/schema.js';
 
 type CacheStatus = 'hit' | 'miss' | 'stale';
 type FreshnessStatus = 'fresh' | 'stale_grace' | 'stale_expired';
@@ -44,10 +44,10 @@ function describeCacheStatus(
 }
 
 export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
-  static id = 'research status';
+  static id = 'status';
   static summary = 'Check the cache status of a URL without fetching or writing.';
   static description =
-    'Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the research command would take.';
+    'Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the root fetch command would take.';
 
   static args = {
     url: Args.string({

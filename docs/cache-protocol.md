@@ -10,7 +10,7 @@ Cached research artifacts are saved as individual Markdown files (`<cache_key>.m
 
 Depending on how the CLI is executed, the database path resolves as follows:
 * **Standalone Bonsai CLI**: `~/.local/share/bonsai/research/` on Linux-style XDG systems, or the platform-specific oclif data directory for the `bonsai` binary.
-* **Project-local Bonsai cache**: `<project>/.bonsai/research/` when `research config set storage project --local` is active.
+* **Project-local Bonsai cache**: `<project>/.bonsai/research/` when `config set storage project --local` is active.
 * **OS-Specific Standards**:
   * **macOS**: `~/Library/Application Support/bonsai/research/`
   * **Linux**: `~/.local/share/bonsai/research/`

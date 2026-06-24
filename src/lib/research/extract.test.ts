@@ -83,7 +83,7 @@ describe('HTML content extraction pipeline', () => {
     `;
 
     expect(() => extractHtmlContent(html, 'https://example.com/docs')).toThrow(
-      /Content extraction failed.*Hint: A future "research import" command/
+      /Content extraction failed.*Hint: The "import" command/
     );
   });
 

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ResearchList from './list.js';
 import ResearchImport from './import.js';
 
-describe('research list command unit tests', () => {
+describe('list command unit tests', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });

@@ -1,7 +1,7 @@
 import type { DocsSearchResult } from './search-index.js';
 
 // Remote docs-search connectors (T-20). DISCOVERY only: they turn a query into official doc URLs
-// that the agent then captures through `research <url>`; snippets are never stored as source. Each
+// that the agent then captures through `<url>`; snippets are never stored as source. Each
 // provider is fixture-backed — a raw config payload and a mocked query response — and must prove its
 // endpoint/index before it is trusted. A visible search button is a signal, not a connector.
 

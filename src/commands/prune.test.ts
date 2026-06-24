@@ -3,7 +3,7 @@ import ResearchPrune from './prune.js';
 import ResearchImport from './import.js';
 import { existsSync } from 'node:fs';
 
-describe('research prune command unit tests', () => {
+describe('prune command unit tests', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });

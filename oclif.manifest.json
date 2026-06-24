@@ -1,6 +1,6 @@
 {
   "commands": {
-    "research": {
+    "Symbol(SINGLE_COMMAND_CLI)": {
       "aliases": [],
       "args": {
         "url": {
@@ -13,11 +13,11 @@
       "examples": [
         {
           "description": "Research a URL with detailed output, tagged with topic and tags",
-          "command": "<%= config.bin %> research https://docs.nestjs.com/ --topic \"Backend Frameworks\" --tags \"Node\" --tags \"NestJS\" --format detailed --ttl 30d"
+          "command": "<%= config.bin %> https://docs.nestjs.com/ --topic \"Backend Frameworks\" --tags \"Node\" --tags \"NestJS\" --format detailed --ttl 30d"
         },
         {
           "description": "Research a volatile page with compressed output and short TTL, returned as JSON",
-          "command": "<%= config.bin %> research https://news.ycombinator.com/ --format compressed --ttl 2h --json"
+          "command": "<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json"
         }
       ],
       "flags": {
@@ -122,7 +122,7 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research",
+      "id": "Symbol(SINGLE_COMMAND_CLI)",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
@@ -130,15 +130,9 @@
       "summary": "An advanced, locally cached web research tool optimized for LLM ingestion.",
       "enableJsonFlag": false,
       "jsonEnvelope": false,
-      "stdoutIsPrimaryData": true,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research.js"
-      ]
+      "stdoutIsPrimaryData": true
     },
-    "research:import": {
+    "import": {
       "aliases": [],
       "args": {
         "url": {
@@ -151,15 +145,15 @@
       "examples": [
         {
           "description": "Import detailed research for a single URL via stdin",
-          "command": "echo \"# My Article\" | <%= config.bin %> research import https://example.com/docs --stdin"
+          "command": "echo \"# My Article\" | <%= config.bin %> import https://example.com/docs --stdin"
         },
         {
           "description": "Import research synthesized from multiple source URLs",
-          "command": "echo \"# Synthesized\" | <%= config.bin %> research import --stdin --topic \"React docs\" --source-url https://react.dev/a --source-url https://react.dev/b"
+          "command": "echo \"# Synthesized\" | <%= config.bin %> import --stdin --topic \"React docs\" --source-url https://react.dev/a --source-url https://react.dev/b"
         },
         {
           "description": "Import research from a local Markdown file",
-          "command": "<%= config.bin %> research import https://example.com/docs --file path/to/notes.md"
+          "command": "<%= config.bin %> import https://example.com/docs --file path/to/notes.md"
         }
       ],
       "flags": {
@@ -252,7 +246,7 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:import",
+      "id": "import",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
@@ -260,16 +254,9 @@
       "summary": "Import agent-supplied clean Markdown notes into the local cache.",
       "enableJsonFlag": false,
       "jsonEnvelope": false,
-      "stdoutIsPrimaryData": true,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "import.js"
-      ]
+      "stdoutIsPrimaryData": true
     },
-    "research:inspect": {
+    "inspect": {
       "aliases": [],
       "args": {
         "url": {
@@ -289,7 +276,7 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:inspect",
+      "id": "inspect",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
@@ -297,31 +284,24 @@
       "summary": "Inspect cached research metadata for a URL.",
       "enableJsonFlag": false,
       "jsonEnvelope": false,
-      "stdoutIsPrimaryData": true,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "inspect.js"
-      ]
+      "stdoutIsPrimaryData": true
     },
-    "research:list": {
+    "list": {
       "aliases": [],
       "args": {},
       "description": "Lists cached research artifacts, including metadata details like path, source count, freshness, token estimates, and quality metrics without printing full content.",
       "examples": [
         {
           "description": "List all cached entries",
-          "command": "<%= config.bin %> research list"
+          "command": "<%= config.bin %> list"
         },
         {
           "description": "List cached entries for a specific topic with JSON output",
-          "command": "<%= config.bin %> research list --topic \"React Suspense\" --json"
+          "command": "<%= config.bin %> list --topic \"React Suspense\" --json"
         },
         {
           "description": "List only fresh entries filtered by tags",
-          "command": "<%= config.bin %> research list --freshness fresh --tags node --tags url"
+          "command": "<%= config.bin %> list --freshness fresh --tags node --tags url"
         }
       ],
       "flags": {
@@ -393,7 +373,7 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:list",
+      "id": "list",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
@@ -401,27 +381,20 @@
       "summary": "List cached research artifacts by metadata filters.",
       "enableJsonFlag": false,
       "jsonEnvelope": false,
-      "stdoutIsPrimaryData": true,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "list.js"
-      ]
+      "stdoutIsPrimaryData": true
     },
-    "research:prune": {
+    "prune": {
       "aliases": [],
       "args": {},
       "description": "Prunes cached research entries based on age, inactivity, or artifact type to free up disk space.",
       "examples": [
         {
           "description": "Perform a dry run of pruning entries older than 90 days",
-          "command": "<%= config.bin %> research prune --older-than 90d --dry-run"
+          "command": "<%= config.bin %> prune --older-than 90d --dry-run"
         },
         {
           "description": "Actually prune entries older than 30 days that are source scrapes",
-          "command": "<%= config.bin %> research prune --older-than 30d --artifact-type source --yes"
+          "command": "<%= config.bin %> prune --older-than 30d --artifact-type source --yes"
         }
       ],
       "flags": {
@@ -472,7 +445,7 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:prune",
+      "id": "prune",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
@@ -480,16 +453,9 @@
       "summary": "Clean up old or inactive research cache entries.",
       "enableJsonFlag": false,
       "jsonEnvelope": false,
-      "stdoutIsPrimaryData": true,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "prune.js"
-      ]
+      "stdoutIsPrimaryData": true
     },
-    "research:search": {
+    "search": {
       "aliases": [],
       "args": {
         "query": {
@@ -566,7 +532,7 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:search",
+      "id": "search",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
@@ -574,16 +540,9 @@
       "summary": "Search locally cached research artifacts by keywords.",
       "enableJsonFlag": false,
       "jsonEnvelope": false,
-      "stdoutIsPrimaryData": true,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "search.js"
-      ]
+      "stdoutIsPrimaryData": true
     },
-    "research:status": {
+    "status": {
       "aliases": [],
       "args": {
         "url": {
@@ -592,7 +551,7 @@
           "required": true
         }
       },
-      "description": "Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the research command would take.",
+      "description": "Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the root fetch command would take.",
       "flags": {
         "json": {
           "description": "Return the output as a machine-readable JSON object.",
@@ -631,7 +590,7 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:status",
+      "id": "status",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
@@ -639,45 +598,9 @@
       "summary": "Check the cache status of a URL without fetching or writing.",
       "enableJsonFlag": false,
       "jsonEnvelope": false,
-      "stdoutIsPrimaryData": true,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "status.js"
-      ]
+      "stdoutIsPrimaryData": true
     },
-    "research:config:base": {
-      "aliases": [],
-      "args": {},
-      "flags": {
-        "json": {
-          "description": "Return the output as a machine-readable JSON object.",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "research:config:base",
-      "pluginAlias": "@taurgis/bonsai",
-      "pluginName": "@taurgis/bonsai",
-      "pluginType": "core",
-      "strict": true,
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "config",
-        "base.js"
-      ]
-    },
-    "research:config:get": {
+    "config:get": {
       "aliases": [],
       "args": {
         "key": {
@@ -690,11 +613,11 @@
       "examples": [
         {
           "description": "Get the effective storage mode",
-          "command": "<%= config.bin %> research config get storage"
+          "command": "<%= config.bin %> config get storage"
         },
         {
           "description": "Read only the project-level value",
-          "command": "<%= config.bin %> research config get storage --local"
+          "command": "<%= config.bin %> config get storage --local"
         }
       ],
       "flags": {
@@ -726,36 +649,26 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:config:get",
+      "id": "config:get",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Get the effective value of a research configuration key.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "config",
-        "get.js"
-      ],
       "stdoutIsPrimaryData": true
     },
-    "research:config:list": {
+    "config:list": {
       "aliases": [],
       "args": {},
       "description": "Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage.",
       "examples": [
         {
           "description": "Show all effective config values",
-          "command": "<%= config.bin %> research config list"
+          "command": "<%= config.bin %> config list"
         },
         {
           "description": "Show only project-level config",
-          "command": "<%= config.bin %> research config list --local"
+          "command": "<%= config.bin %> config list --local"
         }
       ],
       "flags": {
@@ -787,25 +700,15 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:config:list",
+      "id": "config:list",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "List all research configuration keys and their effective values.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "config",
-        "list.js"
-      ],
       "stdoutIsPrimaryData": true
     },
-    "research:config:set": {
+    "config:set": {
       "aliases": [],
       "args": {
         "key": {
@@ -823,11 +726,11 @@
       "examples": [
         {
           "description": "Store research cache inside the current project",
-          "command": "<%= config.bin %> research config set storage project --local"
+          "command": "<%= config.bin %> config set storage project --local"
         },
         {
           "description": "Set the user-level default using the inline key=value form",
-          "command": "<%= config.bin %> research config set storage=global"
+          "command": "<%= config.bin %> config set storage=global"
         }
       ],
       "flags": {
@@ -865,25 +768,15 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:config:set",
+      "id": "config:set",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Set a research configuration key.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "config",
-        "set.js"
-      ],
       "stdoutIsPrimaryData": true
     },
-    "research:config:unset": {
+    "config:unset": {
       "aliases": [],
       "args": {
         "key": {
@@ -896,11 +789,11 @@
       "examples": [
         {
           "description": "Remove the user-level storage setting",
-          "command": "<%= config.bin %> research config unset storage"
+          "command": "<%= config.bin %> config unset storage"
         },
         {
           "description": "Remove the project-level storage setting",
-          "command": "<%= config.bin %> research config unset storage --local"
+          "command": "<%= config.bin %> config unset storage --local"
         }
       ],
       "flags": {
@@ -938,22 +831,12 @@
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "research:config:unset",
+      "id": "config:unset",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Remove a research configuration key.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
-      "isESM": true,
-      "relativePath": [
-        "dist",
-        "commands",
-        "research",
-        "config",
-        "unset.js"
-      ],
       "stdoutIsPrimaryData": true
     }
   },

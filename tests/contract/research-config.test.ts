@@ -21,9 +21,9 @@ const env = () => ({ XDG_DATA_HOME: xdg });
 const PROJECT_CONFIG = '.bonsai.json';
 const PROJECT_CACHE = join('.bonsai', 'research');
 
-describe('research config command', () => {
+describe('config command', () => {
   it('set --local writes the project config file', () => {
-    const r = runContract(['research', 'config', 'set', 'storage', 'project', '--local'], {
+    const r = runContract(['config', 'set', 'storage', 'project', '--local'], {
       cwd,
       env: env(),
     });
@@ -33,50 +33,42 @@ describe('research config command', () => {
   });
 
   it('round-trips via get and list, and unset restores the default', () => {
-    runContract(['research', 'config', 'set', 'storage=project', '--local'], { cwd, env: env() });
+    runContract(['config', 'set', 'storage=project', '--local'], { cwd, env: env() });
     expect(
-      runContract(['research', 'config', 'get', 'storage', '--local'], { cwd, env: env() }).stdout
+      runContract(['config', 'get', 'storage', '--local'], { cwd, env: env() }).stdout
     ).toContain('project');
 
-    const list = runContract(['research', 'config', 'list'], { cwd, env: env() });
+    const list = runContract(['config', 'list'], { cwd, env: env() });
     expect(list.stdout).toContain('storage');
     expect(list.stdout).toContain('project');
 
-    runContract(['research', 'config', 'unset', 'storage', '--local'], { cwd, env: env() });
+    runContract(['config', 'unset', 'storage', '--local'], { cwd, env: env() });
     // After unset the project file no longer pins storage → effective default is global.
-    expect(
-      runContract(['research', 'config', 'get', 'storage'], { cwd, env: env() }).stdout
-    ).toContain('global');
+    expect(runContract(['config', 'get', 'storage'], { cwd, env: env() }).stdout).toContain(
+      'global'
+    );
   });
 
   it('rejects an unknown key and an invalid value with exit 2', () => {
-    expect(runContract(['research', 'config', 'get', 'nope'], { cwd, env: env() }).exitCode).toBe(
+    expect(runContract(['config', 'get', 'nope'], { cwd, env: env() }).exitCode).toBe(2);
+    expect(runContract(['config', 'set', 'storage', 'bogus'], { cwd, env: env() }).exitCode).toBe(
       2
     );
-    expect(
-      runContract(['research', 'config', 'set', 'storage', 'bogus'], { cwd, env: env() }).exitCode
-    ).toBe(2);
   });
 
   it('rejects --global and --local together with exit 2', () => {
-    const r = runContract(
-      ['research', 'config', 'set', 'storage', 'project', '--global', '--local'],
-      {
-        cwd,
-        env: env(),
-      }
-    );
+    const r = runContract(['config', 'set', 'storage', 'project', '--global', '--local'], {
+      cwd,
+      env: env(),
+    });
     expect(r.exitCode).toBe(2);
   });
 
   it('dry-run reports the change without writing the file', () => {
-    const r = runContract(
-      ['research', 'config', 'set', 'storage', 'project', '--local', '--dry-run'],
-      {
-        cwd,
-        env: env(),
-      }
-    );
+    const r = runContract(['config', 'set', 'storage', 'project', '--local', '--dry-run'], {
+      cwd,
+      env: env(),
+    });
     expect(r.exitCode).toBe(0);
     expect(r.stdout).toContain('[dry-run]');
     expect(existsSync(join(cwd, PROJECT_CONFIG))).toBe(false);
@@ -85,7 +77,7 @@ describe('research config command', () => {
 
 describe('storage routing end to end', () => {
   function setProject() {
-    runContract(['research', 'config', 'set', 'storage', 'project', '--local'], {
+    runContract(['config', 'set', 'storage', 'project', '--local'], {
       cwd,
       env: env(),
     });
@@ -102,7 +94,7 @@ describe('storage routing end to end', () => {
     setProject();
     const file = noteFile('clean.md', '# Clean\nOrdinary documentation about widgets.\n');
     const r = runContract(
-      ['research', 'import', 'https://example.com/clean', '--file', file, '--topic', 'clean'],
+      ['import', 'https://example.com/clean', '--file', file, '--topic', 'clean'],
       {
         cwd,
         env: env(),
@@ -116,16 +108,7 @@ describe('storage routing end to end', () => {
     setProject();
     const file = noteFile('secret.md', '# Setup\nexport TOKEN=ghp_' + 'a'.repeat(36) + '\n');
     const r = runContract(
-      [
-        'research',
-        'import',
-        'https://example.com/secret',
-        '--file',
-        file,
-        '--topic',
-        'secret',
-        '--json',
-      ],
+      ['import', 'https://example.com/secret', '--file', file, '--topic', 'secret', '--json'],
       { cwd, env: env(), raw: true }
     );
     const envelope = JSON.parse(r.stdout);
@@ -141,7 +124,6 @@ describe('storage routing end to end', () => {
     const file = noteFile('g.md', '# Global\nContent stored globally.\n');
     runContract(
       [
-        'research',
         'import',
         'https://example.com/g',
         '--file',
@@ -153,7 +135,7 @@ describe('storage routing end to end', () => {
       ],
       { cwd, env: env() }
     );
-    const r = runContract(['research', 'search', 'globaltopic', '--json'], {
+    const r = runContract(['search', 'globaltopic', '--json'], {
       cwd,
       env: env(),
       raw: true,

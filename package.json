@@ -61,13 +61,16 @@
   },
   "packageManager": "pnpm@10.17.1",
   "oclif": {
-    "commands": "./dist/commands",
+    "bin": "bonsai",
+    "dirname": "bonsai",
+    "commands": {
+      "strategy": "explicit",
+      "target": "./dist/commands.js",
+      "identifier": "commands"
+    },
     "topicSeparator": " ",
     "topics": {
-      "research": {
-        "description": "Advanced web research caching database for AI agents"
-      },
-      "research config": {
+      "config": {
         "description": "Manage research cache storage configuration (global vs project)"
       }
     }

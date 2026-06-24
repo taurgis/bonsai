@@ -2,20 +2,20 @@ import { Args, Flags } from '@oclif/core';
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand } from '../../base-command.js';
-import { normalizeUrl } from '../../lib/research/url.js';
-import { deriveCacheKey } from '../../lib/research/cache-key.js';
-import { getArtifactPath } from '../../lib/research/storage.js';
-import { loadStoreRoots } from '../../lib/research/store-roots.js';
-import { writeArtifactSecurely } from '../../lib/research/secure-write.js';
-import type { StorageMode } from '../../lib/config/index.js';
-import { getPolicy } from '../../lib/research/freshness.js';
-import { compressMarkdown } from '../../lib/research/compress.js';
-import { estimateTokens } from '../../lib/research/token-estimate.js';
-import type { ResearchArtifact, ResearchArtifactMetadata } from '../../lib/research/schema.js';
+import { BaseCommand } from '../base-command.js';
+import { normalizeUrl } from '../lib/research/url.js';
+import { deriveCacheKey } from '../lib/research/cache-key.js';
+import { getArtifactPath } from '../lib/research/storage.js';
+import { loadStoreRoots } from '../lib/research/store-roots.js';
+import { writeArtifactSecurely } from '../lib/research/secure-write.js';
+import type { StorageMode } from '../lib/config/index.js';
+import { getPolicy } from '../lib/research/freshness.js';
+import { compressMarkdown } from '../lib/research/compress.js';
+import { estimateTokens } from '../lib/research/token-estimate.js';
+import type { ResearchArtifact, ResearchArtifactMetadata } from '../lib/research/schema.js';
 
 export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
-  static id = 'research import';
+  static id = 'import';
   static summary = 'Import agent-supplied clean Markdown notes into the local cache.';
   static description =
     'Accepts a synthesized Markdown note via stdin and registers it under the single target URL or multiple source URLs.';
@@ -23,17 +23,16 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   static examples = [
     {
       description: 'Import detailed research for a single URL via stdin',
-      command:
-        'echo "# My Article" | <%= config.bin %> research import https://example.com/docs --stdin',
+      command: 'echo "# My Article" | <%= config.bin %> import https://example.com/docs --stdin',
     },
     {
       description: 'Import research synthesized from multiple source URLs',
       command:
-        'echo "# Synthesized" | <%= config.bin %> research import --stdin --topic "React docs" --source-url https://react.dev/a --source-url https://react.dev/b',
+        'echo "# Synthesized" | <%= config.bin %> import --stdin --topic "React docs" --source-url https://react.dev/a --source-url https://react.dev/b',
     },
     {
       description: 'Import research from a local Markdown file',
-      command: '<%= config.bin %> research import https://example.com/docs --file path/to/notes.md',
+      command: '<%= config.bin %> import https://example.com/docs --file path/to/notes.md',
     },
   ];
 
@@ -344,7 +343,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     const inputFormat = this.flags['input-format'];
     return {
       schemaVersion: 1,
-      command: 'research import',
+      command: 'import',
       cache: {
         key: cacheKey,
         status: 'imported',

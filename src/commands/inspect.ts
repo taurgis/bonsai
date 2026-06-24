@@ -1,7 +1,7 @@
 import { Args } from '@oclif/core';
-import { BaseCommand } from '../../base-command.js';
-import { scanCacheDirs } from '../../lib/research/storage.js';
-import { resolveResearchTarget } from '../../lib/research/resolve-target.js';
+import { BaseCommand } from '../base-command.js';
+import { scanCacheDirs } from '../lib/research/storage.js';
+import { resolveResearchTarget } from '../lib/research/resolve-target.js';
 
 interface SectionSummary {
   cacheKey: string;
@@ -11,7 +11,7 @@ interface SectionSummary {
 }
 
 export default class ResearchInspect extends BaseCommand<typeof ResearchInspect> {
-  static id = 'research inspect';
+  static id = 'inspect';
   static summary = 'Inspect cached research metadata for a URL.';
   static description =
     'Inspects local storage and displays full frontmatter metadata for the URL (without printing the content body).';

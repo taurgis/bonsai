@@ -1,13 +1,8 @@
 import { ConfigCommand, configScopeFlags } from './base.js';
-import {
-  ALL_KEYS,
-  KEY_META,
-  BUILT_IN_DEFAULTS,
-  readScopedConfig,
-} from '../../../lib/config/index.js';
+import { ALL_KEYS, KEY_META, BUILT_IN_DEFAULTS, readScopedConfig } from '../../lib/config/index.js';
 
-export default class ResearchConfigList extends ConfigCommand<typeof ResearchConfigList> {
-  static id = 'research config list';
+export default class ConfigList extends ConfigCommand<typeof ConfigList> {
+  static id = 'config list';
   static summary = 'List all research configuration keys and their effective values.';
   static description =
     'Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage.';
@@ -15,11 +10,11 @@ export default class ResearchConfigList extends ConfigCommand<typeof ResearchCon
   static examples = [
     {
       description: 'Show all effective config values',
-      command: '<%= config.bin %> research config list',
+      command: '<%= config.bin %> config list',
     },
     {
       description: 'Show only project-level config',
-      command: '<%= config.bin %> research config list --local',
+      command: '<%= config.bin %> config list --local',
     },
   ];
 
@@ -34,7 +29,7 @@ export default class ResearchConfigList extends ConfigCommand<typeof ResearchCon
 
   async init(): Promise<void> {
     await super.init();
-    const { flags } = await this.parse(ResearchConfigList);
+    const { flags } = await this.parse(ConfigList);
     this.flags = flags;
   }
 

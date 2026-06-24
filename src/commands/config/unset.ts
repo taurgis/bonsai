@@ -1,10 +1,10 @@
 import { Args, Flags } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { writeUserConfig, writeProjectConfig } from '../../../lib/config/index.js';
-import type { ConfigValues } from '../../../lib/config/index.js';
+import { writeUserConfig, writeProjectConfig } from '../../lib/config/index.js';
+import type { ConfigValues } from '../../lib/config/index.js';
 
-export default class ResearchConfigUnset extends ConfigCommand<typeof ResearchConfigUnset> {
-  static id = 'research config unset';
+export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
+  static id = 'config unset';
   static summary = 'Remove a research configuration key.';
   static description =
     'Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage.';
@@ -12,11 +12,11 @@ export default class ResearchConfigUnset extends ConfigCommand<typeof ResearchCo
   static examples = [
     {
       description: 'Remove the user-level storage setting',
-      command: '<%= config.bin %> research config unset storage',
+      command: '<%= config.bin %> config unset storage',
     },
     {
       description: 'Remove the project-level storage setting',
-      command: '<%= config.bin %> research config unset storage --local',
+      command: '<%= config.bin %> config unset storage --local',
     },
   ];
 
@@ -39,7 +39,7 @@ export default class ResearchConfigUnset extends ConfigCommand<typeof ResearchCo
 
   async init(): Promise<void> {
     await super.init();
-    const { args, flags } = await this.parse(ResearchConfigUnset);
+    const { args, flags } = await this.parse(ConfigUnset);
     this.args = args;
     this.flags = flags;
   }

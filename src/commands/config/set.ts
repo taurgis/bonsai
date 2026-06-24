@@ -1,10 +1,10 @@
 import { Args, Flags } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { KEY_META, writeUserConfig, writeProjectConfig } from '../../../lib/config/index.js';
-import type { ConfigValues } from '../../../lib/config/index.js';
+import { KEY_META, writeUserConfig, writeProjectConfig } from '../../lib/config/index.js';
+import type { ConfigValues } from '../../lib/config/index.js';
 
-export default class ResearchConfigSet extends ConfigCommand<typeof ResearchConfigSet> {
-  static id = 'research config set';
+export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
+  static id = 'config set';
   static summary = 'Set a research configuration key.';
   static description =
     'Persist a configuration value. Writes user-level config by default; pass --local to write the project-level config (.bonsai.json in cwd).\n\n' +
@@ -13,11 +13,11 @@ export default class ResearchConfigSet extends ConfigCommand<typeof ResearchConf
   static examples = [
     {
       description: 'Store research cache inside the current project',
-      command: '<%= config.bin %> research config set storage project --local',
+      command: '<%= config.bin %> config set storage project --local',
     },
     {
       description: 'Set the user-level default using the inline key=value form',
-      command: '<%= config.bin %> research config set storage=global',
+      command: '<%= config.bin %> config set storage=global',
     },
   ];
 
@@ -41,7 +41,7 @@ export default class ResearchConfigSet extends ConfigCommand<typeof ResearchConf
 
   async init(): Promise<void> {
     await super.init();
-    const { args, flags } = await this.parse(ResearchConfigSet);
+    const { args, flags } = await this.parse(ConfigSet);
     this.args = args;
     this.flags = flags;
   }

@@ -1,14 +1,14 @@
 import { Args, Flags } from '@oclif/core';
-import { BaseCommand } from '../../base-command.js';
-import { scanCacheDirs } from '../../lib/research/storage.js';
-import { loadStoreRoots } from '../../lib/research/store-roots.js';
-import { evaluateFreshness } from '../../lib/research/freshness.js';
-import { detectSite } from '../../sites/index.js';
-import { fetchStaticHtml, fetchText, postJson } from '../../lib/research/fetcher.js';
+import { BaseCommand } from '../base-command.js';
+import { scanCacheDirs } from '../lib/research/storage.js';
+import { loadStoreRoots } from '../lib/research/store-roots.js';
+import { evaluateFreshness } from '../lib/research/freshness.js';
+import { detectSite } from '../sites/index.js';
+import { fetchStaticHtml, fetchText, postJson } from '../lib/research/fetcher.js';
 import {
   runRemoteDocsSearch,
   type RemoteSearchDeps,
-} from '../../lib/research/docs/remote-search-runner.js';
+} from '../lib/research/docs/remote-search-runner.js';
 
 const REMOTE_SEARCH_DEPS: RemoteSearchDeps = {
   fetchStatic: async (url) => {
@@ -25,7 +25,7 @@ const REMOTE_SEARCH_DEPS: RemoteSearchDeps = {
 const FRESHNESS_BONUS: Record<string, number> = { fresh: 30, stale_grace: 10 };
 
 export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
-  static id = 'research search';
+  static id = 'search';
   static summary = 'Search locally cached research artifacts by keywords.';
   static description =
     'Scans the local research cache database and ranks matching entries based on topic, tags, source URLs, summary, and content.';

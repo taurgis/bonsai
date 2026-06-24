@@ -29,14 +29,14 @@ Requires Node.js 22 or newer.
 Run Bonsai without installing it globally:
 
 ```bash
-npx @taurgis/bonsai research https://nodejs.org/api/url.html
+npx @taurgis/bonsai https://nodejs.org/api/url.html
 ```
 
 Install it as a normal CLI:
 
 ```bash
 npm install -g @taurgis/bonsai
-bonsai research https://nodejs.org/api/url.html
+bonsai https://nodejs.org/api/url.html
 ```
 
 Use the local development binary inside this repository:
@@ -44,7 +44,7 @@ Use the local development binary inside this repository:
 ```bash
 pnpm install
 pnpm build
-node bin/cli.mjs research --help
+node bin/cli.mjs --help
 ```
 
 ## Quick Start
@@ -52,7 +52,7 @@ node bin/cli.mjs research --help
 ### 1. Fetch and cache a URL
 
 ```bash
-npx @taurgis/bonsai research https://nodejs.org/api/url.html
+npx @taurgis/bonsai https://nodejs.org/api/url.html
 ```
 
 The first run fetches the page, extracts the main article content, converts it to Markdown, estimates token size, and stores it locally.
@@ -60,7 +60,7 @@ The first run fetches the page, extracts the main article content, converts it t
 ### 2. Reuse the cache
 
 ```bash
-npx @taurgis/bonsai research https://nodejs.org/api/url.html
+npx @taurgis/bonsai https://nodejs.org/api/url.html
 ```
 
 The second run returns from cache when the entry is still fresh.
@@ -68,34 +68,34 @@ The second run returns from cache when the entry is still fresh.
 ### 3. Check cache state and metadata
 
 ```bash
-npx @taurgis/bonsai research status https://nodejs.org/api/url.html
-npx @taurgis/bonsai research inspect https://nodejs.org/api/url.html
+npx @taurgis/bonsai status https://nodejs.org/api/url.html
+npx @taurgis/bonsai inspect https://nodejs.org/api/url.html
 ```
 
 ### 4. Import manual research notes
 
 ```bash
-echo "# My Custom Node API Notes" | npx @taurgis/bonsai research import https://nodejs.org/api/url.html --stdin
+echo "# My Custom Node API Notes" | npx @taurgis/bonsai import https://nodejs.org/api/url.html --stdin
 
-echo "# Synthesized React Cache Guide" | npx @taurgis/bonsai research import --stdin --topic "React Suspense" --source-url https://react.dev/a --source-url https://react.dev/b
+echo "# Synthesized React Cache Guide" | npx @taurgis/bonsai import --stdin --topic "React Suspense" --source-url https://react.dev/a --source-url https://react.dev/b
 ```
 
 ### 5. Search before fetching
 
 ```bash
-npx @taurgis/bonsai research search "node api url"
+npx @taurgis/bonsai search "node api url"
 ```
 
 ---
 
 ## Command Reference
 
-### `research <url>`
+### `<url>`
 
 Fetch and format a webpage, or retrieve it from cache.
 
 ```bash
-npx @taurgis/bonsai research <url> [flags]
+npx @taurgis/bonsai <url> [flags]
 ```
 
 Common flags:
@@ -112,44 +112,44 @@ Common flags:
 * `--rendered`: Use browser-rendered extraction for SPA pages.
 * `--json`: Return structured machine-readable output.
 
-### `research import [url]`
+### `import [url]`
 
 Save custom Markdown notes directly to the cache.
 
 ```bash
-npx @taurgis/bonsai research import [url] --stdin [flags]
+npx @taurgis/bonsai import [url] --stdin [flags]
 ```
 
-### `research status <url>`
+### `status <url>`
 
 Inspect cache state and planned action without fetching.
 
 ```bash
-npx @taurgis/bonsai research status <url> [flags]
+npx @taurgis/bonsai status <url> [flags]
 ```
 
-### `research inspect <url>`
+### `inspect <url>`
 
 Display stored YAML frontmatter metadata for a URL.
 
 ```bash
-npx @taurgis/bonsai research inspect <url>
+npx @taurgis/bonsai inspect <url>
 ```
 
-### `research search <query>`
+### `search <query>`
 
 Search cached research by metadata and content snippets.
 
 ```bash
-npx @taurgis/bonsai research search "<keywords>" [flags]
+npx @taurgis/bonsai search "<keywords>" [flags]
 ```
 
-### `research config`
+### `config`
 
 Choose global or project-local cache storage.
 
 ```bash
-npx @taurgis/bonsai research config set storage project --local
+npx @taurgis/bonsai config set storage project --local
 ```
 
 Project config is stored in `.bonsai.json`; project cache files are stored under `.bonsai/research/`.
@@ -188,14 +188,14 @@ When run with `--json`, commands return a stable envelope:
 ```json
 {
   "schemaVersion": 1,
-  "command": "research",
+  "command": "bonsai",
   "ok": true,
   "exitCode": 0,
   "stdout": "",
   "stderr": "",
   "data": {
     "schemaVersion": 1,
-    "command": "research",
+    "command": "bonsai",
     "cache": {
       "key": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
       "status": "hit",

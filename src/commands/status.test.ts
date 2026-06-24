@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import ResearchStatus from './status.js';
 import ResearchImport from './import.js';
 
-describe('research status command unit tests', () => {
+describe('status command unit tests', () => {
   it('handles uncached miss status', async () => {
     const result = (await ResearchStatus.run(['https://example.com/not-cached-status'])) as any;
     expect(result).toBeDefined();

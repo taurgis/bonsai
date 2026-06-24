@@ -16,6 +16,12 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     return Boolean(this.flags?.json);
   }
 
+  private envelopeCommandId(): string {
+    return this.ctor.id === 'Symbol(SINGLE_COMMAND_CLI)'
+      ? this.config.bin
+      : this.ctor.id || this.config.bin;
+  }
+
   protected override async _run<R>(): Promise<R> {
     // Check argv directly for --json because if parsing fails in init(),
     // we still want to output the failure in the JSON envelope format.
@@ -29,7 +35,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
           JSON.stringify(
             {
               schemaVersion: 1,
-              command: this.ctor.id ?? 'research',
+              command: this.envelopeCommandId(),
               ok: exitCode === 0 || exitCode === 5,
               exitCode,
               stdout: '',
@@ -46,7 +52,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
           JSON.stringify(
             {
               schemaVersion: 1,
-              command: this.ctor.id ?? 'research',
+              command: this.envelopeCommandId(),
               ok: false,
               exitCode,
               stdout: '',

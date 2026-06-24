@@ -1,11 +1,11 @@
 import { Flags } from '@oclif/core';
-import { BaseCommand } from '../../base-command.js';
-import { scanCacheDirs } from '../../lib/research/storage.js';
-import { loadStoreRoots } from '../../lib/research/store-roots.js';
-import { evaluateFreshness } from '../../lib/research/freshness.js';
+import { BaseCommand } from '../base-command.js';
+import { scanCacheDirs } from '../lib/research/storage.js';
+import { loadStoreRoots } from '../lib/research/store-roots.js';
+import { evaluateFreshness } from '../lib/research/freshness.js';
 
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
-  static id = 'research list';
+  static id = 'list';
   static summary = 'List cached research artifacts by metadata filters.';
   static description =
     'Lists cached research artifacts, including metadata details like path, source count, freshness, token estimates, and quality metrics without printing full content.';
@@ -13,15 +13,15 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static examples = [
     {
       description: 'List all cached entries',
-      command: '<%= config.bin %> research list',
+      command: '<%= config.bin %> list',
     },
     {
       description: 'List cached entries for a specific topic with JSON output',
-      command: '<%= config.bin %> research list --topic "React Suspense" --json',
+      command: '<%= config.bin %> list --topic "React Suspense" --json',
     },
     {
       description: 'List only fresh entries filtered by tags',
-      command: '<%= config.bin %> research list --freshness fresh --tags node --tags url',
+      command: '<%= config.bin %> list --freshness fresh --tags node --tags url',
     },
   ];
 

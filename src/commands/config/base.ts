@@ -1,10 +1,10 @@
 import { Command, Flags } from '@oclif/core';
-import { BaseCommand } from '../../../base-command.js';
-import { isKnownKey, suggestKey, validKeysHint } from '../../../lib/config/index.js';
-import type { ConfigKey, ConfigScope } from '../../../lib/config/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { isKnownKey, suggestKey, validKeysHint } from '../../lib/config/index.js';
+import type { ConfigKey, ConfigScope } from '../../lib/config/index.js';
 
 /**
- * Shared base for the four `research config` subcommands: the mutually-exclusive
+ * Shared base for the four `config` subcommands: the mutually-exclusive
  * scope-flag guard, the binary write-scope helper, and known-key validation.
  */
 export abstract class ConfigCommand<T extends typeof Command> extends BaseCommand<T> {

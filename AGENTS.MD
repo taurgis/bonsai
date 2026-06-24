@@ -102,25 +102,25 @@ Add focused tests with each implementation change. Cover:
 
 ## Keep scope tight
 
-This repo currently contains planning material, generated agent instructions, and skills. Do not refactor generated IDE instruction files unless the task explicitly asks for it. Implement the reusable oclif plugin in normal source files in this repository when the package is scaffolded, and keep generated/manual protocol files as reference material.
+This repo currently contains planning material, generated agent instructions, and skills. Do not refactor generated IDE instruction files unless the task explicitly asks for it. Implement Bonsai in normal source files in this repository, and keep generated/manual protocol files as reference material.
 
 ---
 
 ## Active Agent Research Workflows (Drinking Our Own Champagne)
 
-Agents working in this codebase or utilizing this plugin must run the compiled CLI research subcommands directly instead of executing manual web-scrapes or manual researcher workflows:
+Agents working in this codebase or utilizing Bonsai must run the compiled CLI commands directly instead of executing manual web-scrapes or manual researcher workflows:
 
-* **Retrieve / Cache Scrape**: `node bin/cli.mjs research <url> [--json]`
-* **Retrieve (Browser-Rendered SPA)**: `node bin/cli.mjs research <url> --rendered [--json]`
-* **Import Synthesized Notes**: `node bin/cli.mjs research import <url> --file <path> [--json]`
-* **Status Checklist**: `node bin/cli.mjs research status <url> [--json]`
-* **Inspect Metadata**: `node bin/cli.mjs research inspect <url> [--json]`
-* **Search Cache**: `node bin/cli.mjs research search "<query>" [--json]`
-* **Remote Docs Search (discovery)**: `node bin/cli.mjs research search "<query>" --remote <docs-url> [--json]` — discovers uncached pages via a site's public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes); selected URLs are then captured through `research <url>`. Degrades to local cache search when no connector applies.
-* **List Database**: `node bin/cli.mjs research list [filters] [--json]`
-* **Prune Database**: `node bin/cli.mjs research prune [filters] --yes [--json]`
+* **Retrieve / Cache Scrape**: `node bin/cli.mjs <url> [--json]`
+* **Retrieve (Browser-Rendered SPA)**: `node bin/cli.mjs <url> --rendered [--json]`
+* **Import Synthesized Notes**: `node bin/cli.mjs import <url> --file <path> [--json]`
+* **Status Checklist**: `node bin/cli.mjs status <url> [--json]`
+* **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
+* **Search Cache**: `node bin/cli.mjs search "<query>" [--json]`
+* **Remote Docs Search (discovery)**: `node bin/cli.mjs search "<query>" --remote <docs-url> [--json]` — discovers uncached pages via a site's public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes); selected URLs are then captured through `<url>`. Degrades to local cache search when no connector applies.
+* **List Database**: `node bin/cli.mjs list [filters] [--json]`
+* **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
 
-Published standalone usage is `npx @taurgis/bonsai research <url>` or `bonsai research <url>` after installation. Do not document bare `npx bonsai` unless an unscoped npm shim is actually published.
+Published standalone usage is `npx @taurgis/bonsai <url>` or `bonsai <url>` after installation. Do not document bare `npx bonsai` unless an unscoped npm shim is actually published.
 
 ### Browser-Rendered Extraction (`--rendered`)
 
@@ -133,4 +133,4 @@ Use `--rendered` when the target page is a Single Page Application (SPA) or reli
 
 ### Advanced Full-Text Search
 
-`research search` now supports fuzzy matching (Levenshtein distance ≤ 2 for terms ≥ 4 chars), term frequency ranking, substring matching in topics and tags, and exact phrase match bonuses for multi-word queries.
+`search` now supports fuzzy matching (Levenshtein distance <= 2 for terms >= 4 chars), term frequency ranking, substring matching in topics and tags, and exact phrase match bonuses for multi-word queries.

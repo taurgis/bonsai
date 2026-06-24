@@ -42,11 +42,11 @@ The crawler will block the request if the resolved IP falls within any of the fo
 
 ### Common Failure Symptoms
 * **Attempting to crawl local dev servers**:
-  * *Command*: `bonsai research http://localhost:8080/`
+  * *Command*: `bonsai http://localhost:8080/`
   * *Error*: `Error: IP address "127.0.0.1" is a blocked local or private target.`
 * **Resolution**: Local resources cannot be fetched directly using the automatic crawler. To import documentation from a local dev server, compile it to Markdown first and use the `import` command:
   ```bash
-  curl -s http://localhost:8080/docs | bonsai research import http://localhost:8080/docs --stdin
+  curl -s http://localhost:8080/docs | bonsai import http://localhost:8080/docs --stdin
   ```
 
 ---
@@ -64,7 +64,7 @@ Bonsai prioritizes light CPU/memory footprints and fast execution. It executes a
 1. **Use Pre-Rendered / Server-Side Rendered (SSR) targets**: Most official documentation platforms (like Docusaurus, Nextra, or MkDocs) pre-render pages as static HTML. Target those instead of client-side-only portals.
 2. **Manual CLI Import**: If you must research a JS-rendered page, open the page in a browser, copy the main article content (or convert it locally), and import it into the CLI database:
    ```bash
-   bonsai research import https://spa-docs.com/page --stdin < page.md
+   bonsai import https://spa-docs.com/page --stdin < page.md
    ```
 
 ---
@@ -86,8 +86,8 @@ Bonsai returns distinct exit codes depending on the result status to allow machi
 
 #### Scenario A: Fetch fails with HTTP 403 / 401
 * **Cause**: Some documentation platforms block programmatic scraping using WAFs (like Cloudflare) or require authentication.
-* **Resolution**: v1 of Bonsai does not support authenticated requests or session cookies. You must download the page details manually and use `research import` to cache the notes.
+* **Resolution**: v1 of Bonsai does not support authenticated requests or session cookies. You must download the page details manually and use `import` to cache the notes.
 
 #### Scenario B: Empty content returned
 * **Cause**: The scraper parser uses `@mozilla/readability` to extract main article text. If a page has complex nested tables or does not contain a clean `<article>` or `<main>` layout, Readability may fail to detect the content body.
-* **Resolution**: Check the metadata quality notes (`research inspect <url>`). If the confidence is `low`, you can overwrite the cached scrape with a manual import of clean Markdown.
+* **Resolution**: Check the metadata quality notes (`inspect <url>`). If the confidence is `low`, you can overwrite the cached scrape with a manual import of clean Markdown.

@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import ResearchImport from './import.js';
 
-describe('research import command unit tests', () => {
+describe('import command unit tests', () => {
   it('successfully imports single-source markdown content', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

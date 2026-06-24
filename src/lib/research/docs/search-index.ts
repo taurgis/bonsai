@@ -4,7 +4,7 @@ import type { SearchProvider } from './capabilities.js';
 // (T-25). These are deterministic and safe to fixture: MkDocs/Material `search_index.json`, Just
 // the Docs `search-data.json`, and Sphinx `searchindex.js`. The Sphinx index is parsed as data —
 // the embedded object is extracted and JSON.parsed, never evaluated. Results are DISCOVERY only;
-// selected URLs flow back through `research <url>` for actual capture.
+// selected URLs flow back through `<url>` for actual capture.
 
 export interface DocsSearchResult {
   title: string;

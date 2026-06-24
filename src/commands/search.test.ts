@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import ResearchSearch from './search.js';
 import ResearchImport from './import.js';
 
-describe('research search command unit tests', () => {
+describe('search command unit tests', () => {
   it('fails if query is empty or only whitespace', async () => {
     const runPromise = ResearchSearch.run(['   ']);
     await expect(runPromise).rejects.toThrow(/Query string cannot be empty/);

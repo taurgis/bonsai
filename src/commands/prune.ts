@@ -1,13 +1,13 @@
 import { Flags } from '@oclif/core';
 import { unlinkSync } from 'node:fs';
 import { join } from 'node:path';
-import { BaseCommand } from '../../base-command.js';
-import { scanCacheDir } from '../../lib/research/storage.js';
-import { loadStoreRoots } from '../../lib/research/store-roots.js';
-import { parseTtlToMs } from '../../lib/research/freshness.js';
+import { BaseCommand } from '../base-command.js';
+import { scanCacheDir } from '../lib/research/storage.js';
+import { loadStoreRoots } from '../lib/research/store-roots.js';
+import { parseTtlToMs } from '../lib/research/freshness.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
-  static id = 'research prune';
+  static id = 'prune';
   static summary = 'Clean up old or inactive research cache entries.';
   static description =
     'Prunes cached research entries based on age, inactivity, or artifact type to free up disk space.';
@@ -15,11 +15,11 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static examples = [
     {
       description: 'Perform a dry run of pruning entries older than 90 days',
-      command: '<%= config.bin %> research prune --older-than 90d --dry-run',
+      command: '<%= config.bin %> prune --older-than 90d --dry-run',
     },
     {
       description: 'Actually prune entries older than 30 days that are source scrapes',
-      command: '<%= config.bin %> research prune --older-than 30d --artifact-type source --yes',
+      command: '<%= config.bin %> prune --older-than 30d --artifact-type source --yes',
     },
   ];
 

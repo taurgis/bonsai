@@ -23,8 +23,7 @@ const CAPTURE_DEPS: CaptureDeps = {
   fetchText: (url) => fetchText(url),
 };
 
-export default class Research extends BaseCommand<typeof Research> {
-  static id = 'research';
+export default class Bonsai extends BaseCommand<typeof Bonsai> {
   static summary = 'An advanced, locally cached web research tool optimized for LLM ingestion.';
   static description =
     'Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.';
@@ -33,13 +32,13 @@ export default class Research extends BaseCommand<typeof Research> {
     {
       description: 'Research a URL with detailed output, tagged with topic and tags',
       command:
-        '<%= config.bin %> research https://docs.nestjs.com/ --topic "Backend Frameworks" --tags "Node" --tags "NestJS" --format detailed --ttl 30d',
+        '<%= config.bin %> https://docs.nestjs.com/ --topic "Backend Frameworks" --tags "Node" --tags "NestJS" --format detailed --ttl 30d',
     },
     {
       description:
         'Research a volatile page with compressed output and short TTL, returned as JSON',
       command:
-        '<%= config.bin %> research https://news.ycombinator.com/ --format compressed --ttl 2h --json',
+        '<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json',
     },
   ];
 
@@ -105,7 +104,7 @@ export default class Research extends BaseCommand<typeof Research> {
 
   async init(): Promise<void> {
     await super.init();
-    const { args, flags } = await this.parse(Research);
+    const { args, flags } = await this.parse(Bonsai);
     this.args = args;
     this.flags = flags;
   }
@@ -201,7 +200,7 @@ export default class Research extends BaseCommand<typeof Research> {
   ): any {
     return {
       schemaVersion: 1,
-      command: 'research',
+      command: this.config.bin,
       cache: {
         key: cacheKey,
         status: cacheStatus,
@@ -293,7 +292,7 @@ export default class Research extends BaseCommand<typeof Research> {
 
   // Writes a freshly fetched artifact, honoring dry-run (throwaway dir) and the secret-safety
   // redirect (project→global). Returns the data dir reported to the user and whether a redirect
-  // occurred (so the JSON envelope mirrors `research import`).
+  // occurred (so the JSON envelope mirrors `import`).
   private persistFreshArtifact(
     roots: StoreRoots,
     tmpDir: string | null,

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import ResearchInspect from './inspect.js';
 import ResearchImport from './import.js';
 
-describe('research inspect command unit tests', () => {
+describe('inspect command unit tests', () => {
   it('fails to inspect uncached URL', async () => {
     const runPromise = ResearchInspect.run(['https://example.com/not-cached-inspect']);
     await expect(runPromise).rejects.toThrow(/No cached research found/);

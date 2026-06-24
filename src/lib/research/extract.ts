@@ -86,7 +86,7 @@ export function extractHtmlContent(html: string, finalUrl: string): ExtractionRe
   if (!article || !article.content) {
     throw new Error(
       'Content extraction failed: The target page could not be parsed by the readability engine. ' +
-        'Hint: A future "research import" command will allow you to import pre-cleaned, agent-supplied research notes directly.'
+        'Hint: The "import" command lets you import pre-cleaned, agent-supplied research notes directly.'
     );
   }
 

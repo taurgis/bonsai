@@ -1,6 +1,6 @@
 # Command Reference
 
-This document provides detailed specifications, flag arguments, and JSON schemas for all Bonsai research subcommands.
+This document provides detailed specifications, flag arguments, and JSON schemas for Bonsai commands.
 
 ---
 
@@ -8,13 +8,13 @@ The package is published as `@taurgis/bonsai` and installs a `bonsai` binary. On
 
 ---
 
-## 1. `research`
+## 1. Root fetch command
 
 The primary crawler and cache retriever command.
 
 ### Usage
 ```bash
-npx @taurgis/bonsai research <url> [flags]
+npx @taurgis/bonsai <url> [flags]
 ```
 
 ### Positional Arguments
@@ -39,14 +39,14 @@ npx @taurgis/bonsai research <url> [flags]
 ```json
 {
   "schemaVersion": 1,
-  "command": "research",
+  "command": "bonsai",
   "ok": true,
   "exitCode": 0,
   "stdout": "",
   "stderr": "",
   "data": {
     "schemaVersion": 1,
-    "command": "research",
+    "command": "bonsai",
     "cache": {
       "key": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
       "status": "hit" | "miss" | "revalidated" | "refreshed" | "stale",
@@ -77,13 +77,13 @@ npx @taurgis/bonsai research <url> [flags]
 
 ---
 
-## 2. `research import`
+## 2. `import`
 
 Save agent-supplied Markdown text directly to local storage.
 
 ### Usage
 ```bash
-npx @taurgis/bonsai research import [url] [flags]
+npx @taurgis/bonsai import [url] [flags]
 ```
 
 ### Positional Arguments
@@ -127,13 +127,13 @@ npx @taurgis/bonsai research import [url] [flags]
 
 ---
 
-## 3. `research status`
+## 3. `status`
 
 Inspect cache state and planning outcomes without performing fetches or writes.
 
 ### Usage
 ```bash
-npx @taurgis/bonsai research status <url> [flags]
+npx @taurgis/bonsai status <url> [flags]
 ```
 
 ### JSON Output envelope `data` block
@@ -149,13 +149,13 @@ npx @taurgis/bonsai research status <url> [flags]
 
 ---
 
-## 4. `research inspect`
+## 4. `inspect`
 
 Display cached headers and frontmatter metadata for a URL.
 
 ### Usage
 ```bash
-npx @taurgis/bonsai research inspect <url>
+npx @taurgis/bonsai inspect <url>
 ```
 
 ### JSON Output envelope `data` block
@@ -185,13 +185,13 @@ npx @taurgis/bonsai research inspect <url>
 
 ---
 
-## 5. `research search`
+## 5. `search`
 
 Rank local cache contents based on keyword scores.
 
 ### Usage
 ```bash
-npx @taurgis/bonsai research search "<query>" [flags]
+npx @taurgis/bonsai search "<query>" [flags]
 ```
 
 ### JSON Output envelope `data` block
@@ -215,7 +215,7 @@ npx @taurgis/bonsai research search "<query>" [flags]
 
 ---
 
-## 6. `research config`
+## 6. `config`
 
 Manage where the research cache is stored. Configuration is layered, resolved in
 precedence order: per-command `--storage` flag > `BONSAI_STORAGE` env var >
@@ -241,18 +241,18 @@ only the credential *type* is named.
 
 ```bash
 # Store this project's research cache inside the repo
-npx @taurgis/bonsai research config set storage project --local
+npx @taurgis/bonsai config set storage project --local
 
 # Set the user-wide default
-npx @taurgis/bonsai research config set storage global
+npx @taurgis/bonsai config set storage global
 
 # Inspect values
-npx @taurgis/bonsai research config get storage          # effective value
-npx @taurgis/bonsai research config get storage --local  # project file only
-npx @taurgis/bonsai research config list                 # all keys
+npx @taurgis/bonsai config get storage          # effective value
+npx @taurgis/bonsai config get storage --local  # project file only
+npx @taurgis/bonsai config list                 # all keys
 
 # Remove a key (restores the default)
-npx @taurgis/bonsai research config unset storage --local
+npx @taurgis/bonsai config unset storage --local
 ```
 
 ### Flags
