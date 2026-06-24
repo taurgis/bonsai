@@ -30,6 +30,7 @@ describe('artifact serialization and parsing', () => {
       content_hash: 'sha256-contenthash',
       token_estimate: { compressed: 123, detailed: 456 },
       status: 'active',
+      site_module_id: null,
     },
     summary: 'This is the summary.',
     compressed: 'This is compressed content.',
@@ -49,5 +50,21 @@ describe('artifact serialization and parsing', () => {
   it('throws on missing boundaries', () => {
     expect(() => parseArtifact('malformed')).toThrow(/Frontmatter missing starting boundary/);
     expect(() => parseArtifact('---\nsome: field')).toThrow(/Frontmatter missing ending boundary/);
+  });
+
+  it('roundtrips site_module_id correctly', () => {
+    const withModule = {
+      ...sampleArtifact,
+      metadata: { ...sampleArtifact.metadata, site_module_id: 'react' },
+    };
+    const parsed = parseArtifact(serializeArtifact(withModule));
+    expect(parsed.metadata.site_module_id).toBe('react');
+  });
+
+  it('parses legacy frontmatter without site_module_id as null', () => {
+    const serialized = serializeArtifact(sampleArtifact);
+    const stripped = serialized.replace(/\nsite_module_id:.*/, '');
+    const parsed = parseArtifact(stripped);
+    expect(parsed.metadata.site_module_id).toBeNull();
   });
 });

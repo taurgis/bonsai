@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
+import { getSiteModuleById } from '../../sites/index.js';
 import { fetchStaticHtml } from './fetcher.js';
 import { extractHtmlContent } from './extract.js';
 import { writeArtifact } from './storage.js';
@@ -60,6 +61,7 @@ function buildMetadata(
       detailed: estimateTokens(extraction.detailedMarkdown),
     },
     status: 'active',
+    site_module_id: null,
   };
 }
 
@@ -110,6 +112,43 @@ export function createArtifactFromFetch(
   };
 }
 
+function preserveUserMetadata(
+  source: ResearchArtifactMetadata,
+  target: ResearchArtifact,
+  rendered: boolean | undefined
+): void {
+  target.metadata.topic = source.topic;
+  target.metadata.tags = [...source.tags];
+  target.metadata.site_module_id = source.site_module_id;
+  if (rendered) target.metadata.capture_method = 'browser_fallback';
+}
+
+// Builds a refreshed artifact from a fresh fetch, carries over user metadata, persists it, and
+// returns the "refreshed" result. Shared by both refresh paths (conditional-request fallthrough
+// and site-module re-fetch), which differ only in how fetchResult/extraction are obtained.
+function persistRefreshedArtifact(
+  dataDir: string,
+  meta: ResearchArtifactMetadata,
+  fetchResult: Parameters<typeof createArtifactFromFetch>[3],
+  extraction: Parameters<typeof createArtifactFromFetch>[4],
+  currentTime: Date,
+  options: { ttlOverride?: string | null; rendered?: boolean }
+): RevalidationResult {
+  const refreshed = createArtifactFromFetch(
+    meta.source_url,
+    meta.normalized_url,
+    meta.cache_key,
+    fetchResult,
+    extraction,
+    meta.tier,
+    options.ttlOverride || meta.ttl,
+    currentTime
+  );
+  preserveUserMetadata(meta, refreshed, options.rendered);
+  writeArtifact(dataDir, meta.cache_key, refreshed);
+  return { status: 'refreshed', artifact: refreshed };
+}
+
 async function handleRevalidateResponse(
   dataDir: string,
   existing: ResearchArtifact,
@@ -138,25 +177,7 @@ async function handleRevalidateResponse(
   }
 
   const extraction = extractHtmlContent(fetchResult.content, fetchResult.finalUrl);
-  const refreshed = createArtifactFromFetch(
-    meta.source_url,
-    meta.normalized_url,
-    meta.cache_key,
-    fetchResult,
-    extraction,
-    meta.tier,
-    options.ttlOverride || meta.ttl,
-    currentTime
-  );
-
-  refreshed.metadata.topic = meta.topic;
-  refreshed.metadata.tags = [...meta.tags];
-  if (options.rendered) {
-    refreshed.metadata.capture_method = 'browser_fallback';
-  }
-
-  writeArtifact(dataDir, meta.cache_key, refreshed);
-  return { status: 'refreshed', artifact: refreshed };
+  return persistRefreshedArtifact(dataDir, meta, fetchResult, extraction, currentTime, options);
 }
 
 /**
@@ -189,6 +210,14 @@ export async function revalidateCache(
   }
 
   try {
+    const siteModule = meta.site_module_id ? getSiteModuleById(meta.site_module_id) : null;
+    if (siteModule?.fetchPage) {
+      // Site modules use custom fetch strategies that don't speak HTTP conditional requests
+      // (no ETag/If-Modified-Since), so a full re-fetch is the only correct revalidation here.
+      const { fetchResult, extraction } = await siteModule.fetchPage(meta.source_url);
+      return persistRefreshedArtifact(dataDir, meta, fetchResult, extraction, currentTime, options);
+    }
+
     const fetchResult = options.rendered
       ? await fetchRenderedHtml(meta.source_url)
       : await fetchStaticHtml(meta.source_url, {

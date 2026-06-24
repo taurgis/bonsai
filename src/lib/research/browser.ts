@@ -7,6 +7,8 @@ import { normalizeUrl } from './url.js';
 export interface BrowserFetchOptions {
   timeoutMs?: number;
   bodyLimitBytes?: number;
+  // Extra time to let client-side JS render after the page is ready (SPAs need this).
+  settleMs?: number;
 }
 
 export interface BrowserFetchResult {
@@ -23,7 +25,7 @@ export class CdpClient {
   private ws: WebSocket;
   private nextId = 1;
   private pending = new Map<number, { resolve: (val: any) => void; reject: (err: any) => void }>();
-  private handlers = new Map<string, (params: any) => void>();
+  private handlers = new Map<string, Array<(params: any) => void>>();
 
   constructor(url: string) {
     this.ws = new WebSocket(url);
@@ -47,9 +49,9 @@ export class CdpClient {
           }
         } else if (msg.method) {
           const key = msg.sessionId ? `${msg.sessionId}:${msg.method}` : msg.method;
-          const handler = this.handlers.get(key) || this.handlers.get(msg.method);
-          if (handler) {
-            handler(msg.params);
+          const listeners = this.handlers.get(key) ?? this.handlers.get(msg.method);
+          if (listeners) {
+            listeners.forEach((handler) => handler(msg.params));
           }
         }
       };
@@ -69,7 +71,9 @@ export class CdpClient {
   }
 
   on(event: string, handler: (params: any) => void) {
-    this.handlers.set(event, handler);
+    const listeners = this.handlers.get(event) ?? [];
+    listeners.push(handler);
+    this.handlers.set(event, listeners);
   }
 
   close() {
@@ -181,33 +185,226 @@ async function spawnChrome(
   }
 }
 
-async function waitForLoad(client: CdpClient, sessionId: string, timeoutMs: number): Promise<void> {
-  let loaded = false;
-  client.on(`${sessionId}:Page.loadEventFired`, () => {
-    loaded = true;
-  });
+export async function waitForLoad(
+  client: CdpClient,
+  sessionId: string,
+  timeoutMs: number,
+  settleMs = 1000
+): Promise<void> {
+  // Resolve on whichever fires first: DOMContentLoaded or the full load event. Heavy SPAs
+  // (e.g. Salesforce LWR) often never fire `load`, so requiring it would falsely time out.
+  let ready = false;
+  const markReady = () => {
+    ready = true;
+  };
+  client.on(`${sessionId}:Page.domContentEventFired`, markReady);
+  client.on(`${sessionId}:Page.loadEventFired`, markReady);
 
   const start = Date.now();
-  let settled = false;
-  while (true) {
-    const elapsed = Date.now() - start;
-    if (elapsed >= timeoutMs) {
-      break;
+  while (Date.now() - start < timeoutMs) {
+    if (ready) {
+      const settle = Math.min(settleMs, timeoutMs - (Date.now() - start));
+      if (settle > 0) await new Promise((r) => setTimeout(r, settle));
+      return;
     }
-    if (loaded && !settled) {
-      const remaining = timeoutMs - elapsed;
-      const settleWait = Math.min(1000, remaining);
-      if (settleWait > 0) {
-        await new Promise((r) => setTimeout(r, settleWait));
-      }
-      settled = true;
-      break;
-    }
-    await new Promise((r) => setTimeout(r, Math.min(100, timeoutMs - elapsed)));
+    await new Promise((r) => setTimeout(r, Math.min(100, timeoutMs - (Date.now() - start))));
   }
 
-  if (!loaded || (loaded && !settled && Date.now() - start >= timeoutMs)) {
-    throw new Error(`Navigation timed out after ${timeoutMs}ms`);
+  throw new Error(`Navigation timed out after ${timeoutMs}ms`);
+}
+
+/**
+ * Polls until a content-container element holds enough RENDERED text, so SPAs that fetch their
+ * body after load are captured rendered rather than as a "Loading…" shell. Pierces open shadow
+ * roots (the container is matched across shadow boundaries) and measures `innerText`, which
+ * reflects shadow-rendered text — `document.querySelector` + `textContent` miss both. Returns
+ * without throwing on timeout; the caller captures whatever rendered and judges its quality.
+ */
+export async function waitForContentReady(
+  page: CdpPage,
+  selectors: string[],
+  minChars: number,
+  timeoutMs: number
+): Promise<void> {
+  // Reports whether a content container has rendered (innerText pierces shadow), plus the total
+  // rendered text length so the caller can wait for the render to *settle* — heavy pages (e.g.
+  // the api-console) render the container early but keep filling it in.
+  const expression = `(() => {
+    const out = [];
+    const visit = (r) => { for (const c of Array.from(r.children || [])) { out.push(c); if (c.shadowRoot) visit(c.shadowRoot); visit(c); } };
+    visit(document);
+    const SELS = ${JSON.stringify(selectors)};
+    let has = false;
+    for (const el of out) {
+      if (!el.matches) continue;
+      if (!SELS.some((s) => { try { return el.matches(s); } catch (e) { return false; } })) continue;
+      if (((el.innerText) || '').trim().length >= ${minChars}) { has = true; break; }
+    }
+    return { has, len: document.body ? (document.body.innerText || '').length : 0 };
+  })()`;
+
+  const start = Date.now();
+  let previousLength = -1;
+  let stablePolls = 0;
+  while (Date.now() - start < timeoutMs) {
+    const value = (
+      await page.client
+        .send('Runtime.evaluate', { expression, returnByValue: true }, page.sessionId)
+        .catch(() => null)
+    )?.result?.value;
+    if (value?.has) {
+      const grew =
+        Math.abs((value.len || 0) - previousLength) > Math.max(40, previousLength * 0.02);
+      if (!grew && ++stablePolls >= 2) return; // content present and rendering has settled
+      if (grew) stablePolls = 0;
+      previousLength = value.len || 0;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+}
+
+export const BLOCKED_ASSET_URLS = [
+  '*.css',
+  '*.png',
+  '*.jpg',
+  '*.jpeg',
+  '*.gif',
+  '*.svg',
+  '*.woff',
+  '*.woff2',
+  '*.ttf',
+  '*.mp4',
+  '*.mp3',
+  '*.ico',
+];
+
+const DEFAULT_USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+export interface CdpPage {
+  client: CdpClient;
+  sessionId: string;
+  close: () => Promise<void>;
+}
+
+/**
+ * Spawns a headless Chrome, attaches a flat CDP session, and enables the Page, Network,
+ * and Runtime domains. The caller drives navigation and must call close() when finished.
+ */
+export async function openCdpPage(): Promise<CdpPage> {
+  const chromePath = findChromePath();
+  const { chromeProcess, wsUrl } = await spawnChrome(chromePath);
+  const client = new CdpClient(wsUrl);
+
+  try {
+    await client.connect();
+    const { targetId } = await client.send('Target.createTarget', { url: 'about:blank' });
+    const { sessionId } = await client.send('Target.attachToTarget', { targetId, flatten: true });
+
+    await client.send('Page.enable', {}, sessionId);
+    await client.send('Network.enable', {}, sessionId);
+    await client.send('Runtime.enable', {}, sessionId);
+    await client.send('Network.setUserAgentOverride', { userAgent: DEFAULT_USER_AGENT }, sessionId);
+
+    const close = async (): Promise<void> => {
+      try {
+        await client.send('Target.closeTarget', { targetId });
+      } catch {}
+      client.close();
+      chromeProcess.kill('SIGKILL');
+    };
+    return { client, sessionId, close };
+  } catch (err) {
+    client.close();
+    chromeProcess.kill('SIGKILL');
+    throw err;
+  }
+}
+
+interface RequestWillBeSentEvent {
+  requestId: string;
+  request?: { url?: string; postData?: string };
+}
+
+export interface ResponseMatcher {
+  key: string;
+  test: (request: { url: string; postData?: string }) => boolean;
+  // Optional body filter: when several responses match `test`, capture the first whose
+  // body satisfies `accept` (e.g. the one that parses to a token), ignoring the rest.
+  accept?: (body: string) => boolean;
+}
+
+/**
+ * Buffers response bodies for requests matching one of the supplied matchers, keyed by
+ * matcher key. Matching happens on requestWillBeSent so predicates can inspect post data
+ * (e.g. to tell two same-URL XHRs apart). Works around CdpClient's single-handler-per-event
+ * model so several waitFor() calls can track different responses from one navigation.
+ * Install before navigating.
+ */
+export class ResponseCapture {
+  private matched = new Map<string, string[]>(); // requestId -> matcher keys
+  private bodies = new Map<string, string>(); // matcher key -> response body text
+  private waiters = new Map<string, Array<(body: string | null) => void>>();
+  private page: CdpPage;
+  private matchers: ResponseMatcher[];
+
+  constructor(page: CdpPage, matchers: ResponseMatcher[]) {
+    this.page = page;
+    this.matchers = matchers;
+    const { client, sessionId } = page;
+    client.on(`${sessionId}:Network.requestWillBeSent`, (params: RequestWillBeSentEvent) => {
+      const request = { url: params.request?.url ?? '', postData: params.request?.postData };
+      const keys = this.matchers.filter((m) => m.test(request)).map((m) => m.key);
+      if (keys.length) this.matched.set(params.requestId, keys);
+    });
+    client.on(`${sessionId}:Network.loadingFinished`, (params: { requestId: string }) => {
+      void this.onFinished(params.requestId);
+    });
+  }
+
+  // Body is only available after loadingFinished, per the CDP Network contract.
+  private async onFinished(requestId: string): Promise<void> {
+    const keys = this.matched.get(requestId);
+    if (!keys) return;
+    const body = await this.readBody(requestId);
+    if (body === null) return;
+    for (const key of keys) {
+      if (this.bodies.has(key)) continue; // already captured for this key
+      const matcher = this.matchers.find((m) => m.key === key);
+      if (matcher?.accept && !matcher.accept(body)) continue; // wait for a later matching response
+      this.bodies.set(key, body);
+      const waiters = this.waiters.get(key) ?? [];
+      this.waiters.delete(key);
+      waiters.forEach((resolve) => resolve(body));
+    }
+  }
+
+  private async readBody(requestId: string): Promise<string | null> {
+    try {
+      const res = await this.page.client.send(
+        'Network.getResponseBody',
+        { requestId },
+        this.page.sessionId
+      );
+      return res.base64Encoded ? Buffer.from(res.body, 'base64').toString('utf8') : res.body;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Resolves with the response body text once a matching response finishes, or null on timeout. */
+  waitFor(key: string, timeoutMs: number): Promise<string | null> {
+    const existing = this.bodies.get(key);
+    if (existing !== undefined) return Promise.resolve(existing);
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => resolve(null), timeoutMs);
+      const list = this.waiters.get(key) ?? [];
+      list.push((body) => {
+        clearTimeout(timer);
+        resolve(body);
+      });
+      this.waiters.set(key, list);
+    });
   }
 }
 
@@ -219,69 +416,18 @@ export async function fetchRenderedHtml(
   const limit = options.bodyLimitBytes ?? 2 * 1024 * 1024;
 
   const currentUrl = normalizeUrl(url);
-  const parsedUrl = new URL(currentUrl);
-  await checkDnsSafety(parsedUrl.hostname);
+  await checkDnsSafety(new URL(currentUrl).hostname);
 
-  const chromePath = findChromePath();
-  const { chromeProcess, wsUrl } = await spawnChrome(chromePath);
-
-  let client: CdpClient | null = null;
-  let targetId: string | null = null;
-
+  const page = await openCdpPage();
   try {
-    client = new CdpClient(wsUrl);
-    await client.connect();
+    await page.client.send('Network.setBlockedURLs', { urls: BLOCKED_ASSET_URLS }, page.sessionId);
+    await page.client.send('Page.navigate', { url: currentUrl }, page.sessionId);
+    await waitForLoad(page.client, page.sessionId, timeout, options.settleMs ?? 1000);
 
-    const createResult = await client.send('Target.createTarget', { url: 'about:blank' });
-    targetId = createResult.targetId;
-
-    const attachResult = await client.send('Target.attachToTarget', { targetId, flatten: true });
-    const sessionId = attachResult.sessionId;
-
-    await client.send('Page.enable', {}, sessionId);
-    await client.send('Network.enable', {}, sessionId);
-    await client.send('Runtime.enable', {}, sessionId);
-
-    await client.send(
-      'Network.setUserAgentOverride',
-      {
-        userAgent:
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      },
-      sessionId
-    );
-
-    await client.send(
-      'Network.setBlockedURLs',
-      {
-        urls: [
-          '*.css',
-          '*.png',
-          '*.jpg',
-          '*.jpeg',
-          '*.gif',
-          '*.svg',
-          '*.woff',
-          '*.woff2',
-          '*.ttf',
-          '*.mp4',
-          '*.mp3',
-          '*.ico',
-        ],
-      },
-      sessionId
-    );
-
-    await client.send('Page.navigate', { url: currentUrl }, sessionId);
-    await waitForLoad(client, sessionId, timeout);
-
-    const evalResult = await client.send(
+    const evalResult = await page.client.send(
       'Runtime.evaluate',
-      {
-        expression: 'document.documentElement.outerHTML',
-        returnByValue: true,
-      },
-      sessionId
+      { expression: 'document.documentElement.outerHTML', returnByValue: true },
+      page.sessionId
     );
 
     const html = evalResult.result?.value;
@@ -304,14 +450,6 @@ export async function fetchRenderedHtml(
       content: html,
     };
   } finally {
-    if (client && targetId) {
-      try {
-        await client.send('Target.closeTarget', { targetId });
-      } catch {}
-    }
-    if (client) {
-      client.close();
-    }
-    chromeProcess.kill('SIGKILL');
+    await page.close();
   }
 }

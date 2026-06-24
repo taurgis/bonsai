@@ -7,9 +7,13 @@ import { revalidateCache } from './revalidate.js';
 import { writeArtifact, readArtifact } from './storage.js';
 import type { ResearchArtifact } from './schema.js';
 import * as fetcher from './fetcher.js';
+import * as sites from '../../sites/index.js';
 
 vi.mock('./fetcher.js', () => ({
   fetchStaticHtml: vi.fn(),
+}));
+vi.mock('../../sites/index.js', () => ({
+  getSiteModuleById: vi.fn(),
 }));
 
 describe('freshness and revalidation engine', () => {
@@ -40,6 +44,7 @@ describe('freshness and revalidation engine', () => {
       content_hash: 'sha256-contenthash',
       token_estimate: { compressed: 12, detailed: 24 },
       status: 'active',
+      site_module_id: null,
     },
     summary: 'Excerpt content',
     compressed: 'Compressed text',
@@ -49,6 +54,7 @@ describe('freshness and revalidation engine', () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(sites.getSiteModuleById).mockReturnValue(undefined);
   });
 
   describe('freshness classification', () => {
@@ -204,6 +210,75 @@ describe('freshness and revalidation engine', () => {
       await expect(
         revalidateCache(tempDir, sampleArtifact, currentTime, { allowStale: true })
       ).rejects.toThrow(/expired beyond the grace period/);
+    });
+
+    it('preserves site_module_id through generic refreshed path (non-304 response)', async () => {
+      const newHtml =
+        '<!doctype html><html><body><h1>New Content</h1><p>This is a refreshed paragraph to satisfy reading length thresholds.</p></body></html>';
+      vi.mocked(fetcher.fetchStaticHtml).mockResolvedValue({
+        status: 200,
+        contentType: 'text/html',
+        etag: 'w/9999',
+        lastModified: null,
+        finalUrl: 'https://example.com/docs',
+        responseSize: newHtml.length,
+        content: newHtml,
+      });
+
+      const artifactWithModule: ResearchArtifact = {
+        ...sampleArtifact,
+        metadata: { ...sampleArtifact.metadata, site_module_id: 'salesforce' },
+      };
+      const currentTime = new Date('2026-07-29T00:00:00.000Z');
+      writeArtifact(tempDir, artifactWithModule.metadata.cache_key, artifactWithModule);
+
+      const result = await revalidateCache(tempDir, artifactWithModule, currentTime, {
+        allowStale: false,
+      });
+
+      expect(result.status).toBe('refreshed');
+      expect(result.artifact.metadata.site_module_id).toBe('salesforce');
+    });
+
+    it('uses the site module fetchPage on revalidation and preserves site_module_id', async () => {
+      const mockFetchPage = vi.fn().mockResolvedValue({
+        fetchResult: {
+          contentType: 'text/html',
+          etag: null,
+          lastModified: null,
+          finalUrl: 'https://help.salesforce.com/s/articleView?id=sf.x.htm&type=5',
+          responseSize: 200,
+          content: '<html></html>',
+        },
+        extraction: {
+          title: 'Module Content',
+          detailedMarkdown: '# Module Content\n\nA paragraph long enough to clear length checks.',
+          confidence: 'high' as const,
+          qualityNotes: ['site module extraction'],
+        },
+      });
+      vi.mocked(sites.getSiteModuleById).mockReturnValue({
+        id: 'salesforce',
+        name: 'Salesforce',
+        domains: ['help.salesforce.com'],
+        fetchPage: mockFetchPage,
+      });
+
+      const artifactWithModule: ResearchArtifact = {
+        ...sampleArtifact,
+        metadata: { ...sampleArtifact.metadata, site_module_id: 'salesforce' },
+      };
+      const currentTime = new Date('2026-07-29T00:00:00.000Z'); // stale, in grace
+      writeArtifact(tempDir, artifactWithModule.metadata.cache_key, artifactWithModule);
+
+      const result = await revalidateCache(tempDir, artifactWithModule, currentTime, {
+        allowStale: false,
+      });
+
+      expect(result.status).toBe('refreshed');
+      expect(mockFetchPage).toHaveBeenCalledWith('https://example.com/docs');
+      expect(fetcher.fetchStaticHtml).not.toHaveBeenCalled();
+      expect(result.artifact.metadata.site_module_id).toBe('salesforce');
     });
   });
 });

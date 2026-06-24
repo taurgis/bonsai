@@ -7,47 +7,49 @@ function serializeArrayField(lines: string[], name: string, items: string[]): vo
   }
 }
 
+// A scalar frontmatter line, blanking null/undefined. Using `??` (not `||`) preserves a numeric 0.
+function serializeScalarField(
+  lines: string[],
+  name: string,
+  value: string | number | null | undefined
+): void {
+  lines.push(`${name}: ${value ?? ''}`);
+}
+
 /**
  * Serializes artifact metadata to standard YAML frontmatter text.
  */
 export function serializeMetadata(meta: ResearchArtifactMetadata): string {
   const lines: string[] = [];
   lines.push('---');
-  lines.push(`schema_version: ${meta.schema_version}`);
-  lines.push(`artifact_type: ${meta.artifact_type}`);
-  lines.push(`source_url: ${meta.source_url || ''}`);
-
+  serializeScalarField(lines, 'schema_version', meta.schema_version);
+  serializeScalarField(lines, 'artifact_type', meta.artifact_type);
+  serializeScalarField(lines, 'source_url', meta.source_url);
   serializeArrayField(lines, 'source_urls', meta.source_urls);
-
-  lines.push(`normalized_url: ${meta.normalized_url}`);
-  lines.push(`cache_key: ${meta.cache_key}`);
-  lines.push(`topic: ${meta.topic || ''}`);
-
+  serializeScalarField(lines, 'normalized_url', meta.normalized_url);
+  serializeScalarField(lines, 'cache_key', meta.cache_key);
+  serializeScalarField(lines, 'topic', meta.topic);
   serializeArrayField(lines, 'tags', meta.tags);
   serializeArrayField(lines, 'format_available', meta.format_available);
-
-  lines.push(`tier: ${meta.tier}`);
-  lines.push(`ttl: ${meta.ttl || ''}`);
-  lines.push(`fetched_at: ${meta.fetched_at || ''}`);
-  lines.push(`validated_at: ${meta.validated_at || ''}`);
-  lines.push(`stale_after: ${meta.stale_after || ''}`);
-  lines.push(`capture_method: ${meta.capture_method || ''}`);
-  lines.push(`extraction_status: ${meta.extraction_status || ''}`);
-  lines.push(`extraction_confidence: ${meta.extraction_confidence || ''}`);
-
+  serializeScalarField(lines, 'tier', meta.tier);
+  serializeScalarField(lines, 'ttl', meta.ttl);
+  serializeScalarField(lines, 'fetched_at', meta.fetched_at);
+  serializeScalarField(lines, 'validated_at', meta.validated_at);
+  serializeScalarField(lines, 'stale_after', meta.stale_after);
+  serializeScalarField(lines, 'capture_method', meta.capture_method);
+  serializeScalarField(lines, 'extraction_status', meta.extraction_status);
+  serializeScalarField(lines, 'extraction_confidence', meta.extraction_confidence);
   serializeArrayField(lines, 'quality_notes', meta.quality_notes);
-
-  lines.push(`supplied_at: ${meta.supplied_at || ''}`);
-  lines.push(`supplied_by: ${meta.supplied_by || ''}`);
-  lines.push(`etag: ${meta.etag || ''}`);
-  lines.push(`last_modified: ${meta.last_modified || ''}`);
-  lines.push(`content_hash: ${meta.content_hash}`);
-
+  serializeScalarField(lines, 'supplied_at', meta.supplied_at);
+  serializeScalarField(lines, 'supplied_by', meta.supplied_by);
+  serializeScalarField(lines, 'etag', meta.etag);
+  serializeScalarField(lines, 'last_modified', meta.last_modified);
+  serializeScalarField(lines, 'content_hash', meta.content_hash);
   lines.push('token_estimate:');
-  lines.push(`  compressed: ${meta.token_estimate.compressed ?? ''}`);
-  lines.push(`  detailed: ${meta.token_estimate.detailed ?? ''}`);
-
-  lines.push(`status: ${meta.status}`);
+  serializeScalarField(lines, '  compressed', meta.token_estimate.compressed);
+  serializeScalarField(lines, '  detailed', meta.token_estimate.detailed);
+  serializeScalarField(lines, 'status', meta.status);
+  serializeScalarField(lines, 'site_module_id', meta.site_module_id);
   lines.push('---');
 
   return lines.join('\n');
@@ -165,6 +167,7 @@ export function parseMetadata(lines: string[]): ResearchArtifactMetadata {
       content_hash: '',
       token_estimate: { compressed: null, detailed: null },
       status: 'active',
+      site_module_id: null,
     },
     currentArrayKey: null,
     currentObjectKey: null,

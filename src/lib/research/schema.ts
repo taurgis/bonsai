@@ -29,6 +29,7 @@ export interface ResearchArtifactMetadata {
   content_hash: string;
   token_estimate: TokenEstimate;
   status: 'active' | 'archived';
+  site_module_id: string | null;
 }
 
 export interface ResearchArtifact {

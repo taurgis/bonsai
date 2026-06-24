@@ -11,6 +11,8 @@ import { revalidateCache, createArtifactFromFetch } from '../lib/research/revali
 import { fetchStaticHtml } from '../lib/research/fetcher.js';
 import { extractHtmlContent } from '../lib/research/extract.js';
 import { fetchRenderedHtml } from '../lib/research/browser.js';
+import { detectSite } from '../sites/index.js';
+import type { SiteFetchResult } from '../sites/types.js';
 
 export default class Research extends BaseCommand<typeof Research> {
   static id = 'research';
@@ -133,10 +135,20 @@ export default class Research extends BaseCommand<typeof Research> {
   ): Promise<any> {
     const { topic, tags, tier, ttl, rendered } = this.flags;
 
-    const fetchResult = rendered
-      ? await fetchRenderedHtml(normalizedUrl)
-      : await fetchStaticHtml(normalizedUrl);
-    const extraction = extractHtmlContent(fetchResult.content, fetchResult.finalUrl);
+    const siteModule = detectSite(normalizedUrl);
+    const useRendered = rendered || Boolean(siteModule?.defaults?.rendered);
+
+    let fetchResult: SiteFetchResult['fetchResult'];
+    let extraction: SiteFetchResult['extraction'];
+    if (siteModule?.fetchPage) {
+      ({ fetchResult, extraction } = await siteModule.fetchPage(normalizedUrl));
+    } else {
+      fetchResult = useRendered
+        ? await fetchRenderedHtml(normalizedUrl)
+        : await fetchStaticHtml(normalizedUrl);
+      extraction = extractHtmlContent(fetchResult.content, fetchResult.finalUrl);
+    }
+
     const artifact = createArtifactFromFetch(
       normalizedUrl,
       normalizedUrl,
@@ -150,7 +162,8 @@ export default class Research extends BaseCommand<typeof Research> {
 
     artifact.metadata.topic = topic || null;
     artifact.metadata.tags = tags || [];
-    if (rendered) {
+    artifact.metadata.site_module_id = siteModule?.id ?? null;
+    if (useRendered) {
       artifact.metadata.capture_method = 'browser_fallback';
     }
 

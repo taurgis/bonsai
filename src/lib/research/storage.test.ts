@@ -39,6 +39,7 @@ describe('cache storage filesystem management', () => {
       content_hash: 'sha256-contenthash',
       token_estimate: { compressed: 123, detailed: 456 },
       status: 'active',
+      site_module_id: null,
     },
     summary: 'Summary paragraph.',
     compressed: 'Compressed text.',

@@ -273,6 +273,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         detailed: estimateTokens(detailed),
       },
       status: 'active',
+      site_module_id: null,
     };
 
     return {

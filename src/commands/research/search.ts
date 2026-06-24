@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { BaseCommand } from '../../base-command.js';
 import { getArtifactPath, scanCacheDir } from '../../lib/research/storage.js';
 import { evaluateFreshness } from '../../lib/research/freshness.js';
+import { detectSite } from '../../sites/index.js';
 
 const FRESHNESS_BONUS: Record<string, number> = { fresh: 30, stale_grace: 10 };
 
@@ -40,6 +41,10 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     'include-stale': Flags.boolean({
       description: 'Include stale expired cache entries in the search results.',
       default: false,
+    }),
+    domain: Flags.string({
+      description:
+        'Search a documentation site directly (e.g. help.salesforce.com) instead of the local cache. Requires a site module that implements search.',
     }),
   };
 
@@ -203,6 +208,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
         captureMethod: artifact.metadata.capture_method,
         tokenEstimate: artifact.metadata.token_estimate,
         snippet: this.makeSnippet(snippetText, queryTerms),
+        siteModuleId: artifact.metadata.site_module_id,
         score,
       };
     });
@@ -219,8 +225,34 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     });
   }
 
+  private async executeSiteSearch(query: string, domain: string): Promise<unknown> {
+    const siteModule = detectSite(`https://${domain}`);
+    if (!siteModule) {
+      this.error(`No site module registered for domain: ${domain}`, { exit: 2 });
+    }
+    if (!siteModule.search) {
+      this.error(`Site module '${siteModule.id}' does not implement search.`, { exit: 2 });
+    }
+    const results = await siteModule.search(query);
+    if (!this.requestedJson()) {
+      this.log(`Found ${results.length} results from ${siteModule.name}:\n`);
+      results.forEach((r, i) => {
+        this.log(`${i + 1}. ${r.title}`);
+        this.log(`   URL: ${r.url}`);
+        if (r.snippet) this.log(`   ${r.snippet}`);
+      });
+    }
+    return results.map((r) => ({ ...r, site_module_id: siteModule.id }));
+  }
+
   async execute(): Promise<unknown> {
     const { query } = this.args;
+    const { domain } = this.flags;
+
+    if (domain) {
+      return this.executeSiteSearch(query, domain);
+    }
+
     this.validateSearchFlags();
     const queryTerms = this.getSearchQueryTerms(query);
 

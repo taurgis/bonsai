@@ -19,6 +19,9 @@
     "lint:line-counts": "node scripts/check-line-counts.ts --all",
     "lint:health": "pnpm test:coverage && npx fallow health --format human",
     "prepare": "husky",
+    "regression:suite": "tsc -b && node testing/regression/run-suite.mjs",
+    "regression:promote": "tsc -b && node testing/regression/run-suite.mjs --promote",
+    "regression:check": "tsc -b && node testing/regression/run-suite.mjs --strict",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit"

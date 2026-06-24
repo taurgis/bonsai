@@ -524,6 +524,13 @@
           "name": "include-stale",
           "allowNo": false,
           "type": "boolean"
+        },
+        "domain": {
+          "description": "Search a documentation site directly (e.g. help.salesforce.com) instead of the local cache. Requires a site module that implements search.",
+          "name": "domain",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
