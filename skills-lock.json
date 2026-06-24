@@ -1,0 +1,516 @@
+{
+  "version": 4,
+  "skills": {
+    "agent-authoring": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "c8a8905d0ef96eb0d13a4d7da9fc777cc751a34db81581ccf67188a7c7ee0416",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/agent-authoring/SKILL.md",
+      "installPath": ".agents/skills/agent-authoring",
+      "installHash": "f777f3d73c410fc04607017ea63e0fc43d4a706d3f4af4869decd2afd5098eac",
+      "sourceHash": "c8a8905d0ef96eb0d13a4d7da9fc777cc751a34db81581ccf67188a7c7ee0416",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "cli-design-principles": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "f30c6032cb90d52444330d47e29ae880b566bcf7d085af067eafcfacf1d6a545",
+      "ref": "categories/cli-development",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/cli-design-principles/SKILL.md",
+      "installPath": ".agents/skills/cli-design-principles",
+      "installHash": "32230dc1f2296f6b71d73e3b1b81783b5a445c6c750cd9d75e8d394b8e85ea26",
+      "sourceHash": "f30c6032cb90d52444330d47e29ae880b566bcf7d085af067eafcfacf1d6a545",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "cli-output-design": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "e8299cf6e84e3e39d505ca2c214ce92a8a585d31468fd18fd287ae32c6c8f183",
+      "ref": "categories/cli-development",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/cli-output-design/SKILL.md",
+      "installPath": ".agents/skills/cli-output-design",
+      "installHash": "dac9e1d788b80ef4bc36bc796313e7e077eca6207e0c39dd3a0715143d3e6cda",
+      "sourceHash": "e8299cf6e84e3e39d505ca2c214ce92a8a585d31468fd18fd287ae32c6c8f183",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "fallow": {
+      "source": "fallow-rs/fallow-skills",
+      "sourceType": "github",
+      "computedHash": "fbf66217c44556669c62e1fd2f2b52b56dc201d3a6fa2eaaf1c6bfc1649c4902",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor"
+      ],
+      "repoPath": "fallow/skills/fallow/SKILL.md",
+      "installPath": ".agents/skills/fallow",
+      "installHash": "d5c249f95b948e6954f88bdeb8498d31388b1c7c690844dead0daae6483c8a79",
+      "sourceHash": "fbf66217c44556669c62e1fd2f2b52b56dc201d3a6fa2eaaf1c6bfc1649c4902",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "graphify": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "959b61737a592998e251bb9271520d5f9014e93e7038f6222b4d98378edeb18d",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/graphify/SKILL.md",
+      "installPath": ".agents/skills/graphify",
+      "installHash": "e3ab7fe81f5ced0a78b02a9fb13479551421563f19ec57c14abb418d6ac4d9cc",
+      "sourceHash": "959b61737a592998e251bb9271520d5f9014e93e7038f6222b4d98378edeb18d",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "javascript-development": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "ce830138de379edbf9d1bb56561b6256593980759eab62541b49d34e1a2ddaa4",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/javascript-development/SKILL.md",
+      "installPath": ".agents/skills/javascript-development",
+      "installHash": "c190c0f29e9ecd67d48b77e255df38d353aaccdad9473032dec7473d821f2ae0",
+      "sourceHash": "ce830138de379edbf9d1bb56561b6256593980759eab62541b49d34e1a2ddaa4",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "oclif-command-development": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "cd2ca280f6f14818c14f4fd81b184990ea5b4a0a6bafb6801ac8af2fa92f1e3d",
+      "ref": "categories/cli-development",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/oclif-command-development/SKILL.md",
+      "installPath": ".agents/skills/oclif-command-development",
+      "installHash": "873b05ad4f84b7e4a6f76ecada0a3f90410d0fa0bc018a38c4e7608eb01814b1",
+      "sourceHash": "cd2ca280f6f14818c14f4fd81b184990ea5b4a0a6bafb6801ac8af2fa92f1e3d",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "oclif-project-setup": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "d11891cd25b982656e256d2874af3e74e7081ac2bd8f2beff21c822850b95803",
+      "ref": "categories/cli-development",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/oclif-project-setup/SKILL.md",
+      "installPath": ".agents/skills/oclif-project-setup",
+      "installHash": "b7d4900b74c3bd296966f3f5715b2c06ad2fb4be314639651f2884eb75f75349",
+      "sourceHash": "d11891cd25b982656e256d2874af3e74e7081ac2bd8f2beff21c822850b95803",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "oclif-testing": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "012fdaccf03d47b88d6c8943e5679c3c0d6395c070597bc8fc2a04aec13d1cca",
+      "ref": "categories/cli-development",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/oclif-testing/SKILL.md",
+      "installPath": ".agents/skills/oclif-testing",
+      "installHash": "514f9ea3ff36dfcb0b851b9501876598636365659bfe2216409c8bef7d405c71",
+      "sourceHash": "012fdaccf03d47b88d6c8943e5679c3c0d6395c070597bc8fc2a04aec13d1cca",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "oclif-ux-and-output": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "71f7767f6c03062ed38415306c22a60cf5708f2be3c01030081c8d797edc6fea",
+      "ref": "categories/cli-development",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/oclif-ux-and-output/SKILL.md",
+      "installPath": ".agents/skills/oclif-ux-and-output",
+      "installHash": "d2621858c449ec4c5bd53dddfa63a0cac342dadc64a22ffec39e2af82c95ffa1",
+      "sourceHash": "71f7767f6c03062ed38415306c22a60cf5708f2be3c01030081c8d797edc6fea",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "ponytail": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "e91ed2fadde7b43e4b413b24f2ecb9d8f03e7baace10b140305e30cdf67bc88a",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/ponytail/SKILL.md",
+      "installPath": ".agents/skills/ponytail",
+      "installHash": "5459c4db58879728453d94546c51a2e459b6803ef02a558d3f10817e0f8cbaa5",
+      "sourceHash": "e91ed2fadde7b43e4b413b24f2ecb9d8f03e7baace10b140305e30cdf67bc88a",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "ponytail-audit": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "60d97ceea90c03d6cf6004539e65ab7be1a23ecff6dc1da36f05aa04e98b58c8",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/ponytail-audit/SKILL.md",
+      "installPath": ".agents/skills/ponytail-audit",
+      "installHash": "3f99920e2b1eb85bcbb83762d32c6a8fe96c23739e277720304b15769706a1cc",
+      "sourceHash": "60d97ceea90c03d6cf6004539e65ab7be1a23ecff6dc1da36f05aa04e98b58c8",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "ponytail-debt": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "936fd2e6e88983f03de3b39f4ae13d05dfece12fc0160273ae657d02e0015000",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/ponytail-debt/SKILL.md",
+      "installPath": ".agents/skills/ponytail-debt",
+      "installHash": "d05ecaedb1a4a9f1c3b1dce9b470c23ca1ff377b4c4bb5f4fc8aeea01bb12e31",
+      "sourceHash": "936fd2e6e88983f03de3b39f4ae13d05dfece12fc0160273ae657d02e0015000",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "ponytail-review": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "c2aea3f785047597ae73da52cb1abeba075716d77cbe9626baa1cb43c05c3935",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/ponytail-review/SKILL.md",
+      "installPath": ".agents/skills/ponytail-review",
+      "installHash": "fcdcab492a88bf83bc2881aec0519c5e4b53eff809abc2da3336052205eadd86",
+      "sourceHash": "c2aea3f785047597ae73da52cb1abeba075716d77cbe9626baa1cb43c05c3935",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "skill-authoring": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "1c6dbfa9384b6e0e5334c83bed2be2b72eef4d1e923a86f333e54992acbaea8e",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": "skills/skill-authoring/SKILL.md",
+      "installPath": ".agents/skills/skill-authoring",
+      "installHash": "f8e6a0c79781d87cfa29c21b4164c10f0997bc98eb75d37fb33144aca659d2bb",
+      "sourceHash": "1c6dbfa9384b6e0e5334c83bed2be2b72eef4d1e923a86f333e54992acbaea8e",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "thermo-nuclear-code-quality-review": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "991d5d2e6abb88d72b3d313631c79ec94fd65b3ef9050e994545854027432494",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/thermo-nuclear-code-quality-review/SKILL.md",
+      "installPath": ".agents/skills/thermo-nuclear-code-quality-review",
+      "installHash": "e6c7f47de42b75eac61e510b8656cce04199fe503305479b17f1ce7db8d19788",
+      "sourceHash": "991d5d2e6abb88d72b3d313631c79ec94fd65b3ef9050e994545854027432494",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    }
+  },
+  "instructions": {
+    ".github/instructions/development-principles-ponytail.instructions.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "instructions/development-principles-ponytail.instructions.md",
+      "installPath": ".github/instructions/development-principles-ponytail.instructions.md",
+      "computedHash": "58d53c2ea271871f03aac733baa8759b0cb64767ec093fd35c066d28fefc702f",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "linkedSkills": [
+        "graphify",
+        "ponytail",
+        "ponytail-audit",
+        "ponytail-debt",
+        "ponytail-review",
+        "thermo-nuclear-code-quality-review"
+      ],
+      "installHash": "58d53c2ea271871f03aac733baa8759b0cb64767ec093fd35c066d28fefc702f",
+      "sourceHash": "114f4200c877fe6384192d2fff2bc32d431846b7ec6186a74bc8ef3398f0da86",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    ".github/instructions/post-feature-code-review.instructions.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "instructions/post-feature-code-review.instructions.md",
+      "installPath": ".github/instructions/post-feature-code-review.instructions.md",
+      "computedHash": "2604bcfc4e1f881bae211a84612d823c9c0c676f45e3d1917395f7d596a556d3",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "2604bcfc4e1f881bae211a84612d823c9c0c676f45e3d1917395f7d596a556d3",
+      "sourceHash": "870b5a184df48e1b1b61a1102b222ec12f3d0e92294f50c0d1760e92dd5acc81",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.1.0",
+      "installVersion": "1.1.0"
+    },
+    ".github/instructions/post-feature-quality-validation.instructions.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "instructions/post-feature-quality-validation.instructions.md",
+      "installPath": ".github/instructions/post-feature-quality-validation.instructions.md",
+      "computedHash": "5988c8a1c6916384a3b5b16754bf1c66441e723e82a7672721f93453a1f7f7cf",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "5988c8a1c6916384a3b5b16754bf1c66441e723e82a7672721f93453a1f7f7cf",
+      "sourceHash": "267caea28fd981311fdc9c3f0e8f4077fce6d5fafd35ce32f2ae5480ac4f1ffd",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.1",
+      "installVersion": "1.0.1"
+    },
+    ".github/instructions/release-management.instructions.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "instructions/release-management.instructions.md",
+      "installPath": ".github/instructions/release-management.instructions.md",
+      "computedHash": "252965d962a3682ebb91712bb77e1d8302b671f9e043a03e176fd83d2c8a67ce",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "252965d962a3682ebb91712bb77e1d8302b671f9e043a03e176fd83d2c8a67ce",
+      "sourceHash": "6274fa72a8946cf081f62830065fc785caa0e221c4c5b701f22bffccb207c122",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.2",
+      "installVersion": "1.0.2"
+    },
+    ".github/instructions/repo-research.instructions.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "instructions/repo-research.instructions.md",
+      "installPath": ".github/instructions/repo-research.instructions.md",
+      "computedHash": "8e91fb5aa27b6154fedaac01516c17cef1591f986421c95132b5e91af50751c1",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "8e91fb5aa27b6154fedaac01516c17cef1591f986421c95132b5e91af50751c1",
+      "sourceHash": "1a239b605f9929f20a8b138a252011f3b4dfb076115a080deda952c3521f4598",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.1",
+      "installVersion": "1.0.1"
+    },
+    ".github/instructions/senior-quality-engineer-reporting.instructions.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "instructions/senior-quality-engineer-reporting.instructions.md",
+      "installPath": ".github/instructions/senior-quality-engineer-reporting.instructions.md",
+      "computedHash": "6cfe4dab657eabcfe7fad428b2b760a2f214564330d211ed9b9efd2933cd933e",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "6cfe4dab657eabcfe7fad428b2b760a2f214564330d211ed9b9efd2933cd933e",
+      "sourceHash": "20d6c1921c4cbdfbcd029e84e6e5eb066b796fb4f9f35d3d470934ece82c52ec",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    }
+  },
+  "customAgents": {
+    ".github/agents/official-docs-researcher.agent.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "agents/official-docs-researcher.agent.md",
+      "installPath": ".github/agents/official-docs-researcher.agent.md",
+      "computedHash": "11fedb9728711d960f04aba2601c696c9ecdb3158e96a96fd6e58100dca47d21",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "11fedb9728711d960f04aba2601c696c9ecdb3158e96a96fd6e58100dca47d21",
+      "sourceHash": "78a2fa24e6f33e6b58e6fe2095abf4235a648f9cb686b94fcafe4386d2d4416d",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "2.1.0",
+      "installVersion": "2.1.0"
+    },
+    ".github/agents/senior-code-reviewer.agent.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "agents/senior-code-reviewer.agent.md",
+      "installPath": ".github/agents/senior-code-reviewer.agent.md",
+      "computedHash": "fd435fdeff6ec09e6260ecc3085a560f5741ef6624c0b70bb9b60cb4bec68004",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "fd435fdeff6ec09e6260ecc3085a560f5741ef6624c0b70bb9b60cb4bec68004",
+      "sourceHash": "eec4a8e469923fc0f8af2a84f3c3bd5cefec679375fd4dcfbf8baab6a4892182",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.2.0",
+      "installVersion": "1.2.0"
+    },
+    ".github/agents/senior-quality-engineer.agent.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "agents/senior-quality-engineer.agent.md",
+      "installPath": ".github/agents/senior-quality-engineer.agent.md",
+      "computedHash": "f5cc1bd0badd801d2da8c026186d3aad370701ec9d55a44fece760b10124fa04",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "f5cc1bd0badd801d2da8c026186d3aad370701ec9d55a44fece760b10124fa04",
+      "sourceHash": "da933ecfb1d8da2f1347ce3abe26d402d68b172de4364fa4a10fc4f06f33c2ef",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "2.1.0",
+      "installVersion": "2.1.0"
+    },
+    ".github/agents/senior-release-manager.agent.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "agents/senior-release-manager.agent.md",
+      "installPath": ".github/agents/senior-release-manager.agent.md",
+      "computedHash": "fcf46516bac740e86b4b69465db1c7f99ecac469cc7352bcc2c8aa5974e98774",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "installHash": "fcf46516bac740e86b4b69465db1c7f99ecac469cc7352bcc2c8aa5974e98774",
+      "sourceHash": "fd20eb113ba810c93183f17f3de9e0c7c5b746f0fed7301059e9b05729b4f543",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.1.0",
+      "installVersion": "1.1.0"
+    }
+  }
+}
