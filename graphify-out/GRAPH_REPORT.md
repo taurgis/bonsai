@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-24)
 
 ## Corpus Check
-- 178 files · ~118,318 words
+- 186 files · ~123,945 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1607 nodes · 1707 edges · 172 communities (158 shown, 14 thin omitted)
+- 1675 nodes · 1832 edges · 176 communities (162 shown, 14 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `21754a08`
+- Built from commit: `95c5d6d9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -183,35 +183,39 @@
 - [[_COMMUNITY_Community 166|Community 166]]
 - [[_COMMUNITY_Community 167|Community 167]]
 - [[_COMMUNITY_Community 168|Community 168]]
+- [[_COMMUNITY_Community 172|Community 172]]
+- [[_COMMUNITY_Community 173|Community 173]]
+- [[_COMMUNITY_Community 174|Community 174]]
+- [[_COMMUNITY_Community 175|Community 175]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Fallow: Critical Gotchas` - 35 edges
 2. `Fallow CLI Reference` - 31 edges
 3. `Common Workflows` - 22 edges
-4. `Fallow: codebase intelligence for JavaScript and TypeScript` - 17 edges
-5. `Fallow: Common Workflow Patterns & Recipes` - 17 edges
-6. `CI Pipeline Setup` - 17 edges
-7. `compilerOptions` - 16 edges
-8. `Skill Authoring Guide` - 16 edges
-9. `ResearchImport` - 14 edges
-10. `normalizeUrl()` - 14 edges
+4. `ResearchImport` - 20 edges
+5. `BaseCommand` - 17 edges
+6. `Fallow: codebase intelligence for JavaScript and TypeScript` - 17 edges
+7. `Fallow: Common Workflow Patterns & Recipes` - 17 edges
+8. `CI Pipeline Setup` - 17 edges
+9. `normalizeUrl()` - 16 edges
+10. `compilerOptions` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Research` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/research.ts → src/base-command.ts
 - `ResearchImport` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/research/import.ts → src/base-command.ts
+- `ResearchInspect` --inherits--> `BaseCommand`  [EXTRACTED]
+  src/commands/research/inspect.ts → src/base-command.ts
 - `ResearchSearch` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/research/search.ts → src/base-command.ts
-- `writeArtifact()` --calls--> `serializeArtifact()`  [EXTRACTED]
-  src/lib/research/storage.ts → src/lib/research/artifact.ts
-- `processFileForLookup()` --calls--> `parseArtifact()`  [EXTRACTED]
-  src/lib/research/storage.ts → src/lib/research/artifact.ts
+- `ResearchStatus` --inherits--> `BaseCommand`  [EXTRACTED]
+  src/commands/research/status.ts → src/base-command.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (172 total, 14 thin omitted)
+## Communities (176 total, 14 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -242,8 +246,8 @@ Cohesion: 0.09
 Nodes (22): D1. Preserve the Manual Research Protocol, D2. Follow the Existing `forward-nexus` JSON Envelope, D3. Store Durable Artifacts Outside the Repository, D4. Treat Web Content as Untrusted, D5. Prefer Static Fetch First, D6. Keep Plugin Command Classes Thin, D7. The Cache Index Is Rebuildable, D8. Prefer Stdlib and In-Repo Helpers for Small Glue (+14 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.24
-Nodes (12): handleStaleRevalidationResult(), Research, checkMaxAgeExpired(), evaluateFreshness(), FreshnessPolicy, getPolicy(), parseTtlToMs(), buildMetadata() (+4 more)
+Cohesion: 0.19
+Nodes (16): handleStaleRevalidationResult(), Research, checkMaxAgeExpired(), evaluateFreshness(), FreshnessPolicy, getPolicy(), parseTtlToMs(), buildMetadata() (+8 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.09
@@ -274,8 +278,8 @@ Cohesion: 0.10
 Nodes (19): Behavior, CI Integration, `ci`: Provider-Aware Review Automation, Combined Mode Flags, `config-schema`: Config JSON Schema, Environment Variables, Fallow CLI Reference, Flags (+11 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.22
-Nodes (6): deriveCacheKey(), ResearchInspect, ResearchStatus, getArtifactPath(), normalizeUrl(), BaseCommand
+Cohesion: 0.23
+Nodes (9): deriveCacheKey(), ResearchInspect, ResearchStatus, findArtifact(), getArtifactPath(), hasArtifact(), processFileForLookup(), readArtifact() (+1 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.11
@@ -326,8 +330,8 @@ Cohesion: 0.13
 Nodes (14): 1. Network Constraints & Crawler Limits, 2. DNS Safety & Private IP Blocklist (SSRF Protection), 3. Client-Side Hydration (SPA) Limitations, 4. Exit Codes & Common Errors, Blocked Target Blocks (RFC1918 & Localhost), Common Failure Symptoms, Crawler Limits, Exit Code Directory (+6 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.27
-Nodes (9): compressMarkdown(), RevalidationResult, ResearchArtifact, ResearchArtifactMetadata, TokenEstimate, findArtifact(), hasArtifact(), processFileForLookup() (+1 more)
+Cohesion: 0.14
+Nodes (5): ResearchList, ResearchPrune, isResearchFile(), scanCacheDir(), BaseCommand
 
 ### Community 29 - "Community 29"
 Cohesion: 0.25
@@ -350,12 +354,12 @@ Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.15
-Nodes (12): Combined Dead Code + Duplication, Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, Production audit (+4 more)
+Cohesion: 0.22
+Nodes (8): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, PR Dead Code Check, Step 1: Analyze changed files, Step 1: Run combined analysis, Step 2: If issues found, show specifics, Step 2: Prioritize cleanup, Table of Contents
 
 ### Community 35 - "Community 35"
-Cohesion: 0.28
-Nodes (11): extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseMetadata(), ParserState (+3 more)
+Cohesion: 0.18
+Nodes (15): extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseMetadata(), ParserState (+7 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -642,20 +646,20 @@ Cohesion: 0.33
 Nodes (5): Epic Goal, US-01.1 Confirm Optional Plugin Delivery, US-01.2 Preserve Existing CLI Contract, US-01.3 Name Extension Boundaries, US-01 Delivery Model
 
 ### Community 109 - "Community 109"
-Cohesion: 0.40
-Nodes (4): B-01: Add `research list`, Goal, Not Before, Scope
+Cohesion: 0.10
+Nodes (20): Advanced full-text search, Cache Retrieval Workflows, Check status or inspect metadata, How to Use, Import Custom Research Notes, Installation, Issue: Fetch throws hostname safety error, Issue: Plugin commands not found (+12 more)
 
 ### Community 110 - "Community 110"
-Cohesion: 0.40
-Nodes (4): B-02: Add `research prune`, Goal, Not Before, Scope
+Cohesion: 0.24
+Nodes (7): BrowserFetchOptions, BrowserFetchResult, CdpClient, fetchRenderedHtml(), findChromePath(), spawnChrome(), waitForLoad()
 
 ### Community 111 - "Community 111"
 Cohesion: 0.40
-Nodes (4): B-03: Add Browser-Rendered Extraction, Goal, Not Before, Scope
+Nodes (4): If You Fetched a Page Directly, Mandatory Pre-Step, Web Research Workflow, When This Does Not Apply
 
 ### Community 112 - "Community 112"
 Cohesion: 0.40
-Nodes (4): B-04: Add Advanced Full-Text Cache Search, Goal, Not Before, Scope
+Nodes (4): B-01: Add `research list`, Goal, Implementation Status, Scope
 
 ### Community 113 - "Community 113"
 Cohesion: 0.40
@@ -679,7 +683,7 @@ Nodes (4): B-09: Add Manual Cache Migration, Goal, Not Before, Scope
 
 ### Community 118 - "Community 118"
 Cohesion: 0.40
-Nodes (4): B-10: Add File-Based Import, Goal, Not Before, Scope
+Nodes (4): B-02: Add `research prune`, Goal, Implementation Status, Scope
 
 ### Community 119 - "Community 119"
 Cohesion: 0.40
@@ -826,11 +830,27 @@ Cohesion: 0.67
 Nodes (3): Examples, Flags, `init`: Config Generation
 
 ### Community 158 - "Community 158"
+Cohesion: 0.40
+Nodes (4): B-03: Add Browser-Rendered Extraction, Goal, Implementation Status, Scope
+
+### Community 172 - "Community 172"
+Cohesion: 0.40
+Nodes (4): B-04: Add Advanced Full-Text Cache Search, Goal, Implementation Status, Scope
+
+### Community 173 - "Community 173"
+Cohesion: 0.40
+Nodes (4): B-10: Add File-Based Import, Goal, Implementation Status, Scope
+
+### Community 174 - "Community 174"
+Cohesion: 0.50
+Nodes (4): Custom Plugin Setup, Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory
+
+### Community 175 - "Community 175"
 Cohesion: 0.67
-Nodes (3): PR Dead Code Check, Step 1: Analyze changed files, Step 2: If issues found, show specifics
+Nodes (3): Full audit (default), Production audit, Production vs Full Audit
 
 ## Knowledge Gaps
-- **1105 isolated node(s):** `husky.sh script`, `__dirname`, `name`, `version`, `description` (+1100 more)
+- **1124 isolated node(s):** `husky.sh script`, `__dirname`, `name`, `version`, `description` (+1119 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -838,13 +858,13 @@ Nodes (3): PR Dead Code Check, Step 1: Analyze changed files, Step 2: If issues 
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Fallow CLI Reference` connect `Community 14` to `Community 96`, `Community 101`, `Community 72`, `Community 140`, `Community 141`, `Community 142`, `Community 143`, `Community 144`, `Community 145`, `Community 146`, `Community 83`, `Community 147`, `Community 82`, `Community 154`, `Community 155`, `Community 156`, `Community 95`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **Why does `Fallow: Common Workflow Patterns & Recipes` connect `Community 34` to `Community 128`, `Community 129`, `Community 97`, `Community 130`, `Community 131`, `Community 98`, `Community 102`, `Community 103`, `Community 148`, `Community 22`, `Community 158`, `Community 127`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `ResearchImport` connect `Community 56` to `Community 35`, `Community 28`, `Community 15`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does ``audit`: Changed-File Quality Gate` connect `Community 101` to `Community 14`?**
+- **Why does `BaseCommand` connect `Community 28` to `Community 35`, `Community 7`, `Community 40`, `Community 15`, `Community 56`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **What connects `husky.sh script`, `__dirname`, `name` to the rest of the system?**
-  _1105 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1124 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

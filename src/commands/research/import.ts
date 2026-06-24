@@ -1,5 +1,7 @@
 import { Args, Flags } from '@oclif/core';
 import { createHash } from 'node:crypto';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { BaseCommand } from '../../base-command.js';
 import { normalizeUrl } from '../../lib/research/url.js';
 import { deriveCacheKey } from '../../lib/research/cache-key.js';
@@ -26,6 +28,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       command:
         'echo "# Synthesized" | <%= config.bin %> research import --stdin --topic "React docs" --source-url https://react.dev/a --source-url https://react.dev/b',
     },
+    {
+      description: 'Import research from a local Markdown file',
+      command: '<%= config.bin %> research import https://example.com/docs --file path/to/notes.md',
+    },
   ];
 
   static args = {
@@ -39,6 +45,9 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     stdin: Flags.boolean({
       description: 'Read Markdown from stdin.',
       default: false,
+    }),
+    file: Flags.string({
+      description: 'Path to a Markdown file containing research notes to import.',
     }),
     'input-format': Flags.option({
       description: 'Format of the input provided.',
@@ -139,23 +148,69 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     if (hasMulti && !this.flags.topic) {
       this.error('Multi-source import requires the --topic flag.', { exit: 2 });
     }
-    if (!this.flags.stdin) {
-      this.error('The --stdin flag must be specified to import content.', { exit: 2 });
+    if (!this.flags.stdin && !this.flags.file) {
+      this.error('Either --stdin or --file <path> must be specified to import content.', {
+        exit: 2,
+      });
+    }
+    if (this.flags.stdin && this.flags.file) {
+      this.error('Cannot specify both --stdin and --file <path>. Choose one.', { exit: 2 });
     }
   }
 
-  private async readAndValidateStdin(): Promise<string> {
-    let rawInput: string;
-    try {
-      rawInput = await this.readStdin();
-    } catch (err) {
-      this.error((err as Error).message, { exit: 1 });
+  protected fsExistsSync(filePath: string): boolean {
+    return fs.existsSync(filePath);
+  }
+
+  protected fsStatSync(filePath: string): fs.Stats {
+    return fs.statSync(filePath);
+  }
+
+  protected fsReadFileSync(filePath: string): string {
+    return fs.readFileSync(filePath, 'utf8');
+  }
+
+  private readAndValidateFile(filePath: string): string {
+    if (!this.fsExistsSync(filePath)) {
+      this.error(`File does not exist: ${filePath}`, { exit: 2 });
+    }
+    const stat = this.fsStatSync(filePath);
+    if (!stat.isFile()) {
+      this.error(`Path is not a file: ${filePath}`, { exit: 2 });
+    }
+    if (stat.size > 1024 * 1024) {
+      this.error('File size limit exceeded (max 1 MiB).', { exit: 1 });
+    }
+    const content = this.fsReadFileSync(filePath);
+    if (!content.trim()) {
+      this.error('Empty file content provided.', { exit: 2 });
+    }
+    return content;
+  }
+
+  private async readAndValidateInput(): Promise<string> {
+    if (this.flags.stdin) {
+      try {
+        const rawInput = await this.readStdin();
+        if (!rawInput.trim()) {
+          this.error('Empty stdin content provided.', { exit: 2 });
+        }
+        return rawInput;
+      } catch (err) {
+        this.error((err as Error).message, { exit: 1 });
+      }
     }
 
-    if (!rawInput.trim()) {
-      this.error('Empty stdin content provided.', { exit: 2 });
+    if (this.flags.file) {
+      const filePath = path.resolve(this.flags.file);
+      try {
+        return this.readAndValidateFile(filePath);
+      } catch (err) {
+        this.error(`Failed to read file: ${(err as Error).message}`, { exit: 1 });
+      }
     }
-    return rawInput;
+
+    this.error('No input source specified.', { exit: 2 });
   }
 
   private deriveImportCacheKey(
@@ -235,7 +290,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     const hasMulti = multiUrls.length > 0;
 
     this.validateSourceMode(hasSingle, hasMulti, multiUrls);
-    const rawInput = await this.readAndValidateStdin();
+    const rawInput = await this.readAndValidateInput();
 
     const sourceUrls = this.getSourceUrls(hasMulti, multiUrls, this.args.url);
     const singleNormalizedUrl = hasSingle ? sourceUrls[0] || '' : '';

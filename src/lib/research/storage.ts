@@ -11,6 +11,37 @@ import {
 import { parseArtifact, serializeArtifact } from './artifact.js';
 import type { ResearchArtifact } from './schema.js';
 
+function isResearchFile(file: string): boolean {
+  return (
+    file.endsWith('.md') &&
+    !file.includes('.tmp') &&
+    !file.includes('.corrupt') &&
+    !file.includes('.superseded')
+  );
+}
+
+/**
+ * Scans a cache directory and maps each valid artifact file through a callback.
+ * Return null from the callback to skip an entry; all non-null results are collected.
+ * Parse/read errors are swallowed silently, matching the convention in the command layer.
+ */
+export function scanCacheDir<T>(
+  dir: string,
+  fn: (artifact: ResearchArtifact, filePath: string) => T | null
+): T[] {
+  if (!existsSync(dir)) return [];
+  const results: T[] = [];
+  for (const file of readdirSync(dir)) {
+    if (!isResearchFile(file)) continue;
+    try {
+      const content = readFileSync(join(dir, file), 'utf-8');
+      const result = fn(parseArtifact(content), join(dir, file));
+      if (result !== null) results.push(result);
+    } catch {}
+  }
+  return results;
+}
+
 /**
  * Returns the absolute file path for a cache key within the data directory.
  * Ensures that the key is simple hex to prevent directory traversal.

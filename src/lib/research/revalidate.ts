@@ -6,6 +6,7 @@ import { writeArtifact } from './storage.js';
 import { evaluateFreshness, getPolicy } from './freshness.js';
 import { compressMarkdown } from './compress.js';
 import { estimateTokens } from './token-estimate.js';
+import { fetchRenderedHtml } from './browser.js';
 
 export interface RevalidationResult {
   status: 'revalidated' | 'refreshed' | 'stale';
@@ -114,7 +115,7 @@ async function handleRevalidateResponse(
   existing: ResearchArtifact,
   fetchResult: any,
   currentTime: Date,
-  options: { ttlOverride?: string | null }
+  options: { ttlOverride?: string | null; rendered?: boolean }
 ): Promise<RevalidationResult> {
   const meta = existing.metadata;
 
@@ -150,6 +151,9 @@ async function handleRevalidateResponse(
 
   refreshed.metadata.topic = meta.topic;
   refreshed.metadata.tags = [...meta.tags];
+  if (options.rendered) {
+    refreshed.metadata.capture_method = 'browser_fallback';
+  }
 
   writeArtifact(dataDir, meta.cache_key, refreshed);
   return { status: 'refreshed', artifact: refreshed };
@@ -166,6 +170,7 @@ export async function revalidateCache(
   options: {
     allowStale: boolean;
     ttlOverride?: string | null;
+    rendered?: boolean;
   }
 ): Promise<RevalidationResult> {
   const meta = existing.metadata;
@@ -184,9 +189,11 @@ export async function revalidateCache(
   }
 
   try {
-    const fetchResult = await fetchStaticHtml(meta.source_url, {
-      headers: revalHeaders,
-    });
+    const fetchResult = options.rendered
+      ? await fetchRenderedHtml(meta.source_url)
+      : await fetchStaticHtml(meta.source_url, {
+          headers: revalHeaders,
+        });
     return await handleRevalidateResponse(dataDir, existing, fetchResult, currentTime, options);
   } catch (err) {
     if (freshness === 'stale_grace') {

@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782287203.3352911,
-    "ast_hash": "091328786e79e3b2efc43c44e0043c16",
+    "mtime": 1782289719.532887,
+    "ast_hash": "44d56c67404032b008c139eaa1ac8ac7",
     "semantic_hash": ""
   },
   "package.json": {
@@ -125,18 +125,18 @@
     "semantic_hash": ""
   },
   "src/commands/research.ts": {
-    "mtime": 1782287308.6698802,
-    "ast_hash": "6ceee28e189019da9e0ec5d4d3d46161",
+    "mtime": 1782288097.55683,
+    "ast_hash": "b2b6e61c13a622c902b8c5755aba9218",
     "semantic_hash": ""
   },
   "src/commands/research/import.test.ts": {
-    "mtime": 1782287308.6786346,
-    "ast_hash": "77d3869c37148fe59c6f873c06d2456c",
+    "mtime": 1782288522.9511514,
+    "ast_hash": "26118da00e66cb9550c1cca4a52620b8",
     "semantic_hash": ""
   },
   "src/commands/research/import.ts": {
-    "mtime": 1782287308.691813,
-    "ast_hash": "1d6c8a521ab0e02ae23a1542616e3699",
+    "mtime": 1782288522.9643302,
+    "ast_hash": "cd957a00647381f8f6fbe709cfb3e4df",
     "semantic_hash": ""
   },
   "src/commands/research/inspect.test.ts": {
@@ -150,13 +150,13 @@
     "semantic_hash": ""
   },
   "src/commands/research/search.test.ts": {
-    "mtime": 1782287308.7035403,
-    "ast_hash": "b0a92b138eeb26082b2f23a71320cc01",
+    "mtime": 1782288460.781304,
+    "ast_hash": "c6c2cfb6273981e27ab0d80c8de371dd",
     "semantic_hash": ""
   },
   "src/commands/research/search.ts": {
-    "mtime": 1782287308.7142534,
-    "ast_hash": "9819c92f29dc0dc85e8a07744e7e3f4f",
+    "mtime": 1782289795.7121687,
+    "ast_hash": "af83eea066735168be3bf2b8d5fa5af5",
     "semantic_hash": ""
   },
   "src/commands/research/status.test.ts": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "src/lib/research/fetcher.ts": {
-    "mtime": 1782287308.774857,
-    "ast_hash": "f06cd0b4f30696a79e02bf0ed024dd63",
+    "mtime": 1782288080.692604,
+    "ast_hash": "b0ae4ed0183f6b15036ced69c6a52982",
     "semantic_hash": ""
   },
   "src/lib/research/freshness.ts": {
@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "src/lib/research/revalidate.ts": {
-    "mtime": 1782286313.715967,
-    "ast_hash": "043b7b8c3bafe2cbd6394eb833cbac5c",
+    "mtime": 1782288094.4343014,
+    "ast_hash": "4374a1fd74e2435e22202f3d1e211294",
     "semantic_hash": ""
   },
   "src/lib/research/schema.ts": {
@@ -255,8 +255,8 @@
     "semantic_hash": ""
   },
   "src/lib/research/storage.ts": {
-    "mtime": 1782287308.8100414,
-    "ast_hash": "04e2d1edaf307f8efffba9a5cddd0b0b",
+    "mtime": 1782289638.0173485,
+    "ast_hash": "1b78006a0feade2f96f03b9b3bfcf9ce",
     "semantic_hash": ""
   },
   "src/lib/research/url.test.ts": {
@@ -320,7 +320,7 @@
     "semantic_hash": ""
   },
   ".agents/rules/repo-research.md": {
-    "mtime": 1782280028.3503025,
+    "mtime": 1782289393.5994406,
     "ast_hash": "3c5890fb1dbbfb16e2efbf2a22d7d01e",
     "semantic_hash": ""
   },
@@ -630,8 +630,8 @@
     "semantic_hash": ""
   },
   "AGENTS.MD": {
-    "mtime": 1782284507.0241103,
-    "ast_hash": "9bd04af8aca9323ccfa407d07229ff66",
+    "mtime": 1782288502.5754244,
+    "ast_hash": "d4b647b61027c15fb17cf056be8c552d",
     "semantic_hash": ""
   },
   "README.md": {
@@ -784,26 +784,6 @@
     "ast_hash": "fc68d4790c1605d45a07a801c68cabad",
     "semantic_hash": ""
   },
-  "analysis/tickets/backlog/B-01-RESEARCH-LIST.md": {
-    "mtime": 1782283430.593212,
-    "ast_hash": "19af676caac23578f8a959d83520b396",
-    "semantic_hash": ""
-  },
-  "analysis/tickets/backlog/B-02-RESEARCH-PRUNE.md": {
-    "mtime": 1782283430.7011504,
-    "ast_hash": "4e6fcf91e254d7e5cb83f2c60c3245d2",
-    "semantic_hash": ""
-  },
-  "analysis/tickets/backlog/B-03-BROWSER-RENDERING.md": {
-    "mtime": 1782283430.8099482,
-    "ast_hash": "ecd7d6885da352d760a038926e85e2fb",
-    "semantic_hash": ""
-  },
-  "analysis/tickets/backlog/B-04-FULL-TEXT-SEARCH.md": {
-    "mtime": 1782283528.0624163,
-    "ast_hash": "d7e0443e15d3cc8a16cd0702a25af06b",
-    "semantic_hash": ""
-  },
   "analysis/tickets/backlog/B-05-GENERATED-TOPIC-SYNTHESIS.md": {
     "mtime": 1782283431.0308979,
     "ast_hash": "6b6fd4860a970f6a6035d388cd09622a",
@@ -829,14 +809,9 @@
     "ast_hash": "fc38e5b3284b4b7af0dec7f8fdaf8150",
     "semantic_hash": ""
   },
-  "analysis/tickets/backlog/B-10-FILE-IMPORT.md": {
-    "mtime": 1782283431.56595,
-    "ast_hash": "19a2c47c2d30fd1f87675cea2b8b4dee",
-    "semantic_hash": ""
-  },
   "analysis/tickets/backlog/README.md": {
-    "mtime": 1782283527.951989,
-    "ast_hash": "2595b1c33063afc2e11d11d1a0fcfe6b",
+    "mtime": 1782288211.528461,
+    "ast_hash": "c639ed20ecda8fa3f6f6e25a149ae99b",
     "semantic_hash": ""
   },
   "analysis/user-stories/README.md": {
@@ -892,6 +867,71 @@
   "docs/troubleshooting.md": {
     "mtime": 1782287197.4263942,
     "ast_hash": "bedbdc6b8a9a92a58ef288b799483a64",
+    "semantic_hash": ""
+  },
+  "src/commands/research/list.test.ts": {
+    "mtime": 1782287751.0727713,
+    "ast_hash": "7976f9b4431a7cc0d93c056b4fc8f374",
+    "semantic_hash": ""
+  },
+  "src/commands/research/list.ts": {
+    "mtime": 1782289654.5532134,
+    "ast_hash": "f07011c30b5f98145c5b111e828e5f22",
+    "semantic_hash": ""
+  },
+  "src/commands/research/prune.test.ts": {
+    "mtime": 1782288522.9932675,
+    "ast_hash": "76ee8b3880c6be5730a8d37a976d5f86",
+    "semantic_hash": ""
+  },
+  "src/commands/research/prune.ts": {
+    "mtime": 1782289670.5376241,
+    "ast_hash": "aa78a096c2273c13658e96dba0f212b7",
+    "semantic_hash": ""
+  },
+  "src/lib/research/browser.test.ts": {
+    "mtime": 1782288523.0438116,
+    "ast_hash": "a4575b5d2f01161d6fc75f4b81539331",
+    "semantic_hash": ""
+  },
+  "src/lib/research/browser.ts": {
+    "mtime": 1782288523.0561857,
+    "ast_hash": "894de8d6f7b34ab7c1671e17c225d360",
+    "semantic_hash": ""
+  },
+  "agents/instructions/web-research.instructions.md": {
+    "mtime": 1782289452.0350695,
+    "ast_hash": "08510061e1ba37887b2ed94e48580121",
+    "semantic_hash": ""
+  },
+  "agents/skills/web-research/SKILL.md": {
+    "mtime": 1782289128.7932193,
+    "ast_hash": "f13fc99bd674fc15a07f1ae8d1c6df60",
+    "semantic_hash": ""
+  },
+  "analysis/tickets/B-01-RESEARCH-LIST.md": {
+    "mtime": 1782287935.6182399,
+    "ast_hash": "b7ed7fe0ee446b38f2beb4055f8aa7e0",
+    "semantic_hash": ""
+  },
+  "analysis/tickets/B-02-RESEARCH-PRUNE.md": {
+    "mtime": 1782287937.3939617,
+    "ast_hash": "55656b39aea00a4cc6ca279aa6cdd21d",
+    "semantic_hash": ""
+  },
+  "analysis/tickets/B-03-BROWSER-RENDERING.md": {
+    "mtime": 1782288191.46032,
+    "ast_hash": "32883c312c3144be30bb555abde7b372",
+    "semantic_hash": ""
+  },
+  "analysis/tickets/B-04-FULL-TEXT-SEARCH.md": {
+    "mtime": 1782288193.4040172,
+    "ast_hash": "f3d20152e7fa34e6731c5ee7374eb460",
+    "semantic_hash": ""
+  },
+  "analysis/tickets/B-10-FILE-IMPORT.md": {
+    "mtime": 1782287939.3332543,
+    "ast_hash": "ef447462456782949ef6c1fbd5028943",
     "semantic_hash": ""
   }
 }

@@ -29,7 +29,7 @@ function looksLikeHtml(text: string): boolean {
   );
 }
 
-async function checkDnsSafety(hostname: string): Promise<void> {
+export async function checkDnsSafety(hostname: string): Promise<void> {
   let hostToResolve = hostname;
   if (hostToResolve.startsWith('[') && hostToResolve.endsWith(']')) {
     hostToResolve = hostToResolve.slice(1, -1);

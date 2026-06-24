@@ -101,6 +101,12 @@
           "name": "allow-stale",
           "allowNo": false,
           "type": "boolean"
+        },
+        "rendered": {
+          "description": "Force using a browser-rendered scraping path for dynamic pages.",
+          "name": "rendered",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,
@@ -139,6 +145,10 @@
         {
           "description": "Import research synthesized from multiple source URLs",
           "command": "echo \"# Synthesized\" | <%= config.bin %> research import --stdin --topic \"React docs\" --source-url https://react.dev/a --source-url https://react.dev/b"
+        },
+        {
+          "description": "Import research from a local Markdown file",
+          "command": "<%= config.bin %> research import https://example.com/docs --file path/to/notes.md"
         }
       ],
       "flags": {
@@ -153,6 +163,13 @@
           "name": "stdin",
           "allowNo": false,
           "type": "boolean"
+        },
+        "file": {
+          "description": "Path to a Markdown file containing research notes to import.",
+          "name": "file",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         },
         "input-format": {
           "description": "Format of the input provided.",
@@ -265,6 +282,189 @@
         "commands",
         "research",
         "inspect.js"
+      ]
+    },
+    "research:list": {
+      "aliases": [],
+      "args": {},
+      "description": "Lists cached research artifacts, including metadata details like path, source count, freshness, token estimates, and quality metrics without printing full content.",
+      "examples": [
+        {
+          "description": "List all cached entries",
+          "command": "<%= config.bin %> research list"
+        },
+        {
+          "description": "List cached entries for a specific topic with JSON output",
+          "command": "<%= config.bin %> research list --topic \"React Suspense\" --json"
+        },
+        {
+          "description": "List only fresh entries filtered by tags",
+          "command": "<%= config.bin %> research list --freshness fresh --tags node --tags url"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Return the output as a machine-readable JSON object.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "topic": {
+          "char": "t",
+          "description": "Filter by exact topic (case-insensitive).",
+          "name": "topic",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "tags": {
+          "char": "g",
+          "description": "Filter by tags (must match all tags specified).",
+          "name": "tags",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        },
+        "freshness": {
+          "description": "Filter by freshness state.",
+          "name": "freshness",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "fresh",
+            "stale_grace",
+            "stale_expired"
+          ],
+          "type": "option"
+        },
+        "artifact-type": {
+          "description": "Filter by artifact type.",
+          "name": "artifact-type",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "source",
+            "research_note"
+          ],
+          "type": "option"
+        },
+        "capture-method": {
+          "description": "Filter by capture method.",
+          "name": "capture-method",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "static_fetch",
+            "browser_fallback",
+            "agent_supplied"
+          ],
+          "type": "option"
+        },
+        "limit": {
+          "description": "Maximum number of results to return (default 50, max 100).",
+          "name": "limit",
+          "default": 50,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "research:list",
+      "pluginAlias": "forward-nexus-plugin-research",
+      "pluginName": "forward-nexus-plugin-research",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "List cached research artifacts by metadata filters.",
+      "enableJsonFlag": false,
+      "jsonEnvelope": false,
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "research",
+        "list.js"
+      ]
+    },
+    "research:prune": {
+      "aliases": [],
+      "args": {},
+      "description": "Prunes cached research entries based on age, inactivity, or artifact type to free up disk space.",
+      "examples": [
+        {
+          "description": "Perform a dry run of pruning entries older than 90 days",
+          "command": "<%= config.bin %> research prune --older-than 90d --dry-run"
+        },
+        {
+          "description": "Actually prune entries older than 30 days that are source scrapes",
+          "command": "<%= config.bin %> research prune --older-than 30d --artifact-type source --yes"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Return the output as a machine-readable JSON object.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "older-than": {
+          "description": "Prune entries older than duration (e.g. \"30d\", \"90d\").",
+          "name": "older-than",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "inactive": {
+          "description": "Prune entries inactive (unvalidated/unfetched) for duration (e.g. \"14d\", \"30d\").",
+          "name": "inactive",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "artifact-type": {
+          "description": "Filter pruning to specific artifact type.",
+          "name": "artifact-type",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "source",
+            "research_note"
+          ],
+          "type": "option"
+        },
+        "dry-run": {
+          "description": "List files that would be deleted without actually deleting them.",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "yes": {
+          "char": "y",
+          "description": "Skip confirmation prompt and prune files.",
+          "name": "yes",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "research:prune",
+      "pluginAlias": "forward-nexus-plugin-research",
+      "pluginName": "forward-nexus-plugin-research",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Clean up old or inactive research cache entries.",
+      "enableJsonFlag": false,
+      "jsonEnvelope": false,
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "research",
+        "prune.js"
       ]
     },
     "research:search": {

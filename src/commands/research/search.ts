@@ -1,10 +1,10 @@
 import { Args, Flags } from '@oclif/core';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseCommand } from '../../base-command.js';
-import { getArtifactPath } from '../../lib/research/storage.js';
-import { parseArtifact } from '../../lib/research/artifact.js';
+import { getArtifactPath, scanCacheDir } from '../../lib/research/storage.js';
 import { evaluateFreshness } from '../../lib/research/freshness.js';
+
+const FRESHNESS_BONUS: Record<string, number> = { fresh: 30, stale_grace: 10 };
 
 export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   static id = 'research search';
@@ -97,6 +97,24 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     return true;
   }
 
+  private phraseMatchBonus(
+    topic: string,
+    tags: string[],
+    summ: string,
+    comp: string,
+    queryTerms: string[]
+  ): number {
+    if (queryTerms.length <= 1) return 0;
+    const fullQuery = queryTerms.join(' ');
+    let bonus = 0;
+    if (topic === fullQuery) bonus += 200;
+    if (topic.includes(fullQuery)) bonus += 100;
+    if (tags.includes(fullQuery)) bonus += 150;
+    if (summ.includes(fullQuery)) bonus += 50 + Math.min(summ.split(fullQuery).length - 1, 5) * 10;
+    if (comp.includes(fullQuery)) bonus += 20 + Math.min(comp.split(fullQuery).length - 1, 10) * 5;
+    return bonus;
+  }
+
   private calculateScore(
     meta: any,
     summary: string,
@@ -120,15 +138,10 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
         matchedAny = true;
       }
     }
-
     if (!matchedAny) return 0;
 
-    if (freshness === 'fresh') {
-      score += 30;
-    } else if (freshness === 'stale_grace') {
-      score += 10;
-    }
-
+    score += this.phraseMatchBonus(topic, tags, summ, comp, queryTerms);
+    score += FRESHNESS_BONUS[freshness] ?? 0;
     return score;
   }
 
@@ -156,67 +169,43 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     queryTerms: string[],
     currentTime: Date
   ): any[] {
-    const results: any[] = [];
-    if (!existsSync(dir)) {
-      return results;
-    }
-    const files = readdirSync(dir);
-    for (const file of files) {
+    return scanCacheDir(dir, (artifact) => {
+      if (artifact.metadata.status !== 'active') return null;
+      const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
       if (
-        !file.endsWith('.md') ||
-        file.includes('.tmp') ||
-        file.includes('.corrupt') ||
-        file.includes('.superseded')
-      ) {
-        continue;
-      }
-      try {
-        const content = readFileSync(join(dir, file), 'utf-8');
-        const artifact = parseArtifact(content);
-        if (artifact.metadata.status !== 'active') continue;
-
-        const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
-
-        if (
-          !this.matchesFilters(
-            artifact.metadata,
-            freshness,
-            this.flags.topic,
-            this.flags.tags,
-            this.flags['artifact-type'],
-            Boolean(this.flags['include-stale'])
-          )
-        ) {
-          continue;
-        }
-
-        const score = this.calculateScore(
+        !this.matchesFilters(
           artifact.metadata,
-          artifact.summary,
-          artifact.compressed,
-          queryTerms,
-          freshness
-        );
-
-        if (score > 0) {
-          const snippetText = [artifact.summary, artifact.compressed].filter(Boolean).join('\n');
-          results.push({
-            cacheKey: artifact.metadata.cache_key,
-            path: getArtifactPath(dataDir, artifact.metadata.cache_key),
-            artifactType: artifact.metadata.artifact_type,
-            sourceUrls: artifact.metadata.source_urls,
-            topic: artifact.metadata.topic,
-            tags: artifact.metadata.tags,
-            freshness,
-            captureMethod: artifact.metadata.capture_method,
-            tokenEstimate: artifact.metadata.token_estimate,
-            snippet: this.makeSnippet(snippetText, queryTerms),
-            score,
-          });
-        }
-      } catch {}
-    }
-    return results;
+          freshness,
+          this.flags.topic,
+          this.flags.tags,
+          this.flags['artifact-type'],
+          Boolean(this.flags['include-stale'])
+        )
+      )
+        return null;
+      const score = this.calculateScore(
+        artifact.metadata,
+        artifact.summary,
+        artifact.compressed,
+        queryTerms,
+        freshness
+      );
+      if (score <= 0) return null;
+      const snippetText = [artifact.summary, artifact.compressed].filter(Boolean).join('\n');
+      return {
+        cacheKey: artifact.metadata.cache_key,
+        path: getArtifactPath(dataDir, artifact.metadata.cache_key),
+        artifactType: artifact.metadata.artifact_type,
+        sourceUrls: artifact.metadata.source_urls,
+        topic: artifact.metadata.topic,
+        tags: artifact.metadata.tags,
+        freshness,
+        captureMethod: artifact.metadata.capture_method,
+        tokenEstimate: artifact.metadata.token_estimate,
+        snippet: this.makeSnippet(snippetText, queryTerms),
+        score,
+      };
+    });
   }
 
   private logSearchResults(finalResults: any[]): void {
@@ -261,28 +250,72 @@ function scoreSingleTerm(
 ): number {
   let termScore = 0;
   let termMatched = false;
+
+  // 1. Topic Match
   if (topic === term) {
     termScore += 100;
     termMatched = true;
+  } else if (topic.includes(term)) {
+    termScore += 60;
+    termMatched = true;
+  } else if (isFuzzyMatch(term, topic)) {
+    termScore += 40;
+    termMatched = true;
   }
+
+  // 2. Tags Match
   if (tags.includes(term)) {
     termScore += 80;
     termMatched = true;
+  } else if (tags.some((t) => isFuzzyMatch(term, t) || t.includes(term))) {
+    termScore += 30;
+    termMatched = true;
   }
+
+  // 3. Source URL Match
   if (sourceUrl.includes(term) || sourceUrls.some((u) => u.includes(term))) {
     termScore += 50;
     termMatched = true;
   }
-  if (summ.includes(term)) {
-    termScore += 20;
+
+  // 4. Summary Term Frequency Match
+  const summMatches = summ.split(term).length - 1;
+  if (summMatches > 0) {
+    termScore += 20 + Math.min(summMatches, 5) * 5;
     termMatched = true;
   }
-  if (comp.includes(term)) {
-    termScore += 5;
+
+  // 5. Compressed Content Term Frequency Match
+  const compMatches = comp.split(term).length - 1;
+  if (compMatches > 0) {
+    termScore += 5 + Math.min(compMatches, 10) * 2;
     termMatched = true;
   }
+
   if (termMatched) {
     termScore += 10;
   }
   return termScore;
+}
+
+function levenshtein(s1: string, s2: string): number {
+  if (s1.length < s2.length) return levenshtein(s2, s1);
+  if (s2.length === 0) return s1.length;
+  let prevRow = Array.from({ length: s2.length + 1 }, (_, i) => i);
+  for (let i = 0; i < s1.length; i++) {
+    const currRow = [i + 1];
+    for (let j = 0; j < s2.length; j++) {
+      const deletions = prevRow[j + 1]! + 1;
+      const insertions = currRow[j]! + 1;
+      const substitutions = prevRow[j]! + (s1[i] === s2[j] ? 0 : 1);
+      currRow.push(Math.min(deletions, insertions, substitutions));
+    }
+    prevRow = currRow;
+  }
+  return prevRow[s2.length]!;
+}
+
+function isFuzzyMatch(term: string, target: string): boolean {
+  if (term.length < 4 || target.length < 4) return false;
+  return levenshtein(term, target) <= 2;
 }

@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import ResearchImport from './import.js';
 
 describe('research import command unit tests', () => {
@@ -73,9 +75,53 @@ describe('research import command unit tests', () => {
     await expect(runPromise).rejects.toThrow(/Multi-source import requires the --topic flag/);
   });
 
-  it('fails if stdin flag is missing', async () => {
+  it('successfully imports markdown content from a file', async () => {
+    const existsSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'fsExistsSync')
+      .mockReturnValue(true);
+    const statSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'fsStatSync')
+      .mockReturnValue({ isFile: () => true, size: 500 } as any);
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'fsReadFileSync')
+      .mockReturnValue('## Notes\nFile content notes');
+
+    const result = (await ResearchImport.run([
+      'https://example.com/file-import',
+      '--file',
+      'some-notes.md',
+    ])) as any;
+
+    expect(existsSpy).toHaveBeenCalledWith(path.resolve('some-notes.md'));
+    expect(result).toBeDefined();
+    expect(result.schemaVersion).toBe(1);
+    expect(result.cache.status).toBe('imported');
+    expect(result.content).toBe('## Notes\nFile content notes');
+
+    existsSpy.mockRestore();
+    statSpy.mockRestore();
+    readSpy.mockRestore();
+  });
+
+  it('fails if both stdin and file flags are missing', async () => {
     const runPromise = ResearchImport.run(['https://example.com']);
-    await expect(runPromise).rejects.toThrow(/The --stdin flag must be specified/);
+    await expect(runPromise).rejects.toThrow(/Either --stdin or --file/);
+  });
+
+  it('fails if both stdin and file flags are specified', async () => {
+    const runPromise = ResearchImport.run(['https://example.com', '--stdin', '--file', 'notes.md']);
+    await expect(runPromise).rejects.toThrow(/Cannot specify both --stdin and --file/);
+  });
+
+  it('fails if file does not exist', async () => {
+    const existsSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'fsExistsSync')
+      .mockReturnValue(false);
+
+    const runPromise = ResearchImport.run(['https://example.com', '--file', 'ghost.md']);
+    await expect(runPromise).rejects.toThrow(/File does not exist/);
+
+    existsSpy.mockRestore();
   });
 
   it('fails if empty content is read from stdin', async () => {

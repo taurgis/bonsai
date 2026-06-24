@@ -10,6 +10,7 @@ import { evaluateFreshness, parseTtlToMs, checkMaxAgeExpired } from '../lib/rese
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml } from '../lib/research/fetcher.js';
 import { extractHtmlContent } from '../lib/research/extract.js';
+import { fetchRenderedHtml } from '../lib/research/browser.js';
 
 export default class Research extends BaseCommand<typeof Research> {
   static id = 'research';
@@ -78,6 +79,10 @@ export default class Research extends BaseCommand<typeof Research> {
       description: 'Allow serving stale cache if the remote server is unreachable.',
       default: false,
     }),
+    rendered: Flags.boolean({
+      description: 'Force using a browser-rendered scraping path for dynamic pages.',
+      default: false,
+    }),
   };
 
   static stdoutIsPrimaryData = true;
@@ -94,7 +99,7 @@ export default class Research extends BaseCommand<typeof Research> {
     targetDir: string,
     currentTime: Date
   ): Promise<{ cacheStatus: any; freshnessState: any; artifact: any }> {
-    const { ttl, 'max-age': maxAge, 'allow-stale': allowStale } = this.flags;
+    const { ttl, 'max-age': maxAge, 'allow-stale': allowStale, rendered } = this.flags;
 
     const isExpired = checkMaxAgeExpired(cached, currentTime, maxAge);
     const freshnessState = isExpired
@@ -108,6 +113,7 @@ export default class Research extends BaseCommand<typeof Research> {
     const revalResult = await revalidateCache(targetDir, cached, currentTime, {
       allowStale: Boolean(allowStale),
       ttlOverride: ttl,
+      rendered: Boolean(rendered),
     });
 
     handleStaleRevalidationResult(this, revalResult);
@@ -125,9 +131,11 @@ export default class Research extends BaseCommand<typeof Research> {
     currentTime: Date,
     cacheKey: string
   ): Promise<any> {
-    const { topic, tags, tier, ttl } = this.flags;
+    const { topic, tags, tier, ttl, rendered } = this.flags;
 
-    const fetchResult = await fetchStaticHtml(normalizedUrl);
+    const fetchResult = rendered
+      ? await fetchRenderedHtml(normalizedUrl)
+      : await fetchStaticHtml(normalizedUrl);
     const extraction = extractHtmlContent(fetchResult.content, fetchResult.finalUrl);
     const artifact = createArtifactFromFetch(
       normalizedUrl,
@@ -142,6 +150,9 @@ export default class Research extends BaseCommand<typeof Research> {
 
     artifact.metadata.topic = topic || null;
     artifact.metadata.tags = tags || [];
+    if (rendered) {
+      artifact.metadata.capture_method = 'browser_fallback';
+    }
 
     writeArtifact(targetDir, cacheKey, artifact);
     return artifact;

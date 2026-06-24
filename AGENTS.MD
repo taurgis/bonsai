@@ -104,3 +104,31 @@ Add focused tests with each implementation change. Cover:
 ## Keep scope tight
 
 This repo currently contains planning material, generated agent instructions, and skills. Do not refactor generated IDE instruction files unless the task explicitly asks for it. Implement the reusable oclif plugin in normal source files in this repository when the package is scaffolded, and keep generated/manual protocol files as reference material.
+
+---
+
+## Active Agent Research Workflows (Drinking Our Own Champagne)
+
+Agents working in this codebase or utilizing this plugin must run the compiled CLI research subcommands directly instead of executing manual web-scrapes or manual researcher workflows:
+
+* **Retrieve / Cache Scrape**: `node bin/cli.mjs research <url> [--json]`
+* **Retrieve (Browser-Rendered SPA)**: `node bin/cli.mjs research <url> --rendered [--json]`
+* **Import Synthesized Notes**: `node bin/cli.mjs research import <url> --file <path> [--json]`
+* **Status Checklist**: `node bin/cli.mjs research status <url> [--json]`
+* **Inspect Metadata**: `node bin/cli.mjs research inspect <url> [--json]`
+* **Search Cache**: `node bin/cli.mjs research search "<query>" [--json]`
+* **List Database**: `node bin/cli.mjs research list [filters] [--json]`
+* **Prune Database**: `node bin/cli.mjs research prune [filters] --yes [--json]`
+
+### Browser-Rendered Extraction (`--rendered`)
+
+Use `--rendered` when the target page is a Single Page Application (SPA) or relies on client-side JavaScript rendering. This flag launches a headless Chrome instance via the Chrome DevTools Protocol (CDP) using the native `WebSocket` API (Node 22+). No additional npm dependencies are required.
+
+- Chrome or Chromium must be installed locally, or set `CHROME_PATH` to the executable.
+- Resource blocking is enabled (CSS, images, fonts, media) to reduce load time.
+- The same DNS safety, URL validation, body size limits, and timeout constraints apply.
+- The resulting `capture_method` metadata is set to `browser_fallback`.
+
+### Advanced Full-Text Search
+
+`research search` now supports fuzzy matching (Levenshtein distance ≤ 2 for terms ≥ 4 chars), term frequency ranking, substring matching in topics and tags, and exact phrase match bonuses for multi-word queries.
