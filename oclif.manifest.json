@@ -1,6 +1,6 @@
 {
   "commands": {
-    "Symbol(SINGLE_COMMAND_CLI)": {
+    "fetch": {
       "aliases": [],
       "args": {
         "url": {
@@ -121,8 +121,9 @@
         }
       },
       "hasDynamicHelp": false,
+      "hidden": true,
       "hiddenAliases": [],
-      "id": "Symbol(SINGLE_COMMAND_CLI)",
+      "id": "fetch",
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",

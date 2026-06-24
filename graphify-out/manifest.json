@@ -85,13 +85,13 @@
     "semantic_hash": ""
   },
   "bin/cli.mjs": {
-    "mtime": 1782328809.6537766,
-    "ast_hash": "831804d7b297921f96a684152b53a514",
+    "mtime": 1782329484.972972,
+    "ast_hash": "29a345714f41dca64ffe65fd1d0515de",
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782328929.288059,
-    "ast_hash": "777b9f8e5c80da55f000a8651f214718",
+    "mtime": 1782329521.2146902,
+    "ast_hash": "189af194afdf41c062f0df706d1f5fa5",
     "semantic_hash": ""
   },
   "package.json": {
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "src/base-command.ts": {
-    "mtime": 1782328809.7614827,
-    "ast_hash": "5e3c5e8f51094bc3c8c3d8fe79dffa03",
+    "mtime": 1782329512.7916074,
+    "ast_hash": "8566563461c5f78ddc69fd3e987c691d",
     "semantic_hash": ""
   },
   "src/lib/research/artifact.test.ts": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "tests/contract/research.test.ts": {
-    "mtime": 1782328553.2163782,
-    "ast_hash": "c4d5f581803be5f3e7bbfc2f38cac313",
+    "mtime": 1782329485.5059326,
+    "ast_hash": "1e07a15c0dd8869d55c183f3e4e48d0e",
     "semantic_hash": ""
   },
   "tests/contract/runner.ts": {
@@ -2100,8 +2100,8 @@
     "semantic_hash": ""
   },
   "src/commands.ts": {
-    "mtime": 1782328809.8694625,
-    "ast_hash": "476ee1bfb0a2a5706ff6e5acf9a64579",
+    "mtime": 1782329485.0755334,
+    "ast_hash": "69a245174490848d0e278d4802ab1238",
     "semantic_hash": ""
   },
   "src/commands/config/base.ts": {
@@ -2137,16 +2137,6 @@
   "src/commands/import.ts": {
     "mtime": 1782328918.276431,
     "ast_hash": "2a92d121b24dc91a44f73c304da1d7f2",
-    "semantic_hash": ""
-  },
-  "src/commands/index.test.ts": {
-    "mtime": 1782328879.877327,
-    "ast_hash": "31bc24acc4c2211114ee500c32d1e274",
-    "semantic_hash": ""
-  },
-  "src/commands/index.ts": {
-    "mtime": 1782328553.2249732,
-    "ast_hash": "b08ddf5052198b1dddda1db8801eb3c2",
     "semantic_hash": ""
   },
   "src/commands/inspect.test.ts": {
@@ -2197,6 +2187,16 @@
   "src/commands/status.ts": {
     "mtime": 1782328855.317087,
     "ast_hash": "e0941a461ad460c9f21c6c65bd835f62",
+    "semantic_hash": ""
+  },
+  "src/commands/fetch.test.ts": {
+    "mtime": 1782329485.3821497,
+    "ast_hash": "aa2e06fb4994e975685abd711670767c",
+    "semantic_hash": ""
+  },
+  "src/commands/fetch.ts": {
+    "mtime": 1782329512.9122524,
+    "ast_hash": "23c21aae94a448c6e214263522548459",
     "semantic_hash": ""
   }
 }

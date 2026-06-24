@@ -16,10 +16,8 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     return Boolean(this.flags?.json);
   }
 
-  private envelopeCommandId(): string {
-    return this.ctor.id === 'Symbol(SINGLE_COMMAND_CLI)'
-      ? this.config.bin
-      : this.ctor.id || this.config.bin;
+  protected envelopeCommandId(): string {
+    return this.ctor.id || this.config.bin;
   }
 
   protected override async _run<R>(): Promise<R> {

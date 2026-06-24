@@ -72,20 +72,10 @@
       "norm_label": "__dirname"
     },
     {
-      "label": "TOP_LEVEL_COMMANDS",
-      "file_type": "code",
-      "source_file": "bin/cli.mjs",
-      "source_location": "L9",
-      "_origin": "ast",
-      "id": "bin_cli_top_level_commands",
-      "community": 162,
-      "norm_label": "top_level_commands"
-    },
-    {
       "label": "rawArgv",
       "file_type": "code",
       "source_file": "bin/cli.mjs",
-      "source_location": "L19",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "bin_cli_rawargv",
       "community": 162,
@@ -875,7 +865,7 @@
       "label": "._run()",
       "file_type": "code",
       "source_file": "src/base-command.ts",
-      "source_location": "L25",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "src_base_command_basecommand_run",
       "community": 28,
@@ -888,7 +878,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_commands",
-      "community": 6,
+      "community": 28,
       "norm_label": "commands.ts"
     },
     {
@@ -898,7 +888,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "src_commands_commands",
-      "community": 6,
+      "community": 28,
       "norm_label": "commands"
     },
     {
@@ -1142,6 +1132,176 @@
       "norm_label": ".execute()"
     },
     {
+      "label": "fetch.test.ts",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.test.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "commands_fetch_test",
+      "community": 49,
+      "norm_label": "fetch.test.ts"
+    },
+    {
+      "label": ".execute()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.test.ts",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "commands_fetch_test_fetchcommand_execute",
+      "community": 52,
+      "norm_label": ".execute()"
+    },
+    {
+      "label": "fetch.ts",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "commands_fetch",
+      "community": 338,
+      "norm_label": "fetch.ts"
+    },
+    {
+      "label": "CAPTURE_DEPS",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "commands_fetch_capture_deps",
+      "community": 338,
+      "norm_label": "capture_deps"
+    },
+    {
+      "label": "FetchCommand",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand",
+      "community": 49,
+      "norm_label": "fetchcommand"
+    },
+    {
+      "label": ".envelopeCommandId()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L107",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_envelopecommandid",
+      "community": 49,
+      "norm_label": ".envelopecommandid()"
+    },
+    {
+      "label": ".init()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L111",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_init",
+      "community": 49,
+      "norm_label": ".init()"
+    },
+    {
+      "label": ".executeCacheHit()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L118",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_executecachehit",
+      "community": 338,
+      "norm_label": ".executecachehit()"
+    },
+    {
+      "label": ".executeCacheMiss()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L149",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_executecachemiss",
+      "community": 49,
+      "norm_label": ".executecachemiss()"
+    },
+    {
+      "label": ".buildResultData()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L194",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_buildresultdata",
+      "community": 49,
+      "norm_label": ".buildresultdata()"
+    },
+    {
+      "label": ".validateDurationFlags()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L244",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_validatedurationflags",
+      "community": 49,
+      "norm_label": ".validatedurationflags()"
+    },
+    {
+      "label": ".resolveArtifact()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L260",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_resolveartifact",
+      "community": 49,
+      "norm_label": ".resolveartifact()"
+    },
+    {
+      "label": ".persistFreshArtifact()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L302",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_persistfreshartifact",
+      "community": 49,
+      "norm_label": ".persistfreshartifact()"
+    },
+    {
+      "label": ".persistSectionsIfFresh()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L324",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_persistsectionsiffresh",
+      "community": 49,
+      "norm_label": ".persistsectionsiffresh()"
+    },
+    {
+      "label": ".execute()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L338",
+      "_origin": "ast",
+      "id": "commands_fetch_fetchcommand_execute",
+      "community": 49,
+      "norm_label": ".execute()"
+    },
+    {
+      "label": "applyCaptureMetadata()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L396",
+      "_origin": "ast",
+      "id": "commands_fetch_applycapturemetadata",
+      "community": 49,
+      "norm_label": "applycapturemetadata()"
+    },
+    {
+      "label": "handleStaleRevalidationResult()",
+      "file_type": "code",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L412",
+      "_origin": "ast",
+      "id": "commands_fetch_handlestalerevalidationresult",
+      "community": 338,
+      "norm_label": "handlestalerevalidationresult()"
+    },
+    {
       "label": "import.test.ts",
       "file_type": "code",
       "source_file": "src/commands/import.test.ts",
@@ -1292,173 +1452,13 @@
       "norm_label": ".execute()"
     },
     {
-      "label": "index.test.ts",
-      "file_type": "code",
-      "source_file": "src/commands/index.test.ts",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "commands_index_test",
-      "community": 32,
-      "norm_label": "index.test.ts"
-    },
-    {
-      "label": ".execute()",
-      "file_type": "code",
-      "source_file": "src/commands/index.test.ts",
-      "source_location": "L29",
-      "_origin": "ast",
-      "id": "commands_index_test_bonsai_execute",
-      "community": 54,
-      "norm_label": ".execute()"
-    },
-    {
-      "label": "index.ts",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "commands_index",
-      "community": 32,
-      "norm_label": "index.ts"
-    },
-    {
-      "label": "CAPTURE_DEPS",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L20",
-      "_origin": "ast",
-      "id": "commands_index_capture_deps",
-      "community": 32,
-      "norm_label": "capture_deps"
-    },
-    {
-      "label": "Bonsai",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "commands_index_bonsai",
-      "community": 32,
-      "norm_label": "bonsai"
-    },
-    {
-      "label": ".init()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L105",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_init",
-      "community": 32,
-      "norm_label": ".init()"
-    },
-    {
-      "label": ".executeCacheHit()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L112",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_executecachehit",
-      "community": 32,
-      "norm_label": ".executecachehit()"
-    },
-    {
-      "label": ".executeCacheMiss()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L143",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_executecachemiss",
-      "community": 32,
-      "norm_label": ".executecachemiss()"
-    },
-    {
-      "label": ".buildResultData()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L188",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_buildresultdata",
-      "community": 32,
-      "norm_label": ".buildresultdata()"
-    },
-    {
-      "label": ".validateDurationFlags()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L238",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_validatedurationflags",
-      "community": 32,
-      "norm_label": ".validatedurationflags()"
-    },
-    {
-      "label": ".resolveArtifact()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L254",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_resolveartifact",
-      "community": 32,
-      "norm_label": ".resolveartifact()"
-    },
-    {
-      "label": ".persistFreshArtifact()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L296",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_persistfreshartifact",
-      "community": 32,
-      "norm_label": ".persistfreshartifact()"
-    },
-    {
-      "label": ".persistSectionsIfFresh()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L318",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_persistsectionsiffresh",
-      "community": 32,
-      "norm_label": ".persistsectionsiffresh()"
-    },
-    {
-      "label": ".execute()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L332",
-      "_origin": "ast",
-      "id": "commands_index_bonsai_execute",
-      "community": 32,
-      "norm_label": ".execute()"
-    },
-    {
-      "label": "applyCaptureMetadata()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L390",
-      "_origin": "ast",
-      "id": "commands_index_applycapturemetadata",
-      "community": 32,
-      "norm_label": "applycapturemetadata()"
-    },
-    {
-      "label": "handleStaleRevalidationResult()",
-      "file_type": "code",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L406",
-      "_origin": "ast",
-      "id": "commands_index_handlestalerevalidationresult",
-      "community": 32,
-      "norm_label": "handlestalerevalidationresult()"
-    },
-    {
       "label": "inspect.test.ts",
       "file_type": "code",
       "source_file": "src/commands/inspect.test.ts",
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_inspect_test",
-      "community": 28,
+      "community": 15,
       "norm_label": "inspect.test.ts"
     },
     {
@@ -1618,7 +1618,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_prune_test",
-      "community": 49,
+      "community": 28,
       "norm_label": "prune.test.ts"
     },
     {
@@ -1628,7 +1628,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_prune",
-      "community": 49,
+      "community": 28,
       "norm_label": "prune.ts"
     },
     {
@@ -1638,7 +1638,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "commands_prune_researchprune",
-      "community": 49,
+      "community": 28,
       "norm_label": "researchprune"
     },
     {
@@ -1648,7 +1648,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "commands_prune_researchprune_init",
-      "community": 49,
+      "community": 28,
       "norm_label": ".init()"
     },
     {
@@ -1658,7 +1658,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "commands_prune_researchprune_validatepruneflags",
-      "community": 49,
+      "community": 28,
       "norm_label": ".validatepruneflags()"
     },
     {
@@ -1668,7 +1668,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "commands_prune_researchprune_shouldprune",
-      "community": 49,
+      "community": 28,
       "norm_label": ".shouldprune()"
     },
     {
@@ -1678,7 +1678,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "commands_prune_researchprune_findprunecandidates",
-      "community": 49,
+      "community": 28,
       "norm_label": ".findprunecandidates()"
     },
     {
@@ -1688,7 +1688,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "commands_prune_researchprune_deleteprunecandidates",
-      "community": 49,
+      "community": 28,
       "norm_label": ".deleteprunecandidates()"
     },
     {
@@ -1698,7 +1698,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "commands_prune_researchprune_execute",
-      "community": 49,
+      "community": 28,
       "norm_label": ".execute()"
     },
     {
@@ -1708,7 +1708,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_search_test",
-      "community": 28,
+      "community": 15,
       "norm_label": "search.test.ts"
     },
     {
@@ -1718,7 +1718,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_search",
-      "community": 28,
+      "community": 47,
       "norm_label": "search.ts"
     },
     {
@@ -1728,7 +1728,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "commands_search_remote_search_deps",
-      "community": 28,
+      "community": 47,
       "norm_label": "remote_search_deps"
     },
     {
@@ -1738,7 +1738,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "commands_search_freshness_bonus",
-      "community": 28,
+      "community": 47,
       "norm_label": "freshness_bonus"
     },
     {
@@ -1888,7 +1888,7 @@
       "source_location": "L327",
       "_origin": "ast",
       "id": "commands_search_scoresingleterm",
-      "community": 28,
+      "community": 47,
       "norm_label": "scoresingleterm()"
     },
     {
@@ -1898,7 +1898,7 @@
       "source_location": "L386",
       "_origin": "ast",
       "id": "commands_search_levenshtein",
-      "community": 28,
+      "community": 47,
       "norm_label": "levenshtein()"
     },
     {
@@ -1908,7 +1908,7 @@
       "source_location": "L403",
       "_origin": "ast",
       "id": "commands_search_isfuzzymatch",
-      "community": 28,
+      "community": 47,
       "norm_label": "isfuzzymatch()"
     },
     {
@@ -1918,7 +1918,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_status_test",
-      "community": 48,
+      "community": 15,
       "norm_label": "status.test.ts"
     },
     {
@@ -2048,7 +2048,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "config_index_loadstoragemode",
-      "community": 32,
+      "community": 6,
       "norm_label": "loadstoragemode()"
     },
     {
@@ -2058,7 +2058,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "config_index_effectiveconfig",
-      "community": 32,
+      "community": 6,
       "norm_label": "effectiveconfig()"
     },
     {
@@ -2628,7 +2628,7 @@
       "source_location": "L188",
       "_origin": "ast",
       "id": "research_browser_waitforload",
-      "community": 17,
+      "community": 50,
       "norm_label": "waitforload()"
     },
     {
@@ -2638,7 +2638,7 @@
       "source_location": "L223",
       "_origin": "ast",
       "id": "research_browser_waitforcontentready",
-      "community": 110,
+      "community": 50,
       "norm_label": "waitforcontentready()"
     },
     {
@@ -4448,7 +4448,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_section_artifacts_test",
-      "community": 195,
+      "community": 35,
       "norm_label": "section-artifacts.test.ts"
     },
     {
@@ -4458,7 +4458,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "docs_section_artifacts_test_longdoc",
-      "community": 195,
+      "community": 35,
       "norm_label": "longdoc()"
     },
     {
@@ -4468,7 +4468,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "docs_section_artifacts_test_makeparent",
-      "community": 195,
+      "community": 35,
       "norm_label": "makeparent()"
     },
     {
@@ -4478,7 +4478,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_section_artifacts",
-      "community": 195,
+      "community": 35,
       "norm_label": "section-artifacts.ts"
     },
     {
@@ -4488,7 +4488,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "docs_section_artifacts_childkey",
-      "community": 195,
+      "community": 35,
       "norm_label": "childkey()"
     },
     {
@@ -4498,7 +4498,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "docs_section_artifacts_buildsectionartifacts",
-      "community": 195,
+      "community": 35,
       "norm_label": "buildsectionartifacts()"
     },
     {
@@ -4508,7 +4508,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "docs_section_artifacts_activechildrenof",
-      "community": 195,
+      "community": 35,
       "norm_label": "activechildrenof()"
     },
     {
@@ -4518,7 +4518,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "docs_section_artifacts_persistsectionartifacts",
-      "community": 195,
+      "community": 35,
       "norm_label": "persistsectionartifacts()"
     },
     {
@@ -5288,7 +5288,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "research_resolve_target_resolveresearchtarget",
-      "community": 32,
+      "community": 48,
       "norm_label": "resolveresearchtarget()"
     },
     {
@@ -5478,7 +5478,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_secure_write",
-      "community": 32,
+      "community": 35,
       "norm_label": "secure-write.ts"
     },
     {
@@ -5488,7 +5488,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "research_secure_write_securewriteresult",
-      "community": 32,
+      "community": 35,
       "norm_label": "securewriteresult"
     },
     {
@@ -5498,7 +5498,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "research_secure_write_writeartifactsecurely",
-      "community": 32,
+      "community": 35,
       "norm_label": "writeartifactsecurely()"
     },
     {
@@ -5528,7 +5528,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "research_storage_isresearchfile",
-      "community": 195,
+      "community": 35,
       "norm_label": "isresearchfile()"
     },
     {
@@ -5538,7 +5538,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "research_storage_scancachedir",
-      "community": 195,
+      "community": 35,
       "norm_label": "scancachedir()"
     },
     {
@@ -5588,7 +5588,7 @@
       "source_location": "L133",
       "_origin": "ast",
       "id": "research_storage_writeartifact",
-      "community": 338,
+      "community": 35,
       "norm_label": "writeartifact()"
     },
     {
@@ -5768,7 +5768,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "sites_index_test",
-      "community": 50,
+      "community": 110,
       "norm_label": "index.test.ts"
     },
     {
@@ -5778,7 +5778,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "sites_index",
-      "community": 50,
+      "community": 110,
       "norm_label": "index.ts"
     },
     {
@@ -5788,7 +5788,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "sites_index_sites",
-      "community": 50,
+      "community": 110,
       "norm_label": "sites"
     },
     {
@@ -5798,7 +5798,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "sites_index_detectsite",
-      "community": 50,
+      "community": 47,
       "norm_label": "detectsite()"
     },
     {
@@ -5808,7 +5808,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "sites_index_getsitemodulebyid",
-      "community": 50,
+      "community": 110,
       "norm_label": "getsitemodulebyid()"
     },
     {
@@ -5868,7 +5868,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_test",
-      "community": 110,
+      "community": 50,
       "norm_label": "salesforce-doc-fetch.test.ts"
     },
     {
@@ -5878,7 +5878,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch",
-      "community": 110,
+      "community": 50,
       "norm_label": "salesforce-doc-fetch.ts"
     },
     {
@@ -5888,7 +5888,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_error_patterns",
-      "community": 110,
+      "community": 50,
       "norm_label": "error_patterns"
     },
     {
@@ -5898,7 +5898,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_lookslikesalesforceerror",
-      "community": 110,
+      "community": 50,
       "norm_label": "lookslikesalesforceerror()"
     },
     {
@@ -5908,7 +5908,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_base_remove_selectors",
-      "community": 110,
+      "community": 50,
       "norm_label": "base_remove_selectors"
     },
     {
@@ -5918,7 +5918,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_confidencefor",
-      "community": 110,
+      "community": 50,
       "norm_label": "confidencefor()"
     },
     {
@@ -5928,7 +5928,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_stripboilerplate",
-      "community": 110,
+      "community": 50,
       "norm_label": "stripboilerplate()"
     },
     {
@@ -5938,7 +5938,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_buildcapturescript",
-      "community": 110,
+      "community": 50,
       "norm_label": "buildcapturescript()"
     },
     {
@@ -5948,7 +5948,7 @@
       "source_location": "L269",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_salesforcedocoptions",
-      "community": 110,
+      "community": 50,
       "norm_label": "salesforcedocoptions"
     },
     {
@@ -5958,7 +5958,7 @@
       "source_location": "L280",
       "_origin": "ast",
       "id": "sites_salesforce_doc_fetch_fetchsalesforcedoc",
-      "community": 110,
+      "community": 50,
       "norm_label": "fetchsalesforcedoc()"
     },
     {
@@ -6238,7 +6238,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "sites_types_sitesearchresult",
-      "community": 110,
+      "community": 40,
       "norm_label": "sitesearchresult"
     },
     {
@@ -6378,7 +6378,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "regression_run_suite_capturefixture",
-      "community": 50,
+      "community": 110,
       "norm_label": "capturefixture()"
     },
     {
@@ -6588,7 +6588,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "regression_fixtures_test",
-      "community": 50,
+      "community": 110,
       "norm_label": "fixtures.test.ts"
     },
     {
@@ -6598,7 +6598,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "regression_fixtures_test_fixture",
-      "community": 50,
+      "community": 110,
       "norm_label": "fixture"
     },
     {
@@ -6608,7 +6608,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "regression_fixtures_test_fixtures",
-      "community": 50,
+      "community": 110,
       "norm_label": "fixtures"
     },
     {
@@ -10308,7 +10308,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "references_patterns_pr_dead_code_check",
-      "community": 34,
+      "community": 51,
       "norm_label": "pr dead code check"
     },
     {
@@ -10318,7 +10318,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "references_patterns_step_1_analyze_changed_files",
-      "community": 34,
+      "community": 51,
       "norm_label": "step 1: analyze changed files"
     },
     {
@@ -10328,7 +10328,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "references_patterns_step_2_if_issues_found_show_specifics",
-      "community": 34,
+      "community": 51,
       "norm_label": "step 2: if issues found, show specifics"
     },
     {
@@ -10668,7 +10668,7 @@
       "source_location": "L425",
       "_origin": "ast",
       "id": "references_patterns_migration_from_knip",
-      "community": 51,
+      "community": 34,
       "norm_label": "migration from knip"
     },
     {
@@ -10678,7 +10678,7 @@
       "source_location": "L427",
       "_origin": "ast",
       "id": "references_patterns_step_1_preview_migration",
-      "community": 51,
+      "community": 34,
       "norm_label": "step 1: preview migration"
     },
     {
@@ -10688,7 +10688,7 @@
       "source_location": "L435",
       "_origin": "ast",
       "id": "references_patterns_step_2_apply_migration",
-      "community": 51,
+      "community": 34,
       "norm_label": "step 2: apply migration"
     },
     {
@@ -10698,7 +10698,7 @@
       "source_location": "L448",
       "_origin": "ast",
       "id": "references_patterns_step_3_compare_results",
-      "community": 51,
+      "community": 34,
       "norm_label": "step 3: compare results"
     },
     {
@@ -10708,7 +10708,7 @@
       "source_location": "L458",
       "_origin": "ast",
       "id": "references_patterns_step_4_remove_knip_config",
-      "community": 51,
+      "community": 34,
       "norm_label": "step 4: remove knip config"
     },
     {
@@ -32438,7 +32438,7 @@
       "source_location": "L7126",
       "_origin": "ast",
       "id": "current_node_fs_reference_common_objects",
-      "community": 52,
+      "community": 357,
       "norm_label": "common objects"
     },
     {
@@ -32728,7 +32728,7 @@
       "source_location": "L7542",
       "_origin": "ast",
       "id": "current_node_fs_reference_class_fs_statwatcher",
-      "community": 52,
+      "community": 357,
       "norm_label": "class: `fs.statwatcher`"
     },
     {
@@ -32738,7 +32738,7 @@
       "source_location": "L7555",
       "_origin": "ast",
       "id": "current_node_fs_reference_watcher_ref_7555",
-      "community": 52,
+      "community": 357,
       "norm_label": "`watcher.ref()`"
     },
     {
@@ -32748,7 +32748,7 @@
       "source_location": "L7573",
       "_origin": "ast",
       "id": "current_node_fs_reference_watcher_unref_7573",
-      "community": 52,
+      "community": 357,
       "norm_label": "`watcher.unref()`"
     },
     {
@@ -36190,19 +36190,9 @@
       "source_file": "bin/cli.mjs",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bin_cli",
-      "target": "bin_cli_rawargv",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "bin/cli.mjs",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "bin_cli",
-      "target": "bin_cli_top_level_commands",
-      "confidence_score": 1.0
+      "target": "bin_cli_rawargv"
     },
     {
       "relation": "contains",
@@ -36710,9 +36700,9 @@
       "source_file": "package.json",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_oclif",
-      "target": "package_oclif_bin",
-      "confidence_score": 1.0
+      "target": "package_oclif_bin"
     },
     {
       "relation": "contains",
@@ -36730,9 +36720,9 @@
       "source_file": "package.json",
       "source_location": "L65",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_oclif",
-      "target": "package_oclif_dirname",
-      "confidence_score": 1.0
+      "target": "package_oclif_dirname"
     },
     {
       "relation": "contains",
@@ -36760,9 +36750,9 @@
       "source_file": "package.json",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_oclif_commands",
-      "target": "package_commands_identifier",
-      "confidence_score": 1.0
+      "target": "package_commands_identifier"
     },
     {
       "relation": "contains",
@@ -36770,9 +36760,9 @@
       "source_file": "package.json",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_oclif_commands",
-      "target": "package_commands_strategy",
-      "confidence_score": 1.0
+      "target": "package_commands_strategy"
     },
     {
       "relation": "contains",
@@ -36780,9 +36770,9 @@
       "source_file": "package.json",
       "source_location": "L68",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_oclif_commands",
-      "target": "package_commands_target",
-      "confidence_score": 1.0
+      "target": "package_commands_target"
     },
     {
       "relation": "contains",
@@ -36790,9 +36780,9 @@
       "source_file": "package.json",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_oclif_topics",
-      "target": "package_topics_config",
-      "confidence_score": 1.0
+      "target": "package_topics_config"
     },
     {
       "relation": "contains",
@@ -36800,9 +36790,9 @@
       "source_file": "package.json",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_topics_config",
-      "target": "package_config_description",
-      "confidence_score": 1.0
+      "target": "package_config_description"
     },
     {
       "relation": "contains",
@@ -37039,10 +37029,10 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
+      "source_file": "src/commands/fetch.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
       "target": "src_base_command",
       "confidence_score": 1.0
     },
@@ -37050,12 +37040,12 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
+      "source_file": "src/commands/import.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "source": "commands_index",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -37064,9 +37054,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -37075,9 +37065,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -37086,9 +37076,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -37097,9 +37087,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -37108,9 +37098,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -37137,12 +37127,34 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "src_base_command_basecommand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "src_base_command_basecommand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/commands/import.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -37151,31 +37163,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "inherits",
-      "context": "type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -37184,9 +37174,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -37195,9 +37185,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect_researchinspect",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -37206,9 +37196,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -37217,9 +37207,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -37228,9 +37218,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -37239,9 +37229,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -37250,9 +37240,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -37261,9 +37251,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -37272,9 +37262,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -37283,9 +37273,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_researchstatus",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -37315,9 +37305,9 @@
       "source_file": "src/base-command.ts",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_base_command_basecommand",
-      "target": "src_base_command_basecommand_envelopecommandid",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand_envelopecommandid"
     },
     {
       "relation": "method",
@@ -37346,229 +37336,9 @@
       "source_file": "src/base-command.ts",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_base_command_basecommand_run",
-      "target": "src_base_command_basecommand_envelopecommandid",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_import",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_import_researchimport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_index",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_index_bonsai",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_inspect",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_inspect_researchinspect",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_list",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_list_researchlist",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_prune",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_prune_researchprune",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_search",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_search_researchsearch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_status",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "commands_status_researchstatus",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "config_get",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "config_get_configget",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "config_list",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "config_list_configlist",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "config_set",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "src_commands",
-      "target": "config_set_configset",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand_envelopecommandid"
     },
     {
       "relation": "imports_from",
@@ -37578,7 +37348,7 @@
       "source_location": "L5",
       "weight": 1.0,
       "source": "src_commands",
-      "target": "config_unset",
+      "target": "commands_fetch",
       "confidence_score": 1.0
     },
     {
@@ -37589,8 +37359,228 @@
       "source_location": "L5",
       "weight": 1.0,
       "source": "src_commands",
-      "target": "config_unset_configunset",
+      "target": "commands_fetch_fetchcommand",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_import"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_import_researchimport"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_inspect"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_inspect_researchinspect"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_list"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_list_researchlist"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_prune"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_prune_researchprune"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_search"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_search_researchsearch"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_status"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "commands_status_researchstatus"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_get"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_get_configget"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_list"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_list_configlist"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_set"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_set_configset"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_unset"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_commands",
+      "target": "config_unset_configunset"
     },
     {
       "relation": "contains",
@@ -37598,9 +37588,9 @@
       "source_file": "src/commands.ts",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_commands",
-      "target": "src_commands_commands",
-      "confidence_score": 1.0
+      "target": "src_commands_commands"
     },
     {
       "relation": "contains",
@@ -37790,9 +37780,9 @@
       "source_file": "src/commands/config/get.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_get_configget",
-      "target": "config_base_configcommand",
-      "confidence_score": 1.0
+      "target": "config_base_configcommand"
     },
     {
       "relation": "imports",
@@ -37812,9 +37802,9 @@
       "source_file": "src/commands/config/list.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_list_configlist",
-      "target": "config_base_configcommand",
-      "confidence_score": 1.0
+      "target": "config_base_configcommand"
     },
     {
       "relation": "imports",
@@ -37834,9 +37824,9 @@
       "source_file": "src/commands/config/set.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_set_configset",
-      "target": "config_base_configcommand",
-      "confidence_score": 1.0
+      "target": "config_base_configcommand"
     },
     {
       "relation": "imports",
@@ -37856,9 +37846,9 @@
       "source_file": "src/commands/config/unset.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_unset_configunset",
-      "target": "config_base_configcommand",
-      "confidence_score": 1.0
+      "target": "config_base_configcommand"
     },
     {
       "relation": "references",
@@ -37965,9 +37955,9 @@
       "source_file": "src/commands/config/get.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_get",
-      "target": "config_get_configget",
-      "confidence_score": 1.0
+      "target": "config_get_configget"
     },
     {
       "relation": "imports_from",
@@ -38019,9 +38009,9 @@
       "source_file": "src/commands/config/get.ts",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_get_configget",
-      "target": "config_get_configget_execute",
-      "confidence_score": 1.0
+      "target": "config_get_configget_execute"
     },
     {
       "relation": "method",
@@ -38029,9 +38019,9 @@
       "source_file": "src/commands/config/get.ts",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_get_configget",
-      "target": "config_get_configget_init",
-      "confidence_score": 1.0
+      "target": "config_get_configget_init"
     },
     {
       "relation": "calls",
@@ -38072,9 +38062,9 @@
       "source_file": "src/commands/config/list.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_list",
-      "target": "config_list_configlist",
-      "confidence_score": 1.0
+      "target": "config_list_configlist"
     },
     {
       "relation": "imports",
@@ -38115,9 +38105,9 @@
       "source_file": "src/commands/config/list.ts",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_list_configlist",
-      "target": "config_list_configlist_execute",
-      "confidence_score": 1.0
+      "target": "config_list_configlist_execute"
     },
     {
       "relation": "method",
@@ -38125,9 +38115,9 @@
       "source_file": "src/commands/config/list.ts",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_list_configlist",
-      "target": "config_list_configlist_init",
-      "confidence_score": 1.0
+      "target": "config_list_configlist_init"
     },
     {
       "relation": "calls",
@@ -38201,9 +38191,9 @@
       "source_file": "src/commands/config/set.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_set",
-      "target": "config_set_configset",
-      "confidence_score": 1.0
+      "target": "config_set_configset"
     },
     {
       "relation": "contains",
@@ -38221,9 +38211,9 @@
       "source_file": "src/commands/config/set.ts",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_set_configset",
-      "target": "config_set_configset_execute",
-      "confidence_score": 1.0
+      "target": "config_set_configset_execute"
     },
     {
       "relation": "method",
@@ -38231,9 +38221,9 @@
       "source_file": "src/commands/config/set.ts",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_set_configset",
-      "target": "config_set_configset_init",
-      "confidence_score": 1.0
+      "target": "config_set_configset_init"
     },
     {
       "relation": "calls",
@@ -38264,9 +38254,9 @@
       "source_file": "src/commands/config/set.ts",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_set_configset_execute",
-      "target": "config_set_splitinlinekeyvalue",
-      "confidence_score": 1.0
+      "target": "config_set_splitinlinekeyvalue"
     },
     {
       "relation": "imports_from",
@@ -38318,9 +38308,9 @@
       "source_file": "src/commands/config/unset.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_unset",
-      "target": "config_unset_configunset",
-      "confidence_score": 1.0
+      "target": "config_unset_configunset"
     },
     {
       "relation": "method",
@@ -38328,9 +38318,9 @@
       "source_file": "src/commands/config/unset.ts",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_unset_configunset",
-      "target": "config_unset_configunset_execute",
-      "confidence_score": 1.0
+      "target": "config_unset_configunset_execute"
     },
     {
       "relation": "method",
@@ -38338,9 +38328,9 @@
       "source_file": "src/commands/config/unset.ts",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "config_unset_configunset",
-      "target": "config_unset_configunset_init",
-      "confidence_score": 1.0
+      "target": "config_unset_configunset_init"
     },
     {
       "relation": "calls",
@@ -38368,42 +38358,72 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.test.ts",
-      "source_location": "L4",
+      "source_file": "src/commands/fetch.test.ts",
+      "source_location": "L2",
       "weight": 1.0,
-      "source": "commands_import_test",
-      "target": "commands_import",
+      "source": "commands_fetch_test",
+      "target": "commands_fetch",
       "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.test.ts",
-      "source_location": "L4",
+      "source_file": "src/commands/fetch.test.ts",
+      "source_location": "L2",
       "weight": 1.0,
-      "source": "commands_import_test",
-      "target": "commands_import_researchimport",
+      "source": "commands_fetch_test",
+      "target": "commands_fetch_fetchcommand",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L17",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L396",
       "weight": 1.0,
-      "source": "commands_import",
-      "target": "commands_import_researchimport",
+      "source": "commands_fetch",
+      "target": "commands_fetch_applycapturemetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "commands_fetch_capture_deps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "commands_fetch_fetchcommand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L412",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "commands_fetch_handlestalerevalidationresult",
       "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L11",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L9",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
       "target": "config_index",
       "confidence_score": 1.0
     },
@@ -38411,10 +38431,10 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L11",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L9",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
       "target": "config_schema_storagemode",
       "confidence_score": 1.0
     },
@@ -38422,54 +38442,120 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L7",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L15",
       "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_cache_key",
+      "source": "commands_fetch",
+      "target": "docs_section_artifacts",
       "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L7",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L15",
       "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_cache_key_derivecachekey",
+      "source": "commands_fetch",
+      "target": "docs_section_artifacts_persistsectionartifacts",
       "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
+      "source_file": "src/commands/fetch.ts",
       "source_location": "L13",
       "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_compress",
+      "source": "commands_fetch",
+      "target": "research_browser",
       "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
+      "source_file": "src/commands/fetch.ts",
       "source_location": "L13",
       "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_compress_compressmarkdown",
+      "source": "commands_fetch",
+      "target": "research_browser_fetchrenderedhtml",
       "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_capture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_capture_capturedeps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_capture_capturepage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
       "source_location": "L12",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
+      "target": "research_fetcher",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_fetcher_fetchstatichtml",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_fetcher_fetchtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "commands_fetch",
       "target": "research_freshness",
       "confidence_score": 1.0
     },
@@ -38477,54 +38563,98 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L12",
-      "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_freshness_getpolicy",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L15",
-      "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_schema",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L15",
-      "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_schema_researchartifact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L15",
-      "weight": 1.0,
-      "source": "commands_import",
-      "target": "research_schema_researchartifactmetadata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
+      "source_file": "src/commands/fetch.ts",
       "source_location": "L10",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
+      "target": "research_freshness_checkmaxageexpired",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_freshness_evaluatefreshness",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_freshness_parsettltoms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_resolve_target",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_resolve_target_resolveresearchtarget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_revalidate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_revalidate_createartifactfromfetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_revalidate_revalidatecache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "commands_fetch",
       "target": "research_secure_write",
       "confidence_score": 1.0
     },
@@ -38532,10 +38662,10 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L10",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L8",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
       "target": "research_secure_write_writeartifactsecurely",
       "confidence_score": 1.0
     },
@@ -38543,10 +38673,10 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L8",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L6",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
       "target": "research_storage",
       "confidence_score": 1.0
     },
@@ -38554,21 +38684,43 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L8",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L6",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
       "target": "research_storage_getartifactpath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_storage_locatedartifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_storage_writeartifact",
       "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/import.ts",
-      "source_location": "L9",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L7",
       "weight": 1.0,
-      "source": "commands_import",
+      "source": "commands_fetch",
       "target": "research_store_roots",
       "confidence_score": 1.0
     },
@@ -38576,12 +38728,661 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_store_roots_loadstoreroots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "research_store_roots_storeroots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "sites_index",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "sites_index_detectsite",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "sites_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "commands_fetch",
+      "target": "sites_types_sitefetchresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_buildresultdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_envelopecommandid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L338",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_execute",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L118",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_executecachehit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_executecachemiss",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L111",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L302",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_persistfreshartifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L324",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_persistsectionsiffresh",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L260",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_resolveartifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L244",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand",
+      "target": "commands_fetch_fetchcommand_validatedurationflags",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachehit",
+      "target": "commands_fetch_handlestalerevalidationresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L125",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachehit",
+      "target": "research_freshness_checkmaxageexpired"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L128",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachehit",
+      "target": "research_freshness_evaluatefreshness"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L134",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachehit",
+      "target": "research_revalidate_revalidatecache"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L279",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_resolveartifact",
+      "target": "commands_fetch_fetchcommand_executecachehit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachemiss",
+      "target": "commands_fetch_applycapturemetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachemiss",
+      "target": "research_capture_capturepage"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L171",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachemiss",
+      "target": "research_revalidate_createartifactfromfetch"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L156",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_executecachemiss",
+      "target": "sites_index_detectsite"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L283",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_resolveartifact",
+      "target": "commands_fetch_fetchcommand_executecachemiss",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_buildresultdata",
+      "target": "config_schema_storagemode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_buildresultdata",
+      "target": "research_storage_getartifactpath"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L369",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_execute",
+      "target": "commands_fetch_fetchcommand_buildresultdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L342",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_execute",
+      "target": "commands_fetch_fetchcommand_validatedurationflags",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L251",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_validatedurationflags",
+      "target": "research_freshness_parsettltoms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L364",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_execute",
+      "target": "commands_fetch_fetchcommand_resolveartifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L284",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_resolveartifact",
+      "target": "commands_fetch_fetchcommand_persistfreshartifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L260",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_resolveartifact",
+      "target": "research_storage_locatedartifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L260",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_resolveartifact",
+      "target": "research_store_roots_storeroots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L313",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_persistfreshartifact",
+      "target": "research_secure_write_writeartifactsecurely"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L309",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_persistfreshartifact",
+      "target": "research_storage_writeartifact"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L302",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_persistfreshartifact",
+      "target": "research_store_roots_storeroots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L366",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_execute",
+      "target": "commands_fetch_fetchcommand_persistsectionsiffresh",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L332",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_persistsectionsiffresh",
+      "target": "docs_section_artifacts_persistsectionartifacts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/commands/fetch.ts",
+      "source_location": "L346",
+      "weight": 1.0,
+      "source": "commands_fetch_fetchcommand_execute",
+      "target": "research_resolve_target_resolveresearchtarget"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import_test",
+      "target": "commands_import"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import_test",
+      "target": "commands_import_researchimport"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "commands_import_researchimport"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "config_index"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "config_schema_storagemode"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_cache_key"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_cache_key_derivecachekey"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_compress"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_compress_compressmarkdown"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_freshness"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_freshness_getpolicy"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_schema"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_schema_researchartifact"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_schema_researchartifactmetadata"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_secure_write"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_secure_write_writeartifactsecurely"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_storage"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_storage_getartifactpath"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/commands/import.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import",
-      "target": "research_store_roots_loadstoreroots",
-      "confidence_score": 1.0
+      "target": "research_store_roots"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/commands/import.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "commands_import",
+      "target": "research_store_roots_loadstoreroots"
     },
     {
       "relation": "imports_from",
@@ -38590,9 +39391,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import",
-      "target": "research_url",
-      "confidence_score": 1.0
+      "target": "research_url"
     },
     {
       "relation": "imports",
@@ -38601,9 +39402,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import",
-      "target": "research_url_normalizeurl",
-      "confidence_score": 1.0
+      "target": "research_url_normalizeurl"
     },
     {
       "relation": "imports_from",
@@ -38612,9 +39413,9 @@
       "source_file": "src/commands/inspect.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect_test",
-      "target": "commands_import",
-      "confidence_score": 1.0
+      "target": "commands_import"
     },
     {
       "relation": "imports_from",
@@ -38623,9 +39424,9 @@
       "source_file": "src/commands/list.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_test",
-      "target": "commands_import",
-      "confidence_score": 1.0
+      "target": "commands_import"
     },
     {
       "relation": "imports_from",
@@ -38634,9 +39435,9 @@
       "source_file": "src/commands/prune.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_test",
-      "target": "commands_import",
-      "confidence_score": 1.0
+      "target": "commands_import"
     },
     {
       "relation": "imports_from",
@@ -38645,9 +39446,9 @@
       "source_file": "src/commands/search.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_test",
-      "target": "commands_import",
-      "confidence_score": 1.0
+      "target": "commands_import"
     },
     {
       "relation": "imports_from",
@@ -38656,9 +39457,9 @@
       "source_file": "src/commands/status.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_test",
-      "target": "commands_import",
-      "confidence_score": 1.0
+      "target": "commands_import"
     },
     {
       "relation": "method",
@@ -38666,9 +39467,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_buildimportartifact",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_buildimportartifact"
     },
     {
       "relation": "method",
@@ -38676,9 +39477,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L223",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_deriveimportcachekey",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_deriveimportcachekey"
     },
     {
       "relation": "method",
@@ -38686,9 +39487,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L302",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_execute",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_execute"
     },
     {
       "relation": "method",
@@ -38696,9 +39497,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L168",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_fsexistssync",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_fsexistssync"
     },
     {
       "relation": "method",
@@ -38706,9 +39507,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L176",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_fsreadfilesync",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_fsreadfilesync"
     },
     {
       "relation": "method",
@@ -38716,9 +39517,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L172",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_fsstatsync",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_fsstatsync"
     },
     {
       "relation": "method",
@@ -38726,9 +39527,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_getsourceurls",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_getsourceurls"
     },
     {
       "relation": "method",
@@ -38736,9 +39537,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_init",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_init"
     },
     {
       "relation": "method",
@@ -38746,9 +39547,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_readandvalidatefile",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_readandvalidatefile"
     },
     {
       "relation": "method",
@@ -38756,9 +39557,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L198",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_readandvalidateinput",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_readandvalidateinput"
     },
     {
       "relation": "method",
@@ -38766,9 +39567,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L97",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_readstdin",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_readstdin"
     },
     {
       "relation": "method",
@@ -38776,9 +39577,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L145",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport",
-      "target": "commands_import_researchimport_validatesourcemode",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_validatesourcemode"
     },
     {
       "relation": "imports",
@@ -38787,9 +39588,9 @@
       "source_file": "src/commands/inspect.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect_test",
-      "target": "commands_import_researchimport",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport"
     },
     {
       "relation": "imports",
@@ -38798,9 +39599,9 @@
       "source_file": "src/commands/list.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_test",
-      "target": "commands_import_researchimport",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport"
     },
     {
       "relation": "imports",
@@ -38809,9 +39610,9 @@
       "source_file": "src/commands/prune.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_test",
-      "target": "commands_import_researchimport",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport"
     },
     {
       "relation": "imports",
@@ -38820,9 +39621,9 @@
       "source_file": "src/commands/search.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_test",
-      "target": "commands_import_researchimport",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport"
     },
     {
       "relation": "imports",
@@ -38831,9 +39632,9 @@
       "source_file": "src/commands/status.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_test",
-      "target": "commands_import_researchimport",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport"
     },
     {
       "relation": "calls",
@@ -38842,9 +39643,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L201",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_readandvalidateinput",
-      "target": "commands_import_researchimport_readstdin",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_readstdin"
     },
     {
       "relation": "calls",
@@ -38853,9 +39654,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L310",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_execute",
-      "target": "commands_import_researchimport_getsourceurls",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_getsourceurls"
     },
     {
       "relation": "calls",
@@ -38864,9 +39665,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L307",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_execute",
-      "target": "commands_import_researchimport_validatesourcemode",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_validatesourcemode"
     },
     {
       "relation": "calls",
@@ -38875,9 +39676,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L181",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_readandvalidatefile",
-      "target": "commands_import_researchimport_fsexistssync",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_fsexistssync"
     },
     {
       "relation": "calls",
@@ -38886,9 +39687,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L184",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_readandvalidatefile",
-      "target": "commands_import_researchimport_fsstatsync",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_fsstatsync"
     },
     {
       "relation": "calls",
@@ -38897,9 +39698,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L191",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_readandvalidatefile",
-      "target": "commands_import_researchimport_fsreadfilesync",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_fsreadfilesync"
     },
     {
       "relation": "calls",
@@ -38908,9 +39709,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L214",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_readandvalidateinput",
-      "target": "commands_import_researchimport_readandvalidatefile",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_readandvalidatefile"
     },
     {
       "relation": "calls",
@@ -38919,9 +39720,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L308",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_execute",
-      "target": "commands_import_researchimport_readandvalidateinput",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_readandvalidateinput"
     },
     {
       "relation": "calls",
@@ -38941,9 +39742,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L312",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_execute",
-      "target": "commands_import_researchimport_deriveimportcachekey",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_deriveimportcachekey"
     },
     {
       "relation": "calls",
@@ -38974,9 +39775,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_buildimportartifact",
-      "target": "research_schema_researchartifact",
-      "confidence_score": 1.0
+      "target": "research_schema_researchartifact"
     },
     {
       "relation": "calls",
@@ -38985,9 +39786,9 @@
       "source_file": "src/commands/import.ts",
       "source_location": "L314",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_import_researchimport_execute",
-      "target": "commands_import_researchimport_buildimportartifact",
-      "confidence_score": 1.0
+      "target": "commands_import_researchimport_buildimportartifact"
     },
     {
       "relation": "calls",
@@ -39026,877 +39827,76 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.test.ts",
+      "source_file": "src/commands/inspect.test.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "source": "commands_index_test",
-      "target": "commands_index",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "commands_inspect_test",
+      "target": "commands_inspect"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.test.ts",
+      "source_file": "src/commands/inspect.test.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "source": "commands_index_test",
-      "target": "commands_index_bonsai",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "commands_inspect_test",
+      "target": "commands_inspect_researchinspect"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L390",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "commands_index_applycapturemetadata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "commands_index_bonsai",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L20",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "commands_index_capture_deps",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L406",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "commands_index_handlestalerevalidationresult",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "config_index",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "config_schema_storagemode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L15",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "docs_section_artifacts",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L15",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "docs_section_artifacts_persistsectionartifacts",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
+      "source_file": "src/commands/inspect.ts",
       "source_location": "L13",
       "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_browser",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "commands_inspect",
+      "target": "commands_inspect_researchinspect"
     },
     {
-      "relation": "imports",
-      "context": "import",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L13",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_browser_fetchrenderedhtml",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L14",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_capture",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L14",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_capture_capturedeps",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L14",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_capture_capturepage",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L12",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_fetcher",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L12",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_fetcher_fetchstatichtml",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L12",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_fetcher_fetchtext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_freshness",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_freshness_checkmaxageexpired",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_freshness_evaluatefreshness",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_freshness_parsettltoms",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L16",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_resolve_target",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L16",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_resolve_target_resolveresearchtarget",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_revalidate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_revalidate_createartifactfromfetch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_revalidate_revalidatecache",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_secure_write",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_secure_write_writeartifactsecurely",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
+      "source_file": "src/commands/inspect.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_storage",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_storage_getartifactpath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_storage_locatedartifact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_storage_writeartifact",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "commands_inspect",
+      "target": "commands_inspect_sectionsummary"
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L7",
+      "source_file": "src/commands/inspect.ts",
+      "source_location": "L4",
       "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_store_roots",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "commands_inspect",
+      "target": "research_resolve_target"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L7",
+      "source_file": "src/commands/inspect.ts",
+      "source_location": "L4",
       "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_store_roots_loadstoreroots",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "research_store_roots_storeroots",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L17",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "sites_index",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L17",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "sites_index_detectsite",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L18",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "sites_types",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L18",
-      "weight": 1.0,
-      "source": "commands_index",
-      "target": "sites_types_sitefetchresult",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L188",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_buildresultdata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L332",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_execute",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L112",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_executecachehit",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L143",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_executecachemiss",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L105",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_init",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L296",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_persistfreshartifact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L318",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_persistsectionsiffresh",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L254",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_resolveartifact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L238",
-      "weight": 1.0,
-      "source": "commands_index_bonsai",
-      "target": "commands_index_bonsai_validatedurationflags",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L134",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachehit",
-      "target": "commands_index_handlestalerevalidationresult",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L119",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachehit",
-      "target": "research_freshness_checkmaxageexpired"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L122",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachehit",
-      "target": "research_freshness_evaluatefreshness"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L128",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachehit",
-      "target": "research_revalidate_revalidatecache"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L273",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_resolveartifact",
-      "target": "commands_index_bonsai_executecachehit",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L180",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachemiss",
-      "target": "commands_index_applycapturemetadata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L160",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachemiss",
-      "target": "research_capture_capturepage"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L165",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachemiss",
-      "target": "research_revalidate_createartifactfromfetch"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L150",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_executecachemiss",
-      "target": "sites_index_detectsite"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L277",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_resolveartifact",
-      "target": "commands_index_bonsai_executecachemiss",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L188",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_buildresultdata",
-      "target": "config_schema_storagemode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L208",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_buildresultdata",
-      "target": "research_storage_getartifactpath"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L363",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_execute",
-      "target": "commands_index_bonsai_buildresultdata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L336",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_execute",
-      "target": "commands_index_bonsai_validatedurationflags",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L245",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_validatedurationflags",
-      "target": "research_freshness_parsettltoms"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L358",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_execute",
-      "target": "commands_index_bonsai_resolveartifact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L278",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_resolveartifact",
-      "target": "commands_index_bonsai_persistfreshartifact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L254",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_resolveartifact",
-      "target": "research_storage_locatedartifact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L254",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_resolveartifact",
-      "target": "research_store_roots_storeroots",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L307",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_persistfreshartifact",
-      "target": "research_secure_write_writeartifactsecurely"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L303",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_persistfreshartifact",
-      "target": "research_storage_writeartifact"
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L296",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_persistfreshartifact",
-      "target": "research_store_roots_storeroots",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/index.ts",
-      "source_location": "L360",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_execute",
-      "target": "commands_index_bonsai_persistsectionsiffresh",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L326",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_persistsectionsiffresh",
-      "target": "docs_section_artifacts_persistsectionartifacts"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/commands/index.ts",
-      "source_location": "L340",
-      "weight": 1.0,
-      "source": "commands_index_bonsai_execute",
+      "source": "commands_inspect",
       "target": "research_resolve_target_resolveresearchtarget"
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/commands/inspect.test.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "commands_inspect_test",
-      "target": "commands_inspect",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/inspect.test.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "commands_inspect_test",
-      "target": "commands_inspect_researchinspect",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/inspect.ts",
-      "source_location": "L13",
-      "weight": 1.0,
-      "source": "commands_inspect",
-      "target": "commands_inspect_researchinspect",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/inspect.ts",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "commands_inspect",
-      "target": "commands_inspect_sectionsummary",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/inspect.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "commands_inspect",
-      "target": "research_resolve_target",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/commands/inspect.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "commands_inspect",
-      "target": "research_resolve_target_resolveresearchtarget",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "src/commands/inspect.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect",
-      "target": "research_storage",
-      "confidence_score": 1.0
+      "target": "research_storage"
     },
     {
       "relation": "imports",
@@ -39905,9 +39905,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect",
-      "target": "research_storage_scancachedirs",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedirs"
     },
     {
       "relation": "method",
@@ -39915,9 +39915,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect_researchinspect",
-      "target": "commands_inspect_researchinspect_execute",
-      "confidence_score": 1.0
+      "target": "commands_inspect_researchinspect_execute"
     },
     {
       "relation": "method",
@@ -39925,9 +39925,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L89",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect_researchinspect",
-      "target": "commands_inspect_researchinspect_findsections",
-      "confidence_score": 1.0
+      "target": "commands_inspect_researchinspect_findsections"
     },
     {
       "relation": "method",
@@ -39935,9 +39935,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect_researchinspect",
-      "target": "commands_inspect_researchinspect_init",
-      "confidence_score": 1.0
+      "target": "commands_inspect_researchinspect_init"
     },
     {
       "relation": "calls",
@@ -39946,9 +39946,9 @@
       "source_file": "src/commands/inspect.ts",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_inspect_researchinspect_execute",
-      "target": "commands_inspect_researchinspect_findsections",
-      "confidence_score": 1.0
+      "target": "commands_inspect_researchinspect_findsections"
     },
     {
       "relation": "calls",
@@ -39979,9 +39979,9 @@
       "source_file": "src/commands/list.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_test",
-      "target": "commands_list",
-      "confidence_score": 1.0
+      "target": "commands_list"
     },
     {
       "relation": "imports",
@@ -39990,9 +39990,9 @@
       "source_file": "src/commands/list.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_test",
-      "target": "commands_list_researchlist",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist"
     },
     {
       "relation": "contains",
@@ -40000,9 +40000,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "commands_list_researchlist",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist"
     },
     {
       "relation": "imports_from",
@@ -40011,9 +40011,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "research_freshness",
-      "confidence_score": 1.0
+      "target": "research_freshness"
     },
     {
       "relation": "imports",
@@ -40022,9 +40022,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "research_freshness_evaluatefreshness",
-      "confidence_score": 1.0
+      "target": "research_freshness_evaluatefreshness"
     },
     {
       "relation": "imports_from",
@@ -40033,9 +40033,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "research_storage",
-      "confidence_score": 1.0
+      "target": "research_storage"
     },
     {
       "relation": "imports",
@@ -40044,9 +40044,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "research_storage_scancachedirs",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedirs"
     },
     {
       "relation": "imports_from",
@@ -40055,9 +40055,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "research_store_roots",
-      "confidence_score": 1.0
+      "target": "research_store_roots"
     },
     {
       "relation": "imports",
@@ -40066,9 +40066,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list",
-      "target": "research_store_roots_loadstoreroots",
-      "confidence_score": 1.0
+      "target": "research_store_roots_loadstoreroots"
     },
     {
       "relation": "method",
@@ -40076,9 +40076,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist",
-      "target": "commands_list_researchlist_execute",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_execute"
     },
     {
       "relation": "method",
@@ -40086,9 +40086,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist",
-      "target": "commands_list_researchlist_init",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_init"
     },
     {
       "relation": "method",
@@ -40096,9 +40096,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L121",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist",
-      "target": "commands_list_researchlist_loglistresults",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_loglistresults"
     },
     {
       "relation": "method",
@@ -40106,9 +40106,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist",
-      "target": "commands_list_researchlist_matchesfilters",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_matchesfilters"
     },
     {
       "relation": "method",
@@ -40116,9 +40116,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist",
-      "target": "commands_list_researchlist_scancachedirforlist",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_scancachedirforlist"
     },
     {
       "relation": "method",
@@ -40126,9 +40126,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist",
-      "target": "commands_list_researchlist_validatelistflags",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_validatelistflags"
     },
     {
       "relation": "calls",
@@ -40137,9 +40137,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist_execute",
-      "target": "commands_list_researchlist_validatelistflags",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_validatelistflags"
     },
     {
       "relation": "calls",
@@ -40148,9 +40148,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L148",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist_execute",
-      "target": "commands_list_researchlist_scancachedirforlist",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_scancachedirforlist"
     },
     {
       "relation": "calls",
@@ -40170,9 +40170,9 @@
       "source_file": "src/commands/list.ts",
       "source_location": "L159",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_list_researchlist_execute",
-      "target": "commands_list_researchlist_loglistresults",
-      "confidence_score": 1.0
+      "target": "commands_list_researchlist_loglistresults"
     },
     {
       "relation": "calls",
@@ -40192,9 +40192,9 @@
       "source_file": "src/commands/prune.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_test",
-      "target": "commands_prune",
-      "confidence_score": 1.0
+      "target": "commands_prune"
     },
     {
       "relation": "imports",
@@ -40203,9 +40203,9 @@
       "source_file": "src/commands/prune.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_test",
-      "target": "commands_prune_researchprune",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune"
     },
     {
       "relation": "contains",
@@ -40213,9 +40213,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "commands_prune_researchprune",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune"
     },
     {
       "relation": "imports_from",
@@ -40224,9 +40224,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "research_freshness",
-      "confidence_score": 1.0
+      "target": "research_freshness"
     },
     {
       "relation": "imports",
@@ -40235,9 +40235,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "research_freshness_parsettltoms",
-      "confidence_score": 1.0
+      "target": "research_freshness_parsettltoms"
     },
     {
       "relation": "imports_from",
@@ -40246,9 +40246,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "research_storage",
-      "confidence_score": 1.0
+      "target": "research_storage"
     },
     {
       "relation": "imports",
@@ -40257,9 +40257,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "research_storage_scancachedir",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedir"
     },
     {
       "relation": "imports_from",
@@ -40268,9 +40268,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "research_store_roots",
-      "confidence_score": 1.0
+      "target": "research_store_roots"
     },
     {
       "relation": "imports",
@@ -40279,9 +40279,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune",
-      "target": "research_store_roots_loadstoreroots",
-      "confidence_score": 1.0
+      "target": "research_store_roots_loadstoreroots"
     },
     {
       "relation": "method",
@@ -40289,9 +40289,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L115",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune",
-      "target": "commands_prune_researchprune_deleteprunecandidates",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_deleteprunecandidates"
     },
     {
       "relation": "method",
@@ -40299,9 +40299,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L128",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune",
-      "target": "commands_prune_researchprune_execute",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_execute"
     },
     {
       "relation": "method",
@@ -40309,9 +40309,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L101",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune",
-      "target": "commands_prune_researchprune_findprunecandidates",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_findprunecandidates"
     },
     {
       "relation": "method",
@@ -40319,9 +40319,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune",
-      "target": "commands_prune_researchprune_init",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_init"
     },
     {
       "relation": "method",
@@ -40329,9 +40329,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune",
-      "target": "commands_prune_researchprune_shouldprune",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_shouldprune"
     },
     {
       "relation": "method",
@@ -40339,9 +40339,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune",
-      "target": "commands_prune_researchprune_validatepruneflags",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_validatepruneflags"
     },
     {
       "relation": "calls",
@@ -40350,9 +40350,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune_execute",
-      "target": "commands_prune_researchprune_validatepruneflags",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_validatepruneflags"
     },
     {
       "relation": "calls",
@@ -40372,9 +40372,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune_execute",
-      "target": "commands_prune_researchprune_findprunecandidates",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_findprunecandidates"
     },
     {
       "relation": "calls",
@@ -40383,9 +40383,9 @@
       "source_file": "src/commands/prune.ts",
       "source_location": "L150",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_prune_researchprune_execute",
-      "target": "commands_prune_researchprune_deleteprunecandidates",
-      "confidence_score": 1.0
+      "target": "commands_prune_researchprune_deleteprunecandidates"
     },
     {
       "relation": "calls",
@@ -40405,9 +40405,9 @@
       "source_file": "src/commands/search.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_test",
-      "target": "commands_search",
-      "confidence_score": 1.0
+      "target": "commands_search"
     },
     {
       "relation": "imports",
@@ -40416,9 +40416,9 @@
       "source_file": "src/commands/search.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_test",
-      "target": "commands_search_researchsearch",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch"
     },
     {
       "relation": "contains",
@@ -40426,9 +40426,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "commands_search_freshness_bonus",
-      "confidence_score": 1.0
+      "target": "commands_search_freshness_bonus"
     },
     {
       "relation": "contains",
@@ -40436,9 +40436,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L403",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "commands_search_isfuzzymatch",
-      "confidence_score": 1.0
+      "target": "commands_search_isfuzzymatch"
     },
     {
       "relation": "contains",
@@ -40446,9 +40446,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L386",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "commands_search_levenshtein",
-      "confidence_score": 1.0
+      "target": "commands_search_levenshtein"
     },
     {
       "relation": "contains",
@@ -40456,9 +40456,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "commands_search_remote_search_deps",
-      "confidence_score": 1.0
+      "target": "commands_search_remote_search_deps"
     },
     {
       "relation": "contains",
@@ -40466,9 +40466,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "commands_search_researchsearch",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch"
     },
     {
       "relation": "contains",
@@ -40476,9 +40476,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L327",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "commands_search_scoresingleterm",
-      "confidence_score": 1.0
+      "target": "commands_search_scoresingleterm"
     },
     {
       "relation": "imports_from",
@@ -40487,9 +40487,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "docs_remote_search_runner",
-      "confidence_score": 1.0
+      "target": "docs_remote_search_runner"
     },
     {
       "relation": "imports",
@@ -40498,9 +40498,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "docs_remote_search_runner_remotesearchdeps",
-      "confidence_score": 1.0
+      "target": "docs_remote_search_runner_remotesearchdeps"
     },
     {
       "relation": "imports",
@@ -40509,9 +40509,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "docs_remote_search_runner_runremotedocssearch",
-      "confidence_score": 1.0
+      "target": "docs_remote_search_runner_runremotedocssearch"
     },
     {
       "relation": "imports_from",
@@ -40520,9 +40520,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_fetcher",
-      "confidence_score": 1.0
+      "target": "research_fetcher"
     },
     {
       "relation": "imports",
@@ -40531,9 +40531,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_fetcher_fetchstatichtml",
-      "confidence_score": 1.0
+      "target": "research_fetcher_fetchstatichtml"
     },
     {
       "relation": "imports",
@@ -40542,9 +40542,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_fetcher_fetchtext",
-      "confidence_score": 1.0
+      "target": "research_fetcher_fetchtext"
     },
     {
       "relation": "imports",
@@ -40553,9 +40553,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_fetcher_postjson",
-      "confidence_score": 1.0
+      "target": "research_fetcher_postjson"
     },
     {
       "relation": "imports_from",
@@ -40564,9 +40564,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_freshness",
-      "confidence_score": 1.0
+      "target": "research_freshness"
     },
     {
       "relation": "imports",
@@ -40575,9 +40575,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_freshness_evaluatefreshness",
-      "confidence_score": 1.0
+      "target": "research_freshness_evaluatefreshness"
     },
     {
       "relation": "imports_from",
@@ -40586,9 +40586,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_storage",
-      "confidence_score": 1.0
+      "target": "research_storage"
     },
     {
       "relation": "imports",
@@ -40597,9 +40597,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_storage_scancachedirs",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedirs"
     },
     {
       "relation": "imports_from",
@@ -40608,9 +40608,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_store_roots",
-      "confidence_score": 1.0
+      "target": "research_store_roots"
     },
     {
       "relation": "imports",
@@ -40619,9 +40619,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "research_store_roots_loadstoreroots",
-      "confidence_score": 1.0
+      "target": "research_store_roots_loadstoreroots"
     },
     {
       "relation": "imports_from",
@@ -40630,9 +40630,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "sites_index",
-      "confidence_score": 1.0
+      "target": "sites_index"
     },
     {
       "relation": "imports",
@@ -40641,9 +40641,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search",
-      "target": "sites_index_detectsite",
-      "confidence_score": 1.0
+      "target": "sites_index_detectsite"
     },
     {
       "relation": "method",
@@ -40651,9 +40651,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L144",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_calculatescore",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_calculatescore"
     },
     {
       "relation": "method",
@@ -40661,9 +40661,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L292",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_execute",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_execute"
     },
     {
       "relation": "method",
@@ -40671,9 +40671,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L281",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_executeremotesearch",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_executeremotesearch"
     },
     {
       "relation": "method",
@@ -40681,9 +40681,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L266",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_executesitesearch",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_executesitesearch"
     },
     {
       "relation": "method",
@@ -40691,9 +40691,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L88",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_getsearchqueryterms",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_getsearchqueryterms"
     },
     {
       "relation": "method",
@@ -40701,9 +40701,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_init",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_init"
     },
     {
       "relation": "method",
@@ -40711,9 +40711,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L240",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_logsearchresults",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_logsearchresults"
     },
     {
       "relation": "method",
@@ -40721,9 +40721,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L174",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_makesnippet",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_makesnippet"
     },
     {
       "relation": "method",
@@ -40731,9 +40731,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_matchesfilters",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_matchesfilters"
     },
     {
       "relation": "method",
@@ -40741,9 +40741,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_phrasematchbonus",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_phrasematchbonus"
     },
     {
       "relation": "method",
@@ -40751,9 +40751,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L253",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_printresults",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_printresults"
     },
     {
       "relation": "method",
@@ -40761,9 +40761,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_scancachedirforresults",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_scancachedirforresults"
     },
     {
       "relation": "method",
@@ -40771,9 +40771,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch",
-      "target": "commands_search_researchsearch_validatesearchflags",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_validatesearchflags"
     },
     {
       "relation": "calls",
@@ -40782,9 +40782,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L306",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_execute",
-      "target": "commands_search_researchsearch_validatesearchflags",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_validatesearchflags"
     },
     {
       "relation": "calls",
@@ -40793,9 +40793,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L307",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_execute",
-      "target": "commands_search_researchsearch_getsearchqueryterms",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_getsearchqueryterms"
     },
     {
       "relation": "calls",
@@ -40804,9 +40804,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L169",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_calculatescore",
-      "target": "commands_search_researchsearch_phrasematchbonus",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_phrasematchbonus"
     },
     {
       "relation": "calls",
@@ -40815,9 +40815,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_calculatescore",
-      "target": "commands_search_scoresingleterm",
-      "confidence_score": 1.0
+      "target": "commands_search_scoresingleterm"
     },
     {
       "relation": "calls",
@@ -40826,9 +40826,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L316",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_execute",
-      "target": "commands_search_researchsearch_scancachedirforresults",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_scancachedirforresults"
     },
     {
       "relation": "calls",
@@ -40848,9 +40848,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L321",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_execute",
-      "target": "commands_search_researchsearch_logsearchresults",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_logsearchresults"
     },
     {
       "relation": "calls",
@@ -40859,9 +40859,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L284",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_executeremotesearch",
-      "target": "commands_search_researchsearch_printresults",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_printresults"
     },
     {
       "relation": "calls",
@@ -40870,9 +40870,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L275",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_executesitesearch",
-      "target": "commands_search_researchsearch_printresults",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_printresults"
     },
     {
       "relation": "calls",
@@ -40881,9 +40881,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L297",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_execute",
-      "target": "commands_search_researchsearch_executesitesearch",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_executesitesearch"
     },
     {
       "relation": "calls",
@@ -40903,9 +40903,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L301",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_researchsearch_execute",
-      "target": "commands_search_researchsearch_executeremotesearch",
-      "confidence_score": 1.0
+      "target": "commands_search_researchsearch_executeremotesearch"
     },
     {
       "relation": "calls",
@@ -40936,9 +40936,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L346",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_scoresingleterm",
-      "target": "commands_search_isfuzzymatch",
-      "confidence_score": 1.0
+      "target": "commands_search_isfuzzymatch"
     },
     {
       "relation": "calls",
@@ -40947,9 +40947,9 @@
       "source_file": "src/commands/search.ts",
       "source_location": "L405",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_search_isfuzzymatch",
-      "target": "commands_search_levenshtein",
-      "confidence_score": 1.0
+      "target": "commands_search_levenshtein"
     },
     {
       "relation": "imports_from",
@@ -40958,9 +40958,9 @@
       "source_file": "src/commands/status.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_test",
-      "target": "commands_status",
-      "confidence_score": 1.0
+      "target": "commands_status"
     },
     {
       "relation": "imports",
@@ -40969,9 +40969,9 @@
       "source_file": "src/commands/status.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_test",
-      "target": "commands_status_researchstatus",
-      "confidence_score": 1.0
+      "target": "commands_status_researchstatus"
     },
     {
       "relation": "contains",
@@ -40979,9 +40979,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "commands_status_cachestatus",
-      "confidence_score": 1.0
+      "target": "commands_status_cachestatus"
     },
     {
       "relation": "contains",
@@ -40989,9 +40989,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "commands_status_describecachestatus",
-      "confidence_score": 1.0
+      "target": "commands_status_describecachestatus"
     },
     {
       "relation": "contains",
@@ -40999,9 +40999,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "commands_status_freshnessstatus",
-      "confidence_score": 1.0
+      "target": "commands_status_freshnessstatus"
     },
     {
       "relation": "contains",
@@ -41009,9 +41009,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "commands_status_researchstatus",
-      "confidence_score": 1.0
+      "target": "commands_status_researchstatus"
     },
     {
       "relation": "contains",
@@ -41019,9 +41019,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "commands_status_resolvefreshness",
-      "confidence_score": 1.0
+      "target": "commands_status_resolvefreshness"
     },
     {
       "relation": "contains",
@@ -41029,9 +41029,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "commands_status_statusaction",
-      "confidence_score": 1.0
+      "target": "commands_status_statusaction"
     },
     {
       "relation": "contains",
@@ -41039,9 +41039,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "commands_status_statusresult",
-      "confidence_score": 1.0
+      "target": "commands_status_statusresult"
     },
     {
       "relation": "imports_from",
@@ -41050,9 +41050,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_freshness",
-      "confidence_score": 1.0
+      "target": "research_freshness"
     },
     {
       "relation": "imports",
@@ -41061,9 +41061,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_freshness_checkmaxageexpired",
-      "confidence_score": 1.0
+      "target": "research_freshness_checkmaxageexpired"
     },
     {
       "relation": "imports",
@@ -41072,9 +41072,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_freshness_evaluatefreshness",
-      "confidence_score": 1.0
+      "target": "research_freshness_evaluatefreshness"
     },
     {
       "relation": "imports_from",
@@ -41083,9 +41083,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_resolve_target",
-      "confidence_score": 1.0
+      "target": "research_resolve_target"
     },
     {
       "relation": "imports",
@@ -41094,9 +41094,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_resolve_target_resolveresearchtarget",
-      "confidence_score": 1.0
+      "target": "research_resolve_target_resolveresearchtarget"
     },
     {
       "relation": "imports_from",
@@ -41105,9 +41105,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_schema",
-      "confidence_score": 1.0
+      "target": "research_schema"
     },
     {
       "relation": "imports",
@@ -41116,9 +41116,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_schema_researchartifact",
-      "confidence_score": 1.0
+      "target": "research_schema_researchartifact"
     },
     {
       "relation": "imports_from",
@@ -41127,9 +41127,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_storage",
-      "confidence_score": 1.0
+      "target": "research_storage"
     },
     {
       "relation": "imports",
@@ -41138,9 +41138,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status",
-      "target": "research_storage_getartifactpath",
-      "confidence_score": 1.0
+      "target": "research_storage_getartifactpath"
     },
     {
       "relation": "calls",
@@ -41149,9 +41149,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_describecachestatus",
-      "target": "commands_status_resolvefreshness",
-      "confidence_score": 1.0
+      "target": "commands_status_resolvefreshness"
     },
     {
       "relation": "calls",
@@ -41160,9 +41160,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_resolvefreshness",
-      "target": "research_freshness_checkmaxageexpired",
-      "confidence_score": 1.0
+      "target": "research_freshness_checkmaxageexpired"
     },
     {
       "relation": "calls",
@@ -41171,9 +41171,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_resolvefreshness",
-      "target": "research_freshness_evaluatefreshness",
-      "confidence_score": 1.0
+      "target": "research_freshness_evaluatefreshness"
     },
     {
       "relation": "calls",
@@ -41182,9 +41182,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_researchstatus_execute",
-      "target": "commands_status_describecachestatus",
-      "confidence_score": 1.0
+      "target": "commands_status_describecachestatus"
     },
     {
       "relation": "method",
@@ -41192,9 +41192,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_researchstatus",
-      "target": "commands_status_researchstatus_execute",
-      "confidence_score": 1.0
+      "target": "commands_status_researchstatus_execute"
     },
     {
       "relation": "method",
@@ -41202,9 +41202,9 @@
       "source_file": "src/commands/status.ts",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_status_researchstatus",
-      "target": "commands_status_researchstatus_init",
-      "confidence_score": 1.0
+      "target": "commands_status_researchstatus_init"
     },
     {
       "relation": "calls",
@@ -60995,9 +60995,9 @@
       "source_file": "README.md",
       "source_location": "L147",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_command_reference",
-      "target": "readme_config",
-      "confidence_score": 1.0
+      "target": "readme_config"
     },
     {
       "relation": "contains",
@@ -61005,9 +61005,9 @@
       "source_file": "README.md",
       "source_location": "L115",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_command_reference",
-      "target": "readme_import_url",
-      "confidence_score": 1.0
+      "target": "readme_import_url"
     },
     {
       "relation": "contains",
@@ -61015,9 +61015,9 @@
       "source_file": "README.md",
       "source_location": "L131",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_command_reference",
-      "target": "readme_inspect_url",
-      "confidence_score": 1.0
+      "target": "readme_inspect_url"
     },
     {
       "relation": "contains",
@@ -61025,9 +61025,9 @@
       "source_file": "README.md",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_command_reference",
-      "target": "readme_search_query",
-      "confidence_score": 1.0
+      "target": "readme_search_query"
     },
     {
       "relation": "contains",
@@ -61035,9 +61035,9 @@
       "source_file": "README.md",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_command_reference",
-      "target": "readme_status_url",
-      "confidence_score": 1.0
+      "target": "readme_status_url"
     },
     {
       "relation": "contains",
@@ -61045,9 +61045,9 @@
       "source_file": "README.md",
       "source_location": "L93",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_command_reference",
-      "target": "readme_url",
-      "confidence_score": 1.0
+      "target": "readme_url"
     },
     {
       "relation": "contains",
@@ -61315,9 +61315,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_command_reference",
-      "target": "docs_commands_1_root_fetch_command",
-      "confidence_score": 1.0
+      "target": "docs_commands_1_root_fetch_command"
     },
     {
       "relation": "contains",
@@ -61325,9 +61325,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L80",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_command_reference",
-      "target": "docs_commands_2_import",
-      "confidence_score": 1.0
+      "target": "docs_commands_2_import"
     },
     {
       "relation": "contains",
@@ -61335,9 +61335,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L130",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_command_reference",
-      "target": "docs_commands_3_status",
-      "confidence_score": 1.0
+      "target": "docs_commands_3_status"
     },
     {
       "relation": "contains",
@@ -61345,9 +61345,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L152",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_command_reference",
-      "target": "docs_commands_4_inspect",
-      "confidence_score": 1.0
+      "target": "docs_commands_4_inspect"
     },
     {
       "relation": "contains",
@@ -61355,9 +61355,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L188",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_command_reference",
-      "target": "docs_commands_5_search",
-      "confidence_score": 1.0
+      "target": "docs_commands_5_search"
     },
     {
       "relation": "contains",
@@ -61365,9 +61365,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L218",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_command_reference",
-      "target": "docs_commands_6_config",
-      "confidence_score": 1.0
+      "target": "docs_commands_6_config"
     },
     {
       "relation": "contains",
@@ -61375,9 +61375,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_1_root_fetch_command",
-      "target": "docs_commands_command_line_flags",
-      "confidence_score": 1.0
+      "target": "docs_commands_command_line_flags"
     },
     {
       "relation": "contains",
@@ -61385,9 +61385,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_1_root_fetch_command",
-      "target": "docs_commands_json_output_envelope_schema",
-      "confidence_score": 1.0
+      "target": "docs_commands_json_output_envelope_schema"
     },
     {
       "relation": "contains",
@@ -61395,9 +61395,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_1_root_fetch_command",
-      "target": "docs_commands_positional_arguments",
-      "confidence_score": 1.0
+      "target": "docs_commands_positional_arguments"
     },
     {
       "relation": "contains",
@@ -61405,9 +61405,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_1_root_fetch_command",
-      "target": "docs_commands_usage",
-      "confidence_score": 1.0
+      "target": "docs_commands_usage"
     },
     {
       "relation": "contains",
@@ -61415,9 +61415,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L92",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_2_import",
-      "target": "docs_commands_command_line_flags_92",
-      "confidence_score": 1.0
+      "target": "docs_commands_command_line_flags_92"
     },
     {
       "relation": "contains",
@@ -61425,9 +61425,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_2_import",
-      "target": "docs_commands_json_output_envelope_data_block",
-      "confidence_score": 1.0
+      "target": "docs_commands_json_output_envelope_data_block"
     },
     {
       "relation": "contains",
@@ -61435,9 +61435,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L89",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_2_import",
-      "target": "docs_commands_positional_arguments_89",
-      "confidence_score": 1.0
+      "target": "docs_commands_positional_arguments_89"
     },
     {
       "relation": "contains",
@@ -61445,9 +61445,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L84",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_2_import",
-      "target": "docs_commands_usage_84",
-      "confidence_score": 1.0
+      "target": "docs_commands_usage_84"
     },
     {
       "relation": "contains",
@@ -61455,9 +61455,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_3_status",
-      "target": "docs_commands_json_output_envelope_data_block_139",
-      "confidence_score": 1.0
+      "target": "docs_commands_json_output_envelope_data_block_139"
     },
     {
       "relation": "contains",
@@ -61465,9 +61465,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L134",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_3_status",
-      "target": "docs_commands_usage_134",
-      "confidence_score": 1.0
+      "target": "docs_commands_usage_134"
     },
     {
       "relation": "contains",
@@ -61475,9 +61475,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_4_inspect",
-      "target": "docs_commands_json_output_envelope_data_block_161",
-      "confidence_score": 1.0
+      "target": "docs_commands_json_output_envelope_data_block_161"
     },
     {
       "relation": "contains",
@@ -61485,9 +61485,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L156",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_4_inspect",
-      "target": "docs_commands_usage_156",
-      "confidence_score": 1.0
+      "target": "docs_commands_usage_156"
     },
     {
       "relation": "contains",
@@ -61495,9 +61495,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L197",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_5_search",
-      "target": "docs_commands_json_output_envelope_data_block_197",
-      "confidence_score": 1.0
+      "target": "docs_commands_json_output_envelope_data_block_197"
     },
     {
       "relation": "contains",
@@ -61505,9 +61505,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_5_search",
-      "target": "docs_commands_usage_192",
-      "confidence_score": 1.0
+      "target": "docs_commands_usage_192"
     },
     {
       "relation": "contains",
@@ -61515,9 +61515,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L265",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_6_config",
-      "target": "docs_commands_configuration_keys",
-      "confidence_score": 1.0
+      "target": "docs_commands_configuration_keys"
     },
     {
       "relation": "contains",
@@ -61525,9 +61525,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L258",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_6_config",
-      "target": "docs_commands_flags",
-      "confidence_score": 1.0
+      "target": "docs_commands_flags"
     },
     {
       "relation": "contains",
@@ -61535,9 +61535,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L225",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_6_config",
-      "target": "docs_commands_storage_modes",
-      "confidence_score": 1.0
+      "target": "docs_commands_storage_modes"
     },
     {
       "relation": "contains",
@@ -61545,9 +61545,9 @@
       "source_file": "docs/commands.md",
       "source_location": "L240",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_commands_6_config",
-      "target": "docs_commands_subcommands",
-      "confidence_score": 1.0
+      "target": "docs_commands_subcommands"
     },
     {
       "relation": "contains",
@@ -80141,5 +80141,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "868816a0d44156e0707f16a18ddae2e90058e87e"
+  "built_at_commit": "268d71899aad9e1780bfb6ef51a3517981254ae6"
 }

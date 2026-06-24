@@ -2,15 +2,26 @@ import { describe, it, expect } from 'vitest';
 import { runContract } from './runner.ts';
 
 describe('research contract tests', () => {
-  it('bonsai --help exits 0 and prints help description', () => {
+  it('bonsai --help exits 0 and lists top-level commands', () => {
     const result = runContract(['--help']);
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('An advanced, locally cached web research tool');
+    expect(result.stdout).toContain('COMMANDS');
+    expect(result.stdout).toContain('import');
+    expect(result.stdout).toContain('search');
+    expect(result.stdout).toContain('config');
   });
 
-  it('bonsai without URL argument fails with exit code 2 (usage error)', () => {
+  it('bonsai help exits 0 and lists top-level commands', () => {
+    const result = runContract(['help']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('COMMANDS');
+    expect(result.stdout).toContain('import');
+  });
+
+  it('bonsai without URL argument exits 0 and lists top-level commands', () => {
     const result = runContract([]);
-    expect(result.exitCode).toBe(2);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('COMMANDS');
   });
 
   it('bonsai with invalid flag value fails with exit code 2 (usage error)', () => {

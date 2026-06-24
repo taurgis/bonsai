@@ -23,7 +23,9 @@ const CAPTURE_DEPS: CaptureDeps = {
   fetchText: (url) => fetchText(url),
 };
 
-export default class Bonsai extends BaseCommand<typeof Bonsai> {
+export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
+  static id = 'fetch';
+  static hidden = true;
   static summary = 'An advanced, locally cached web research tool optimized for LLM ingestion.';
   static description =
     'Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.';
@@ -102,9 +104,13 @@ export default class Bonsai extends BaseCommand<typeof Bonsai> {
 
   static stdoutIsPrimaryData = true;
 
+  protected override envelopeCommandId(): string {
+    return this.config.bin;
+  }
+
   async init(): Promise<void> {
     await super.init();
-    const { args, flags } = await this.parse(Bonsai);
+    const { args, flags } = await this.parse(FetchCommand);
     this.args = args;
     this.flags = flags;
   }
