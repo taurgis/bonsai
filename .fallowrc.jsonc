@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": ["bin/cli.mjs"],
+
+
+  "health": {
+    "maxCyclomatic": 20,
+    "maxCognitive": 15,
+    "maxCrap": 30,
+    "coverage": "coverage/coverage-final.json",
+    "ignore": ["scripts/**", "tests/**", "**/*.test.ts", "**/__fixtures__/**"]
+  },
+
+  "audit": {
+    "gate": "new-only"
+  },
+
+  "duplicates": {
+    "minTokens": 70,
+    "ignore": ["tests/**", "**/*.test.ts"]
+  }
+}

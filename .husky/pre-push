@@ -1,0 +1,11 @@
+# Pre-push intentionally runs no checks.
+#
+# It used to run `pnpm test:coverage` — a full instrumented suite that also enforces
+# the coverage threshold from vitest.config.ts. That run takes minutes and repeatedly
+# stalled or aborted pushes, so it has been removed from the push path.
+#
+# Run the coverage gate manually when you want it (e.g. before a release):
+#
+#   pnpm test:coverage      # also part of `pnpm lint:health`
+#
+# The plain `pnpm test` suite still runs in CI (.github/workflows/ci.yml).

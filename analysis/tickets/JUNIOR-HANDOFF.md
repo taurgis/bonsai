@@ -14,7 +14,7 @@ This repository is where the optional oclif plugin package should be scaffolded 
 
 ## Existing Patterns to Copy
 
-| Need | Copy from |
+| Need | Copy from (in host CLI repository `/Users/thomastheunen/Documents/Projects/forward-nexus`) |
 | --- | --- |
 | Thin oclif command class | `src/commands/find.ts` |
 | Host contract style | `src/commands/index.ts` and existing command metadata |

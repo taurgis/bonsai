@@ -1,0 +1,28 @@
+# Quality gate. lint-staged runs first so the checks below see the
+# formatted, final-committed content. Any non-zero exit aborts the commit.
+pnpm lint-staged
+
+# code-structure rule #1: no production file may reach 1000 lines.
+node scripts/check-line-counts.ts
+
+# Block newly introduced complexity (cyclomatic/cognitive), dead code, and
+# duplication. --gate new-only ignores pre-existing findings so the team can
+# ratchet down. CRAP needs fresh coverage (see .fallowrc.jsonc + the pre-push
+# coverage gate); --max-crap 500 lifts it here because it exceeds the highest
+# CRAP a function within the cyclomatic<=20 limit can reach (20^2+20=420), so the
+# fast commit gate relies on cyclomatic/cognitive and never on estimated CRAP.
+npx fallow audit --gate new-only --max-crap 500 --format human
+
+# Keep the graphify knowledge graph (graphify-out/, tracked) current with the
+# code being committed — AST-only, zero API cost. Runs last so an aborted commit
+# never triggers a refresh. Skipped silently when graphify is not on PATH, so
+# contributors without it (and CI) are never blocked. Re-stages the refreshed
+# graph so it lands in this commit; a refresh failure warns but never aborts —
+# this is maintenance, not a quality gate.
+if command -v graphify >/dev/null 2>&1; then
+  if graphify update .; then
+    git add graphify-out
+  else
+    echo "graphify: 'update .' failed; committing without a graph refresh" >&2
+  fi
+fi

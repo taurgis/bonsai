@@ -1,0 +1,93 @@
+import { parseHTML } from 'linkedom';
+import { Readability } from '@mozilla/readability';
+import { htmlToMarkdown } from './markdown.js';
+
+export interface ExtractionResult {
+  title: string;
+  detailedMarkdown: string;
+  confidence: 'high' | 'medium' | 'low';
+  qualityNotes: string[];
+}
+
+function resolveRelativeLinks(document: any, finalUrl: string): void {
+  const base = new URL(finalUrl);
+  const links = document.querySelectorAll('a');
+  for (const link of links) {
+    const href = link.getAttribute('href');
+    if (!href) continue;
+    try {
+      const resolved = new URL(href, base).toString();
+      if (resolved.startsWith('javascript:')) {
+        link.removeAttribute('href');
+      } else {
+        link.setAttribute('href', resolved);
+      }
+    } catch {
+      // Ignore resolution errors for invalid link formats
+    }
+  }
+}
+
+function cleanUnsafeElements(document: any): void {
+  const scripts = document.querySelectorAll('script, style, iframe, noscript');
+  for (const script of scripts) {
+    script.remove();
+  }
+
+  const allElements = document.querySelectorAll('*');
+  for (const el of allElements) {
+    for (const attr of Array.from(el.attributes) as any[]) {
+      if (attr.name.startsWith('on')) {
+        el.removeAttribute(attr.name);
+      }
+    }
+  }
+}
+
+function determineConfidence(textLength: number): {
+  confidence: 'high' | 'medium' | 'low';
+  notes: string[];
+} {
+  const notes = ['readability extracted main article'];
+  let confidence: 'high' | 'medium' | 'low' = 'high';
+
+  if (textLength < 500) {
+    confidence = 'low';
+    notes.push('warning: extracted content is very short (less than 500 characters)');
+  } else if (textLength < 2000) {
+    confidence = 'medium';
+  }
+
+  return { confidence, notes };
+}
+
+/**
+ * Extracts readerable content from an HTML document, sanitizes it, and converts it to detailed Markdown.
+ */
+export function extractHtmlContent(html: string, finalUrl: string): ExtractionResult {
+  const { document } = parseHTML(html);
+
+  resolveRelativeLinks(document, finalUrl);
+  cleanUnsafeElements(document);
+
+  const reader = new Readability(document as any);
+  const article = reader.parse();
+
+  if (!article || !article.content) {
+    throw new Error(
+      'Content extraction failed: The target page could not be parsed by the readability engine. ' +
+        'Hint: A future "research import" command will allow you to import pre-cleaned, agent-supplied research notes directly.'
+    );
+  }
+
+  const detailedMarkdown = htmlToMarkdown(article.content);
+  const textLength = article.textContent ? article.textContent.trim().length : 0;
+  const { confidence, notes } = determineConfidence(textLength);
+
+  return {
+    title: article.title || 'Untitled',
+    detailedMarkdown,
+    confidence,
+    qualityNotes: notes,
+  };
+}

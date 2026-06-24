@@ -23,11 +23,11 @@ Prove the command behaves predictably for agents and humans across success and f
 
 ## Implementation Notes
 
-- Copy the JSON-envelope expectations from existing contract tests.
-- Verify against `src/oclif/runtime.ts` `buildJsonEnvelope`.
-- Verify exit codes against `src/oclif/runtime.ts` `CLI_EXIT_CODE`.
-- For command class behavior, compare with `src/commands/find.ts`.
-- Keep those host references as compatibility fixtures; implementation code remains in this plugin package unless a separate host-integration ticket says otherwise.
+- Copy the JSON-envelope expectations from existing contract tests in the host CLI.
+- Verify against `src/oclif/runtime.ts` `buildJsonEnvelope` in the host CLI (or our plugin-local equivalent `src/base-command.ts`).
+- Verify exit codes against `src/oclif/runtime.ts` `CLI_EXIT_CODE` in the host CLI.
+- For command class behavior, compare with `src/commands/find.ts` in the host CLI.
+- Keep those host references as compatibility fixtures; implementation code remains in this plugin package (under `src/base-command.ts` and `src/commands/research.ts`).
 - Do not assert exact absolute cache paths except that they live under the test data directory.
 
 ## Scope

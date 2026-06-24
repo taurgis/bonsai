@@ -1,0 +1,63 @@
+{
+  "name": "forward-nexus-plugin-research",
+  "version": "1.0.0",
+  "description": "An advanced local research result database plugin for forward-nexus",
+  "type": "module",
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "oclif.manifest.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -b && oclif manifest",
+    "prepack": "pnpm build",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
+    "lint": "pnpm lint:line-counts && pnpm lint:health",
+    "lint:line-counts": "node scripts/check-line-counts.ts --all",
+    "lint:health": "pnpm test:coverage && npx fallow health --format human",
+    "prepare": "husky",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "lint-staged": {
+    "src/**/*.ts": "prettier --write",
+    "scripts/**/*.ts": "prettier --write",
+    "tests/**/*.ts": "prettier --write"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "@oclif/core": "^4.11.4",
+    "linkedom": "^0.18.12",
+    "turndown": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/mozilla-readability": "^0.2.1",
+    "@types/node": "^22.10.0",
+    "@types/turndown": "^5.0.5",
+    "@vitest/coverage-istanbul": "^4.0.18",
+    "husky": "^9.1.7",
+    "jsdom": "^26.0.0",
+    "lint-staged": "^16.2.7",
+    "oclif": "^4.23.21",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.17.1",
+  "oclif": {
+    "commands": "./dist/commands",
+    "topicSeparator": " ",
+    "topics": {
+      "research": {
+        "description": "Advanced web research caching database for AI agents"
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Compilation / build output
+dist/
+*.tgz
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+*.lcov
+
+# Logs
+*.log
+logs/
+
+# Caches
+.cache/
+.fallow/
+.eslintcache
+
+# IDEs and editors
+.idea/
+.vscode/
+.DS_Store
+
+# Agent specific local paths
+.gemini/
+.claude/settings.local.json
+.cursor/
+
+# Temporary / testing artifacts
+tmp/
+/scratch/
+fnr-contract-scratch/
+fn-contract-config-home/
+fn-contract-scratch/
