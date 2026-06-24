@@ -100,7 +100,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
  * Splits only when no separate value positional was supplied, and on the FIRST `=`
  * so a value may itself contain `=`.
  */
-export function splitInlineKeyValue(
+function splitInlineKeyValue(
   rawKey: string | undefined,
   rawValue: string | undefined
 ): { keyArg: string | undefined; valueArg: string | undefined } {

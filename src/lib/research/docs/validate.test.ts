@@ -1,12 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  looksLikeErrorPage,
-  isSameDocsOrigin,
-  validateTextArtifact,
-  validateJsonArtifact,
-} from './validate.js';
+import { looksLikeErrorPage, isSameDocsOrigin, validateTextArtifact } from './validate.js';
 
 const FIXTURES = join(import.meta.dirname, '__fixtures__');
 const load = (name: string) => readFileSync(join(FIXTURES, name), 'utf8');
@@ -44,17 +39,5 @@ describe('validateTextArtifact', () => {
 
   it('rejects empty bodies', () => {
     expect(validateTextArtifact('   ').ok).toBe(false);
-  });
-});
-
-describe('validateJsonArtifact', () => {
-  it('accepts a non-empty object', () => {
-    expect(validateJsonArtifact('{"docs":[{"location":"x"}]}').ok).toBe(true);
-  });
-
-  it('rejects invalid, empty, or HTML JSON', () => {
-    expect(validateJsonArtifact('not json').ok).toBe(false);
-    expect(validateJsonArtifact('{}').ok).toBe(false);
-    expect(validateJsonArtifact('<!doctype html><html></html>').ok).toBe(false);
   });
 });

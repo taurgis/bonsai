@@ -48,23 +48,3 @@ export function validateTextArtifact(body: string): ArtifactValidation {
   if (looksLikeErrorPage(trimmed)) return { ok: false, reason: 'body looks like an error page' };
   return { ok: true };
 }
-
-/** Validates a JSON search-index body parses and is a non-empty object/array. */
-export function validateJsonArtifact(body: string): ArtifactValidation {
-  const trimmed = body.trim();
-  if (trimmed.length < MIN_BODY_CHARS) return { ok: false, reason: 'empty body' };
-  if (looksLikeHtml(trimmed)) return { ok: false, reason: 'body is HTML, not JSON' };
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(trimmed);
-  } catch (err) {
-    return { ok: false, reason: `invalid JSON: ${(err as Error).message}` };
-  }
-  if (parsed === null || typeof parsed !== 'object') {
-    return { ok: false, reason: 'JSON is not an object or array' };
-  }
-  if (Array.isArray(parsed) ? parsed.length === 0 : Object.keys(parsed).length === 0) {
-    return { ok: false, reason: 'JSON is empty' };
-  }
-  return { ok: true };
-}

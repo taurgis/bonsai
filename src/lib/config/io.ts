@@ -1,12 +1,6 @@
-import {
-  readFileSync,
-  writeFileSync,
-  mkdirSync,
-  renameSync,
-  unlinkSync,
-  existsSync,
-} from 'node:fs';
+import { readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { atomicWriteFile } from '../atomic-write.js';
 import type { ConfigValues } from './schema.js';
 import { KEY_META, ALL_KEYS } from './schema.js';
 
@@ -52,19 +46,7 @@ export function readProjectConfig(cwd: string): Partial<ConfigValues> {
 }
 
 function writeAtomically(filePath: string, data: unknown): void {
-  // Unique per call so two rapid writes to the same file (e.g. a programmatic invoker) can't
-  // share — and clobber — the same temp before its rename. Mirrors writeArtifact in storage.ts.
-  const tempPath = `${filePath}.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2, 7)}.tmp`;
-  const content = JSON.stringify(data, null, 2) + '\n';
-  try {
-    writeFileSync(tempPath, content, 'utf-8');
-    renameSync(tempPath, filePath);
-  } catch (error) {
-    try {
-      unlinkSync(tempPath);
-    } catch {}
-    throw error;
-  }
+  atomicWriteFile(filePath, JSON.stringify(data, null, 2) + '\n');
 }
 
 function omitUndefined(obj: Record<string, unknown>): Record<string, unknown> {

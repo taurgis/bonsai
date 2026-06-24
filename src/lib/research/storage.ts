@@ -5,9 +5,9 @@ import {
   mkdirSync,
   existsSync,
   readdirSync,
-  unlinkSync,
   renameSync,
 } from 'node:fs';
+import { atomicWriteFile } from '../atomic-write.js';
 import { parseArtifact, serializeArtifact } from './artifact.js';
 import type { ResearchArtifact } from './schema.js';
 
@@ -137,29 +137,26 @@ export function writeArtifact(dataDir: string, key: string, artifact: ResearchAr
     mkdirSync(dir, { recursive: true });
   }
 
-  const tmpPath = `${path}.${Date.now()}.${Math.random().toString(36).substring(2, 7)}.tmp`;
-  const content = serializeArtifact(artifact);
-
-  writeFileSync(tmpPath, content, 'utf-8');
-
-  try {
-    if (existsSync(path)) {
-      try {
-        const existingContent = readFileSync(path, 'utf-8');
-        const archivePath = join(dir, `${key}.superseded.${Date.now()}.md`);
-        writeFileSync(archivePath, existingContent, 'utf-8');
-      } catch (err) {
-        console.warn(`Warning: failed to archive superseded artifact: ${(err as Error).message}`);
-      }
+  // Capture the current artifact before overwriting it, then commit the new content atomically.
+  // Archiving is best-effort and happens only after the write succeeds: a read/archive failure
+  // never aborts the write, and a failed write never leaves a stray `.superseded` copy.
+  let existingContent: string | null = null;
+  if (existsSync(path)) {
+    try {
+      existingContent = readFileSync(path, 'utf-8');
+    } catch (err) {
+      console.warn(`Warning: failed to read artifact for archiving: ${(err as Error).message}`);
     }
-    renameSync(tmpPath, path);
-  } catch (err) {
-    if (existsSync(tmpPath)) {
-      try {
-        unlinkSync(tmpPath);
-      } catch {}
+  }
+
+  atomicWriteFile(path, serializeArtifact(artifact));
+
+  if (existingContent !== null) {
+    try {
+      writeFileSync(join(dir, `${key}.superseded.${Date.now()}.md`), existingContent, 'utf-8');
+    } catch (err) {
+      console.warn(`Warning: failed to archive superseded artifact: ${(err as Error).message}`);
     }
-    throw err;
   }
 }
 

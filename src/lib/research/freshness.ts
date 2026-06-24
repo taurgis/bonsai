@@ -1,5 +1,8 @@
 import type { ResearchArtifactMetadata } from './schema.js';
 
+const HOUR_MS = 3600 * 1000;
+const DAY_MS = 24 * HOUR_MS;
+
 export interface FreshnessPolicy {
   freshWindowMs: number;
   graceWindowMs: number;
@@ -15,20 +18,18 @@ export function parseTtlToMs(ttl: string): number {
   }
   const val = parseInt(match[1] || '', 10);
   const unit = match[2] || '';
-  const hour = 3600 * 1000;
-  const day = 24 * hour;
 
   switch (unit) {
     case 'h':
-      return val * hour;
+      return val * HOUR_MS;
     case 'd':
-      return val * day;
+      return val * DAY_MS;
     case 'w':
-      return val * 7 * day;
+      return val * 7 * DAY_MS;
     case 'm':
-      return val * 30 * day;
+      return val * 30 * DAY_MS;
     case 'y':
-      return val * 365 * day;
+      return val * 365 * DAY_MS;
     default:
       return 0;
   }
@@ -41,23 +42,24 @@ export function getPolicy(
   tier: 'stable' | 'standard' | 'volatile',
   ttlOverride?: string | null
 ): FreshnessPolicy {
-  const day = 24 * 3600 * 1000;
-  let freshWindowMs = 30 * day;
-  let graceWindowMs = 14 * day;
+  let freshWindowMs = 30 * DAY_MS;
+  let graceWindowMs = 14 * DAY_MS;
 
   if (tier === 'stable') {
-    freshWindowMs = 180 * day;
-    graceWindowMs = 60 * day;
+    freshWindowMs = 180 * DAY_MS;
+    graceWindowMs = 60 * DAY_MS;
   } else if (tier === 'volatile') {
-    freshWindowMs = 7 * day;
-    graceWindowMs = 5 * day;
+    freshWindowMs = 7 * DAY_MS;
+    graceWindowMs = 5 * DAY_MS;
   }
 
   const activeTtl = ttlOverride;
   if (activeTtl) {
     freshWindowMs = parseTtlToMs(activeTtl);
-    const defaultFresh = tier === 'stable' ? 180 * day : tier === 'volatile' ? 7 * day : 30 * day;
-    const defaultGrace = tier === 'stable' ? 60 * day : tier === 'volatile' ? 5 * day : 14 * day;
+    const defaultFresh =
+      tier === 'stable' ? 180 * DAY_MS : tier === 'volatile' ? 7 * DAY_MS : 30 * DAY_MS;
+    const defaultGrace =
+      tier === 'stable' ? 60 * DAY_MS : tier === 'volatile' ? 5 * DAY_MS : 14 * DAY_MS;
     graceWindowMs = Math.floor(freshWindowMs * (defaultGrace / defaultFresh));
   }
 
