@@ -145,7 +145,7 @@
       "label": "scripts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "package_scripts",
       "community": 38,
@@ -155,7 +155,7 @@
       "label": "build",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L13",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "package_scripts_build",
       "community": 38,
@@ -165,7 +165,7 @@
       "label": "prepack",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L14",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "package_scripts_prepack",
       "community": 38,
@@ -175,7 +175,7 @@
       "label": "format",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "package_scripts_format",
       "community": 38,
@@ -185,7 +185,7 @@
       "label": "format:check",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "package_scripts_format_check",
       "community": 38,
@@ -195,7 +195,7 @@
       "label": "lint",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "package_scripts_lint",
       "community": 38,
@@ -205,7 +205,7 @@
       "label": "lint:line-counts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "package_scripts_lint_line_counts",
       "community": 38,
@@ -215,7 +215,7 @@
       "label": "lint:health",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "package_scripts_lint_health",
       "community": 38,
@@ -225,7 +225,7 @@
       "label": "prepare",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "package_scripts_prepare",
       "community": 38,
@@ -235,7 +235,7 @@
       "label": "test",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "package_scripts_test",
       "community": 38,
@@ -245,7 +245,7 @@
       "label": "test:coverage",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "package_scripts_test_coverage",
       "community": 38,
@@ -255,7 +255,7 @@
       "label": "type-check",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "package_scripts_type_check",
       "community": 38,
@@ -265,7 +265,7 @@
       "label": "lint-staged",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L25",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "package_lint_staged",
       "community": 137,
@@ -275,7 +275,7 @@
       "label": "src/**/*.ts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L26",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "package_lint_staged_src_ts",
       "community": 137,
@@ -285,7 +285,7 @@
       "label": "scripts/**/*.ts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L27",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "package_lint_staged_scripts_ts",
       "community": 137,
@@ -295,7 +295,7 @@
       "label": "tests/**/*.ts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L28",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "package_lint_staged_tests_ts",
       "community": 137,
@@ -305,7 +305,7 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "package_dependencies",
       "community": 123,
@@ -315,7 +315,7 @@
       "label": "@mozilla/readability",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "package_dependencies_mozilla_readability",
       "community": 123,
@@ -325,7 +325,7 @@
       "label": "@oclif/core",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "package_dependencies_oclif_core",
       "community": 123,
@@ -335,7 +335,7 @@
       "label": "linkedom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "package_dependencies_linkedom",
       "community": 123,
@@ -345,7 +345,7 @@
       "label": "turndown",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "package_dependencies_turndown",
       "community": 123,
@@ -355,7 +355,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "package_devdependencies",
       "community": 37,
@@ -365,7 +365,7 @@
       "label": "@types/jsdom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L37",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "package_devdependencies_types_jsdom",
       "community": 37,
@@ -375,7 +375,7 @@
       "label": "@types/mozilla-readability",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L38",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "package_devdependencies_types_mozilla_readability",
       "community": 37,
@@ -385,7 +385,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L39",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "package_devdependencies_types_node",
       "community": 37,
@@ -395,7 +395,7 @@
       "label": "@types/turndown",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L40",
+      "source_location": "L41",
       "_origin": "ast",
       "id": "package_devdependencies_types_turndown",
       "community": 37,
@@ -405,7 +405,7 @@
       "label": "@vitest/coverage-istanbul",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "package_devdependencies_vitest_coverage_istanbul",
       "community": 37,
@@ -415,7 +415,7 @@
       "label": "husky",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "_origin": "ast",
       "id": "package_devdependencies_husky",
       "community": 153,
@@ -425,7 +425,7 @@
       "label": "jsdom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "_origin": "ast",
       "id": "package_devdependencies_jsdom",
       "community": 37,
@@ -435,7 +435,7 @@
       "label": "lint-staged",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "package_devdependencies_lint_staged",
       "community": 37,
@@ -445,7 +445,7 @@
       "label": "oclif",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "package_devdependencies_oclif",
       "community": 37,
@@ -455,7 +455,7 @@
       "label": "prettier",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "package_devdependencies_prettier",
       "community": 37,
@@ -465,7 +465,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "package_devdependencies_typescript",
       "community": 37,
@@ -475,7 +475,7 @@
       "label": "vitest",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L48",
+      "source_location": "L49",
       "_origin": "ast",
       "id": "package_devdependencies_vitest",
       "community": 37,
@@ -485,7 +485,7 @@
       "label": "engines",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L50",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "package_engines",
       "community": 53,
@@ -495,7 +495,7 @@
       "label": "node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L51",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "package_engines_node",
       "community": 53,
@@ -505,7 +505,7 @@
       "label": "packageManager",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L53",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "package_packagemanager",
       "community": 53,
@@ -515,7 +515,7 @@
       "label": "oclif",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L54",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "package_oclif",
       "community": 100,
@@ -525,7 +525,7 @@
       "label": "commands",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L55",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "package_oclif_commands",
       "community": 100,
@@ -535,7 +535,7 @@
       "label": "topicSeparator",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L56",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "package_oclif_topicseparator",
       "community": 100,
@@ -545,7 +545,7 @@
       "label": "topics",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L57",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "package_oclif_topics",
       "community": 100,
@@ -555,7 +555,7 @@
       "label": "research",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L58",
+      "source_location": "L59",
       "_origin": "ast",
       "id": "package_topics_research",
       "community": 100,
@@ -565,7 +565,7 @@
       "label": "description",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L59",
+      "source_location": "L60",
       "_origin": "ast",
       "id": "package_research_description",
       "community": 100,
@@ -708,7 +708,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_base_command",
-      "community": 28,
+      "community": 15,
       "norm_label": "base-command.ts"
     },
     {
@@ -718,7 +718,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "src_base_command_basecommand",
-      "community": 28,
+      "community": 15,
       "norm_label": "basecommand"
     },
     {
@@ -728,7 +728,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "src_base_command_basecommand_requestedjson",
-      "community": 28,
+      "community": 15,
       "norm_label": ".requestedjson()"
     },
     {
@@ -738,7 +738,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_base_command_basecommand_run",
-      "community": 28,
+      "community": 15,
       "norm_label": "._run()"
     },
     {
@@ -748,7 +748,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_research_test",
-      "community": 7,
+      "community": 111,
       "norm_label": "research.test.ts"
     },
     {
@@ -768,7 +768,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "commands_research",
-      "community": 7,
+      "community": 111,
       "norm_label": "research.ts"
     },
     {
@@ -778,7 +778,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "commands_research_research",
-      "community": 7,
+      "community": 111,
       "norm_label": "research"
     },
     {
@@ -788,7 +788,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "commands_research_research_init",
-      "community": 7,
+      "community": 111,
       "norm_label": ".init()"
     },
     {
@@ -798,7 +798,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "commands_research_research_executecachehit",
-      "community": 7,
+      "community": 111,
       "norm_label": ".executecachehit()"
     },
     {
@@ -808,7 +808,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "commands_research_research_executecachemiss",
-      "community": 7,
+      "community": 111,
       "norm_label": ".executecachemiss()"
     },
     {
@@ -818,7 +818,7 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "commands_research_research_buildresultdata",
-      "community": 7,
+      "community": 111,
       "norm_label": ".buildresultdata()"
     },
     {
@@ -828,7 +828,7 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "commands_research_research_execute",
-      "community": 7,
+      "community": 111,
       "norm_label": ".execute()"
     },
     {
@@ -838,7 +838,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "commands_research_handlestalerevalidationresult",
-      "community": 7,
+      "community": 111,
       "norm_label": "handlestalerevalidationresult()"
     },
     {
@@ -848,7 +848,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_import_test",
-      "community": 56,
+      "community": 7,
       "norm_label": "import.test.ts"
     },
     {
@@ -858,7 +858,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_import",
-      "community": 56,
+      "community": 7,
       "norm_label": "import.ts"
     },
     {
@@ -1038,7 +1038,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "research_inspect_researchinspect_execute",
-      "community": 15,
+      "community": 35,
       "norm_label": ".execute()"
     },
     {
@@ -1228,7 +1228,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_search_test",
-      "community": 35,
+      "community": 131,
       "norm_label": "search.test.ts"
     },
     {
@@ -1238,7 +1238,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_search",
-      "community": 35,
+      "community": 131,
       "norm_label": "search.ts"
     },
     {
@@ -1248,7 +1248,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "research_search_freshness_bonus",
-      "community": 35,
+      "community": 131,
       "norm_label": "freshness_bonus"
     },
     {
@@ -1368,7 +1368,7 @@
       "source_location": "L242",
       "_origin": "ast",
       "id": "research_search_scoresingleterm",
-      "community": 35,
+      "community": 131,
       "norm_label": "scoresingleterm()"
     },
     {
@@ -1378,7 +1378,7 @@
       "source_location": "L301",
       "_origin": "ast",
       "id": "research_search_levenshtein",
-      "community": 35,
+      "community": 131,
       "norm_label": "levenshtein()"
     },
     {
@@ -1388,7 +1388,7 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "research_search_isfuzzymatch",
-      "community": 35,
+      "community": 131,
       "norm_label": "isfuzzymatch()"
     },
     {
@@ -1438,7 +1438,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "research_status_researchstatus_execute",
-      "community": 15,
+      "community": 35,
       "norm_label": ".execute()"
     },
     {
@@ -1748,7 +1748,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_compress_test",
-      "community": 56,
+      "community": 7,
       "norm_label": "compress.test.ts"
     },
     {
@@ -1758,7 +1758,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_compress",
-      "community": 56,
+      "community": 7,
       "norm_label": "compress.ts"
     },
     {
@@ -1768,7 +1768,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "research_compress_compressmarkdown",
-      "community": 56,
+      "community": 7,
       "norm_label": "compressmarkdown()"
     },
     {
@@ -1978,7 +1978,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "research_freshness_parsettltoms",
-      "community": 7,
+      "community": 111,
       "norm_label": "parsettltoms()"
     },
     {
@@ -2008,7 +2008,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "research_freshness_checkmaxageexpired",
-      "community": 7,
+      "community": 111,
       "norm_label": "checkmaxageexpired()"
     },
     {
@@ -2148,7 +2148,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_storage_test",
-      "community": 15,
+      "community": 35,
       "norm_label": "storage.test.ts"
     },
     {
@@ -2158,7 +2158,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "research_storage",
-      "community": 15,
+      "community": 35,
       "norm_label": "storage.ts"
     },
     {
@@ -2188,7 +2188,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "research_storage_getartifactpath",
-      "community": 15,
+      "community": 35,
       "norm_label": "getartifactpath()"
     },
     {
@@ -2198,7 +2198,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "research_storage_processfileforlookup",
-      "community": 15,
+      "community": 35,
       "norm_label": "processfileforlookup()"
     },
     {
@@ -2208,7 +2208,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "research_storage_findartifact",
-      "community": 15,
+      "community": 35,
       "norm_label": "findartifact()"
     },
     {
@@ -2218,7 +2218,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "research_storage_hasartifact",
-      "community": 15,
+      "community": 35,
       "norm_label": "hasartifact()"
     },
     {
@@ -2228,7 +2228,7 @@
       "source_location": "L133",
       "_origin": "ast",
       "id": "research_storage_writeartifact",
-      "community": 7,
+      "community": 35,
       "norm_label": "writeartifact()"
     },
     {
@@ -2238,7 +2238,7 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "research_storage_readartifact",
-      "community": 15,
+      "community": 35,
       "norm_label": "readartifact()"
     },
     {
@@ -2308,7 +2308,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "research_url_normalizeurl",
-      "community": 15,
+      "community": 29,
       "norm_label": "normalizeurl()"
     },
     {
@@ -6068,7 +6068,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "references_patterns_pr_dead_code_check",
-      "community": 34,
+      "community": 177,
       "norm_label": "pr dead code check"
     },
     {
@@ -6078,7 +6078,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "references_patterns_step_1_analyze_changed_files",
-      "community": 34,
+      "community": 177,
       "norm_label": "step 1: analyze changed files"
     },
     {
@@ -6088,7 +6088,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "references_patterns_step_2_if_issues_found_show_specifics",
-      "community": 34,
+      "community": 177,
       "norm_label": "step 2: if issues found, show specifics"
     },
     {
@@ -6428,7 +6428,7 @@
       "source_location": "L425",
       "_origin": "ast",
       "id": "references_patterns_migration_from_knip",
-      "community": 131,
+      "community": 34,
       "norm_label": "migration from knip"
     },
     {
@@ -6438,7 +6438,7 @@
       "source_location": "L427",
       "_origin": "ast",
       "id": "references_patterns_step_1_preview_migration",
-      "community": 131,
+      "community": 34,
       "norm_label": "step 1: preview migration"
     },
     {
@@ -6448,7 +6448,7 @@
       "source_location": "L435",
       "_origin": "ast",
       "id": "references_patterns_step_2_apply_migration",
-      "community": 131,
+      "community": 34,
       "norm_label": "step 2: apply migration"
     },
     {
@@ -6458,7 +6458,7 @@
       "source_location": "L448",
       "_origin": "ast",
       "id": "references_patterns_step_3_compare_results",
-      "community": 131,
+      "community": 34,
       "norm_label": "step 3: compare results"
     },
     {
@@ -6468,7 +6468,7 @@
       "source_location": "L458",
       "_origin": "ast",
       "id": "references_patterns_step_4_remove_knip_config",
-      "community": 131,
+      "community": 34,
       "norm_label": "step 4: remove knip config"
     },
     {
@@ -6598,7 +6598,7 @@
       "source_location": "L541",
       "_origin": "ast",
       "id": "references_patterns_production_vs_full_audit",
-      "community": 175,
+      "community": 34,
       "norm_label": "production vs full audit"
     },
     {
@@ -6608,7 +6608,7 @@
       "source_location": "L543",
       "_origin": "ast",
       "id": "references_patterns_full_audit_default",
-      "community": 175,
+      "community": 34,
       "norm_label": "full audit (default)"
     },
     {
@@ -6618,7 +6618,7 @@
       "source_location": "L551",
       "_origin": "ast",
       "id": "references_patterns_production_audit",
-      "community": 175,
+      "community": 34,
       "norm_label": "production audit"
     },
     {
@@ -9772,6 +9772,216 @@
       "norm_label": "approval bar"
     },
     {
+      "label": "SKILL.md",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill",
+      "community": 109,
+      "norm_label": "skill.md"
+    },
+    {
+      "label": "Web Research Skill",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "community": 109,
+      "norm_label": "web research skill"
+    },
+    {
+      "label": "When to Use This Skill",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_when_to_use_this_skill",
+      "community": 109,
+      "norm_label": "when to use this skill"
+    },
+    {
+      "label": "How to Use",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_how_to_use",
+      "community": 109,
+      "norm_label": "how to use"
+    },
+    {
+      "label": "Installation",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_installation",
+      "community": 109,
+      "norm_label": "installation"
+    },
+    {
+      "label": "Cache Retrieval Workflows",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_cache_retrieval_workflows",
+      "community": 109,
+      "norm_label": "cache retrieval workflows"
+    },
+    {
+      "label": "Step 1: Search the cache first (SSOT)",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_step_1_search_the_cache_first_ssot",
+      "community": 109,
+      "norm_label": "step 1: search the cache first (ssot)"
+    },
+    {
+      "label": "Step 2: Fetch and crawl if missing",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_step_2_fetch_and_crawl_if_missing",
+      "community": 109,
+      "norm_label": "step 2: fetch and crawl if missing"
+    },
+    {
+      "label": "Output Density Control:",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_output_density_control",
+      "community": 109,
+      "norm_label": "output density control:"
+    },
+    {
+      "label": "Step 3: Use `--rendered` for SPA / client-side JS pages",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_step_3_use_rendered_for_spa_client_side_js_pages",
+      "community": 109,
+      "norm_label": "step 3: use `--rendered` for spa / client-side js pages"
+    },
+    {
+      "label": "Managing cache metadata",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L83",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_managing_cache_metadata",
+      "community": 109,
+      "norm_label": "managing cache metadata"
+    },
+    {
+      "label": "List cached items",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_list_cached_items",
+      "community": 109,
+      "norm_label": "list cached items"
+    },
+    {
+      "label": "Check status or inspect metadata",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L95",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_check_status_or_inspect_metadata",
+      "community": 109,
+      "norm_label": "check status or inspect metadata"
+    },
+    {
+      "label": "Advanced full-text search",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L105",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_advanced_full_text_search",
+      "community": 109,
+      "norm_label": "advanced full-text search"
+    },
+    {
+      "label": "Storing and Pruning Cache Notes",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L114",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_storing_and_pruning_cache_notes",
+      "community": 109,
+      "norm_label": "storing and pruning cache notes"
+    },
+    {
+      "label": "Import Custom Research Notes",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L116",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_import_custom_research_notes",
+      "community": 109,
+      "norm_label": "import custom research notes"
+    },
+    {
+      "label": "Pruning Expired Cache Files",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L127",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_pruning_expired_cache_files",
+      "community": 109,
+      "norm_label": "pruning expired cache files"
+    },
+    {
+      "label": "Troubleshooting",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L139",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_troubleshooting",
+      "community": 109,
+      "norm_label": "troubleshooting"
+    },
+    {
+      "label": "Issue: Plugin commands not found",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L141",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_issue_plugin_commands_not_found",
+      "community": 109,
+      "norm_label": "issue: plugin commands not found"
+    },
+    {
+      "label": "Issue: Fetch throws hostname safety error",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L148",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_issue_fetch_throws_hostname_safety_error",
+      "community": 109,
+      "norm_label": "issue: fetch throws hostname safety error"
+    },
+    {
+      "label": "Issue: Scraped Markdown is empty or contains only loading indicators",
+      "file_type": "document",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L155",
+      "_origin": "ast",
+      "id": "agents_skills_web_research_skill_md_web_research_skill_issue_scraped_markdown_is_empty_or_contains_only_loading_indicators",
+      "community": 109,
+      "norm_label": "issue: scraped markdown is empty or contains only loading indicators"
+    },
+    {
       "label": "AGENT_ALIASES.md",
       "file_type": "document",
       "source_file": ".claude/agents/AGENT_ALIASES.md",
@@ -11412,6 +11622,56 @@
       "norm_label": "severity expectations"
     },
     {
+      "label": "web-research.instructions.md",
+      "file_type": "document",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "github_instructions_web_research_instructions_md_instructions_web_research_instructions",
+      "community": 176,
+      "norm_label": "web-research.instructions.md"
+    },
+    {
+      "label": "Web Research Workflow",
+      "file_type": "document",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "community": 176,
+      "norm_label": "web research workflow"
+    },
+    {
+      "label": "Mandatory Pre-Step",
+      "file_type": "document",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_mandatory_pre_step",
+      "community": 176,
+      "norm_label": "mandatory pre-step"
+    },
+    {
+      "label": "If You Fetched a Page Directly",
+      "file_type": "document",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_if_you_fetched_a_page_directly",
+      "community": 176,
+      "norm_label": "if you fetched a page directly"
+    },
+    {
+      "label": "When This Does Not Apply",
+      "file_type": "document",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_when_this_does_not_apply",
+      "community": 176,
+      "norm_label": "when this does not apply"
+    },
+    {
       "label": "README.md",
       "file_type": "document",
       "source_file": "README.md",
@@ -11657,8 +11917,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "instructions_web_research_instructions",
-      "community": 111,
+      "id": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions",
+      "community": 175,
       "norm_label": "web-research.instructions.md"
     },
     {
@@ -11667,8 +11927,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L10",
       "_origin": "ast",
-      "id": "instructions_web_research_instructions_web_research_workflow",
-      "community": 111,
+      "id": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "community": 175,
       "norm_label": "web research workflow"
     },
     {
@@ -11677,8 +11937,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "instructions_web_research_instructions_mandatory_pre_step",
-      "community": 111,
+      "id": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_mandatory_pre_step",
+      "community": 175,
       "norm_label": "mandatory pre-step"
     },
     {
@@ -11687,8 +11947,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L27",
       "_origin": "ast",
-      "id": "instructions_web_research_instructions_if_you_fetched_a_page_directly",
-      "community": 111,
+      "id": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_if_you_fetched_a_page_directly",
+      "community": 175,
       "norm_label": "if you fetched a page directly"
     },
     {
@@ -11697,219 +11957,9 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L43",
       "_origin": "ast",
-      "id": "instructions_web_research_instructions_when_this_does_not_apply",
-      "community": 111,
+      "id": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_when_this_does_not_apply",
+      "community": 175,
       "norm_label": "when this does not apply"
-    },
-    {
-      "label": "SKILL.md",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "web_research_skill",
-      "community": 109,
-      "norm_label": "skill.md"
-    },
-    {
-      "label": "Web Research Skill",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "web_research_skill_web_research_skill",
-      "community": 109,
-      "norm_label": "web research skill"
-    },
-    {
-      "label": "When to Use This Skill",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L16",
-      "_origin": "ast",
-      "id": "web_research_skill_when_to_use_this_skill",
-      "community": 109,
-      "norm_label": "when to use this skill"
-    },
-    {
-      "label": "How to Use",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "web_research_skill_how_to_use",
-      "community": 109,
-      "norm_label": "how to use"
-    },
-    {
-      "label": "Installation",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L28",
-      "_origin": "ast",
-      "id": "web_research_skill_installation",
-      "community": 109,
-      "norm_label": "installation"
-    },
-    {
-      "label": "Cache Retrieval Workflows",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L47",
-      "_origin": "ast",
-      "id": "web_research_skill_cache_retrieval_workflows",
-      "community": 109,
-      "norm_label": "cache retrieval workflows"
-    },
-    {
-      "label": "Step 1: Search the cache first (SSOT)",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L49",
-      "_origin": "ast",
-      "id": "web_research_skill_step_1_search_the_cache_first_ssot",
-      "community": 109,
-      "norm_label": "step 1: search the cache first (ssot)"
-    },
-    {
-      "label": "Step 2: Fetch and crawl if missing",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L55",
-      "_origin": "ast",
-      "id": "web_research_skill_step_2_fetch_and_crawl_if_missing",
-      "community": 109,
-      "norm_label": "step 2: fetch and crawl if missing"
-    },
-    {
-      "label": "Output Density Control:",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L61",
-      "_origin": "ast",
-      "id": "web_research_skill_output_density_control",
-      "community": 109,
-      "norm_label": "output density control:"
-    },
-    {
-      "label": "Step 3: Use `--rendered` for SPA / client-side JS pages",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L71",
-      "_origin": "ast",
-      "id": "web_research_skill_step_3_use_rendered_for_spa_client_side_js_pages",
-      "community": 109,
-      "norm_label": "step 3: use `--rendered` for spa / client-side js pages"
-    },
-    {
-      "label": "Managing cache metadata",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L83",
-      "_origin": "ast",
-      "id": "web_research_skill_managing_cache_metadata",
-      "community": 109,
-      "norm_label": "managing cache metadata"
-    },
-    {
-      "label": "List cached items",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L85",
-      "_origin": "ast",
-      "id": "web_research_skill_list_cached_items",
-      "community": 109,
-      "norm_label": "list cached items"
-    },
-    {
-      "label": "Check status or inspect metadata",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L95",
-      "_origin": "ast",
-      "id": "web_research_skill_check_status_or_inspect_metadata",
-      "community": 109,
-      "norm_label": "check status or inspect metadata"
-    },
-    {
-      "label": "Advanced full-text search",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L105",
-      "_origin": "ast",
-      "id": "web_research_skill_advanced_full_text_search",
-      "community": 109,
-      "norm_label": "advanced full-text search"
-    },
-    {
-      "label": "Storing and Pruning Cache Notes",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L114",
-      "_origin": "ast",
-      "id": "web_research_skill_storing_and_pruning_cache_notes",
-      "community": 109,
-      "norm_label": "storing and pruning cache notes"
-    },
-    {
-      "label": "Import Custom Research Notes",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L116",
-      "_origin": "ast",
-      "id": "web_research_skill_import_custom_research_notes",
-      "community": 109,
-      "norm_label": "import custom research notes"
-    },
-    {
-      "label": "Pruning Expired Cache Files",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L127",
-      "_origin": "ast",
-      "id": "web_research_skill_pruning_expired_cache_files",
-      "community": 109,
-      "norm_label": "pruning expired cache files"
-    },
-    {
-      "label": "Troubleshooting",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L139",
-      "_origin": "ast",
-      "id": "web_research_skill_troubleshooting",
-      "community": 109,
-      "norm_label": "troubleshooting"
-    },
-    {
-      "label": "Issue: Plugin commands not found",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L141",
-      "_origin": "ast",
-      "id": "web_research_skill_issue_plugin_commands_not_found",
-      "community": 109,
-      "norm_label": "issue: plugin commands not found"
-    },
-    {
-      "label": "Issue: Fetch throws hostname safety error",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L148",
-      "_origin": "ast",
-      "id": "web_research_skill_issue_fetch_throws_hostname_safety_error",
-      "community": 109,
-      "norm_label": "issue: fetch throws hostname safety error"
-    },
-    {
-      "label": "Issue: Scraped Markdown is empty or contains only loading indicators",
-      "file_type": "document",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L155",
-      "_origin": "ast",
-      "id": "web_research_skill_issue_scraped_markdown_is_empty_or_contains_only_loading_indicators",
-      "community": 109,
-      "norm_label": "issue: scraped markdown is empty or contains only loading indicators"
     },
     {
       "label": "README.md",
@@ -17565,9 +17615,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -17576,9 +17626,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune",
-      "target": "src_base_command",
-      "confidence_score": 1.0
+      "target": "src_base_command"
     },
     {
       "relation": "imports_from",
@@ -17685,9 +17735,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -17696,9 +17746,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -17707,9 +17757,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "inherits",
@@ -17718,9 +17768,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune",
-      "target": "src_base_command_basecommand",
-      "confidence_score": 1.0
+      "target": "src_base_command_basecommand"
     },
     {
       "relation": "imports",
@@ -17835,9 +17885,9 @@
       "source_file": "src/commands/research.ts",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_research",
-      "target": "research_browser",
-      "confidence_score": 1.0
+      "target": "research_browser"
     },
     {
       "relation": "imports",
@@ -17846,9 +17896,9 @@
       "source_file": "src/commands/research.ts",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_research",
-      "target": "research_browser_fetchrenderedhtml",
-      "confidence_score": 1.0
+      "target": "research_browser_fetchrenderedhtml"
     },
     {
       "relation": "imports_from",
@@ -18500,9 +18550,9 @@
       "source_file": "src/commands/research/list.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_test",
-      "target": "research_import",
-      "confidence_score": 1.0
+      "target": "research_import"
     },
     {
       "relation": "imports_from",
@@ -18511,9 +18561,9 @@
       "source_file": "src/commands/research/prune.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_test",
-      "target": "research_import",
-      "confidence_score": 1.0
+      "target": "research_import"
     },
     {
       "relation": "imports_from",
@@ -18573,9 +18623,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport",
-      "target": "research_import_researchimport_fsexistssync",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_fsexistssync"
     },
     {
       "relation": "method",
@@ -18583,9 +18633,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L169",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport",
-      "target": "research_import_researchimport_fsreadfilesync",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_fsreadfilesync"
     },
     {
       "relation": "method",
@@ -18593,9 +18643,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L165",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport",
-      "target": "research_import_researchimport_fsstatsync",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_fsstatsync"
     },
     {
       "relation": "method",
@@ -18623,9 +18673,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L173",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport",
-      "target": "research_import_researchimport_readandvalidatefile",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_readandvalidatefile"
     },
     {
       "relation": "method",
@@ -18633,9 +18683,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L191",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport",
-      "target": "research_import_researchimport_readandvalidateinput",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_readandvalidateinput"
     },
     {
       "relation": "method",
@@ -18675,9 +18725,9 @@
       "source_file": "src/commands/research/list.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_test",
-      "target": "research_import_researchimport",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport"
     },
     {
       "relation": "imports",
@@ -18686,9 +18736,9 @@
       "source_file": "src/commands/research/prune.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_test",
-      "target": "research_import_researchimport",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport"
     },
     {
       "relation": "imports",
@@ -18719,9 +18769,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L194",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport_readandvalidateinput",
-      "target": "research_import_researchimport_readstdin",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_readstdin"
     },
     {
       "relation": "calls",
@@ -18752,9 +18802,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L174",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport_readandvalidatefile",
-      "target": "research_import_researchimport_fsexistssync",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_fsexistssync"
     },
     {
       "relation": "calls",
@@ -18763,9 +18813,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L177",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport_readandvalidatefile",
-      "target": "research_import_researchimport_fsstatsync",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_fsstatsync"
     },
     {
       "relation": "calls",
@@ -18774,9 +18824,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L184",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport_readandvalidatefile",
-      "target": "research_import_researchimport_fsreadfilesync",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_fsreadfilesync"
     },
     {
       "relation": "calls",
@@ -18785,9 +18835,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L207",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport_readandvalidateinput",
-      "target": "research_import_researchimport_readandvalidatefile",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_readandvalidatefile"
     },
     {
       "relation": "calls",
@@ -18796,9 +18846,9 @@
       "source_file": "src/commands/research/import.ts",
       "source_location": "L293",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_import_researchimport_execute",
-      "target": "research_import_researchimport_readandvalidateinput",
-      "confidence_score": 1.0
+      "target": "research_import_researchimport_readandvalidateinput"
     },
     {
       "relation": "calls",
@@ -19068,9 +19118,9 @@
       "source_file": "src/commands/research/list.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_test",
-      "target": "research_list",
-      "confidence_score": 1.0
+      "target": "research_list"
     },
     {
       "relation": "imports",
@@ -19079,9 +19129,9 @@
       "source_file": "src/commands/research/list.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_test",
-      "target": "research_list_researchlist",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist"
     },
     {
       "relation": "imports_from",
@@ -19090,9 +19140,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "research_freshness",
-      "confidence_score": 1.0
+      "target": "research_freshness"
     },
     {
       "relation": "imports",
@@ -19101,9 +19151,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "research_freshness_evaluatefreshness",
-      "confidence_score": 1.0
+      "target": "research_freshness_evaluatefreshness"
     },
     {
       "relation": "contains",
@@ -19111,9 +19161,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "research_list_researchlist",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist"
     },
     {
       "relation": "imports_from",
@@ -19122,9 +19172,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "research_storage",
-      "confidence_score": 1.0
+      "target": "research_storage"
     },
     {
       "relation": "imports",
@@ -19133,9 +19183,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "research_storage_getartifactpath",
-      "confidence_score": 1.0
+      "target": "research_storage_getartifactpath"
     },
     {
       "relation": "imports",
@@ -19144,9 +19194,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list",
-      "target": "research_storage_scancachedir",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedir"
     },
     {
       "relation": "method",
@@ -19154,9 +19204,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist",
-      "target": "research_list_researchlist_execute",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_execute"
     },
     {
       "relation": "method",
@@ -19164,9 +19214,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist",
-      "target": "research_list_researchlist_init",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_init"
     },
     {
       "relation": "method",
@@ -19174,9 +19224,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L121",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist",
-      "target": "research_list_researchlist_loglistresults",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_loglistresults"
     },
     {
       "relation": "method",
@@ -19184,9 +19234,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist",
-      "target": "research_list_researchlist_matchesfilters",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_matchesfilters"
     },
     {
       "relation": "method",
@@ -19194,9 +19244,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist",
-      "target": "research_list_researchlist_scancachedirforlist",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_scancachedirforlist"
     },
     {
       "relation": "method",
@@ -19204,9 +19254,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist",
-      "target": "research_list_researchlist_validatelistflags",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_validatelistflags"
     },
     {
       "relation": "calls",
@@ -19215,9 +19265,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist_execute",
-      "target": "research_list_researchlist_validatelistflags",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_validatelistflags"
     },
     {
       "relation": "calls",
@@ -19226,9 +19276,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L145",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist_execute",
-      "target": "research_list_researchlist_scancachedirforlist",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_scancachedirforlist"
     },
     {
       "relation": "calls",
@@ -19248,9 +19298,9 @@
       "source_file": "src/commands/research/list.ts",
       "source_location": "L156",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_list_researchlist_execute",
-      "target": "research_list_researchlist_loglistresults",
-      "confidence_score": 1.0
+      "target": "research_list_researchlist_loglistresults"
     },
     {
       "relation": "imports_from",
@@ -19259,9 +19309,9 @@
       "source_file": "src/commands/research/prune.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_test",
-      "target": "research_prune",
-      "confidence_score": 1.0
+      "target": "research_prune"
     },
     {
       "relation": "imports",
@@ -19270,9 +19320,9 @@
       "source_file": "src/commands/research/prune.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_test",
-      "target": "research_prune_researchprune",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune"
     },
     {
       "relation": "imports_from",
@@ -19281,9 +19331,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune",
-      "target": "research_freshness",
-      "confidence_score": 1.0
+      "target": "research_freshness"
     },
     {
       "relation": "imports",
@@ -19292,9 +19342,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune",
-      "target": "research_freshness_parsettltoms",
-      "confidence_score": 1.0
+      "target": "research_freshness_parsettltoms"
     },
     {
       "relation": "contains",
@@ -19302,9 +19352,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune",
-      "target": "research_prune_researchprune",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune"
     },
     {
       "relation": "imports_from",
@@ -19313,9 +19363,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune",
-      "target": "research_storage",
-      "confidence_score": 1.0
+      "target": "research_storage"
     },
     {
       "relation": "imports",
@@ -19324,9 +19374,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune",
-      "target": "research_storage_scancachedir",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedir"
     },
     {
       "relation": "method",
@@ -19334,9 +19384,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L110",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune",
-      "target": "research_prune_researchprune_deleteprunecandidates",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_deleteprunecandidates"
     },
     {
       "relation": "method",
@@ -19344,9 +19394,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune",
-      "target": "research_prune_researchprune_execute",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_execute"
     },
     {
       "relation": "method",
@@ -19354,9 +19404,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L98",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune",
-      "target": "research_prune_researchprune_findprunecandidates",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_findprunecandidates"
     },
     {
       "relation": "method",
@@ -19364,9 +19414,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune",
-      "target": "research_prune_researchprune_init",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_init"
     },
     {
       "relation": "method",
@@ -19374,9 +19424,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune",
-      "target": "research_prune_researchprune_shouldprune",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_shouldprune"
     },
     {
       "relation": "method",
@@ -19384,9 +19434,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune",
-      "target": "research_prune_researchprune_validatepruneflags",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_validatepruneflags"
     },
     {
       "relation": "calls",
@@ -19395,9 +19445,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune_execute",
-      "target": "research_prune_researchprune_validatepruneflags",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_validatepruneflags"
     },
     {
       "relation": "calls",
@@ -19417,9 +19467,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L130",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune_execute",
-      "target": "research_prune_researchprune_findprunecandidates",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_findprunecandidates"
     },
     {
       "relation": "calls",
@@ -19439,9 +19489,9 @@
       "source_file": "src/commands/research/prune.ts",
       "source_location": "L142",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_prune_researchprune_execute",
-      "target": "research_prune_researchprune_deleteprunecandidates",
-      "confidence_score": 1.0
+      "target": "research_prune_researchprune_deleteprunecandidates"
     },
     {
       "relation": "imports_from",
@@ -19515,9 +19565,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search",
-      "target": "research_search_freshness_bonus",
-      "confidence_score": 1.0
+      "target": "research_search_freshness_bonus"
     },
     {
       "relation": "contains",
@@ -19525,9 +19575,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L318",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search",
-      "target": "research_search_isfuzzymatch",
-      "confidence_score": 1.0
+      "target": "research_search_isfuzzymatch"
     },
     {
       "relation": "contains",
@@ -19535,9 +19585,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L301",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search",
-      "target": "research_search_levenshtein",
-      "confidence_score": 1.0
+      "target": "research_search_levenshtein"
     },
     {
       "relation": "contains",
@@ -19588,9 +19638,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search",
-      "target": "research_storage_scancachedir",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedir"
     },
     {
       "relation": "method",
@@ -19668,9 +19718,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search_researchsearch",
-      "target": "research_search_researchsearch_phrasematchbonus",
-      "confidence_score": 1.0
+      "target": "research_search_researchsearch_phrasematchbonus"
     },
     {
       "relation": "method",
@@ -19732,9 +19782,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search_researchsearch_calculatescore",
-      "target": "research_search_researchsearch_phrasematchbonus",
-      "confidence_score": 1.0
+      "target": "research_search_researchsearch_phrasematchbonus"
     },
     {
       "relation": "calls",
@@ -19842,9 +19892,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L261",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search_scoresingleterm",
-      "target": "research_search_isfuzzymatch",
-      "confidence_score": 1.0
+      "target": "research_search_isfuzzymatch"
     },
     {
       "relation": "calls",
@@ -19853,9 +19903,9 @@
       "source_file": "src/commands/research/search.ts",
       "source_location": "L320",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_search_isfuzzymatch",
-      "target": "research_search_levenshtein",
-      "confidence_score": 1.0
+      "target": "research_search_levenshtein"
     },
     {
       "relation": "imports_from",
@@ -20444,9 +20494,9 @@
       "source_file": "src/lib/research/browser.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_test",
-      "target": "research_browser",
-      "confidence_score": 1.0
+      "target": "research_browser"
     },
     {
       "relation": "imports",
@@ -20455,9 +20505,9 @@
       "source_file": "src/lib/research/browser.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_test",
-      "target": "research_browser_fetchrenderedhtml",
-      "confidence_score": 1.0
+      "target": "research_browser_fetchrenderedhtml"
     },
     {
       "relation": "imports",
@@ -20466,9 +20516,9 @@
       "source_file": "src/lib/research/browser.test.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_test",
-      "target": "research_browser_findchromepath",
-      "confidence_score": 1.0
+      "target": "research_browser_findchromepath"
     },
     {
       "relation": "contains",
@@ -20476,9 +20526,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_browser_browserfetchoptions",
-      "confidence_score": 1.0
+      "target": "research_browser_browserfetchoptions"
     },
     {
       "relation": "contains",
@@ -20486,9 +20536,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_browser_browserfetchresult",
-      "confidence_score": 1.0
+      "target": "research_browser_browserfetchresult"
     },
     {
       "relation": "contains",
@@ -20496,9 +20546,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_browser_cdpclient",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient"
     },
     {
       "relation": "contains",
@@ -20506,9 +20556,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L214",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_browser_fetchrenderedhtml",
-      "confidence_score": 1.0
+      "target": "research_browser_fetchrenderedhtml"
     },
     {
       "relation": "contains",
@@ -20516,9 +20566,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L80",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_browser_findchromepath",
-      "confidence_score": 1.0
+      "target": "research_browser_findchromepath"
     },
     {
       "relation": "contains",
@@ -20526,9 +20576,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L125",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_browser_spawnchrome",
-      "confidence_score": 1.0
+      "target": "research_browser_spawnchrome"
     },
     {
       "relation": "contains",
@@ -20536,9 +20586,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L184",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_browser_waitforload",
-      "confidence_score": 1.0
+      "target": "research_browser_waitforload"
     },
     {
       "relation": "imports_from",
@@ -20547,9 +20597,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_fetcher",
-      "confidence_score": 1.0
+      "target": "research_fetcher"
     },
     {
       "relation": "imports",
@@ -20558,9 +20608,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_fetcher_checkdnssafety",
-      "confidence_score": 1.0
+      "target": "research_fetcher_checkdnssafety"
     },
     {
       "relation": "imports_from",
@@ -20569,9 +20619,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_url",
-      "confidence_score": 1.0
+      "target": "research_url"
     },
     {
       "relation": "imports",
@@ -20580,9 +20630,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser",
-      "target": "research_url_normalizeurl",
-      "confidence_score": 1.0
+      "target": "research_url_normalizeurl"
     },
     {
       "relation": "imports_from",
@@ -20591,9 +20641,9 @@
       "source_file": "src/lib/research/revalidate.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_revalidate",
-      "target": "research_browser",
-      "confidence_score": 1.0
+      "target": "research_browser"
     },
     {
       "relation": "method",
@@ -20601,9 +20651,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L75",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_cdpclient",
-      "target": "research_browser_cdpclient_close",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_close"
     },
     {
       "relation": "method",
@@ -20611,9 +20661,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_cdpclient",
-      "target": "research_browser_cdpclient_connect",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_connect"
     },
     {
       "relation": "method",
@@ -20621,9 +20671,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_cdpclient",
-      "target": "research_browser_cdpclient_constructor",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_constructor"
     },
     {
       "relation": "method",
@@ -20631,9 +20681,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_cdpclient",
-      "target": "research_browser_cdpclient_on",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_on"
     },
     {
       "relation": "method",
@@ -20641,9 +20691,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_cdpclient",
-      "target": "research_browser_cdpclient_send",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_send"
     },
     {
       "relation": "calls",
@@ -20652,9 +20702,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L233",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_fetchrenderedhtml",
-      "target": "research_browser_cdpclient_connect",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_connect"
     },
     {
       "relation": "calls",
@@ -20663,9 +20713,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L235",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_fetchrenderedhtml",
-      "target": "research_browser_cdpclient_send",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_send"
     },
     {
       "relation": "calls",
@@ -20674,9 +20724,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L186",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_waitforload",
-      "target": "research_browser_cdpclient_on",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_on"
     },
     {
       "relation": "calls",
@@ -20685,9 +20735,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L313",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_fetchrenderedhtml",
-      "target": "research_browser_cdpclient_close",
-      "confidence_score": 1.0
+      "target": "research_browser_cdpclient_close"
     },
     {
       "relation": "calls",
@@ -20696,9 +20746,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L225",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_fetchrenderedhtml",
-      "target": "research_browser_findchromepath",
-      "confidence_score": 1.0
+      "target": "research_browser_findchromepath"
     },
     {
       "relation": "calls",
@@ -20707,9 +20757,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L226",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_fetchrenderedhtml",
-      "target": "research_browser_spawnchrome",
-      "confidence_score": 1.0
+      "target": "research_browser_spawnchrome"
     },
     {
       "relation": "calls",
@@ -20718,9 +20768,9 @@
       "source_file": "src/lib/research/browser.ts",
       "source_location": "L276",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_browser_fetchrenderedhtml",
-      "target": "research_browser_waitforload",
-      "confidence_score": 1.0
+      "target": "research_browser_waitforload"
     },
     {
       "relation": "calls",
@@ -20751,9 +20801,9 @@
       "source_file": "src/lib/research/revalidate.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_revalidate",
-      "target": "research_browser_fetchrenderedhtml",
-      "confidence_score": 1.0
+      "target": "research_browser_fetchrenderedhtml"
     },
     {
       "relation": "calls",
@@ -21939,9 +21989,9 @@
       "source_file": "src/lib/research/storage.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_storage",
-      "target": "research_storage_isresearchfile",
-      "confidence_score": 1.0
+      "target": "research_storage_isresearchfile"
     },
     {
       "relation": "contains",
@@ -21969,9 +22019,9 @@
       "source_file": "src/lib/research/storage.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_storage",
-      "target": "research_storage_scancachedir",
-      "confidence_score": 1.0
+      "target": "research_storage_scancachedir"
     },
     {
       "relation": "contains",
@@ -21990,9 +22040,9 @@
       "source_file": "src/lib/research/storage.ts",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "research_storage_scancachedir",
-      "target": "research_storage_isresearchfile",
-      "confidence_score": 1.0
+      "target": "research_storage_isresearchfile"
     },
     {
       "relation": "calls",
@@ -29173,6 +29223,206 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_cache_retrieval_workflows",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_how_to_use",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_managing_cache_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_storing_and_pruning_cache_notes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L139",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_troubleshooting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_web_research_skill",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_when_to_use_this_skill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_how_to_use",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_installation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_cache_retrieval_workflows",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_step_1_search_the_cache_first_ssot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_cache_retrieval_workflows",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_step_2_fetch_and_crawl_if_missing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_cache_retrieval_workflows",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_step_3_use_rendered_for_spa_client_side_js_pages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_step_2_fetch_and_crawl_if_missing",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_output_density_control",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_managing_cache_metadata",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_advanced_full_text_search",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L95",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_managing_cache_metadata",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_check_status_or_inspect_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_managing_cache_metadata",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_list_cached_items",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_storing_and_pruning_cache_notes",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_import_custom_research_notes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_storing_and_pruning_cache_notes",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_pruning_expired_cache_files",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L148",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_troubleshooting",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_issue_fetch_throws_hostname_safety_error",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_troubleshooting",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_issue_plugin_commands_not_found",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "agents/skills/web-research/SKILL.md",
+      "source_location": "L155",
+      "weight": 1.0,
+      "source": "agents_skills_web_research_skill_md_web_research_skill_troubleshooting",
+      "target": "agents_skills_web_research_skill_md_web_research_skill_issue_scraped_markdown_is_empty_or_contains_only_loading_indicators",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": ".claude/agents/AGENT_ALIASES.md",
       "source_location": "L3",
       "weight": 1.0,
@@ -30603,6 +30853,46 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "github_instructions_web_research_instructions_md_instructions_web_research_instructions",
+      "target": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "target": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_if_you_fetched_a_page_directly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "target": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_mandatory_pre_step",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".github/instructions/web-research.instructions.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "target": "github_instructions_web_research_instructions_md_instructions_web_research_instructions_when_this_does_not_apply",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "README.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -30836,8 +31126,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L10",
       "weight": 1.0,
-      "source": "instructions_web_research_instructions",
-      "target": "instructions_web_research_instructions_web_research_workflow",
+      "source": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions",
+      "target": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
       "confidence_score": 1.0
     },
     {
@@ -30846,8 +31136,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L27",
       "weight": 1.0,
-      "source": "instructions_web_research_instructions_web_research_workflow",
-      "target": "instructions_web_research_instructions_if_you_fetched_a_page_directly",
+      "source": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "target": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_if_you_fetched_a_page_directly",
       "confidence_score": 1.0
     },
     {
@@ -30856,8 +31146,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L12",
       "weight": 1.0,
-      "source": "instructions_web_research_instructions_web_research_workflow",
-      "target": "instructions_web_research_instructions_mandatory_pre_step",
+      "source": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "target": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_mandatory_pre_step",
       "confidence_score": 1.0
     },
     {
@@ -30866,208 +31156,8 @@
       "source_file": "agents/instructions/web-research.instructions.md",
       "source_location": "L43",
       "weight": 1.0,
-      "source": "instructions_web_research_instructions_web_research_workflow",
-      "target": "instructions_web_research_instructions_when_this_does_not_apply",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "web_research_skill",
-      "target": "web_research_skill_web_research_skill",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L47",
-      "weight": 1.0,
-      "source": "web_research_skill_web_research_skill",
-      "target": "web_research_skill_cache_retrieval_workflows",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "web_research_skill_web_research_skill",
-      "target": "web_research_skill_how_to_use",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L83",
-      "weight": 1.0,
-      "source": "web_research_skill_web_research_skill",
-      "target": "web_research_skill_managing_cache_metadata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L114",
-      "weight": 1.0,
-      "source": "web_research_skill_web_research_skill",
-      "target": "web_research_skill_storing_and_pruning_cache_notes",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L139",
-      "weight": 1.0,
-      "source": "web_research_skill_web_research_skill",
-      "target": "web_research_skill_troubleshooting",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L16",
-      "weight": 1.0,
-      "source": "web_research_skill_web_research_skill",
-      "target": "web_research_skill_when_to_use_this_skill",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L28",
-      "weight": 1.0,
-      "source": "web_research_skill_how_to_use",
-      "target": "web_research_skill_installation",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L49",
-      "weight": 1.0,
-      "source": "web_research_skill_cache_retrieval_workflows",
-      "target": "web_research_skill_step_1_search_the_cache_first_ssot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L55",
-      "weight": 1.0,
-      "source": "web_research_skill_cache_retrieval_workflows",
-      "target": "web_research_skill_step_2_fetch_and_crawl_if_missing",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L71",
-      "weight": 1.0,
-      "source": "web_research_skill_cache_retrieval_workflows",
-      "target": "web_research_skill_step_3_use_rendered_for_spa_client_side_js_pages",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L61",
-      "weight": 1.0,
-      "source": "web_research_skill_step_2_fetch_and_crawl_if_missing",
-      "target": "web_research_skill_output_density_control",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L105",
-      "weight": 1.0,
-      "source": "web_research_skill_managing_cache_metadata",
-      "target": "web_research_skill_advanced_full_text_search",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L95",
-      "weight": 1.0,
-      "source": "web_research_skill_managing_cache_metadata",
-      "target": "web_research_skill_check_status_or_inspect_metadata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L85",
-      "weight": 1.0,
-      "source": "web_research_skill_managing_cache_metadata",
-      "target": "web_research_skill_list_cached_items",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L116",
-      "weight": 1.0,
-      "source": "web_research_skill_storing_and_pruning_cache_notes",
-      "target": "web_research_skill_import_custom_research_notes",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L127",
-      "weight": 1.0,
-      "source": "web_research_skill_storing_and_pruning_cache_notes",
-      "target": "web_research_skill_pruning_expired_cache_files",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L148",
-      "weight": 1.0,
-      "source": "web_research_skill_troubleshooting",
-      "target": "web_research_skill_issue_fetch_throws_hostname_safety_error",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L141",
-      "weight": 1.0,
-      "source": "web_research_skill_troubleshooting",
-      "target": "web_research_skill_issue_plugin_commands_not_found",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "agents/skills/web-research/SKILL.md",
-      "source_location": "L155",
-      "weight": 1.0,
-      "source": "web_research_skill_troubleshooting",
-      "target": "web_research_skill_issue_scraped_markdown_is_empty_or_contains_only_loading_indicators",
+      "source": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_web_research_workflow",
+      "target": "agents_instructions_web_research_instructions_md_instructions_web_research_instructions_when_this_does_not_apply",
       "confidence_score": 1.0
     },
     {
@@ -32296,9 +32386,9 @@
       "source_file": "analysis/tickets/B-01-RESEARCH-LIST.md",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_01_research_list",
-      "target": "tickets_b_01_research_list_b_01_add_research_list",
-      "confidence_score": 1.0
+      "target": "tickets_b_01_research_list_b_01_add_research_list"
     },
     {
       "relation": "contains",
@@ -32306,9 +32396,9 @@
       "source_file": "analysis/tickets/B-01-RESEARCH-LIST.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_01_research_list_b_01_add_research_list",
-      "target": "tickets_b_01_research_list_goal",
-      "confidence_score": 1.0
+      "target": "tickets_b_01_research_list_goal"
     },
     {
       "relation": "contains",
@@ -32316,9 +32406,9 @@
       "source_file": "analysis/tickets/B-01-RESEARCH-LIST.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_01_research_list_b_01_add_research_list",
-      "target": "tickets_b_01_research_list_implementation_status",
-      "confidence_score": 1.0
+      "target": "tickets_b_01_research_list_implementation_status"
     },
     {
       "relation": "contains",
@@ -32326,9 +32416,9 @@
       "source_file": "analysis/tickets/B-01-RESEARCH-LIST.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_01_research_list_b_01_add_research_list",
-      "target": "tickets_b_01_research_list_scope",
-      "confidence_score": 1.0
+      "target": "tickets_b_01_research_list_scope"
     },
     {
       "relation": "contains",
@@ -32336,9 +32426,9 @@
       "source_file": "analysis/tickets/B-02-RESEARCH-PRUNE.md",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_02_research_prune",
-      "target": "tickets_b_02_research_prune_b_02_add_research_prune",
-      "confidence_score": 1.0
+      "target": "tickets_b_02_research_prune_b_02_add_research_prune"
     },
     {
       "relation": "contains",
@@ -32346,9 +32436,9 @@
       "source_file": "analysis/tickets/B-02-RESEARCH-PRUNE.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_02_research_prune_b_02_add_research_prune",
-      "target": "tickets_b_02_research_prune_goal",
-      "confidence_score": 1.0
+      "target": "tickets_b_02_research_prune_goal"
     },
     {
       "relation": "contains",
@@ -32356,9 +32446,9 @@
       "source_file": "analysis/tickets/B-02-RESEARCH-PRUNE.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_02_research_prune_b_02_add_research_prune",
-      "target": "tickets_b_02_research_prune_implementation_status",
-      "confidence_score": 1.0
+      "target": "tickets_b_02_research_prune_implementation_status"
     },
     {
       "relation": "contains",
@@ -32366,9 +32456,9 @@
       "source_file": "analysis/tickets/B-02-RESEARCH-PRUNE.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_02_research_prune_b_02_add_research_prune",
-      "target": "tickets_b_02_research_prune_scope",
-      "confidence_score": 1.0
+      "target": "tickets_b_02_research_prune_scope"
     },
     {
       "relation": "contains",
@@ -32376,9 +32466,9 @@
       "source_file": "analysis/tickets/B-03-BROWSER-RENDERING.md",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_03_browser_rendering",
-      "target": "tickets_b_03_browser_rendering_b_03_add_browser_rendered_extraction",
-      "confidence_score": 1.0
+      "target": "tickets_b_03_browser_rendering_b_03_add_browser_rendered_extraction"
     },
     {
       "relation": "contains",
@@ -32386,9 +32476,9 @@
       "source_file": "analysis/tickets/B-03-BROWSER-RENDERING.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_03_browser_rendering_b_03_add_browser_rendered_extraction",
-      "target": "tickets_b_03_browser_rendering_goal",
-      "confidence_score": 1.0
+      "target": "tickets_b_03_browser_rendering_goal"
     },
     {
       "relation": "contains",
@@ -32396,9 +32486,9 @@
       "source_file": "analysis/tickets/B-03-BROWSER-RENDERING.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_03_browser_rendering_b_03_add_browser_rendered_extraction",
-      "target": "tickets_b_03_browser_rendering_implementation_status",
-      "confidence_score": 1.0
+      "target": "tickets_b_03_browser_rendering_implementation_status"
     },
     {
       "relation": "contains",
@@ -32406,9 +32496,9 @@
       "source_file": "analysis/tickets/B-03-BROWSER-RENDERING.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_03_browser_rendering_b_03_add_browser_rendered_extraction",
-      "target": "tickets_b_03_browser_rendering_scope",
-      "confidence_score": 1.0
+      "target": "tickets_b_03_browser_rendering_scope"
     },
     {
       "relation": "contains",
@@ -32416,9 +32506,9 @@
       "source_file": "analysis/tickets/B-04-FULL-TEXT-SEARCH.md",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_04_full_text_search",
-      "target": "tickets_b_04_full_text_search_b_04_add_advanced_full_text_cache_search",
-      "confidence_score": 1.0
+      "target": "tickets_b_04_full_text_search_b_04_add_advanced_full_text_cache_search"
     },
     {
       "relation": "contains",
@@ -32426,9 +32516,9 @@
       "source_file": "analysis/tickets/B-04-FULL-TEXT-SEARCH.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_04_full_text_search_b_04_add_advanced_full_text_cache_search",
-      "target": "tickets_b_04_full_text_search_goal",
-      "confidence_score": 1.0
+      "target": "tickets_b_04_full_text_search_goal"
     },
     {
       "relation": "contains",
@@ -32436,9 +32526,9 @@
       "source_file": "analysis/tickets/B-04-FULL-TEXT-SEARCH.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_04_full_text_search_b_04_add_advanced_full_text_cache_search",
-      "target": "tickets_b_04_full_text_search_implementation_status",
-      "confidence_score": 1.0
+      "target": "tickets_b_04_full_text_search_implementation_status"
     },
     {
       "relation": "contains",
@@ -32446,9 +32536,9 @@
       "source_file": "analysis/tickets/B-04-FULL-TEXT-SEARCH.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_04_full_text_search_b_04_add_advanced_full_text_cache_search",
-      "target": "tickets_b_04_full_text_search_scope",
-      "confidence_score": 1.0
+      "target": "tickets_b_04_full_text_search_scope"
     },
     {
       "relation": "contains",
@@ -32456,9 +32546,9 @@
       "source_file": "analysis/tickets/B-10-FILE-IMPORT.md",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_10_file_import",
-      "target": "tickets_b_10_file_import_b_10_add_file_based_import",
-      "confidence_score": 1.0
+      "target": "tickets_b_10_file_import_b_10_add_file_based_import"
     },
     {
       "relation": "contains",
@@ -32466,9 +32556,9 @@
       "source_file": "analysis/tickets/B-10-FILE-IMPORT.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_10_file_import_b_10_add_file_based_import",
-      "target": "tickets_b_10_file_import_goal",
-      "confidence_score": 1.0
+      "target": "tickets_b_10_file_import_goal"
     },
     {
       "relation": "contains",
@@ -32476,9 +32566,9 @@
       "source_file": "analysis/tickets/B-10-FILE-IMPORT.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_10_file_import_b_10_add_file_based_import",
-      "target": "tickets_b_10_file_import_implementation_status",
-      "confidence_score": 1.0
+      "target": "tickets_b_10_file_import_implementation_status"
     },
     {
       "relation": "contains",
@@ -32486,9 +32576,9 @@
       "source_file": "analysis/tickets/B-10-FILE-IMPORT.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tickets_b_10_file_import_b_10_add_file_based_import",
-      "target": "tickets_b_10_file_import_scope",
-      "confidence_score": 1.0
+      "target": "tickets_b_10_file_import_scope"
     },
     {
       "relation": "contains",
@@ -35412,5 +35502,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "95c5d6d9f0379f525081feef8c1e539c14695f91"
+  "built_at_commit": "dbb6ef7c4b040261a5b45eeb80e6cbb79c10d82b"
 }

@@ -5,82 +5,82 @@
     "semantic_hash": ""
   },
   ".husky/_/applypatch-msg": {
-    "mtime": 1782286769.1034992,
+    "mtime": 1782289861.5153937,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/commit-msg": {
-    "mtime": 1782286769.103021,
+    "mtime": 1782289861.5147505,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/h": {
-    "mtime": 1782286769.1019988,
+    "mtime": 1782289861.5131156,
     "ast_hash": "15239a01c5554e56ff745570fb583a91",
     "semantic_hash": ""
   },
   ".husky/_/husky.sh": {
-    "mtime": 1782286769.1062424,
+    "mtime": 1782289861.534496,
     "ast_hash": "13871d2ab13e8423790ecb2c01c78c18",
     "semantic_hash": ""
   },
   ".husky/_/post-applypatch": {
-    "mtime": 1782286769.1041899,
+    "mtime": 1782289861.527319,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/post-checkout": {
-    "mtime": 1782286769.1050837,
+    "mtime": 1782289861.5332637,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/post-commit": {
-    "mtime": 1782286769.1032412,
+    "mtime": 1782289861.515137,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/post-merge": {
-    "mtime": 1782286769.105556,
+    "mtime": 1782289861.5336335,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/post-rewrite": {
-    "mtime": 1782286769.1048183,
+    "mtime": 1782289861.532929,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/pre-applypatch": {
-    "mtime": 1782286769.1039166,
+    "mtime": 1782289861.5156467,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/pre-auto-gc": {
-    "mtime": 1782286769.1059716,
+    "mtime": 1782289861.5341012,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/pre-commit": {
-    "mtime": 1782286769.1022782,
+    "mtime": 1782289861.5134506,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/pre-merge-commit": {
-    "mtime": 1782286769.102454,
+    "mtime": 1782289861.5137572,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/pre-push": {
-    "mtime": 1782286769.105788,
+    "mtime": 1782289861.5338774,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/pre-rebase": {
-    "mtime": 1782286769.104544,
+    "mtime": 1782289861.531336,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   ".husky/_/prepare-commit-msg": {
-    "mtime": 1782286769.1027234,
+    "mtime": 1782289861.5144575,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
@@ -90,13 +90,13 @@
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782289719.532887,
+    "mtime": 1782289861.2325802,
     "ast_hash": "44d56c67404032b008c139eaa1ac8ac7",
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782286756.735886,
-    "ast_hash": "b96967ae2b7d4a442cd1b5341175d62f",
+    "mtime": 1782290009.2005463,
+    "ast_hash": "5200065e1ed186ef8c8caa0dece7902b",
     "semantic_hash": ""
   },
   "scripts/check-line-counts.ts": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "skills-lock.json": {
-    "mtime": 1782280028.3237188,
-    "ast_hash": "c15d9719220b32c8c19c6fae634045a8",
+    "mtime": 1782290073.9923007,
+    "ast_hash": "72c451fb4f9c9c29fcfe1a6f57604a73",
     "semantic_hash": ""
   },
   "src/base-command.ts": {
@@ -932,6 +932,16 @@
   "analysis/tickets/B-10-FILE-IMPORT.md": {
     "mtime": 1782287939.3332543,
     "ast_hash": "ef447462456782949ef6c1fbd5028943",
+    "semantic_hash": ""
+  },
+  ".agents/skills/web-research/SKILL.md": {
+    "mtime": 1782290073.955812,
+    "ast_hash": "f13fc99bd674fc15a07f1ae8d1c6df60",
+    "semantic_hash": ""
+  },
+  ".github/instructions/web-research.instructions.md": {
+    "mtime": 1782290073.957005,
+    "ast_hash": "1bd3ab2f617ac30e96f145ec3004de79",
     "semantic_hash": ""
   }
 }

@@ -309,6 +309,25 @@
       "includePrerelease": false,
       "sourceVersion": "1.0.0",
       "installVersion": "1.0.0"
+    },
+    "web-research": {
+      "source": "/Users/thomastheunen/Documents/Projects/forward-nexus-research/agents",
+      "sourceType": "local",
+      "computedHash": "c68a46dc8cd34c33ecc9667365f61e6b77e6f28adc7b9c5756d2a3f7011994fb",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/web-research/SKILL.md",
+      "installPath": ".agents/skills/web-research",
+      "installHash": "c84c7b0ed39f2a3b24dc4e0d4b134b52810f611f57ddca8bfcddced15b2f5985",
+      "sourceHash": "c68a46dc8cd34c33ecc9667365f61e6b77e6f28adc7b9c5756d2a3f7011994fb",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "2.0.0",
+      "installVersion": "2.0.0"
     }
   },
   "instructions": {
@@ -429,6 +448,28 @@
       ],
       "installHash": "6cfe4dab657eabcfe7fad428b2b760a2f214564330d211ed9b9efd2933cd933e",
       "sourceHash": "20d6c1921c4cbdfbcd029e84e6e5eb066b796fb4f9f35d3d470934ece82c52ec",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    ".github/instructions/web-research.instructions.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/forward-nexus-research/agents",
+      "sourceType": "local",
+      "repoPath": "instructions/web-research.instructions.md",
+      "installPath": ".github/instructions/web-research.instructions.md",
+      "computedHash": "a80315b8c74921aa0930687aaa18ea9864b25b48c1ce40e3e1e45f1c11f395ea",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "linkedSkills": [
+        "web-research"
+      ],
+      "installHash": "a80315b8c74921aa0930687aaa18ea9864b25b48c1ce40e3e1e45f1c11f395ea",
+      "sourceHash": "b5c5edd0c88112af264ec9722fcde6c2fdf8924e9967056709f261904c271d40",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.0.0",
