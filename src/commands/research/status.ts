@@ -1,9 +1,47 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../../base-command.js';
-import { normalizeUrl } from '../../lib/research/url.js';
-import { deriveCacheKey } from '../../lib/research/cache-key.js';
-import { findArtifact, getArtifactPath } from '../../lib/research/storage.js';
+import { getArtifactPath } from '../../lib/research/storage.js';
 import { evaluateFreshness, checkMaxAgeExpired } from '../../lib/research/freshness.js';
+import { resolveResearchTarget } from '../../lib/research/resolve-target.js';
+import type { ResearchArtifact } from '../../lib/research/schema.js';
+
+type CacheStatus = 'hit' | 'miss' | 'stale';
+type FreshnessStatus = 'fresh' | 'stale_grace' | 'stale_expired';
+type StatusAction = 'would_fetch' | 'would_revalidate' | 'would_return_cached';
+
+interface StatusResult {
+  action: StatusAction;
+  freshness: FreshnessStatus;
+  status: CacheStatus;
+}
+
+function resolveFreshness(
+  cached: ResearchArtifact,
+  currentTime: Date,
+  ttl: string | undefined,
+  maxAge: string | undefined
+): FreshnessStatus {
+  const isMaxAgeExpired = maxAge ? checkMaxAgeExpired(cached, currentTime, maxAge) : false;
+  return isMaxAgeExpired
+    ? 'stale_expired'
+    : evaluateFreshness(cached.metadata, currentTime, ttl || cached.metadata.ttl);
+}
+
+function describeCacheStatus(
+  cached: ResearchArtifact | null,
+  currentTime: Date,
+  ttl: string | undefined,
+  maxAge: string | undefined
+): StatusResult {
+  if (!cached) {
+    return { status: 'miss', freshness: 'stale_expired', action: 'would_fetch' };
+  }
+
+  const freshness = resolveFreshness(cached, currentTime, ttl, maxAge);
+  return freshness === 'fresh'
+    ? { status: 'hit', freshness, action: 'would_return_cached' }
+    : { status: 'stale', freshness, action: 'would_revalidate' };
+}
 
 export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   static id = 'research status';
@@ -46,69 +84,47 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const { url } = this.args;
     const { ttl, tier, 'max-age': maxAge } = this.flags;
 
-    let normalizedUrl: string;
-    let cacheKey: string;
+    let target: ReturnType<typeof resolveResearchTarget>;
     try {
-      normalizedUrl = normalizeUrl(url);
-      cacheKey = deriveCacheKey(normalizedUrl);
+      target = resolveResearchTarget({
+        configDir: this.config.configDir,
+        cwd: process.cwd(),
+        dataDir: this.config.dataDir,
+        url,
+      });
     } catch (err) {
       this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2 });
     }
 
-    const dataDir = this.config.dataDir;
-    const cached = findArtifact(dataDir, cacheKey);
+    const { cacheKey, located, normalizedUrl, roots } = target;
+    const cached = located?.artifact ?? null;
     const currentTime = new Date();
 
-    let status: 'hit' | 'miss' | 'stale';
-    let freshness: 'fresh' | 'stale_grace' | 'stale_expired';
-    let action: 'would_fetch' | 'would_revalidate' | 'would_return_cached';
-
-    if (!cached) {
-      status = 'miss';
-      freshness = 'stale_expired';
-      action = 'would_fetch';
-    } else {
-      let isMaxAgeExpired = false;
-      if (maxAge) {
-        try {
-          isMaxAgeExpired = checkMaxAgeExpired(cached, currentTime, maxAge);
-        } catch (err) {
-          this.error(`Invalid max-age: ${(err as Error).message}`, { exit: 2 });
-        }
-      }
-
-      const freshnessState = isMaxAgeExpired
-        ? 'stale_expired'
-        : evaluateFreshness(cached.metadata, currentTime, ttl || cached.metadata.ttl);
-
-      freshness = freshnessState;
-
-      if (freshnessState === 'fresh') {
-        status = 'hit';
-        action = 'would_return_cached';
-      } else {
-        status = 'stale';
-        action = 'would_revalidate';
-      }
+    let result: StatusResult;
+    try {
+      result = describeCacheStatus(cached, currentTime, ttl, maxAge);
+    } catch (err) {
+      this.error(`Invalid max-age: ${(err as Error).message}`, { exit: 2 });
     }
 
-    const artifactPath = getArtifactPath(dataDir, cacheKey);
+    // On a hit, report where it actually lives; on a miss, where a fetch would write it.
+    const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
 
     if (!this.requestedJson()) {
       this.log(`URL: ${normalizedUrl}`);
       this.log(`Cache Key: ${cacheKey}`);
       this.log(`Cache Path: ${artifactPath}`);
-      this.log(`Status: ${status}`);
-      this.log(`Freshness: ${freshness}`);
-      this.log(`Action: ${action}`);
+      this.log(`Status: ${result.status}`);
+      this.log(`Freshness: ${result.freshness}`);
+      this.log(`Action: ${result.action}`);
     }
 
     return {
       cacheKey,
       cachePath: artifactPath,
-      status,
-      freshness,
-      action,
+      status: result.status,
+      freshness: result.freshness,
+      action: result.action,
     };
   }
 }

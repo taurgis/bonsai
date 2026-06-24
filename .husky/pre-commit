@@ -11,7 +11,7 @@ node scripts/check-line-counts.ts
 # coverage gate); --max-crap 500 lifts it here because it exceeds the highest
 # CRAP a function within the cyclomatic<=20 limit can reach (20^2+20=420), so the
 # fast commit gate relies on cyclomatic/cognitive and never on estimated CRAP.
-npx fallow audit --gate new-only --max-crap 500 --format human
+pnpm exec fallow audit --gate new-only --max-crap 500 --format human
 
 # Keep the graphify knowledge graph (graphify-out/, tracked) current with the
 # code being committed — AST-only, zero API cost. Runs last so an aborted commit

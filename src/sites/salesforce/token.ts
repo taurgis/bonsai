@@ -137,7 +137,7 @@ function readTokenFields(returnValue: unknown): TokenFields {
 
 function tokenCachePath(): string {
   const base = process.env.XDG_CACHE_HOME || join(homedir(), '.cache');
-  return join(base, 'forward-nexus-research', 'salesforce-coveo-token.json');
+  return join(base, 'bonsai', 'salesforce-coveo-token.json');
 }
 
 export function loadToken(): TokenInfo | null {

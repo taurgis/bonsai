@@ -1,9 +1,7 @@
 import { Args } from '@oclif/core';
-import { join } from 'node:path';
 import { BaseCommand } from '../../base-command.js';
-import { normalizeUrl } from '../../lib/research/url.js';
-import { deriveCacheKey } from '../../lib/research/cache-key.js';
-import { findArtifact, getArtifactPath, scanCacheDir } from '../../lib/research/storage.js';
+import { scanCacheDirs } from '../../lib/research/storage.js';
+import { resolveResearchTarget } from '../../lib/research/resolve-target.js';
 
 interface SectionSummary {
   cacheKey: string;
@@ -36,24 +34,27 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   async execute(): Promise<unknown> {
     const { url } = this.args;
 
-    let normalizedUrl: string;
-    let cacheKey: string;
+    let target: ReturnType<typeof resolveResearchTarget>;
     try {
-      normalizedUrl = normalizeUrl(url);
-      cacheKey = deriveCacheKey(normalizedUrl);
+      target = resolveResearchTarget({
+        configDir: this.config.configDir,
+        cwd: process.cwd(),
+        dataDir: this.config.dataDir,
+        url,
+      });
     } catch (err) {
       this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2 });
     }
 
-    const dataDir = this.config.dataDir;
-    const cached = findArtifact(dataDir, cacheKey);
+    const { cacheKey, located, normalizedUrl, roots } = target;
 
-    if (!cached) {
+    if (!located) {
       this.error(`No cached research found for URL: ${normalizedUrl}`, { exit: 1 });
     }
 
-    const artifactPath = getArtifactPath(dataDir, cacheKey);
-    const sections = this.findSections(dataDir, cacheKey);
+    const cached = located.artifact;
+    const artifactPath = located.path;
+    const sections = this.findSections(roots.readRoots, cacheKey);
 
     if (!this.requestedJson()) {
       this.log(`Cache Key: ${cacheKey}`);
@@ -85,8 +86,8 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   }
 
   // Section children link back via parent_cache_key; list the active ones for this page (T-22).
-  private findSections(dataDir: string, parentKey: string): SectionSummary[] {
-    return scanCacheDir<SectionSummary>(join(dataDir, 'research'), (artifact) => {
+  private findSections(readRoots: string[], parentKey: string): SectionSummary[] {
+    return scanCacheDirs<SectionSummary>(readRoots, (artifact) => {
       const meta = artifact.metadata;
       if (meta.parent_cache_key !== parentKey || meta.status !== 'active') return null;
       return {

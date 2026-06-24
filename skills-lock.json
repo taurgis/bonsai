@@ -63,7 +63,7 @@
     "fallow": {
       "source": "fallow-rs/fallow-skills",
       "sourceType": "github",
-      "computedHash": "fbf66217c44556669c62e1fd2f2b52b56dc201d3a6fa2eaaf1c6bfc1649c4902",
+      "computedHash": "1690e1e47c4ee2825983d8127a44e8a6843d50699729c68b03ccb5be519bc812",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -71,8 +71,8 @@
       ],
       "repoPath": "fallow/skills/fallow/SKILL.md",
       "installPath": ".agents/skills/fallow",
-      "installHash": "d5c249f95b948e6954f88bdeb8498d31388b1c7c690844dead0daae6483c8a79",
-      "sourceHash": "fbf66217c44556669c62e1fd2f2b52b56dc201d3a6fa2eaaf1c6bfc1649c4902",
+      "installHash": "5e05a2c0e3b939ab7d7444b75ebe929067850f1ac85766dad84080a8d6074332",
+      "sourceHash": "1690e1e47c4ee2825983d8127a44e8a6843d50699729c68b03ccb5be519bc812",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.0.0",
@@ -313,7 +313,7 @@
     "web-research": {
       "source": "/Users/thomastheunen/Documents/Projects/forward-nexus-research/agents",
       "sourceType": "local",
-      "computedHash": "c68a46dc8cd34c33ecc9667365f61e6b77e6f28adc7b9c5756d2a3f7011994fb",
+      "computedHash": "98a3bded9931bd4dc03635e048273b10d60f1c98b2b79d3cda6d878f8ee8686d",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -322,12 +322,12 @@
       ],
       "repoPath": "skills/web-research/SKILL.md",
       "installPath": ".agents/skills/web-research",
-      "installHash": "c84c7b0ed39f2a3b24dc4e0d4b134b52810f611f57ddca8bfcddced15b2f5985",
-      "sourceHash": "c68a46dc8cd34c33ecc9667365f61e6b77e6f28adc7b9c5756d2a3f7011994fb",
+      "installHash": "58bb7ff624f2640648ca1398159e5ae77117e94b97bac04dcacd636e31c5ffc9",
+      "sourceHash": "98a3bded9931bd4dc03635e048273b10d60f1c98b2b79d3cda6d878f8ee8686d",
       "versionPolicy": "minor",
       "includePrerelease": false,
-      "sourceVersion": "2.0.0",
-      "installVersion": "2.0.0"
+      "sourceVersion": "2.1.0",
+      "installVersion": "2.1.0"
     }
   },
   "instructions": {
@@ -415,25 +415,6 @@
       "sourceVersion": "1.0.2",
       "installVersion": "1.0.2"
     },
-    ".github/instructions/repo-research.instructions.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "repoPath": "instructions/repo-research.instructions.md",
-      "installPath": ".github/instructions/repo-research.instructions.md",
-      "computedHash": "8e91fb5aa27b6154fedaac01516c17cef1591f986421c95132b5e91af50751c1",
-      "agents": [
-        "claude-code",
-        "codex",
-        "github-copilot",
-        "antigravity"
-      ],
-      "installHash": "8e91fb5aa27b6154fedaac01516c17cef1591f986421c95132b5e91af50751c1",
-      "sourceHash": "1a239b605f9929f20a8b138a252011f3b4dfb076115a080deda952c3521f4598",
-      "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.1",
-      "installVersion": "1.0.1"
-    },
     ".github/instructions/senior-quality-engineer-reporting.instructions.md": {
       "source": "Forward-Services-NV/forward-nexus-projects",
       "sourceType": "github",
@@ -458,7 +439,7 @@
       "sourceType": "local",
       "repoPath": "instructions/web-research.instructions.md",
       "installPath": ".github/instructions/web-research.instructions.md",
-      "computedHash": "a80315b8c74921aa0930687aaa18ea9864b25b48c1ce40e3e1e45f1c11f395ea",
+      "computedHash": "0688d5632bd856d92e8fb0893bbb3bdda83d0b8b1423720f9500f48996ea2c54",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -468,33 +449,33 @@
       "linkedSkills": [
         "web-research"
       ],
-      "installHash": "a80315b8c74921aa0930687aaa18ea9864b25b48c1ce40e3e1e45f1c11f395ea",
-      "sourceHash": "b5c5edd0c88112af264ec9722fcde6c2fdf8924e9967056709f261904c271d40",
+      "installHash": "0688d5632bd856d92e8fb0893bbb3bdda83d0b8b1423720f9500f48996ea2c54",
+      "sourceHash": "726da9f8a50b980212085732bc9ad8d11b1711eeadb22c6219595ca667edf689",
       "versionPolicy": "minor",
       "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
+      "sourceVersion": "3.0.0",
+      "installVersion": "3.0.0"
     }
   },
   "customAgents": {
     ".github/agents/official-docs-researcher.agent.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
+      "source": "/Users/thomastheunen/Documents/Projects/forward-nexus-research/agents",
+      "sourceType": "local",
       "repoPath": "agents/official-docs-researcher.agent.md",
       "installPath": ".github/agents/official-docs-researcher.agent.md",
-      "computedHash": "11fedb9728711d960f04aba2601c696c9ecdb3158e96a96fd6e58100dca47d21",
+      "computedHash": "70e393689107e8477673fa5c13e2cf38216840e7a387d06142cf8d10b89b81bc",
       "agents": [
-        "claude-code",
-        "codex",
         "github-copilot",
+        "claude-code",
+        "cursor",
         "antigravity"
       ],
-      "installHash": "11fedb9728711d960f04aba2601c696c9ecdb3158e96a96fd6e58100dca47d21",
-      "sourceHash": "78a2fa24e6f33e6b58e6fe2095abf4235a648f9cb686b94fcafe4386d2d4416d",
+      "installHash": "70e393689107e8477673fa5c13e2cf38216840e7a387d06142cf8d10b89b81bc",
+      "sourceHash": "68e1a7aa7febbe53196947e0c7d886354a85649865e91b000eac5c8cf0fa81ad",
       "versionPolicy": "minor",
       "includePrerelease": false,
-      "sourceVersion": "2.1.0",
-      "installVersion": "2.1.0"
+      "sourceVersion": "3.0.0",
+      "installVersion": "3.0.0"
     },
     ".github/agents/senior-code-reviewer.agent.md": {
       "source": "Forward-Services-NV/forward-nexus-projects",

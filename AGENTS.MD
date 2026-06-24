@@ -1,14 +1,13 @@
 # Agent Instructions
 
-This repository is for turning the manual `Official Docs Researcher` workflow into a reusable optional oclif plugin that exposes `forward-nexus research` when installed into the `forward-nexus` CLI.
+This repository builds Bonsai, a standalone oclif CLI published as `@taurgis/bonsai` with a `bonsai` binary. Bonsai turns the manual docs research workflow into reusable local research cache commands for agents.
 
 ## Read first
 
 Before changing technical content or implementation code, read:
 
-1. `analysis/README.md` for the intended architecture and ticket breakdown.
-2. `.agents/rules/repo-research.md` for the existing repo-wide research requirement.
-3. `.github/agents/official-docs-researcher.agent.md` for the manual cache protocol being migrated.
+1. `.agents/rules/web-research.md` for the existing repo-wide research requirement.
+2. `.github/agents/official-docs-researcher.agent.md` for the Bonsai-backed official docs workflow.
 
 If a change depends on platform behavior, verify current official documentation in the same task. Do not rely only on model memory for oclif, Readability, Turndown, Node.js, or browser behavior.
 
@@ -26,7 +25,7 @@ Build a CLI that lets agents do research through a stable local cache instead of
 
 The CLI should make the protocol executable, testable, and reusable across repositories.
 
-Development of the research package happens in this repository. The `/Users/thomastheunen/Documents/Projects/forward-nexus` repository is the host CLI used for compatibility checks, optional plugin-host integration, and dogfooding; it is not where the research implementation should be added as a core command.
+Development of Bonsai happens in this repository. Keep Bonsai implementation in this package instead of adding it to another CLI as a core command.
 
 ## CLI design rules
 
@@ -120,6 +119,8 @@ Agents working in this codebase or utilizing this plugin must run the compiled C
 * **Remote Docs Search (discovery)**: `node bin/cli.mjs research search "<query>" --remote <docs-url> [--json]` — discovers uncached pages via a site's public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes); selected URLs are then captured through `research <url>`. Degrades to local cache search when no connector applies.
 * **List Database**: `node bin/cli.mjs research list [filters] [--json]`
 * **Prune Database**: `node bin/cli.mjs research prune [filters] --yes [--json]`
+
+Published standalone usage is `npx @taurgis/bonsai research <url>` or `bonsai research <url>` after installation. Do not document bare `npx bonsai` unless an unscoped npm shim is actually published.
 
 ### Browser-Rendered Extraction (`--rendered`)
 

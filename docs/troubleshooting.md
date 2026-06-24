@@ -1,6 +1,6 @@
 # Troubleshooting & Limitations
 
-This document lists the design limits, security blocklists, technical constraints, and common troubleshooting steps for the `forward-nexus-plugin-research` plugin.
+This document lists the design limits, security blocklists, technical constraints, and common troubleshooting steps for Bonsai.
 
 ---
 
@@ -42,18 +42,18 @@ The crawler will block the request if the resolved IP falls within any of the fo
 
 ### Common Failure Symptoms
 * **Attempting to crawl local dev servers**:
-  * *Command*: `forward-nexus research http://localhost:8080/`
+  * *Command*: `bonsai research http://localhost:8080/`
   * *Error*: `Error: IP address "127.0.0.1" is a blocked local or private target.`
 * **Resolution**: Local resources cannot be fetched directly using the automatic crawler. To import documentation from a local dev server, compile it to Markdown first and use the `import` command:
   ```bash
-  curl -s http://localhost:8080/docs | node bin/cli.mjs research import http://localhost:8080/docs --stdin
+  curl -s http://localhost:8080/docs | bonsai research import http://localhost:8080/docs --stdin
   ```
 
 ---
 
 ## 3. Client-Side Hydration (SPA) Limitations
 
-The research plugin prioritizes light CPU/memory footprints and fast execution. It executes a **static HTML fetch** using Node's native fetch API and parses the response into a virtual DOM via `linkedom`.
+Bonsai prioritizes light CPU/memory footprints and fast execution. It executes a **static HTML fetch** using Node's native fetch API and parses the response into a virtual DOM via `linkedom`.
 
 ### The Constraint
 * **No Javascript Runtime**: The crawler **does not execute client-side JavaScript**. It cannot hydrate pages, click cookie consent banners, or wait for asynchronous API calls to render content.
@@ -64,14 +64,14 @@ The research plugin prioritizes light CPU/memory footprints and fast execution. 
 1. **Use Pre-Rendered / Server-Side Rendered (SSR) targets**: Most official documentation platforms (like Docusaurus, Nextra, or MkDocs) pre-render pages as static HTML. Target those instead of client-side-only portals.
 2. **Manual CLI Import**: If you must research a JS-rendered page, open the page in a browser, copy the main article content (or convert it locally), and import it into the CLI database:
    ```bash
-   node bin/cli.mjs research import https://spa-docs.com/page --stdin < page.md
+   bonsai research import https://spa-docs.com/page --stdin < page.md
    ```
 
 ---
 
 ## 4. Exit Codes & Common Errors
 
-The research plugin returns distinct exit codes depending on the result status to allow machine callers (like AI agents) to programmatically handle errors.
+Bonsai returns distinct exit codes depending on the result status to allow machine callers (like AI agents) to programmatically handle errors.
 
 ### Exit Code Directory
 
@@ -86,7 +86,7 @@ The research plugin returns distinct exit codes depending on the result status t
 
 #### Scenario A: Fetch fails with HTTP 403 / 401
 * **Cause**: Some documentation platforms block programmatic scraping using WAFs (like Cloudflare) or require authentication.
-* **Resolution**: v1 of the Research Plugin does not support authenticated requests or session cookies. You must download the page details manually and use `research import` to cache the notes.
+* **Resolution**: v1 of Bonsai does not support authenticated requests or session cookies. You must download the page details manually and use `research import` to cache the notes.
 
 #### Scenario B: Empty content returned
 * **Cause**: The scraper parser uses `@mozilla/readability` to extract main article text. If a page has complex nested tables or does not contain a clean `<article>` or `<main>` layout, Readability may fail to detect the content body.

@@ -1,24 +1,40 @@
 # Caching Protocol Specification
 
-This document details the local caching protocol, storage paths, metadata schemas, freshness calculations, and revalidation behaviors used by the `forward-nexus-plugin-research` plugin.
+This document details the local caching protocol, storage paths, metadata schemas, freshness calculations, and revalidation behaviors used by Bonsai.
 
 ---
 
 ## 1. Storage Location & Directory Resolution
 
-Cached research artifacts are saved as individual Markdown files (`<cache_key>.md`) under the directory resolved by the host CLI config's data directory (`this.config.dataDir`).
+Cached research artifacts are saved as individual Markdown files (`<cache_key>.md`) under the directory resolved by Bonsai's oclif data directory (`this.config.dataDir`).
 
 Depending on how the CLI is executed, the database path resolves as follows:
-* **Standalone / Local Development**: `~/.local/share/forward-nexus-plugin-research/research/`
-* **Integrated in `forward-nexus` Host CLI**: `~/.local/share/forward-nexus/research/`
+* **Standalone Bonsai CLI**: `~/.local/share/bonsai/research/` on Linux-style XDG systems, or the platform-specific oclif data directory for the `bonsai` binary.
+* **Project-local Bonsai cache**: `<project>/.bonsai/research/` when `research config set storage project --local` is active.
 * **OS-Specific Standards**:
-  * **macOS**: `~/Library/Application Support/forward-nexus/research/`
-  * **Linux**: `~/.local/share/forward-nexus/research/`
-  * **Windows**: `%USERPROFILE%\AppData\Local\forward-nexus\research\`
+  * **macOS**: `~/Library/Application Support/bonsai/research/`
+  * **Linux**: `~/.local/share/bonsai/research/`
+  * **Windows**: `%LOCALAPPDATA%\bonsai\research\`
 
 Inside this folder, you will find:
 1. **Durable Cache Files**: Named `<sha256_hash>.md`.
 2. **Temporary/Scratch Files**: Created atomically under a `tmp` directory during writes to prevent file corruption.
+
+### Read fallback (project → global)
+
+When `storage` resolves to `project`, reads check the project cache first and then
+fall back to the global cache. A cache key present in both locations is served from
+the project copy. Writes go to the project cache, except as noted below.
+
+### Secret-safety routing
+
+The project cache is meant to be committed, so it must never hold credentials. Before
+a write under `project` storage, the artifact's content is scanned for known secret
+patterns (API keys, bearer/JWT tokens, private-key blocks, `secret=`/`token=`
+assignments, etc.). On a match the artifact is **redirected to the global cache**, a
+warning naming the credential *type* (never its value) is printed, and the JSON
+envelope sets `redirectedToGlobal: true`. Global storage is not scanned, since it is
+never committed.
 
 ---
 

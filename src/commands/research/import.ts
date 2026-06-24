@@ -5,7 +5,10 @@ import * as path from 'node:path';
 import { BaseCommand } from '../../base-command.js';
 import { normalizeUrl } from '../../lib/research/url.js';
 import { deriveCacheKey } from '../../lib/research/cache-key.js';
-import { writeArtifact, getArtifactPath } from '../../lib/research/storage.js';
+import { getArtifactPath } from '../../lib/research/storage.js';
+import { loadStoreRoots } from '../../lib/research/store-roots.js';
+import { writeArtifactSecurely } from '../../lib/research/secure-write.js';
+import type { StorageMode } from '../../lib/config/index.js';
 import { getPolicy } from '../../lib/research/freshness.js';
 import { compressMarkdown } from '../../lib/research/compress.js';
 import { estimateTokens } from '../../lib/research/token-estimate.js';
@@ -76,6 +79,11 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       char: 'l',
       description: 'Predicted lifespan of the data (e.g. "24h", "7d").',
     }),
+    storage: Flags.option({
+      description:
+        'Override where this note is cached (overrides configured default). Secret-bearing notes are always stored globally.',
+      options: ['global', 'project'] as const,
+    })(),
   };
 
   static stdoutIsPrimaryData = true;
@@ -312,13 +320,25 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       rawInput
     );
 
-    const dataDir = this.config.dataDir;
-    writeArtifact(dataDir, cacheKey, artifact);
+    const roots = loadStoreRoots({
+      configDir: this.config.configDir,
+      cwd: process.cwd(),
+      dataDir: this.config.dataDir,
+      flagOverride: this.flags.storage as StorageMode | undefined,
+    });
+    const writeResult = writeArtifactSecurely(roots, cacheKey, artifact);
+    const storagePath = getArtifactPath(writeResult.dataDir, cacheKey);
+
+    if (writeResult.redirected) {
+      this.warn(
+        `Detected ${writeResult.secretLabel} in the imported content; stored in the global cache instead of the project to avoid committing secrets.`
+      );
+    }
 
     if (!this.requestedJson()) {
       this.log(`Successfully imported research artifact.`);
       this.log(`Cache Key: ${cacheKey}`);
-      this.log(`Storage Path: ${getArtifactPath(dataDir, cacheKey)}`);
+      this.log(`Storage Path: ${storagePath}`);
     }
 
     const inputFormat = this.flags['input-format'];
@@ -329,7 +349,9 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         key: cacheKey,
         status: 'imported',
         freshness: 'fresh',
-        path: getArtifactPath(dataDir, cacheKey),
+        path: storagePath,
+        storage: roots.mode,
+        redirectedToGlobal: writeResult.redirected,
       },
       source: {
         url: hasSingle ? this.args.url! : '',

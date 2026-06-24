@@ -1,7 +1,7 @@
 import { Flags } from '@oclif/core';
-import { join } from 'node:path';
 import { BaseCommand } from '../../base-command.js';
-import { getArtifactPath, scanCacheDir } from '../../lib/research/storage.js';
+import { scanCacheDirs } from '../../lib/research/storage.js';
+import { loadStoreRoots } from '../../lib/research/store-roots.js';
 import { evaluateFreshness } from '../../lib/research/freshness.js';
 
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
@@ -96,14 +96,14 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     return true;
   }
 
-  private scanCacheDirForList(dir: string, dataDir: string, currentTime: Date): any[] {
-    return scanCacheDir(dir, (artifact) => {
+  private scanCacheDirForList(readRoots: string[], currentTime: Date): any[] {
+    return scanCacheDirs(readRoots, (artifact, filePath) => {
       if (artifact.metadata.status !== 'active') return null;
       const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
       if (!this.matchesFilters(artifact.metadata, freshness)) return null;
       return {
         cacheKey: artifact.metadata.cache_key,
-        path: getArtifactPath(dataDir, artifact.metadata.cache_key),
+        path: filePath,
         artifactType: artifact.metadata.artifact_type,
         sourceUrls: artifact.metadata.source_urls,
         topic: artifact.metadata.topic,
@@ -138,11 +138,14 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   async execute(): Promise<unknown> {
     this.validateListFlags();
 
-    const dataDir = this.config.dataDir;
-    const dir = join(dataDir, 'research');
+    const roots = loadStoreRoots({
+      configDir: this.config.configDir,
+      cwd: process.cwd(),
+      dataDir: this.config.dataDir,
+    });
     const currentTime = new Date();
 
-    const results = this.scanCacheDirForList(dir, dataDir, currentTime);
+    const results = this.scanCacheDirForList(roots.readRoots, currentTime);
 
     // Sort by validated_at or fetched_at descending (most recent first)
     results.sort((a, b) => {

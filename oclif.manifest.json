@@ -107,13 +107,24 @@
           "name": "rendered",
           "allowNo": false,
           "type": "boolean"
+        },
+        "storage": {
+          "description": "Override where this result is cached (overrides configured default). Secret-bearing pages are always stored globally.",
+          "name": "storage",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "global",
+            "project"
+          ],
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "research",
-      "pluginAlias": "forward-nexus-plugin-research",
-      "pluginName": "forward-nexus-plugin-research",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "An advanced, locally cached web research tool optimized for LLM ingestion.",
@@ -226,13 +237,24 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "storage": {
+          "description": "Override where this note is cached (overrides configured default). Secret-bearing notes are always stored globally.",
+          "name": "storage",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "global",
+            "project"
+          ],
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "research:import",
-      "pluginAlias": "forward-nexus-plugin-research",
-      "pluginName": "forward-nexus-plugin-research",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Import agent-supplied clean Markdown notes into the local cache.",
@@ -268,8 +290,8 @@
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "research:inspect",
-      "pluginAlias": "forward-nexus-plugin-research",
-      "pluginName": "forward-nexus-plugin-research",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Inspect cached research metadata for a URL.",
@@ -372,8 +394,8 @@
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "research:list",
-      "pluginAlias": "forward-nexus-plugin-research",
-      "pluginName": "forward-nexus-plugin-research",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "List cached research artifacts by metadata filters.",
@@ -451,8 +473,8 @@
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "research:prune",
-      "pluginAlias": "forward-nexus-plugin-research",
-      "pluginName": "forward-nexus-plugin-research",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Clean up old or inactive research cache entries.",
@@ -545,8 +567,8 @@
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "research:search",
-      "pluginAlias": "forward-nexus-plugin-research",
-      "pluginName": "forward-nexus-plugin-research",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Search locally cached research artifacts by keywords.",
@@ -610,8 +632,8 @@
       "hasDynamicHelp": false,
       "hiddenAliases": [],
       "id": "research:status",
-      "pluginAlias": "forward-nexus-plugin-research",
-      "pluginName": "forward-nexus-plugin-research",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
       "summary": "Check the cache status of a URL without fetching or writing.",
@@ -625,6 +647,314 @@
         "research",
         "status.js"
       ]
+    },
+    "research:config:base": {
+      "aliases": [],
+      "args": {},
+      "flags": {
+        "json": {
+          "description": "Return the output as a machine-readable JSON object.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "research:config:base",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false,
+      "jsonEnvelope": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "research",
+        "config",
+        "base.js"
+      ]
+    },
+    "research:config:get": {
+      "aliases": [],
+      "args": {
+        "key": {
+          "description": "The configuration key to read.",
+          "name": "key",
+          "required": true
+        }
+      },
+      "description": "Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: storage.",
+      "examples": [
+        {
+          "description": "Get the effective storage mode",
+          "command": "<%= config.bin %> research config get storage"
+        },
+        {
+          "description": "Read only the project-level value",
+          "command": "<%= config.bin %> research config get storage --local"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Return the output as a machine-readable JSON object.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "global": {
+          "char": "g",
+          "description": "Read from user-level config only.",
+          "name": "global",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "local": {
+          "aliases": [
+            "project"
+          ],
+          "charAliases": [
+            "p"
+          ],
+          "description": "Read from project-level config only.",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "research:config:get",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Get the effective value of a research configuration key.",
+      "enableJsonFlag": false,
+      "jsonEnvelope": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "research",
+        "config",
+        "get.js"
+      ],
+      "stdoutIsPrimaryData": true
+    },
+    "research:config:list": {
+      "aliases": [],
+      "args": {},
+      "description": "Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage.",
+      "examples": [
+        {
+          "description": "Show all effective config values",
+          "command": "<%= config.bin %> research config list"
+        },
+        {
+          "description": "Show only project-level config",
+          "command": "<%= config.bin %> research config list --local"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Return the output as a machine-readable JSON object.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "global": {
+          "char": "g",
+          "description": "Show user-level config only.",
+          "name": "global",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "local": {
+          "aliases": [
+            "project"
+          ],
+          "charAliases": [
+            "p"
+          ],
+          "description": "Show project-level config only.",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "research:config:list",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "List all research configuration keys and their effective values.",
+      "enableJsonFlag": false,
+      "jsonEnvelope": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "research",
+        "config",
+        "list.js"
+      ],
+      "stdoutIsPrimaryData": true
+    },
+    "research:config:set": {
+      "aliases": [],
+      "args": {
+        "key": {
+          "description": "The configuration key to set.",
+          "name": "key",
+          "required": false
+        },
+        "value": {
+          "description": "The value to assign.",
+          "name": "value",
+          "required": false
+        }
+      },
+      "description": "Persist a configuration value. Writes user-level config by default; pass --local to write the project-level config (.bonsai.json in cwd).\n\nValid keys: storage. The inline form `<key>=<value>` is also accepted.",
+      "examples": [
+        {
+          "description": "Store research cache inside the current project",
+          "command": "<%= config.bin %> research config set storage project --local"
+        },
+        {
+          "description": "Set the user-level default using the inline key=value form",
+          "command": "<%= config.bin %> research config set storage=global"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Return the output as a machine-readable JSON object.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "global": {
+          "char": "g",
+          "description": "Write to user-level config (default).",
+          "name": "global",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "local": {
+          "aliases": [
+            "project"
+          ],
+          "charAliases": [
+            "p"
+          ],
+          "description": "Write to project-level config (.bonsai.json in cwd).",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Show what would be written without saving.",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "research:config:set",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Set a research configuration key.",
+      "enableJsonFlag": false,
+      "jsonEnvelope": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "research",
+        "config",
+        "set.js"
+      ],
+      "stdoutIsPrimaryData": true
+    },
+    "research:config:unset": {
+      "aliases": [],
+      "args": {
+        "key": {
+          "description": "The configuration key to remove.",
+          "name": "key",
+          "required": true
+        }
+      },
+      "description": "Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage.",
+      "examples": [
+        {
+          "description": "Remove the user-level storage setting",
+          "command": "<%= config.bin %> research config unset storage"
+        },
+        {
+          "description": "Remove the project-level storage setting",
+          "command": "<%= config.bin %> research config unset storage --local"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Return the output as a machine-readable JSON object.",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "global": {
+          "char": "g",
+          "description": "Remove from user-level config (default).",
+          "name": "global",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "local": {
+          "aliases": [
+            "project"
+          ],
+          "charAliases": [
+            "p"
+          ],
+          "description": "Remove from project-level config (.bonsai.json in cwd).",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Show what would be removed without saving.",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "research:config:unset",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Remove a research configuration key.",
+      "enableJsonFlag": false,
+      "jsonEnvelope": false,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "research",
+        "config",
+        "unset.js"
+      ],
+      "stdoutIsPrimaryData": true
     }
   },
   "version": "1.0.0"

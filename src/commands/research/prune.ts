@@ -3,6 +3,7 @@ import { unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseCommand } from '../../base-command.js';
 import { scanCacheDir } from '../../lib/research/storage.js';
+import { loadStoreRoots } from '../../lib/research/store-roots.js';
 import { parseTtlToMs } from '../../lib/research/freshness.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
@@ -95,16 +96,20 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     return true;
   }
 
-  private findPruneCandidates(dir: string, currentTime: Date): any[] {
-    return scanCacheDir(dir, (artifact, filePath) => {
-      if (!this.shouldPrune(artifact.metadata, currentTime)) return null;
-      return {
-        cacheKey: artifact.metadata.cache_key,
-        path: filePath,
-        topic: artifact.metadata.topic,
-        url: artifact.metadata.source_url,
-      };
-    });
+  // Prune across every read root (project + global). No cross-root dedup: each file is a distinct
+  // deletion target, so a cache key present in both locations is pruned in both.
+  private findPruneCandidates(readRoots: string[], currentTime: Date): any[] {
+    return readRoots.flatMap((dataDir) =>
+      scanCacheDir(join(dataDir, 'research'), (artifact, filePath) => {
+        if (!this.shouldPrune(artifact.metadata, currentTime)) return null;
+        return {
+          cacheKey: artifact.metadata.cache_key,
+          path: filePath,
+          topic: artifact.metadata.topic,
+          url: artifact.metadata.source_url,
+        };
+      })
+    );
   }
 
   private deletePruneCandidates(filesToPrune: any[]): number {
@@ -123,11 +128,14 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   async execute(): Promise<unknown> {
     this.validatePruneFlags();
 
-    const dataDir = this.config.dataDir;
-    const dir = join(dataDir, 'research');
+    const roots = loadStoreRoots({
+      configDir: this.config.configDir,
+      cwd: process.cwd(),
+      dataDir: this.config.dataDir,
+    });
     const currentTime = new Date();
 
-    const filesToPrune = this.findPruneCandidates(dir, currentTime);
+    const filesToPrune = this.findPruneCandidates(roots.readRoots, currentTime);
     const dryRun = this.flags['dry-run'];
     const count = filesToPrune.length;
 

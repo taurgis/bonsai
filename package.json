@@ -1,11 +1,15 @@
 {
-  "name": "forward-nexus-plugin-research",
+  "name": "@taurgis/bonsai",
   "version": "1.0.0",
-  "description": "An advanced local research result database plugin for forward-nexus",
+  "description": "Bonsai is a standalone local research cache CLI for AI agents",
   "type": "module",
   "main": "./dist/index.js",
+  "bin": {
+    "bonsai": "./bin/cli.mjs"
+  },
   "files": [
     "dist",
+    "bin",
     "agents",
     "oclif.manifest.json",
     "README.md"
@@ -17,7 +21,7 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
     "lint": "pnpm lint:line-counts && pnpm lint:health",
     "lint:line-counts": "node scripts/check-line-counts.ts --all",
-    "lint:health": "pnpm test:coverage && npx fallow health --format human",
+    "lint:health": "pnpm test:coverage && pnpm exec fallow health --format human",
     "prepare": "husky",
     "regression:suite": "tsc -b && node testing/regression/run-suite.mjs",
     "regression:promote": "tsc -b && node testing/regression/run-suite.mjs --promote",
@@ -43,6 +47,7 @@
     "@types/node": "^22.10.0",
     "@types/turndown": "^5.0.5",
     "@vitest/coverage-istanbul": "^4.0.18",
+    "fallow": "^2.102.0",
     "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "lint-staged": "^16.2.7",
@@ -61,6 +66,9 @@
     "topics": {
       "research": {
         "description": "Advanced web research caching database for AI agents"
+      },
+      "research config": {
+        "description": "Manage research cache storage configuration (global vs project)"
       }
     }
   }

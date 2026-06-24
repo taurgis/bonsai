@@ -1,161 +1,126 @@
 ---
 name: web-research
-description: 'Searches, crawls, and manages the local research cache for any web content using the forward-nexus research plugin. Use when asked to research a technical topic, fetch documentation or web pages, list or search local cache contents, import custom notes, or prune expired research.'
+description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when searching/listing/pruning the local research cache, or when importing manually gathered notes.'
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '2.0.0'
+  version: '2.1.0'
 ---
 
 # Web Research Skill
 
-This skill guides agents on how to search, scrape, import, and prune web research cache entries using the `research` plugin for the `forward-nexus` CLI.
+Use Bonsai as the cache-first research path for official documentation and web content. Prefer current official sources, keep research reusable, and avoid direct one-off web fetches when Bonsai can capture the same page.
 
----
+## Required Pre-Step
 
-## When to Use This Skill
+Before creating, updating, refactoring, scaffolding, or deleting technical content, verify relevant current official documentation in the same task.
 
-* Before making any technical or architectural changes, to verify platform specs, API documentation, or any authoritative web source.
-* To check if target content is already cached locally.
-* To crawl public HTTP/HTTPS pages and convert them to clean Markdown.
-* To import custom synthesized notes or Markdown files.
-* To prune old/expired entries from the local research cache.
+Search the cache first:
 
----
-
-## How to Use
-
-### Installation
-
-`forward-nexus-plugin-research` is a plugin for the published `forward-nexus` CLI. Install the plugin once:
 ```bash
-forward-nexus plugins install forward-nexus-plugin-research
+bonsai research search "<topic or keywords>"
 ```
 
-After installation, all `research` subcommands are available under the host CLI:
+If the cache misses or does not cover the question, fetch the source through Bonsai:
+
 ```bash
-forward-nexus research <url>
+bonsai research <official-url> --format detailed
 ```
 
-> **Developer mode** (running inside this plugin repo directly):
-> ```bash
-> node bin/cli.mjs research <url>
-> ```
+Inside the Bonsai repository, use the development binary:
 
----
-
-## Cache Retrieval Workflows
-
-### Step 1: Search the cache first (SSOT)
-Always search for existing records before starting a network crawl to save time and prevent duplicates:
 ```bash
-forward-nexus research search "node url"
+node bin/cli.mjs research search "<topic or keywords>" --json
+node bin/cli.mjs research <official-url> --format detailed --json
 ```
 
-### Step 2: Fetch and crawl if missing
-If search returns no results, perform a fetch. By default, it will crawl the URL, strip boilerplate, convert it to clean Markdown, and write it to the cache:
+For one-shot published usage outside this repo, use the scoped package name:
+
 ```bash
-forward-nexus research https://nodejs.org/api/url.html
+npx @taurgis/bonsai research <official-url> --format detailed
 ```
 
-#### Output Density Control:
-* **Compressed (Default)**: Best for tight LLM context windows (strips images, extra attributes, raw formatting):
-  ```bash
-  forward-nexus research https://nodejs.org/api/url.html --format compressed
-  ```
-* **Detailed**: Retains full detailed markup, code snippets, tables, and absolute links:
-  ```bash
-  forward-nexus research https://nodejs.org/api/url.html --format detailed
-  ```
+Do not document or run bare `npx bonsai` unless an unscoped npm shim is actually published.
 
-### Step 3: Use `--rendered` for SPA / client-side JS pages
-If the static fetch returns empty content or loading indicators, the page likely requires JavaScript execution. Use `--rendered` to launch headless Chrome via CDP:
+## Source Rules
+
+- Prefer official vendor docs, standards, API references, SDK docs, release notes, changelogs, and security advisories.
+- Include official source URLs when the change relies on platform behavior or standards.
+- Use `--tier stable`, `--tier standard`, or `--tier volatile` when the source class is clear.
+- Treat volatile sources as needing fresh validation before trusting them.
+- Do not use the retired manual `artifacts/online-research/` protocol for new research.
+
+## Fetch Rules
+
+Use `--format compressed` for context-budgeted reading and `--format detailed` for exact technical details, links, tables, and code examples.
+
+Use `--rendered` when static extraction is incomplete or the page is an SPA:
+
 ```bash
-forward-nexus research https://react.dev/reference/react --rendered
-```
-Requirements:
-* Chrome or Chromium installed locally (or set `CHROME_PATH`).
-* Node.js 22+ (native `WebSocket` support).
-* No additional npm dependencies needed.
-
----
-
-## Managing cache metadata
-
-### List cached items
-List cached entries with flexible metadata filters:
-```bash
-# List all node-related entries
-forward-nexus research list --tags node
-
-# List only volatile entries
-forward-nexus research list --freshness fresh --topic volatile
+bonsai research <official-url> --rendered --format detailed
 ```
 
-### Check status or inspect metadata
-See if a URL would cache hit or miss without performing a download:
-```bash
-forward-nexus research status https://nodejs.org/api/url.html
-```
-To print the full parsed YAML frontmatter:
-```bash
-forward-nexus research inspect https://nodejs.org/api/url.html
-```
+Never reach for direct `WebFetch` or `WebSearch` to retrieve a specific page when Bonsai can fetch it. Bonsai returns reusable Markdown and keeps it cached for future agents.
 
-### Advanced full-text search
-`research search` supports fuzzy matching (Levenshtein distance ≤ 2 for terms ≥ 4 chars), term frequency ranking, substring matching in topics/tags, and exact phrase match bonuses:
+Pure discovery searches are allowed when you do not yet know which URL to fetch. Once a URL is selected, capture it with Bonsai.
+
+## Manual Fallbacks
+
+If direct web access was unavoidable because of authentication, browser interaction, or a tool constraint, import the result into Bonsai before returning.
+
+Single-source import:
+
 ```bash
-forward-nexus research search "react suspnse"   # finds "react suspense" via fuzzy match
-forward-nexus research search "nestjs config"    # phrase match ranks topic "Custom NestJS Config" higher
+bonsai research import <url> --file path/to/notes.md
 ```
 
----
+Stdin import:
 
-## Storing and Pruning Cache Notes
-
-### Import Custom Research Notes
-If scraping a client-side JS app (SPA) yields empty output, or if you want to save a multi-source research synthesis, use the `import` command:
-* **Stdin Import**:
-  ```bash
-  echo "# My Synthesis Note" | forward-nexus research import https://example.com/single --stdin
-  ```
-* **File Import**:
-  ```bash
-  forward-nexus research import --topic "React Suspense Guide" --source-url https://react.dev/a --source-url https://react.dev/b --file path/to/my-notes.md
-  ```
-
-### Pruning Expired Cache Files
-Prune stale files based on age, inactivity, or type. Always perform a `--dry-run` first to preview the changes safely:
 ```bash
-# Dry Run check
-forward-nexus research prune --older-than 90d --dry-run
-
-# Actual delete
-forward-nexus research prune --older-than 90d --yes
+echo "# My Synthesis Note" | bonsai research import <url> --stdin
 ```
 
----
+Multi-source synthesis:
 
-## Troubleshooting
+```bash
+bonsai research import \
+  --topic "<descriptive topic>" \
+  --source-url <url1> \
+  --source-url <url2> \
+  --file path/to/synthesized-notes.md
+```
 
-### Issue: Plugin commands not found
-* **Cause**: Plugin not yet installed in the `forward-nexus` CLI.
-* **Solution**: Install it first:
-  ```bash
-  forward-nexus plugins install forward-nexus-plugin-research
-  ```
+## Cache Operations
 
-### Issue: Fetch throws hostname safety error
-* **Cause**: Target host resolved to a private or local IP block (SSRF protection blocking RFC1918/localhost).
-* **Solution**: You cannot automatically scrape private networks. Export the target page manually to Markdown and import it:
-  ```bash
-  forward-nexus research import http://localhost:8080/docs --file path/to/local-notes.md
-  ```
+Check status without fetching:
 
-### Issue: Scraped Markdown is empty or contains only loading indicators
-* **Cause**: The target page is a Single-Page Application (SPA) relying entirely on client-side JS.
-* **Solution**: Re-run with `--rendered` to use browser-rendered extraction:
-  ```bash
-  forward-nexus research https://spa-docs.example.com --rendered
-  ```
-  If Chrome is not available, open the page in a browser, copy the main text, and import it using the `--file` or `--stdin` flags.
+```bash
+bonsai research status <url>
+```
+
+Inspect stored metadata:
+
+```bash
+bonsai research inspect <url>
+```
+
+List or search cached entries:
+
+```bash
+bonsai research list --tags node
+bonsai research search "react suspense"
+```
+
+Preview pruning before deleting:
+
+```bash
+bonsai research prune --older-than 90d --dry-run
+bonsai research prune --older-than 90d --yes
+```
+
+## When This Does Not Apply
+
+- No technical content or web content is involved.
+- You already fetched and applied current official docs in the current task.
+- The request is a trivial typo or formatting fix that does not involve platform behavior.
+- Bonsai is not installed and `npx @taurgis/bonsai ...` is not available; use the best available official-source workflow and import notes later.

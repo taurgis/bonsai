@@ -3,15 +3,17 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
-import { normalizeUrl } from '../lib/research/url.js';
-import { deriveCacheKey } from '../lib/research/cache-key.js';
-import { findArtifact, writeArtifact, getArtifactPath } from '../lib/research/storage.js';
+import { writeArtifact, getArtifactPath, type LocatedArtifact } from '../lib/research/storage.js';
+import { loadStoreRoots, type StoreRoots } from '../lib/research/store-roots.js';
+import { writeArtifactSecurely } from '../lib/research/secure-write.js';
+import type { StorageMode } from '../lib/config/index.js';
 import { evaluateFreshness, parseTtlToMs, checkMaxAgeExpired } from '../lib/research/freshness.js';
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
 import { fetchRenderedHtml } from '../lib/research/browser.js';
 import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
+import { resolveResearchTarget } from '../lib/research/resolve-target.js';
 import { detectSite } from '../sites/index.js';
 import type { SiteFetchResult } from '../sites/types.js';
 
@@ -92,6 +94,11 @@ export default class Research extends BaseCommand<typeof Research> {
       description: 'Force using a browser-rendered scraping path for dynamic pages.',
       default: false,
     }),
+    storage: Flags.option({
+      description:
+        'Override where this result is cached (overrides configured default). Secret-bearing pages are always stored globally.',
+      options: ['global', 'project'] as const,
+    })(),
   };
 
   static stdoutIsPrimaryData = true;
@@ -136,7 +143,6 @@ export default class Research extends BaseCommand<typeof Research> {
 
   private async executeCacheMiss(
     normalizedUrl: string,
-    targetDir: string,
     currentTime: Date,
     cacheKey: string
   ): Promise<any> {
@@ -177,7 +183,6 @@ export default class Research extends BaseCommand<typeof Research> {
       artifact.metadata.capture_method = 'browser_fallback';
     }
 
-    writeArtifact(targetDir, cacheKey, artifact);
     return artifact;
   }
 
@@ -185,14 +190,14 @@ export default class Research extends BaseCommand<typeof Research> {
     url: string,
     normalizedUrl: string,
     cacheKey: string,
-    targetDir: string,
-    dataDir: string,
+    storageDir: string,
+    storageMode: StorageMode,
     cacheStatus: any,
     freshnessState: any,
     format: any,
     artifact: any,
     content: string,
-    dryRun: boolean
+    redirectedToGlobal: boolean
   ): any {
     return {
       schemaVersion: 1,
@@ -201,7 +206,9 @@ export default class Research extends BaseCommand<typeof Research> {
         key: cacheKey,
         status: cacheStatus,
         freshness: freshnessState,
-        path: getArtifactPath(dryRun ? targetDir : dataDir, cacheKey),
+        path: getArtifactPath(storageDir, cacheKey),
+        storage: storageMode,
+        redirectedToGlobal,
       },
       source: {
         url,
@@ -243,21 +250,68 @@ export default class Research extends BaseCommand<typeof Research> {
     }
   }
 
-  // Serves the cache when a fresh/revalidatable entry exists, otherwise fetches fresh. Returns the
-  // resolved artifact plus its cache/freshness state.
+  // Serves the cache when a fresh/revalidatable entry exists, otherwise fetches fresh. Reads fall
+  // back project→global; the resolved artifact is returned with the dir it lives in / landed in.
   private async resolveArtifact(
     normalizedUrl: string,
     cacheKey: string,
-    targetDir: string,
-    dataDir: string,
-    currentTime: Date
-  ): Promise<{ cacheStatus: any; freshnessState: any; artifact: any }> {
-    const cached = findArtifact(dataDir, cacheKey);
-    if (cached && !this.flags.force) {
-      return this.executeCacheHit(cached, targetDir, currentTime);
+    roots: StoreRoots,
+    tmpDir: string | null,
+    currentTime: Date,
+    located: LocatedArtifact | null
+  ): Promise<{
+    cacheStatus: any;
+    freshnessState: any;
+    artifact: any;
+    storageDir: string;
+    redirectedToGlobal: boolean;
+  }> {
+    if (located) {
+      // Revalidate where the entry already lives; on dry-run use the throwaway dir so the cache is
+      // never mutated. ponytail: revalidation rewrites in place, so a refreshed project entry that
+      // gains a secret is not re-routed — only first-time project writes are scanned.
+      const revalDir = tmpDir ?? located.dataDir;
+      const hit = await this.executeCacheHit(located.artifact, revalDir, currentTime);
+      return { ...hit, storageDir: located.dataDir, redirectedToGlobal: false };
     }
-    const artifact = await this.executeCacheMiss(normalizedUrl, targetDir, currentTime, cacheKey);
-    return { cacheStatus: 'miss', freshnessState: 'stale_expired', artifact };
+
+    const artifact = await this.executeCacheMiss(normalizedUrl, currentTime, cacheKey);
+    const { dir, redirectedToGlobal } = this.persistFreshArtifact(
+      roots,
+      tmpDir,
+      cacheKey,
+      artifact
+    );
+    return {
+      cacheStatus: 'miss',
+      freshnessState: 'stale_expired',
+      artifact,
+      storageDir: dir,
+      redirectedToGlobal,
+    };
+  }
+
+  // Writes a freshly fetched artifact, honoring dry-run (throwaway dir) and the secret-safety
+  // redirect (project→global). Returns the data dir reported to the user and whether a redirect
+  // occurred (so the JSON envelope mirrors `research import`).
+  private persistFreshArtifact(
+    roots: StoreRoots,
+    tmpDir: string | null,
+    cacheKey: string,
+    artifact: any
+  ): { dir: string; redirectedToGlobal: boolean } {
+    if (tmpDir) {
+      writeArtifact(tmpDir, cacheKey, artifact);
+      // Report the real would-be location, not the throwaway dir that is about to be deleted.
+      return { dir: roots.writeRoot, redirectedToGlobal: false };
+    }
+    const result = writeArtifactSecurely(roots, cacheKey, artifact);
+    if (result.redirected) {
+      this.warn(
+        `Detected ${result.secretLabel} in the page content; stored in the global cache instead of the project to avoid committing secrets.`
+      );
+    }
+    return { dir: result.dataDir, redirectedToGlobal: result.redirected };
   }
 
   // Long references are split into searchable/inspectable section children whenever the page artifact
@@ -282,43 +336,43 @@ export default class Research extends BaseCommand<typeof Research> {
 
     this.validateDurationFlags(ttl, maxAge);
 
-    let normalizedUrl: string;
-    let cacheKey: string;
+    let target: ReturnType<typeof resolveResearchTarget>;
     try {
-      normalizedUrl = normalizeUrl(url);
-      cacheKey = deriveCacheKey(normalizedUrl);
+      target = resolveResearchTarget({
+        configDir: this.config.configDir,
+        cwd: process.cwd(),
+        dataDir: this.config.dataDir,
+        flagOverride: this.flags.storage as StorageMode | undefined,
+        lookup: !this.flags.force,
+        url,
+      });
     } catch (err) {
       this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2 });
     }
 
-    const dataDir = this.config.dataDir;
-    const targetDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : dataDir;
+    const { cacheKey, located, normalizedUrl, roots } = target;
+    const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;
     const currentTime = new Date();
 
     try {
-      const { cacheStatus, freshnessState, artifact } = await this.resolveArtifact(
-        normalizedUrl,
-        cacheKey,
-        targetDir,
-        dataDir,
-        currentTime
-      );
+      const { cacheStatus, freshnessState, artifact, storageDir, redirectedToGlobal } =
+        await this.resolveArtifact(normalizedUrl, cacheKey, roots, tmpDir, currentTime, located);
 
-      this.persistSectionsIfFresh(targetDir, artifact, currentTime, cacheStatus);
+      this.persistSectionsIfFresh(tmpDir ?? storageDir, artifact, currentTime, cacheStatus);
 
       const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
       const resultData = this.buildResultData(
         url,
         normalizedUrl,
         cacheKey,
-        targetDir,
-        dataDir,
+        storageDir,
+        roots.mode,
         cacheStatus,
         freshnessState,
         format,
         artifact,
         content,
-        Boolean(dryRun)
+        redirectedToGlobal
       );
 
       if (!this.requestedJson()) {
@@ -326,8 +380,8 @@ export default class Research extends BaseCommand<typeof Research> {
       }
       return resultData;
     } finally {
-      if (dryRun) {
-        rmSync(targetDir, { recursive: true, force: true });
+      if (tmpDir) {
+        rmSync(tmpDir, { recursive: true, force: true });
       }
     }
   }

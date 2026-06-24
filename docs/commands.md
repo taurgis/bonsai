@@ -1,6 +1,10 @@
 # Command Reference
 
-This document provides detailed specifications, flag arguments, and JSON schemas for all subcommands in the `forward-nexus-plugin-research` plugin.
+This document provides detailed specifications, flag arguments, and JSON schemas for all Bonsai research subcommands.
+
+---
+
+The package is published as `@taurgis/bonsai` and installs a `bonsai` binary. One-shot npm execution should use `npx @taurgis/bonsai ...`; after installation, use `bonsai ...`.
 
 ---
 
@@ -10,7 +14,7 @@ The primary crawler and cache retriever command.
 
 ### Usage
 ```bash
-forward-nexus research <url> [flags]
+npx @taurgis/bonsai research <url> [flags]
 ```
 
 ### Positional Arguments
@@ -28,6 +32,7 @@ forward-nexus research <url> [flags]
 | `--force` | — | boolean | `false` | Ignore cached copies and force a full network crawl. |
 | `--dry-run` | — | boolean | `false` | Crawl and extract without writing to cache. |
 | `--allow-stale` | — | boolean | `false` | Allow serving stale entries if remote server is offline. |
+| `--storage` | — | choice | (configured) | Override cache location for this run: `global` or `project`. Secret-bearing pages are always stored globally. |
 | `--json` | — | boolean | `false` | Format command response as machine-readable JSON. |
 
 ### JSON Output Envelope Schema
@@ -46,7 +51,9 @@ forward-nexus research <url> [flags]
       "key": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
       "status": "hit" | "miss" | "revalidated" | "refreshed" | "stale",
       "freshness": "fresh" | "stale_grace" | "stale_expired",
-      "path": "/path/to/research/cache/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md"
+      "path": "/path/to/research/cache/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
+      "storage": "global" | "project",
+      "redirectedToGlobal": false
     },
     "source": {
       "url": "https://example.com",
@@ -76,7 +83,7 @@ Save agent-supplied Markdown text directly to local storage.
 
 ### Usage
 ```bash
-forward-nexus research import [url] [flags]
+npx @taurgis/bonsai research import [url] [flags]
 ```
 
 ### Positional Arguments
@@ -88,6 +95,7 @@ forward-nexus research import [url] [flags]
 * `--input-format`: choice (`detailed` or `compressed`). Defaults to `detailed`.
 * `--topic`: string. Categorized topic. **Required** for multi-source import.
 * `--tags`, `--tier`, `--ttl`: Metadata options mapped to cache rules.
+* `--storage`: choice (`global` or `project`). Override the configured cache location for this import. Notes containing secrets are always stored globally and never written to a project cache.
 
 ### JSON Output envelope `data` block
 ```json
@@ -96,7 +104,9 @@ forward-nexus research import [url] [flags]
     "key": "sha256-import-hash...",
     "status": "imported",
     "freshness": "fresh",
-    "path": "/path/to/cache.md"
+    "path": "/path/to/cache.md",
+    "storage": "global" | "project",
+    "redirectedToGlobal": false
   },
   "source": {
     "url": "https://example.com",
@@ -123,7 +133,7 @@ Inspect cache state and planning outcomes without performing fetches or writes.
 
 ### Usage
 ```bash
-forward-nexus research status <url> [flags]
+npx @taurgis/bonsai research status <url> [flags]
 ```
 
 ### JSON Output envelope `data` block
@@ -145,7 +155,7 @@ Display cached headers and frontmatter metadata for a URL.
 
 ### Usage
 ```bash
-forward-nexus research inspect <url>
+npx @taurgis/bonsai research inspect <url>
 ```
 
 ### JSON Output envelope `data` block
@@ -181,7 +191,7 @@ Rank local cache contents based on keyword scores.
 
 ### Usage
 ```bash
-forward-nexus research search "<query>" [flags]
+npx @taurgis/bonsai research search "<query>" [flags]
 ```
 
 ### JSON Output envelope `data` block
@@ -202,3 +212,58 @@ forward-nexus research search "<query>" [flags]
   }
 ]
 ```
+
+---
+
+## 6. `research config`
+
+Manage where the research cache is stored. Configuration is layered, resolved in
+precedence order: per-command `--storage` flag > `BONSAI_STORAGE` env var >
+project config (`.bonsai.json` in cwd) > user config (`config.json` in the OCLIF
+config dir) > built-in default (`global`).
+
+### Storage modes
+
+| Mode | Cache location | Read behavior |
+| --- | --- | --- |
+| `global` (default) | OCLIF data dir (`<dataDir>/research/`) | Reads the global cache only. |
+| `project` | `<cwd>/.bonsai/research/` (committable) | Reads the project cache first, then falls back to the global cache. |
+
+The project cache is intended to be shared/committed with a repository. To keep
+secrets out of version control, any artifact whose content matches a known
+credential pattern (API keys, tokens, private keys, `secret=`/`token=`
+assignments, etc.) is **always written to the global cache**, even when
+`project` storage is selected — a warning is printed and the JSON envelope
+reports `redirectedToGlobal: true`. The matched secret value is never echoed;
+only the credential *type* is named.
+
+### Subcommands
+
+```bash
+# Store this project's research cache inside the repo
+npx @taurgis/bonsai research config set storage project --local
+
+# Set the user-wide default
+npx @taurgis/bonsai research config set storage global
+
+# Inspect values
+npx @taurgis/bonsai research config get storage          # effective value
+npx @taurgis/bonsai research config get storage --local  # project file only
+npx @taurgis/bonsai research config list                 # all keys
+
+# Remove a key (restores the default)
+npx @taurgis/bonsai research config unset storage --local
+```
+
+### Flags
+
+* `--global` / `-g`: target the user-level config file (default for `set`/`unset`).
+* `--local` / `--project` / `-p`: target the project-level config file (`.bonsai.json`).
+* `--dry-run`: (`set`/`unset`) show the change without writing.
+* `--json`: machine-readable envelope.
+
+### Configuration keys
+
+| Key | Values | Default | Description |
+| --- | --- | --- | --- |
+| `storage` | `global`, `project` | `global` | Where new research artifacts are cached. |

@@ -1,6 +1,6 @@
 // Vitest setup: fail loudly if a test mutates the repo's OWN tracked customization files.
 //
-// This repo dogfoods Forward Nexus: it installs skills/instructions/custom agents under
+// This repo dogfoods Bonsai-adjacent agent assets: it installs skills/instructions/custom agents under
 // .agents/skills, .claude/skills, .cursor/*, .github/* and tracks them in skills-lock.json. A test
 // that runs a mutating command (add/remove/sync/agents) with cwd === the repo root — instead of an
 // isolated temp directory — installs into or deletes those tracked files and rewrites the lockfile.

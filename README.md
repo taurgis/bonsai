@@ -1,103 +1,89 @@
-# Forward Nexus - Research Plugin
+# Bonsai
 
-An advanced, local research result caching database plugin for the `forward-nexus` CLI.
+Bonsai is a standalone local research cache CLI for AI agents. It turns official documentation and web pages into source-cited Markdown artifacts, stores them in a durable local cache, and returns deterministic output that agents can reuse instead of repeatedly scraping the same pages.
 
-Instead of AI agents constantly re-reading raw web pages, scraping HTML boilerplate, and manually deciding freshness, this plugin provides a robust local cache and search engine optimized for LLM context budgets.
+The package is published as `@taurgis/bonsai` and installs a `bonsai` binary.
+
+> Because the npm package is scoped, the correct one-shot command is `npx @taurgis/bonsai ...`. The unscoped `npx bonsai` name resolves to the separate `bonsai` package on npm unless an unscoped shim is published later.
 
 ---
 
 ## What it Does
 
-| Feature | How it works | Typical Use Case |
+| Feature | How it works | Typical use case |
 | --- | --- | --- |
-| **Scrape & Convert** | Static fetcher prunes stylesheets/scripts, converts HTML main article content to clean Markdown | Crawling API documentation or GitHub pages |
-| **Cache-First Lookup** | Resolves URL to deterministic SHA-256 key, checks local storage for fresh cached notes | Avoiding repeated network fetches and API rate limits |
-| **Token Budgeting** | Provides `detailed` (rich markup) or `compressed` (pruned images, absolute links) variants | Minimizing token usage in tight agent context windows |
-| **Freshness Tiers** | Custom TTLs or default standard tiers (`stable`, `standard`, `volatile`) keep cache fresh | Tracking volatile release notes vs. stable standard specs |
-| **Revalidation** | Uses HTTP ETags/Last-Modified headers to check freshness; allows stale fallback if offline | Quick, offline-first command executions |
-| **Import Stdin** | Allows agents to manually import custom notes or synthesized results | Storing pre-crawled pages or manual research findings |
-| **Keyword Search** | Instantly searches local cache metadata and snippets by query score | Retrieving existing cache content before executing new fetches |
+| **Scrape and convert** | Fetches HTML, extracts main content, sanitizes unsafe markup, and converts it to deterministic Markdown | Capturing API docs, guides, standards, and changelogs |
+| **Cache-first lookup** | Normalizes URLs to collision-resistant SHA-256 keys before fetching | Avoiding duplicate network requests and repeated agent research |
+| **Token budgeting** | Returns `compressed` or `detailed` Markdown variants | Fitting research into limited context windows without losing full detail |
+| **Freshness tiers** | Supports `stable`, `standard`, `volatile`, custom TTLs, and stale revalidation | Handling standards differently from release notes or beta docs |
+| **Browser fallback** | Uses `--rendered` for pages that need client-side JavaScript | Capturing SPA documentation when static HTML is incomplete |
+| **Manual import** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
+| **Search** | Ranks local cache entries by topic, tags, snippets, fuzzy terms, and phrases | Finding existing research before fetching again |
 
 ---
 
-## Installation & Setup
+## Installation
 
-Before installing, ensure you have **Node.js 22 or newer** installed.
+Requires Node.js 22 or newer.
 
-### 1. Linking into host CLI `forward-nexus`
-To install this plugin locally for development or testing with the main `forward-nexus` CLI:
+Run Bonsai without installing it globally:
 
 ```bash
-# Clone and build the research plugin
-cd /path/to/forward-nexus-research
-pnpm install
-pnpm build
-
-# Link the plugin to your global npm node_modules
-npm link
-
-# Link it into the main forward-nexus CLI repository
-cd /path/to/forward-nexus
-npm link forward-nexus-plugin-research
+npx @taurgis/bonsai research https://nodejs.org/api/url.html
 ```
 
-### 2. Standalone execution (Developer Mode)
-You can run the plugin directly from its bin script inside this repository:
+Install it as a normal CLI:
 
 ```bash
-# Display help and description
+npm install -g @taurgis/bonsai
+bonsai research https://nodejs.org/api/url.html
+```
+
+Use the local development binary inside this repository:
+
+```bash
+pnpm install
+pnpm build
 node bin/cli.mjs research --help
 ```
 
----
+## Quick Start
 
-## Step-by-Step Quick Start
-
-Follow these steps to learn the research plugin commands in under 5 minutes.
-
-### Step 1: Scrape and cache a URL
-Let's crawl a public page. The first execution will perform a **cache miss** and fetch it from the web:
+### 1. Fetch and cache a URL
 
 ```bash
-node bin/cli.mjs research https://nodejs.org/api/url.html
-```
-*Behind the scenes, the HTML is parsed, stripped of boilerplate, converted to Markdown, estimated for token size, and saved locally.*
-
-### Step 2: Fast Cache Hit
-Run the exact same command again:
-
-```bash
-node bin/cli.mjs research https://nodejs.org/api/url.html
-```
-*This time, the result returns instantly (0ms network request) because the cache is evaluated as fresh.*
-
-### Step 3: Check Cache Status & Metadata
-Before downloading or trusting content, you can inspect the cache status or check the metadata without printing the entire content payload.
-
-```bash
-# Check if the cache would hit, stale, or miss:
-node bin/cli.mjs research status https://nodejs.org/api/url.html
-
-# View full header metadata (topic, tags, fetched time, token count):
-node bin/cli.mjs research inspect https://nodejs.org/api/url.html
+npx @taurgis/bonsai research https://nodejs.org/api/url.html
 ```
 
-### Step 4: Import Manual Research Notes
-If automatic crawler extraction is insufficient, or if you want to store a synthesis from multiple sources, you can import clean Markdown via standard input (`stdin`):
+The first run fetches the page, extracts the main article content, converts it to Markdown, estimates token size, and stores it locally.
+
+### 2. Reuse the cache
 
 ```bash
-# Single-source import:
-echo "# My Custom Node API Notes" | node bin/cli.mjs research import https://nodejs.org/api/url.html --stdin
-
-# Multi-source research synthesis:
-echo "# Synthesized React Cache Guide" | node bin/cli.mjs research import --stdin --topic "React Suspense" --source-url https://react.dev/a --source-url https://react.dev/b
+npx @taurgis/bonsai research https://nodejs.org/api/url.html
 ```
 
-### Step 5: Keyword Search the Cache
-To find existing cached results before making new network crawls, search the local database by keywords:
+The second run returns from cache when the entry is still fresh.
+
+### 3. Check cache state and metadata
 
 ```bash
-node bin/cli.mjs research search "node api url"
+npx @taurgis/bonsai research status https://nodejs.org/api/url.html
+npx @taurgis/bonsai research inspect https://nodejs.org/api/url.html
+```
+
+### 4. Import manual research notes
+
+```bash
+echo "# My Custom Node API Notes" | npx @taurgis/bonsai research import https://nodejs.org/api/url.html --stdin
+
+echo "# Synthesized React Cache Guide" | npx @taurgis/bonsai research import --stdin --topic "React Suspense" --source-url https://react.dev/a --source-url https://react.dev/b
+```
+
+### 5. Search before fetching
+
+```bash
+npx @taurgis/bonsai research search "node api url"
 ```
 
 ---
@@ -105,100 +91,99 @@ node bin/cli.mjs research search "node api url"
 ## Command Reference
 
 ### `research <url>`
-Fetch and format a webpage, or retrieve it from the cache.
+
+Fetch and format a webpage, or retrieve it from cache.
 
 ```bash
-node bin/cli.mjs research <url> [flags]
+npx @taurgis/bonsai research <url> [flags]
 ```
 
-**Common Flags:**
-* `--topic`, `-t`: Primary category/topic for metadata tagging.
-* `--tags`, `-g`: Searchable tags (can be repeated: `--tags node --tags url`).
-* `--format`, `-f`: Output density: `compressed` (default) or `detailed`.
-* `--tier`: Freshness tier: `stable`, `standard` (default), or `volatile`.
-* `--ttl`, `-l`: Custom predicted lifespan (e.g. "2h", "7d", "30d").
-* `--max-age`: Read-time freshness threshold. Forces refresh if cache is older than duration.
-* `--force`: Force a fresh fetch, ignoring any cached entries.
-* `--dry-run`: Scrape and validate the URL without writing to cache.
-* `--allow-stale`: Serve stale cache if the remote site is offline or unreachable.
-* `--json`: Return structured machine-readable JSON output (ideal for agents).
+Common flags:
 
----
+* `--topic`, `-t`: Primary category/topic for metadata tagging.
+* `--tags`, `-g`: Searchable tags. Can be repeated.
+* `--format`, `-f`: Output density: `compressed` or `detailed`.
+* `--tier`: Freshness tier: `stable`, `standard`, or `volatile`.
+* `--ttl`, `-l`: Custom predicted lifespan, such as `2h`, `7d`, or `30d`.
+* `--max-age`: Read-time freshness threshold.
+* `--force`: Force a fresh fetch.
+* `--dry-run`: Scrape and validate without writing to cache.
+* `--allow-stale`: Serve stale cache if the remote site is offline.
+* `--rendered`: Use browser-rendered extraction for SPA pages.
+* `--json`: Return structured machine-readable output.
 
 ### `research import [url]`
-Save custom synthesized Markdown notes directly to the cache database.
+
+Save custom Markdown notes directly to the cache.
 
 ```bash
-node bin/cli.mjs research import [url] --stdin [flags]
+npx @taurgis/bonsai research import [url] --stdin [flags]
 ```
-
-**Common Flags:**
-* `--stdin`: Required flag indicating content is piped via stdin.
-* `--input-format`: Density of the input content: `detailed` (default) or `compressed`.
-* `--topic`: Required for multi-source imports.
-* `--source-url`: Repeated flags specifying multiple source URLs for synthesis.
-* `--tags`, `--tier`, `--ttl`: Same metadata mapping as main command.
-
----
 
 ### `research status <url>`
-Inspect cache state and planned actions without executing reads or writes.
+
+Inspect cache state and planned action without fetching.
 
 ```bash
-node bin/cli.mjs research status <url> [flags]
+npx @taurgis/bonsai research status <url> [flags]
 ```
-Returns: `cacheKey`, `cachePath`, `status` (`hit` / `miss` / `stale`), `freshness`, and `action` (`would_fetch` / `would_revalidate` / `would_return_cached`).
-
----
 
 ### `research inspect <url>`
-Display full stored YAML frontmatter metadata for a URL.
+
+Display stored YAML frontmatter metadata for a URL.
 
 ```bash
-node bin/cli.mjs research inspect <url>
+npx @taurgis/bonsai research inspect <url>
 ```
-
----
 
 ### `research search <query>`
-Scan the local cache and rank matching entries.
+
+Search cached research by metadata and content snippets.
 
 ```bash
-node bin/cli.mjs research search "<keywords>" [flags]
+npx @taurgis/bonsai research search "<keywords>" [flags]
 ```
 
-**Common Flags:**
-* `--topic`: Filter results matching this exact topic.
-* `--tags`: Filter results matching all specified tags.
-* `--artifact-type`: Filter by type: `source` or `research_note`.
-* `--limit`: Max results to return (default `10`, max `50`).
-* `--include-stale`: Include expired cache files.
+### `research config`
+
+Choose global or project-local cache storage.
+
+```bash
+npx @taurgis/bonsai research config set storage project --local
+```
+
+Project config is stored in `.bonsai.json`; project cache files are stored under `.bonsai/research/`.
 
 ---
 
 ## Freshness and Cache Rules
 
-Durable cache files are stored in your OS data directory:
-- **macOS**: `~/.local/share/forward-nexus-plugin-research/research/` (or `~/Library/Application Support/forward-nexus/research/` when linked in the host CLI).
+Global cache files live in Bonsai's oclif data directory, typically:
 
-### Freshness Tiers
-If no `--ttl` is specified, freshness is computed based on the assigned `--tier`:
+* **macOS**: `~/Library/Application Support/bonsai/research/`
+* **Linux**: `~/.local/share/bonsai/research/`
+* **Windows**: `%LOCALAPPDATA%\bonsai\research\`
 
-| Tier | Fresh Duration | Grace Window (Stale Revalidation) | Use Case |
+Project-local storage uses:
+
+* `.bonsai.json` for the project config
+* `.bonsai/research/` for Markdown cache artifacts
+
+If no `--ttl` is specified, freshness is computed from the tier:
+
+| Tier | Fresh duration | Grace window | Use case |
 | --- | --- | --- | --- |
-| `volatile` | 7 Days | 5 Days | Latest releases, volatile changelogs |
-| `standard` | 30 Days | 14 Days | General API docs, developer guides |
-| `stable` | 180 Days | 60 Days | RFCs, long-lived standards, language specifications |
+| `volatile` | 7 days | 5 days | Latest releases, volatile changelogs, beta docs |
+| `standard` | 30 days | 14 days | General API docs and developer guides |
+| `stable` | 180 days | 60 days | RFCs, standards, long-lived references |
 
-### Offline and Revalidation Grace
-1. **ETag / Last-Modified Check**: When an entry is stale but within its grace window, the command issues a quick `conditional GET` request using ETag/Last-Modified headers. If the server returns `304 Not Modified`, the local cache timestamp is bumped to fresh without re-downloading the page.
-2. **Failure Exit Code 5**: If revalidation fails (e.g. server is offline or unreachable) and `--allow-stale` is omitted, the command serves the stale content but exits with status code `5`.
+When stale entries still have `ETag` or `Last-Modified` metadata, Bonsai attempts cheap revalidation before a full refetch. If revalidation fails and `--allow-stale` is omitted, the CLI can serve the stale content while exiting with code `5`.
 
 ---
 
-## Machine-Readable JSON Envelope
+## JSON Envelope
 
-When run with `--json`, all commands return a standard JSON envelope:
+When run with `--json`, commands return a stable envelope:
 
 ```json
 {
@@ -215,7 +200,7 @@ When run with `--json`, all commands return a standard JSON envelope:
       "key": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
       "status": "hit",
       "freshness": "fresh",
-      "path": "/Users/user/.local/share/forward-nexus-plugin-research/research/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md"
+      "path": "/Users/user/Library/Application Support/bonsai/research/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md"
     },
     "source": {
       "url": "https://example.com",
@@ -237,20 +222,18 @@ When run with `--json`, all commands return a standard JSON envelope:
 
 ---
 
-## Security & Limitations
+## Security and Limits
 
-* **Untrusted HTML Parsing**: Parsing is isolated within a lightweight virtual DOM (`linkedom`). All script tags, event handlers, styles, and iframes are stripped.
-* **No Authentication**: Authenticated or private page scraping is not supported in the MVP.
-* **No Client-side JS Hydration**: Pages that are single-page apps (SPAs) relying heavily on client-side JS/React execution to render body content may yield empty markdown.
-* **Protocol Whitelist**: Only `http:` and `https:` URL schemes are accepted. Local file systems (`file:///`) are rejected to prevent directory traversal attacks.
+* Fetched HTML is treated as untrusted input.
+* Only `http:` and `https:` URLs are accepted.
+* Private and local IP ranges are blocked to reduce SSRF risk.
+* Static extraction does not execute JavaScript; use `--rendered` when a page needs browser execution.
+* Authenticated/private scraping is not supported in the default workflow. Import trusted Markdown manually instead.
 
 ---
 
 ## Reference Documentation
 
-For detailed information on design decisions, specifications, limits, and configurations:
-
-* **[Command Reference](file:///Users/thomastheunen/Documents/Projects/forward-nexus-research/docs/commands.md)**: Detailed specifications, flags, arguments, and JSON schemas for all CLI subcommands.
-* **[Caching Protocol Specification](file:///Users/thomastheunen/Documents/Projects/forward-nexus-research/docs/cache-protocol.md)**: Deep dive on local directories, URL normalization rules, YAML frontmatter schemas, freshness policies, and revalidation flow.
-* **[Troubleshooting & Limitations](file:///Users/thomastheunen/Documents/Projects/forward-nexus-research/docs/troubleshooting.md)**: Technical limits (size, timeouts, redirects), DNS private IP blocklists, client-side hydration constraints, and exit codes.
-
+* [Command Reference](docs/commands.md)
+* [Caching Protocol Specification](docs/cache-protocol.md)
+* [Troubleshooting and Limitations](docs/troubleshooting.md)

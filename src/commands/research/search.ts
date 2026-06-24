@@ -1,7 +1,7 @@
 import { Args, Flags } from '@oclif/core';
-import { join } from 'node:path';
 import { BaseCommand } from '../../base-command.js';
-import { getArtifactPath, scanCacheDir } from '../../lib/research/storage.js';
+import { scanCacheDirs } from '../../lib/research/storage.js';
+import { loadStoreRoots } from '../../lib/research/store-roots.js';
 import { evaluateFreshness } from '../../lib/research/freshness.js';
 import { detectSite } from '../../sites/index.js';
 import { fetchStaticHtml, fetchText, postJson } from '../../lib/research/fetcher.js';
@@ -190,12 +190,11 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   }
 
   private scanCacheDirForResults(
-    dir: string,
-    dataDir: string,
+    readRoots: string[],
     queryTerms: string[],
     currentTime: Date
   ): any[] {
-    return scanCacheDir(dir, (artifact) => {
+    return scanCacheDirs(readRoots, (artifact, filePath) => {
       if (artifact.metadata.status !== 'active') return null;
       const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
       if (
@@ -223,7 +222,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       const snippetText = [artifact.summary, artifact.compressed].filter(Boolean).join('\n');
       return {
         cacheKey: artifact.metadata.cache_key,
-        path: getArtifactPath(dataDir, artifact.metadata.cache_key),
+        path: filePath,
         artifactType: artifact.metadata.artifact_type,
         sourceUrls: artifact.metadata.source_urls,
         topic: artifact.metadata.topic,
@@ -307,11 +306,14 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     this.validateSearchFlags();
     const queryTerms = this.getSearchQueryTerms(query);
 
-    const dataDir = this.config.dataDir;
-    const dir = join(dataDir, 'research');
+    const roots = loadStoreRoots({
+      configDir: this.config.configDir,
+      cwd: process.cwd(),
+      dataDir: this.config.dataDir,
+    });
     const currentTime = new Date();
 
-    const results = this.scanCacheDirForResults(dir, dataDir, queryTerms, currentTime);
+    const results = this.scanCacheDirForResults(roots.readRoots, queryTerms, currentTime);
 
     results.sort((a, b) => b.score - a.score);
     const finalResults = results.slice(0, this.flags.limit);

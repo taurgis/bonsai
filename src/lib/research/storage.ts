@@ -173,3 +173,47 @@ export function readArtifact(dataDir: string, key: string): ResearchArtifact {
   }
   return artifact;
 }
+
+export interface LocatedArtifact {
+  artifact: ResearchArtifact;
+  /** The data dir the artifact was found in (project or global). */
+  dataDir: string;
+  /** The artifact's actual file path within that data dir. */
+  path: string;
+}
+
+/**
+ * Looks up a cache key across an ordered list of data dirs (project first, then global),
+ * returning the first match along with where it lives. Implements the project→global
+ * read fallback: a missing project entry still resolves against the global cache.
+ */
+export function locateArtifact(dataDirs: string[], key: string): LocatedArtifact | null {
+  for (const dataDir of dataDirs) {
+    const artifact = findArtifact(dataDir, key);
+    if (artifact) {
+      return { artifact, dataDir, path: getArtifactPath(dataDir, key) };
+    }
+  }
+  return null;
+}
+
+/**
+ * Multi-root variant of {@link scanCacheDir}. Scans the `research/` dir of each data dir in
+ * order and deduplicates by cache key so an entry present in an earlier root (project) shadows
+ * the same key in a later root (global) — even when the callback filters it out. Composes
+ * scanCacheDir so the file-format and read/parse rules stay defined in exactly one place.
+ */
+export function scanCacheDirs<T>(
+  dataDirs: string[],
+  fn: (artifact: ResearchArtifact, filePath: string) => T | null
+): T[] {
+  const seen = new Set<string>();
+  return dataDirs.flatMap((dataDir) =>
+    scanCacheDir(join(dataDir, 'research'), (artifact, filePath) => {
+      const key = artifact.metadata.cache_key;
+      if (seen.has(key)) return null;
+      seen.add(key);
+      return fn(artifact, filePath);
+    })
+  );
+}
