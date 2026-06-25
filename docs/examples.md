@@ -9,7 +9,7 @@ that **a built-in web fetch quietly drops, summarizes, or refuses content**,
 while Bonsai returns the complete page every time, deterministically, and caches
 it for reuse.
 
-One section per agent. **Claude Code**, **Antigravity**, and **Codex** are documented below; GitHub Copilot will follow ([see below](#other-agents)).
+One section per agent. **Claude Code**, **Antigravity**, **Codex**, and **Cursor** are documented below; GitHub Copilot will follow ([see below](#other-agents)).
 
 ## Claude Code
 
@@ -216,6 +216,113 @@ answering a live question. It is not a documentation cache:
   line-index scaffolding consume context that Bonsai removes from the cached
   research note.
 
+## Cursor
+
+> **Agent: Cursor** — its native **`WebFetch`** tool fetches the URL and returns
+> the page as readable Markdown. There is **no model in the loop** — conversion is
+> deterministic, unlike Claude Code's summarizing `WebFetch`.
+
+::: info How we measured (tools used)
+- **Agent web fetch** — Cursor's native **`WebFetch`** tool with no extra prompt
+  (the tool does not accept a reproduction instruction).
+- **Bonsai** — the `@taurgis/bonsai` CLI with **default settings** (`compressed`
+  format, `conservative` summary). Both cached variants come from one fetch.
+- **Raw page** — a plain HTTP GET of the URL.
+- **Tokens** are an estimate (`≈ chars / 4`) applied identically to every result,
+  so the columns are comparable. Captured **2026-06-25** with `@taurgis/bonsai`
+  **v1.0.3**.
+:::
+
+### Results
+
+| Page | What WebFetch returned | WebFetch | Bonsai `compressed` | Bonsai `detailed` | Raw page |
+| --- | --- | --: | --: | --: | --: |
+| React – `useEffect` | **Partial** — article text and code, but Pitfall/Deep-Dive callouts dropped; heading slug noise on every section | 14,442 | **8,119** | 11,296 | 150,883 |
+| TypeScript – Everyday Types | **Complete** — full handbook text, but noisy (inline Playground links, mangled fenced-code labels) | 9,087 | **4,983** | 6,903 | 80,398 |
+| Vue – Introduction | **Complete** — full guide text from the rendered page (not a refusal) | 2,291 | **1,520** | 2,105 | 28,523 |
+| Next.js – Layouts and Pages | **Complete** — pulled Next's published Markdown source | 2,444 | **2,401** | 2,968 | 246,298 |
+
+Read the WebFetch column carefully: Cursor does not summarize like Claude Code,
+but the token counts are **not** automatically better. On React and TypeScript,
+WebFetch is **28–32% larger** than Bonsai's `detailed` variant while still
+dropping structured callouts. On Next.js, WebFetch matches Bonsai's `compressed`
+size almost exactly — but only for that one lucky page where Next publishes a
+Markdown source.
+
+### What WebFetch left behind
+
+Measured against Bonsai's **complete** capture — the `detailed` variant preserves
+the whole article — here's what Cursor's fetch missed or added:
+
+::: warning Content missing vs Bonsai's complete capture
+- **React – `useEffect`** — Pitfall and Deep-Dive callouts are **absent** even
+  though the fetch is *larger* than Bonsai `detailed` (14,442 vs 11,296 tokens).
+  The extra tokens are routing-slug suffixes on headings (`{/ reference/}`),
+  a trailing Sitemap section, and duplicated scaffolding — not the missing
+  callouts.
+- **TypeScript – Everyday Types** — **no major section loss**, but Playground
+  URLs and inline `Try` affordances are left inline, and several code fences are
+  merged with their language tags (`tslet obj: any`).
+- **Vue – Introduction** — **no refusal** (unlike Claude Code) and no empty SPA
+  shell (unlike Antigravity's raw HTML). The fetch includes sponsor chrome, a
+  rendered `Count is: 0` demo label, and duplicate Options/Composition examples
+  that Bonsai's source Markdown collapses.
+- **Next.js – Layouts and Pages** — **no meaningful article loss**: WebFetch found
+  Next's published Markdown source, matching Bonsai here. The fetch is slightly
+  shorter than Bonsai `detailed` because footer provenance links are trimmed.
+
+Cursor returned all four pages as readable text — no copyright refusal — but only
+Next.js landed near Bonsai's token budget. React is the cautionary tale: **more
+tokens did not mean more documentation**.
+:::
+
+### Why WebFetch behaves this way
+
+Cursor's `WebFetch` is a **static HTML-to-Markdown conversion** with no LLM
+summarization step. That changes the tradeoffs:
+
+- **Deterministic** — the same URL returns the same Markdown shape every time.
+- **Not cached** — every agent session re-fetches and re-converts; there is no
+  reusable artifact with freshness metadata.
+- **Extraction gaps** — without Readability-style main-content tuning or a
+  browser fallback, structured callouts (React Pitfall/Deep-Dive) and some
+  interactive embeds are dropped while page chrome leaks through.
+- **No budget variants** — one blob per fetch. Bonsai's `compressed` and
+  `detailed` pair lets agents pick structure-preserving brevity vs exact wording.
+
+### Worked example: React's `useEffect`
+
+What Cursor's `WebFetch` returns with no extra prompt:
+
+```text
+WebFetch(url: "https://react.dev/reference/react/useEffect")
+→ 14,442 tokens — larger than Bonsai `detailed`, but Pitfall and Deep-Dive
+  callouts are missing and every heading carries a slug suffix like {/ usage/}.
+```
+
+The same page through Bonsai, with defaults:
+
+```bash
+npx @taurgis/bonsai https://react.dev/reference/react/useEffect
+npx @taurgis/bonsai inspect https://react.dev/reference/react/useEffect --json
+```
+
+```json
+{
+  "source_url": "https://react.dev/reference/react/useEffect",
+  "capture_method": "static_fetch",
+  "extraction_status": "extracted",
+  "token_estimate": {
+    "compressed": 8119,
+    "detailed": 11296
+  }
+}
+```
+
+8,119 tokens for the **complete** reference (Pitfall/Deep-Dive included), cached
+and reusable — versus a 14,442-token fetch that costs more and still drops
+structured warnings.
+
 ## Why Bonsai is different
 
 This part is agent-agnostic — it's true no matter which agent's fetch you compare
@@ -244,8 +351,8 @@ need exact wording.
 
 ## Other agents
 
-Claude Code, Antigravity, and Codex are measured here. The same four pages are
-being run through the built-in fetch tools of other agents — **GitHub Copilot**
+Claude Code, Antigravity, Codex, and Cursor are measured here. The same four pages
+are being run through the built-in fetch tools of other agents — **GitHub Copilot**
 will get its own section above, measured the same way. Bonsai is the constant:
 one deterministic, reusable cache, whichever agent is doing the reading.
 
