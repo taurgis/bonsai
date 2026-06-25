@@ -9,8 +9,7 @@ that **a built-in web fetch quietly drops, summarizes, or refuses content**,
 while Bonsai returns the complete page every time, deterministically, and caches
 it for reuse.
 
-One section per agent. First up is **Claude Code**; Codex, Antigravity, and
-GitHub Copilot are measured separately and will follow ([see below](#other-agents)).
+One section per agent. **Claude Code** and **Antigravity** are documented below; Codex and GitHub Copilot will follow ([see below](#other-agents)).
 
 ## Claude Code
 
@@ -124,6 +123,42 @@ npx @taurgis/bonsai inspect https://react.dev/reference/react/useEffect --json
 8,119 tokens for the **complete** reference, cached and reusable — versus a
 7,150-token fetch that silently left a third of the page behind.
 
+## Antigravity
+
+> **Agent: Antigravity** — its native **`read_url_content`** tool fetches the URL
+> and saves the raw HTML response body directly into a workspace file.
+
+::: info How we measured (tools used)
+- **Agent web fetch** — Antigravity's native **`read_url_content`** tool. We measured
+  the character length of the raw output file saved to the workspace (`≈ chars / 4`).
+- **Bonsai** — the `@taurgis/bonsai` CLI with **default settings** (`compressed`
+  format, `conservative` summary). Both cached variants come from one fetch.
+- **Raw page** — a plain HTTP GET of the URL.
+- **Tokens** are an estimate (`≈ chars / 4`) applied identically to every result,
+  so the columns are comparable. Captured **2026-06-25** with `@taurgis/bonsai`
+  **v1.0.3**.
+:::
+
+### Results
+
+| Page | What read_url_content returned | read_url_content | Bonsai `compressed` | Bonsai `detailed` | Raw page |
+| --- | --- | --: | --: | --: | --: |
+| React – `useEffect` | **Raw HTML** — complete raw HTML source containing all scripts/styles | 150,905 | **8,119** | 11,296 | 150,883 |
+| TypeScript – Everyday Types | **Raw HTML** — complete raw HTML source containing all scripts/styles | 19,377 | **4,983** | 6,903 | 80,398 |
+| Vue – Introduction | **Empty Shell** — returned initial static HTML containing only menus; main content was client-rendered | 4,494 | **1,520** | 2,105 | 28,523 |
+| Next.js – Layouts and Pages | **Raw HTML** — complete raw HTML source containing all scripts/styles | 245,393 | **2,401** | 2,968 | 246,298 |
+
+### What read_url_content left behind
+
+Unlike Claude Code's model-backed tool which summarizes or drops sections, Antigravity's `read_url_content` fetches the full page response. However:
+
+- **React, TypeScript, Next.js** — **No content loss, but massive token waste**: The tool returns the raw HTML document verbatim. This wastes **93% to 99%** of the token budget on boilerplate scripts, SVG icons, and inline styles compared to Bonsai's clean Markdown extraction.
+- **Vue – Introduction** — **84% content loss**: Because Vue uses client-side rendering (SPA navigation/hydration), the static fetch only captures the navigation shell (4,494 tokens vs 28,523 for the full raw document). The actual guide text is completely missing from the HTML body.
+
+### Why read_url_content behaves this way
+
+The tool does not run a browser fallback or perform main-content extraction (like Readability/Turndown). It retrieves the HTTP response body and writes it directly to disk. For Single Page Applications, this results in missing content; for server-rendered pages, it results in huge, cluttered HTML inputs that flood the model's context window.
+
 ## Why Bonsai is different
 
 This part is agent-agnostic — it's true no matter which agent's fetch you compare
@@ -152,11 +187,10 @@ need exact wording.
 
 ## Other agents
 
-Claude Code is the first agent measured here. The same four pages are being run
-through the built-in fetch tools of other agents — **Codex**, **Antigravity**,
-and **GitHub Copilot** — and each will get its own section above, measured the
-same way. Bonsai is the constant: one deterministic, reusable cache, whichever
-agent is doing the reading.
+Claude Code and Antigravity are measured here. The same four pages are being run
+through the built-in fetch tools of other agents — **Codex** and **GitHub Copilot** —
+and each will get its own section above, measured the same way. Bonsai is the constant:
+one deterministic, reusable cache, whichever agent is doing the reading.
 
 ## Try it yourself
 

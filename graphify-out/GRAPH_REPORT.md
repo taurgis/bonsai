@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-25)
 
 ## Corpus Check
-- 691 files · ~755,653 words
+- 753 files · ~808,233 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 6968 nodes · 7615 edges · 645 communities (598 shown, 47 thin omitted)
+- 7573 nodes · 8159 edges · 733 communities (677 shown, 56 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e53fca83`
+- Built from commit: `ca88f1db`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -649,6 +649,93 @@
 - [[_COMMUNITY_Community 642|Community 642]]
 - [[_COMMUNITY_Community 643|Community 643]]
 - [[_COMMUNITY_Community 644|Community 644]]
+- [[_COMMUNITY_Community 645|Community 645]]
+- [[_COMMUNITY_Community 646|Community 646]]
+- [[_COMMUNITY_Community 647|Community 647]]
+- [[_COMMUNITY_Community 648|Community 648]]
+- [[_COMMUNITY_Community 649|Community 649]]
+- [[_COMMUNITY_Community 650|Community 650]]
+- [[_COMMUNITY_Community 651|Community 651]]
+- [[_COMMUNITY_Community 652|Community 652]]
+- [[_COMMUNITY_Community 653|Community 653]]
+- [[_COMMUNITY_Community 654|Community 654]]
+- [[_COMMUNITY_Community 655|Community 655]]
+- [[_COMMUNITY_Community 656|Community 656]]
+- [[_COMMUNITY_Community 657|Community 657]]
+- [[_COMMUNITY_Community 658|Community 658]]
+- [[_COMMUNITY_Community 659|Community 659]]
+- [[_COMMUNITY_Community 660|Community 660]]
+- [[_COMMUNITY_Community 661|Community 661]]
+- [[_COMMUNITY_Community 662|Community 662]]
+- [[_COMMUNITY_Community 663|Community 663]]
+- [[_COMMUNITY_Community 664|Community 664]]
+- [[_COMMUNITY_Community 665|Community 665]]
+- [[_COMMUNITY_Community 666|Community 666]]
+- [[_COMMUNITY_Community 667|Community 667]]
+- [[_COMMUNITY_Community 668|Community 668]]
+- [[_COMMUNITY_Community 669|Community 669]]
+- [[_COMMUNITY_Community 670|Community 670]]
+- [[_COMMUNITY_Community 671|Community 671]]
+- [[_COMMUNITY_Community 672|Community 672]]
+- [[_COMMUNITY_Community 673|Community 673]]
+- [[_COMMUNITY_Community 674|Community 674]]
+- [[_COMMUNITY_Community 675|Community 675]]
+- [[_COMMUNITY_Community 676|Community 676]]
+- [[_COMMUNITY_Community 677|Community 677]]
+- [[_COMMUNITY_Community 678|Community 678]]
+- [[_COMMUNITY_Community 679|Community 679]]
+- [[_COMMUNITY_Community 680|Community 680]]
+- [[_COMMUNITY_Community 681|Community 681]]
+- [[_COMMUNITY_Community 682|Community 682]]
+- [[_COMMUNITY_Community 683|Community 683]]
+- [[_COMMUNITY_Community 684|Community 684]]
+- [[_COMMUNITY_Community 685|Community 685]]
+- [[_COMMUNITY_Community 686|Community 686]]
+- [[_COMMUNITY_Community 687|Community 687]]
+- [[_COMMUNITY_Community 688|Community 688]]
+- [[_COMMUNITY_Community 689|Community 689]]
+- [[_COMMUNITY_Community 690|Community 690]]
+- [[_COMMUNITY_Community 691|Community 691]]
+- [[_COMMUNITY_Community 692|Community 692]]
+- [[_COMMUNITY_Community 693|Community 693]]
+- [[_COMMUNITY_Community 694|Community 694]]
+- [[_COMMUNITY_Community 695|Community 695]]
+- [[_COMMUNITY_Community 696|Community 696]]
+- [[_COMMUNITY_Community 697|Community 697]]
+- [[_COMMUNITY_Community 698|Community 698]]
+- [[_COMMUNITY_Community 699|Community 699]]
+- [[_COMMUNITY_Community 700|Community 700]]
+- [[_COMMUNITY_Community 701|Community 701]]
+- [[_COMMUNITY_Community 702|Community 702]]
+- [[_COMMUNITY_Community 703|Community 703]]
+- [[_COMMUNITY_Community 704|Community 704]]
+- [[_COMMUNITY_Community 705|Community 705]]
+- [[_COMMUNITY_Community 707|Community 707]]
+- [[_COMMUNITY_Community 708|Community 708]]
+- [[_COMMUNITY_Community 709|Community 709]]
+- [[_COMMUNITY_Community 710|Community 710]]
+- [[_COMMUNITY_Community 711|Community 711]]
+- [[_COMMUNITY_Community 712|Community 712]]
+- [[_COMMUNITY_Community 713|Community 713]]
+- [[_COMMUNITY_Community 714|Community 714]]
+- [[_COMMUNITY_Community 715|Community 715]]
+- [[_COMMUNITY_Community 716|Community 716]]
+- [[_COMMUNITY_Community 717|Community 717]]
+- [[_COMMUNITY_Community 718|Community 718]]
+- [[_COMMUNITY_Community 719|Community 719]]
+- [[_COMMUNITY_Community 720|Community 720]]
+- [[_COMMUNITY_Community 721|Community 721]]
+- [[_COMMUNITY_Community 722|Community 722]]
+- [[_COMMUNITY_Community 723|Community 723]]
+- [[_COMMUNITY_Community 724|Community 724]]
+- [[_COMMUNITY_Community 725|Community 725]]
+- [[_COMMUNITY_Community 726|Community 726]]
+- [[_COMMUNITY_Community 727|Community 727]]
+- [[_COMMUNITY_Community 728|Community 728]]
+- [[_COMMUNITY_Community 729|Community 729]]
+- [[_COMMUNITY_Community 730|Community 730]]
+- [[_COMMUNITY_Community 731|Community 731]]
+- [[_COMMUNITY_Community 732|Community 732]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Callback API` - 55 edges
@@ -665,19 +752,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
   testing/regression/run-suite.mjs → src/lib/research/capture.ts
-- `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
-  testing/regression/run-suite.mjs → src/sites/index.ts
-- `ResolveResearchTargetOptions` --references--> `StorageMode`  [EXTRACTED]
-  src/lib/research/resolve-target.ts → src/lib/config/schema.ts
 - `SummarizeOptions` --references--> `SummaryLevel`  [EXTRACTED]
   src/lib/research/summarize.ts → src/lib/config/schema.ts
 - `defaultFetcher()` --calls--> `fetchText()`  [EXTRACTED]
   src/lib/research/docs/machine-readable.ts → src/lib/research/fetcher.ts
+- `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
+  testing/regression/run-suite.mjs → src/sites/index.ts
+- `FetchCommand` --inherits--> `BaseCommand`  [EXTRACTED]
+  src/commands/fetch.ts → src/base-command.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (645 total, 47 thin omitted)
+## Communities (733 total, 56 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -705,7 +792,7 @@ Nodes (20): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state a
 
 ### Community 6 - "Community 6"
 Cohesion: 0.10
-Nodes (40): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel(), readScopedConfig() (+32 more)
+Nodes (38): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel(), readScopedConfig() (+30 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -740,8 +827,8 @@ Cohesion: 0.09
 Nodes (21): Behavior, CI Integration, `ci`: Provider-Aware Review Automation, Combined Mode Flags, `config-schema`: Config JSON Schema, `decision-surface`: Structural Decisions, Environment Variables, Fallow CLI Reference (+13 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.12
-Nodes (9): ResearchImport, ResearchPrune, SecureWriteResult, KEY_A, KEY_B, writeArtifactSecurely(), loadStoreRoots(), projectDataDir() (+1 more)
+Cohesion: 0.15
+Nodes (12): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+4 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.29
@@ -764,8 +851,8 @@ Cohesion: 0.11
 Nodes (17): `captureOutput` — Test a Command Class Directly, Common Patterns, Environment variable flags, OCLIF Testing, Prerequisites, Primary API: `runCommand`, Quick Reference, References (+9 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.09
-Nodes (17): ResearchInspect, SectionSummary, ResearchList, FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS, scoreSingleTerm() (+9 more)
+Cohesion: 0.07
+Nodes (21): ResearchImport, ResearchInspect, SectionSummary, ResearchList, ResearchPrune, FRESHNESS_BONUS, isFuzzyMatch(), levenshtein() (+13 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.12
@@ -792,8 +879,8 @@ Cohesion: 0.13
 Nodes (14): 1. Network Constraints & Crawler Limits, 2. DNS Safety & Private IP Blocklist (SSRF Protection), 3. Client-Side Hydration (SPA) Limitations, 4. Exit Codes & Common Errors, Blocked Target Blocks (RFC1918 & Localhost), Common Failure Symptoms, Crawler Limits, Exit Code Directory (+6 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.15
-Nodes (22): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), assertOk(), FetchOptions (+14 more)
+Cohesion: 0.16
+Nodes (23): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), assertOk(), checkDnsSafety() (+15 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.26
@@ -804,40 +891,40 @@ Cohesion: 0.14
 Nodes (13): Analytics in `postrun`, Auth check in `prerun`, `command_not_found`, Common Hook Patterns, Custom Events, Fuzzy match in `command_not_found`, Hook Error Handling, Hook Event Payloads (+5 more)
 
 ### Community 31 - "Community 31"
-Cohesion: 0.12
-Nodes (15): 1. Storage Location & Directory Resolution, 2. URL Normalization & Cache Key Generation, 3. Stored Markdown File Format (YAML Frontmatter), 4. Freshness Policy & Tiers, 5. Revalidation Flow (Conditional Requests), 6. Offline Fallback & Stale Serving Policies, Cache Key Formula, Caching Protocol Specification (+7 more)
+Cohesion: 0.09
+Nodes (22): Compressed, Creating a dynamic segment, Creating a dynamic segment, Creating a layout, Creating a layout, Creating a nested route, Creating a nested route, Creating a page (+14 more)
 
 ### Community 33 - "Community 33"
 Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.17
-Nodes (11): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), PR Dead Code Check, Production audit, Production vs Full Audit, Step 1: Analyze changed files, Step 1: Run combined analysis (+3 more)
+Cohesion: 0.14
+Nodes (13): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Migration from knip, Production audit, Production vs Full Audit, Step 1: Preview migration, Step 1: Run combined analysis (+5 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.09
-Nodes (37): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow() (+29 more)
+Cohesion: 0.14
+Nodes (21): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow() (+13 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
 Nodes (10): allProductionFiles(), countLines(), findOffenders(), git(), isBinary(), main(), readContent(), rootDir (+2 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.15
-Nodes (13): devDependencies, fallow, jsdom, lint-staged, oclif, prettier, @types/jsdom, @types/mozilla-readability (+5 more)
+Cohesion: 0.13
+Nodes (15): devDependencies, fallow, jsdom, lint-staged, oclif, prettier, @types/jsdom, @types/mozilla-readability (+7 more)
 
 ### Community 38 - "Community 38"
-Cohesion: 0.12
-Nodes (16): scripts, build, format, format:check, lint, lint:health, lint:line-counts, nexus:sync (+8 more)
+Cohesion: 0.11
+Nodes (19): scripts, build, docs:build, docs:dev, docs:preview, format, format:check, lint (+11 more)
 
 ### Community 39 - "Community 39"
 Cohesion: 0.14
 Nodes (14): AGENTS.md, Architecture, Best practices, Code Style, How rules work, Importing Rules, Improvements, Nested AGENTS.md support (+6 more)
 
 ### Community 40 - "Community 40"
-Cohesion: 0.06
-Nodes (54): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+46 more)
+Cohesion: 0.16
+Nodes (22): waitForLoad(), cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor } (+14 more)
 
 ### Community 41 - "Community 41"
 Cohesion: 0.29
@@ -868,8 +955,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, Organize rules with `.claude/rules/`, Organize rules with `.claude/rules/`, Path-specific rules, Path-specific rules, Provenance, Set up rules (+4 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.20
-Nodes (5): FetchCommand, ResolvedResearchTarget, ResolveResearchTargetOptions, LocatedArtifact, StoreRoots
+Cohesion: 0.11
+Nodes (23): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, handleStaleRevalidationResult(), StorageMode, SummaryLevel, ResolvedResearchTarget, ResolveResearchTargetOptions (+15 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.15
@@ -884,8 +971,8 @@ Cohesion: 0.17
 Nodes (12): AGENTS.md, Choose where to put CLAUDE.md files, CLAUDE.md files, Deploy organization-wide CLAUDE.md, Exclude specific CLAUDE.md files, How CLAUDE.md files load, Import additional files, Load from additional directories (+4 more)
 
 ### Community 53 - "Community 53"
-Cohesion: 0.17
-Nodes (11): bin, bonsai, description, engines, node, files, main, name (+3 more)
+Cohesion: 0.12
+Nodes (15): bin, bonsai, description, engines, node, files, homepage, main (+7 more)
 
 ### Community 54 - "Community 54"
 Cohesion: 0.17
@@ -1037,7 +1124,7 @@ Nodes (6): Default Workflow, Guardrails, Primary Objective, Reporting Format, Re
 
 ### Community 91 - "Community 91"
 Cohesion: 0.09
-Nodes (22): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, captureFixture(), CURRENT_DIR, filters, FIXTURES_PATH (+14 more)
+Nodes (21): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, CURRENT_DIR, filters, FIXTURES_PATH, flags (+13 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.29
@@ -1396,8 +1483,8 @@ Cohesion: 0.04
 Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
 
 ### Community 195 - "Community 195"
-Cohesion: 0.43
-Nodes (6): breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading(), splitMarkdownSections()
+Cohesion: 0.21
+Nodes (10): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading() (+2 more)
 
 ### Community 196 - "Community 196"
 Cohesion: 0.22
@@ -1556,8 +1643,8 @@ Cohesion: 0.18
 Nodes (10): Class: `fs.StatWatcher`, Class: `fs.StatWatcher`, Compressed, Detailed, Provenance, Summary, `watcher.ref()`, `watcher.ref()` (+2 more)
 
 ### Community 235 - "Community 235"
-Cohesion: 0.12
-Nodes (16): Buffer paths, Callback example, Detailed, File descriptors, File paths, File system, File system flags, File URL paths (+8 more)
+Cohesion: 0.18
+Nodes (11): Buffer paths, File descriptors, File paths, File system flags, File URL paths, Notes, Ordering of callback and promise-based operations, Per-drive working directories on Windows (+3 more)
 
 ### Community 236 - "Community 236"
 Cohesion: 0.18
@@ -1576,8 +1663,8 @@ Cohesion: 0.18
 Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
 
 ### Community 240 - "Community 240"
-Cohesion: 0.18
-Nodes (11): Buffer paths, File descriptors, File paths, File system flags, File URL paths, Notes, Ordering of callback and promise-based operations, Per-drive working directories on Windows (+3 more)
+Cohesion: 0.12
+Nodes (16): Buffer paths, Callback example, File descriptors, File paths, File system, File system flags, File URL paths, Notes (+8 more)
 
 ### Community 241 - "Community 241"
 Cohesion: 0.20
@@ -1613,7 +1700,7 @@ Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`,
 
 ### Community 249 - "Community 249"
 Cohesion: 0.25
-Nodes (7): Callback example, Compressed, File system, Promise example, Provenance, Summary, Synchronous example
+Nodes (7): Callback example, Compressed, Detailed, File system, Promise example, Summary, Synchronous example
 
 ### Community 250 - "Community 250"
 Cohesion: 0.25
@@ -1888,8 +1975,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
 
 ### Community 338 - "Community 338"
-Cohesion: 0.11
-Nodes (31): applyCaptureMetadata(), CAPTURE_DEPS, handleStaleRevalidationResult(), resolveFreshness(), SummaryLevel, activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts() (+23 more)
+Cohesion: 0.13
+Nodes (28): resolveFreshness(), buildCompressed(), compressMarkdown(), checkMaxAgeExpired(), evaluateFreshness(), FreshnessPolicy, getPolicy(), parseTtlToMs() (+20 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -2704,8 +2791,8 @@ Cohesion: 0.67
 Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
 
 ### Community 564 - "Community 564"
-Cohesion: 0.11
-Nodes (29): STOPWORDS, ABBREVIATIONS, applySalienceBoost(), BlockState, buildFrequencies(), collectHeadingTerms(), collectSentences(), contentTokens() (+21 more)
+Cohesion: 0.12
+Nodes (28): ABBREVIATIONS, applySalienceBoost(), BlockState, buildFrequencies(), collectHeadingTerms(), collectSentences(), contentTokens(), findBoundaryEnd() (+20 more)
 
 ### Community 565 - "Community 565"
 Cohesion: 0.06
@@ -2760,8 +2847,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, JS Render Attribute, JS Render Attribute, PHP Render Attribute, PHP Render Attribute, Provenance, Rendering HTML Attributes (+4 more)
 
 ### Community 578 - "Community 578"
-Cohesion: 0.33
-Nodes (6): Compressed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Random replacement (RR), Simple queue-based policies
+Cohesion: 0.22
+Nodes (8): Compressed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Provenance, Random replacement (RR), Simple queue-based policies, Summary
 
 ### Community 579 - "Community 579"
 Cohesion: 0.29
@@ -2816,8 +2903,8 @@ Cohesion: 0.33
 Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
 
 ### Community 592 - "Community 592"
-Cohesion: 0.22
-Nodes (8): Detailed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Provenance, Random replacement (RR), Simple queue-based policies, Summary
+Cohesion: 0.33
+Nodes (6): Detailed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Random replacement (RR), Simple queue-based policies
 
 ### Community 593 - "Community 593"
 Cohesion: 0.40
@@ -3000,8 +3087,8 @@ Cohesion: 0.33
 Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
 
 ### Community 638 - "Community 638"
-Cohesion: 0.40
-Nodes (5): Migration from knip, Step 1: Preview migration, Step 2: Apply migration, Step 3: Compare results, Step 4: Remove knip config
+Cohesion: 0.17
+Nodes (16): waitForContentReady(), ExtractionResult, CONTENT_SELECTORS, fetchDeveloperPage(), CONTENT_SELECTORS, fetchSalesforcePage(), BASE_REMOVE_SELECTORS, buildCaptureScript() (+8 more)
 
 ### Community 639 - "Community 639"
 Cohesion: 0.40
@@ -3027,22 +3114,334 @@ Nodes (4): Compressed, Detailed, Provenance, Summary
 Cohesion: 0.40
 Nodes (4): Compressed, Detailed, Provenance, Summary
 
+### Community 645 - "Community 645"
+Cohesion: 0.12
+Nodes (16): Arrays, Arrays, Compressed, Detailed, Enums, Enums, Provenance, Summary (+8 more)
+
+### Community 646 - "Community 646"
+Cohesion: 0.12
+Nodes (15): 1. Storage Location & Directory Resolution, 2. URL Normalization & Cache Key Generation, 3. Stored Markdown File Format (YAML Frontmatter), 4. Freshness Policy & Tiers, 5. Revalidation Flow (Conditional Requests), 6. Offline Fallback & Stale Serving Policies, Cache Key Formula, Caching Protocol Specification (+7 more)
+
+### Community 647 - "Community 647"
+Cohesion: 0.13
+Nodes (14): Agent web fetch vs Bonsai, Antigravity, Claude Code, Other agents, Results, Results, The token angle, honestly, Try it yourself (+6 more)
+
+### Community 648 - "Community 648"
+Cohesion: 0.13
+Nodes (15): Connecting to an external system, Controlling a non-React widget, Custom `useChatRoom` Hook, Deep Dive, Displaying different content on the server and the client, Examples of wrapping Effects in custom Hooks, Fetching data with Effects, Reading the latest props and state from an Effect (+7 more)
+
+### Community 649 - "Community 649"
+Cohesion: 0.13
+Nodes (15): Connecting to an external system, Controlling a non-React widget, Custom `useChatRoom` Hook, Deep Dive, Displaying different content on the server and the client, Examples of wrapping Effects in custom Hooks, Fetching data with Effects, Reading the latest props and state from an Effect (+7 more)
+
+### Community 650 - "Community 650"
+Cohesion: 0.26
+Nodes (8): Fixture, fixtures, captureFixture(), salesforceDeveloper, salesforce, getSiteModuleById(), SITES, SiteModule
+
+### Community 651 - "Community 651"
+Cohesion: 0.14
+Nodes (13): API Styles {#api-styles}, Composition API {#composition-api}, Compressed, Introduction {#introduction}, Options API {#options-api}, Pick Your Learning Path {#pick-your-learning-path}, Provenance, Single-File Components {#single-file-components} (+5 more)
+
+### Community 652 - "Community 652"
+Cohesion: 0.15
+Nodes (12): Caveats, Caveats, Compressed, Detailed, Parameters, Parameters, Provenance, Returns (+4 more)
+
+### Community 653 - "Community 653"
+Cohesion: 0.18
+Nodes (10): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. Search before fetching, Getting Started, Install, Next steps (+2 more)
+
+### Community 654 - "Community 654"
+Cohesion: 0.18
+Nodes (10): Compressed, Detailed, Examples of passing reactive dependencies, Examples of passing reactive dependencies, Passing a dependency array, Passing a dependency array, Pitfall, Pitfall (+2 more)
+
+### Community 655 - "Community 655"
+Cohesion: 0.18
+Nodes (10): Compressed, Deep Dive, Deep Dive, Detailed, Fetching data with Effects, Fetching data with Effects, Provenance, Summary (+2 more)
+
+### Community 656 - "Community 656"
+Cohesion: 0.18
+Nodes (10): Compressed, Connecting to a chat server, Connecting to a chat server, Detailed, Examples of connecting to an external system, Examples of connecting to an external system, Note, Note (+2 more)
+
+### Community 657 - "Community 657"
+Cohesion: 0.18
+Nodes (10): `bigint`, `bigint`, Compressed, Detailed, Less Common Primitives, Less Common Primitives, Provenance, Summary (+2 more)
+
+### Community 658 - "Community 658"
+Cohesion: 0.18
+Nodes (10): Compressed, Custom `useChatRoom` Hook, Custom `useChatRoom` Hook, Detailed, Examples of wrapping Effects in custom Hooks, Examples of wrapping Effects in custom Hooks, Provenance, Summary (+2 more)
+
+### Community 659 - "Community 659"
+Cohesion: 0.20
+Nodes (9): Caveats, Compressed, Detailed, Parameters, Provenance, Reference, Returns, Summary (+1 more)
+
+### Community 660 - "Community 660"
+Cohesion: 0.22
+Nodes (8): Compressed, Detailed, Functions Which Return Promises, Functions Which Return Promises, Provenance, Return Type Annotations, Return Type Annotations, Summary
+
+### Community 661 - "Community 661"
+Cohesion: 0.25
+Nodes (7): Caching & Freshness, Custom TTLs, Freshness tiers, How entries are keyed, Offline & stale serving, Revalidation: cheap before expensive, Where the cache lives
+
+### Community 662 - "Community 662"
+Cohesion: 0.29
+Nodes (6): Introduction, Safe by default, What it does, Where to next, Why a cache?, Why the name?
+
+### Community 663 - "Community 663"
+Cohesion: 0.29
+Nodes (6): Configuration, File locations, Flags, Keys, Managing values, Precedence
+
+### Community 664 - "Community 664"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, My Effect runs twice when the component mounts, My Effect runs twice when the component mounts, Provenance, Summary
+
+### Community 665 - "Community 665"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Type Annotations on Variables, Type Annotations on Variables
+
+### Community 666 - "Community 666"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `noImplicitAny`, `noImplicitAny`, Provenance, Summary
+
+### Community 667 - "Community 667"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Displaying different content on the server and the client, Displaying different content on the server and the client, Provenance, Summary
+
+### Community 668 - "Community 668"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Type Assertions, Type Assertions
+
+### Community 669 - "Community 669"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Optional Properties, Optional Properties, Provenance, Summary
+
+### Community 670 - "Community 670"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, The primitives: `string`, `number`, and `boolean`, The primitives: `string`, `number`, and `boolean`
+
+### Community 671 - "Community 671"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Non-null Assertion Operator (Postfix `!`), Non-null Assertion Operator (Postfix `!`), Provenance, Summary
+
+### Community 672 - "Community 672"
+Cohesion: 0.29
+Nodes (6): `any`, `any`, Compressed, Detailed, Provenance, Summary
+
+### Community 673 - "Community 673"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, `strictNullChecks` on, `strictNullChecks` on, Summary
+
+### Community 674 - "Community 674"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Usage, Usage
+
+### Community 675 - "Community 675"
+Cohesion: 0.29
+Nodes (6): Arrays, Arrays, Compressed, Detailed, Provenance, Summary
+
+### Community 676 - "Community 676"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Working with Union Types, Working with Union Types
+
+### Community 677 - "Community 677"
+Cohesion: 0.29
+Nodes (6): Compressed, Connecting to an external system, Connecting to an external system, Detailed, Provenance, Summary
+
+### Community 678 - "Community 678"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Updating state based on previous state from an Effect, Updating state based on previous state from an Effect
+
+### Community 679 - "Community 679"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Union Types, Union Types
+
+### Community 680 - "Community 680"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Reference, Reference, Summary
+
+### Community 681 - "Community 681"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Literal Types, Literal Types, Provenance, Summary
+
+### Community 682 - "Community 682"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Removing unnecessary function dependencies, Removing unnecessary function dependencies, Summary
+
+### Community 683 - "Community 683"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Type Aliases, Type Aliases
+
+### Community 684 - "Community 684"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, `strictNullChecks` off, `strictNullChecks` off, Summary
+
+### Community 685 - "Community 685"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Differences Between Type Aliases and Interfaces, Differences Between Type Aliases and Interfaces, Provenance, Summary
+
+### Community 686 - "Community 686"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Literal Inference, Literal Inference, Provenance, Summary
+
+### Community 687 - "Community 687"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, My cleanup logic runs even though my component didn’t unmount, My cleanup logic runs even though my component didn’t unmount, Provenance, Summary
+
+### Community 688 - "Community 688"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, My Effect does something visual, and I see a flicker before it runs, My Effect does something visual, and I see a flicker before it runs, Provenance, Summary
+
+### Community 689 - "Community 689"
+Cohesion: 0.29
+Nodes (6): Compressed, Controlling a non-React widget, Controlling a non-React widget, Detailed, Provenance, Summary
+
+### Community 690 - "Community 690"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Enums, Enums, Provenance, Summary
+
+### Community 691 - "Community 691"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, My Effect runs after every re-render, My Effect runs after every re-render, Provenance, Summary
+
+### Community 692 - "Community 692"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Object Types, Object Types, Provenance, Summary
+
+### Community 693 - "Community 693"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Troubleshooting, Troubleshooting
+
+### Community 694 - "Community 694"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Parameter Type Annotations, Parameter Type Annotations, Provenance, Summary
+
+### Community 695 - "Community 695"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Interfaces, Interfaces, Provenance, Summary
+
+### Community 696 - "Community 696"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Reading the latest props and state from an Effect, Reading the latest props and state from an Effect, Summary
+
+### Community 697 - "Community 697"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `null` and `undefined`, `null` and `undefined`, Provenance, Summary
+
+### Community 698 - "Community 698"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, My Effect keeps re-running in an infinite cycle, My Effect keeps re-running in an infinite cycle, Provenance, Summary
+
+### Community 699 - "Community 699"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Specifying reactive dependencies, Specifying reactive dependencies, Summary
+
+### Community 700 - "Community 700"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Functions, Functions, Provenance, Summary
+
+### Community 701 - "Community 701"
+Cohesion: 0.29
+Nodes (6): Compressed, Defining a Union Type, Defining a Union Type, Detailed, Provenance, Summary
+
+### Community 702 - "Community 702"
+Cohesion: 0.29
+Nodes (6): Anonymous Functions, Anonymous Functions, Compressed, Detailed, Provenance, Summary
+
+### Community 703 - "Community 703"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Removing unnecessary object dependencies, Removing unnecessary object dependencies, Summary
+
+### Community 704 - "Community 704"
+Cohesion: 0.33
+Nodes (6): My cleanup logic runs even though my component didn’t unmount, My Effect does something visual, and I see a flicker before it runs, My Effect keeps re-running in an infinite cycle, My Effect runs after every re-render, My Effect runs twice when the component mounts, Troubleshooting
+
+### Community 705 - "Community 705"
+Cohesion: 0.33
+Nodes (6): My cleanup logic runs even though my component didn’t unmount, My Effect does something visual, and I see a flicker before it runs, My Effect keeps re-running in an infinite cycle, My Effect runs after every re-render, My Effect runs twice when the component mounts, Troubleshooting
+
+### Community 707 - "Community 707"
+Cohesion: 0.40
+Nodes (4): A cache-first workflow, Agent Integration, Exit codes, JSON output
+
+### Community 708 - "Community 708"
+Cohesion: 0.40
+Nodes (4): Compression & Token Budgeting, Summary aggressiveness, What compression does, When to use which
+
+### Community 709 - "Community 709"
+Cohesion: 0.40
+Nodes (4): Choosing a mode, Read fallback (project → global), Secret-safety routing, Storage Modes
+
+### Community 710 - "Community 710"
+Cohesion: 0.40
+Nodes (5): Anonymous Functions, Functions, Functions Which Return Promises, Parameter Type Annotations, Return Type Annotations
+
+### Community 711 - "Community 711"
+Cohesion: 0.40
+Nodes (5): Anonymous Functions, Functions, Functions Which Return Promises, Parameter Type Annotations, Return Type Annotations
+
+### Community 712 - "Community 712"
+Cohesion: 0.40
+Nodes (5): Caveats, Parameters, Reference, Returns, `useEffect(setup, dependencies?)`
+
+### Community 713 - "Community 713"
+Cohesion: 0.50
+Nodes (4): Non-null Assertion Operator (Postfix `!`), `null` and `undefined`, `strictNullChecks` off, `strictNullChecks` on
+
+### Community 714 - "Community 714"
+Cohesion: 0.50
+Nodes (4): Non-null Assertion Operator (Postfix `!`), `null` and `undefined`, `strictNullChecks` off, `strictNullChecks` on
+
+### Community 715 - "Community 715"
+Cohesion: 0.67
+Nodes (3): PR Dead Code Check, Step 1: Analyze changed files, Step 2: If issues found, show specifics
+
+### Community 716 - "Community 716"
+Cohesion: 0.67
+Nodes (3): `bigint`, Less Common Primitives, `symbol`
+
+### Community 717 - "Community 717"
+Cohesion: 0.67
+Nodes (3): `bigint`, Less Common Primitives, `symbol`
+
+### Community 718 - "Community 718"
+Cohesion: 0.67
+Nodes (3): Defining a Union Type, Union Types, Working with Union Types
+
+### Community 719 - "Community 719"
+Cohesion: 0.67
+Nodes (3): Defining a Union Type, Union Types, Working with Union Types
+
+### Community 720 - "Community 720"
+Cohesion: 0.67
+Nodes (3): Connecting to a chat server, Examples of connecting to an external system, Note
+
+### Community 721 - "Community 721"
+Cohesion: 0.67
+Nodes (3): Connecting to a chat server, Examples of connecting to an external system, Note
+
+### Community 722 - "Community 722"
+Cohesion: 0.67
+Nodes (3): Examples of passing reactive dependencies, Passing a dependency array, Pitfall
+
+### Community 723 - "Community 723"
+Cohesion: 0.67
+Nodes (3): Examples of passing reactive dependencies, Passing a dependency array, Pitfall
+
 ## Knowledge Gaps
-- **4820 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+4815 more)
+- **5234 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+5229 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **47 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **56 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Common Objects` connect `Community 239` to `Community 248`, `Community 237`, `Community 242`, `Community 214`, `Community 536`, `Community 249`, `Community 538`, `Community 251`, `Community 220`?**
+- **Why does `File system` connect `Community 249` to `Community 194`, `Community 235`, `Community 238`, `Community 209`, `Community 61`?**
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+- **Why does `File system` connect `Community 240` to `Community 110`, `Community 207`, `Community 239`, `Community 210`, `Community 249`?**
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+- **Why does `Common Objects` connect `Community 239` to `Community 248`, `Community 237`, `Community 240`, `Community 242`, `Community 214`, `Community 536`, `Community 538`, `Community 251`, `Community 220`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `File system` connect `Community 249` to `Community 110`, `Community 207`, `Community 240`, `Community 239`, `Community 210`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `File system` connect `Community 235` to `Community 194`, `Community 238`, `Community 209`, `Community 249`, `Community 61`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **What connects `husky.sh script`, `__dirname`, `rawArgv` to the rest of the system?**
-  _4820 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _5234 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
