@@ -29,6 +29,12 @@ export default defineConfig({
   ],
 
   themeConfig: {
+    // Color the trailing "ai" of "Bonsai" to signal the tool is built for AI
+    // agents. siteTitle is rendered with v-html by VPNavBarTitle, so inline
+    // markup is supported; the string is a static constant (no XSS surface).
+    // https://vitepress.dev/reference/default-theme-nav#site-title-and-logo
+    siteTitle: 'Bons<span class="brand-ai">ai</span>',
+
     nav: [
       { text: 'Guide', link: '/guide/introduction', activeMatch: '/guide/(introduction|getting-started)' },
       { text: 'How-to', link: '/how-to/share-cache-with-your-team', activeMatch: '/how-to/' },
