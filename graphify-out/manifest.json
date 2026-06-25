@@ -1200,13 +1200,13 @@
     "semantic_hash": ""
   },
   "src/lib/research/docs/code-blocks.test.ts": {
-    "mtime": 1782373886.91286,
-    "ast_hash": "a91b8fdcf9cd009c622589c628820b3c",
+    "mtime": 1782391129.037131,
+    "ast_hash": "b1986ab61c0f67c34267c66da03c6a4a",
     "semantic_hash": ""
   },
   "src/lib/research/docs/code-blocks.ts": {
-    "mtime": 1782310522.7941568,
-    "ast_hash": "1456a826678465639bf4f83b890fe1ce",
+    "mtime": 1782391120.8298242,
+    "ast_hash": "6735bb2b90ed025cc912100ab7800eba",
     "semantic_hash": ""
   },
   "src/lib/research/docs/detect.test.ts": {
@@ -3377,6 +3377,241 @@
   ".bonsai/research/f31ec5e385e81c6291c7011f90738112efebe14e46c51e82e82236316155a42a.md": {
     "mtime": 1782386205.6408262,
     "ast_hash": "0ec09e6f456be9667323933c057a35c5",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/010ffb2a5d3af8ded0722b58fac5df232a4e9ed9499d0ea77f7fef45f8b7c55c.md": {
+    "mtime": 1782390115.9395201,
+    "ast_hash": "ccf4a1f222727b1e475c2355fd38761c",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/03f9063734328a4c54bf188425eed9d4750395857b056d92c076b6aa83b58c43.md": {
+    "mtime": 1782389918.0528758,
+    "ast_hash": "bec9ecd9716c267c1cc522142aeb43f8",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/068e4f6494b93b186a28e266e551f0b0c12e6651c017af10dd2dddc3305cf08e.md": {
+    "mtime": 1782390125.2122126,
+    "ast_hash": "7389b70572500c3d3f5103513bfb66c4",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/06d940a0fa5d4f0c29a6e5972369ccbaffabd0fe04216874c65e11c47a72259a.md": {
+    "mtime": 1782390115.9411287,
+    "ast_hash": "135e75f710b6e9b7395671182a83679e",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/0922ceadb9edce27f8a2c0a0f780a1aa9806bd468e5a3c9efc326856825780c2.md": {
+    "mtime": 1782390216.38798,
+    "ast_hash": "4d080d702a9c5d11ad5ed1d788270af8",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/0e2639eacf9055cb2a6118e7ba05d8f47e6c1fabe174b283e1e9ca928f92898e.md": {
+    "mtime": 1782390115.9432318,
+    "ast_hash": "30a4519ea6e58e084200c3ab351f5b39",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/0f71816dd64ea04388204cb537245e38eae152abdb3cb3ead5aefada2d98136e.md": {
+    "mtime": 1782389877.749478,
+    "ast_hash": "8bfe1b74b822a4f4b4cd53dd2fa4e381",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/1667b0c5ce1185a6d7f209a472b43fdeada89a79685b6ccdb76519cec2b1aab1.md": {
+    "mtime": 1782390125.2259755,
+    "ast_hash": "805274fd6b3a1dbf4ffcc8fc7eabd590",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/1e0f9d9697948e07b7ac96b253bb7ffb1c5c80d4e9c65c5c47f8219c8c08be57.md": {
+    "mtime": 1782390115.937121,
+    "ast_hash": "1b56c37031d6810a305f8f08d14c36ab",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/204335ff566e88ac26fdaffebbe8e4f22cb478360be821c97e7bb12e0047240f.md": {
+    "mtime": 1782390125.2093043,
+    "ast_hash": "862f2c0280bad4ea5d678fa43d01d0cd",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/205f9a4294465abd3a69fc5f8c49a335d23377731e38a5821b342e6398d90262.md": {
+    "mtime": 1782390125.2244425,
+    "ast_hash": "2aa3ea62d30d57a8e844b9aaea2d569f",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/243e4468244bf7617a7fd294a3c3ed1e53266026767a1c6064870d37089b50d8.md": {
+    "mtime": 1782390125.2250147,
+    "ast_hash": "e9ba3ff252d3cd5107ef7f0439db34a0",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/2459b356ffee80c9eedd96f7eadedc6b83731b32284194a7a404219a723357f2.md": {
+    "mtime": 1782390115.9375482,
+    "ast_hash": "682e3bd8c8959953e4adf46485ed59ba",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/2b434709ff47e55c56974abc3ac6d4fb80cddbe5c00501cc89c44d396a318ffc.md": {
+    "mtime": 1782390115.9388382,
+    "ast_hash": "b17674b23c6e4f569d5ff1f3724b8ef5",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/2fa093f8cc900992efd6a3a7504559c81f27288c42c0c449c62ff42e3ac78785.md": {
+    "mtime": 1782389923.3235674,
+    "ast_hash": "a7ee8426c181a7814fbf67c2e2ef8af3",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/370ae9237680ff81b4bd75fbaa2dffc1de2abd32c06d4f71bc20a975836791f0.md": {
+    "mtime": 1782390115.9384544,
+    "ast_hash": "e0d6cc401956a9fc9f48fd5eeb8b86e3",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/39106758ad8f25b50b7c984b3b89aafe8c98e6ad7c572b2b12b32b957fb744b6.md": {
+    "mtime": 1782390125.213091,
+    "ast_hash": "007ec4a284d2ce09d45e4285770b543b",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/3fab6a2f2f26adaf2e39632f24c88fa3bdde57a39e3fd5ff168bc946210edc59.md": {
+    "mtime": 1782390125.1588871,
+    "ast_hash": "8c0869fd4177b750d17bbcebdebb925b",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/46c5325e2452e207349a38617c4dd52c6d96487f01c5cc54b69395d19159e6f1.md": {
+    "mtime": 1782390115.9361494,
+    "ast_hash": "33ea8051f61f9de55e6a30894fe6a9f3",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/46d5d19f11b9377c230cc3a5082d8e7721a980d23ff55231542a071d5739cd17.md": {
+    "mtime": 1782390125.223126,
+    "ast_hash": "7c04641cb7e858e359d14348769f779b",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/4bcaa30c93cde2b3b40630e579da02e05c734b529966df09822a53374c7e9daf.md": {
+    "mtime": 1782390113.2400565,
+    "ast_hash": "0afbda7c0dce5e2c5ff68467a9fcc86c",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/5605b7c6a40f77fbf29af0e853c46320917fa93b23418dc0a1425cd571f5a1d9.md": {
+    "mtime": 1782390125.2155051,
+    "ast_hash": "1f874dfb223c0899923bc97cf3b1debd",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/5711e5f11c87e0b294af178bd0e25ab8064a280d2386458e1d84fd5e1426baf3.md": {
+    "mtime": 1782390125.2140934,
+    "ast_hash": "64b7ac1a6e6d7372d924625ec6211a00",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/5e0ce8aa9a350b0e11fd846899d98cd2355a79cd2c07844a6144b375a4518d09.md": {
+    "mtime": 1782390115.9423919,
+    "ast_hash": "ee083e8191b981fffe6d4981a71a62ec",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/5fa656648d41d19853a9a39cefee8970bbb119db5e830b64d99828ed6e4f3013.md": {
+    "mtime": 1782389929.0914583,
+    "ast_hash": "bb98875f9b75dc584e0e88f7ed1bb56e",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/655d503ba1091f1c637a59ab11b4474b8cd78c60ec4f0f6cd1635bff120da33a.md": {
+    "mtime": 1782390115.9427779,
+    "ast_hash": "3441a790b932b391f9e9e85a991275b0",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/6ee3859d73833257a368f26e7343a2f2abbf09f1bb8e0212f282c2f2e3d59c1a.md": {
+    "mtime": 1782389872.8707304,
+    "ast_hash": "c6f213507c9f1521a18ac78aef6fcb21",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/75d1efedfeb8d1c04fcd967668faf94b4811660ce6c53a22badffe483fde907e.md": {
+    "mtime": 1782390115.9379632,
+    "ast_hash": "5eb21e784e1d46c53115f543b5dec62e",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/8cae499cc9c3bc8e939850c5e7e8ae9f8c6360400c81bdf991ec818ba5fb1b26.md": {
+    "mtime": 1782389903.9963734,
+    "ast_hash": "e7e9e25033f67ce1b53b25daca4f17da",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/8e3d90980dc6092b53f1afe88c427dce08d942c70aeb96002866fd52feb41ac8.md": {
+    "mtime": 1782389893.1267626,
+    "ast_hash": "6f3a47802274eb8c031a404a93939ad0",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/a48cd0a7ed8cc1c452263ac8e55b024597ea1afe063b3a68d9dd7ec3c00381d0.md": {
+    "mtime": 1782390115.9366758,
+    "ast_hash": "d395bc480b8576f25522a50f43d98196",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/a96ef37b3fe471a691ca48a687be9b80e565cda312dd5618e48bc61e9619d36d.md": {
+    "mtime": 1782390115.941579,
+    "ast_hash": "694f7d55e7cbc529a3dfe485264093b5",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/b05a43196435dc343631c5c7367c4fd7fed2e78f6a81c800fbe06c5649ffe28d.md": {
+    "mtime": 1782389897.9342976,
+    "ast_hash": "b3bedf70b0268a2354c8aaea2c61e122",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/b24ff54755efb2a141690eff48d879c02a81460f519788a877c91163150c349e.md": {
+    "mtime": 1782390125.2254725,
+    "ast_hash": "aee12bb100f8ce911f10eaad1ab2f112",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/bc9f15533baa125609a79e566ad0949e1d98249601cb24ac85be873abe86ed60.md": {
+    "mtime": 1782390125.2161448,
+    "ast_hash": "445779b4aba76054ab563ea67f6ffdfa",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/be4aa2459a599dade226afcd7d57e02966c1e1a316287f8bc3a79a9d0a70c8a5.md": {
+    "mtime": 1782390125.2263808,
+    "ast_hash": "049c3058e158251b58431b5cdbc7e065",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/c93c77611cd7d74cbaed6262d3fe5d763745e52aa8b85c39340e077fcf550cb8.md": {
+    "mtime": 1782390115.942069,
+    "ast_hash": "c8d53a5c987c04db25d17f5f5e60568c",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/c94d90a9ab169fa86fc9b08faa628e7cbc1690fc71027e78e2141cd5f9c0adac.md": {
+    "mtime": 1782390125.2170997,
+    "ast_hash": "b697148141e057c18392e7b4e44dc51f",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/db069a1be8d4aa3a49a575591bfc7d39f63b24acb08f3e5d834441e8c435fc16.md": {
+    "mtime": 1782390125.2136118,
+    "ast_hash": "1d3fabbf1a33585365b01899a78a0bda",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/e17c0329eb0f60986269844c4f5e2ff1de0225f97a5df1084f48b33ec180cb14.md": {
+    "mtime": 1782390115.9025924,
+    "ast_hash": "5d53b3d705dd43ccc827db0dcdb4d7d5",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/ea7551affc4664862fa458169e9fb2f8ddb8be3f86ec23db7366f5477d43df0d.md": {
+    "mtime": 1782390125.2145488,
+    "ast_hash": "8777b2e1121c0eb84862c46468ce11c8",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/ebb9e4bbe2a471a4b986cef8372c4c54f696956a422836533d8bcbcf51a7580a.md": {
+    "mtime": 1782390115.9401815,
+    "ast_hash": "475964f29e873c6d02ce5ae9922c26a0",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/ed3c1aea3404cf190a18e81c9dda358b2188cb0f857498ef1757525292d9aa65.md": {
+    "mtime": 1782390125.2196364,
+    "ast_hash": "7630c1a84e5a817e260ab310ec868411",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/f27bcda3d0d62d48be66afabd87e859c5522ea0ea93574c922a9b82ff70ab215.md": {
+    "mtime": 1782390198.3417335,
+    "ast_hash": "6ab46f0a0ad888f08d8e002b52e834c6",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/fa78cbc22137fc7cd96bd1d08d35ec102bc39926ba3cc85e648849231196f219.md": {
+    "mtime": 1782389884.3862388,
+    "ast_hash": "31f84831034436ef9c394e8a14592fae",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/fe0bcb2e4fff72bb02a50caa3b881c9f59e9acfa2e9d5761ab123158131d6301.md": {
+    "mtime": 1782390125.2150116,
+    "ast_hash": "fe7ba532df54c3fd6fba2f1c7ba49458",
+    "semantic_hash": ""
+  },
+  "src/lib/research/docs/__fixtures__/elementor-code-highlight.html": {
+    "mtime": 1782390775.0915453,
+    "ast_hash": "2b0c0a912e0f7228ca1e58a6c8c948a9",
     "semantic_hash": ""
   }
 }

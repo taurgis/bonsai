@@ -40,6 +40,37 @@ describe('normalizeCodeBlocks (T-17)', () => {
     expect(toMarkdown('redux-multi-command.html')).not.toMatch(/\bCopy\b/);
   });
 
+  it('recovers Elementor code-highlight widgets (xmp wrapper, copy-to-clipboard container)', () => {
+    const md = toMarkdown('elementor-code-highlight.html');
+    // The whole block survives as a fenced JS block, not a collapsed inline span.
+    expect(md).toContain('```javascript');
+    expect(md).toContain("'use strict';\n\nvar CustomerMgr = require('dw/customer/CustomerMgr');");
+    expect(md).not.toMatch(/`'use strict';.*customerNoIterator`/);
+  });
+
+  it('keeps a copy-class container that wraps a code block', () => {
+    const { document } = parseHTML(
+      '<!doctype html><html><body>' +
+        '<div class="copy-to-clipboard"><pre><code>keep me</code></pre></div>' +
+        '</body></html>'
+    );
+    normalizeCodeBlocks(document);
+    expect(document.querySelector('pre')).not.toBeNull();
+    expect(htmlToMarkdown(document.body.innerHTML)).toContain('keep me');
+  });
+
+  it('still removes a copy button that uses a decorative <code> icon', () => {
+    const { document } = parseHTML(
+      '<!doctype html><html><body>' +
+        '<button class="copy-btn"><code>&lt;/&gt;</code>Copy</button>' +
+        '<pre><code>actual code</code></pre>' +
+        '</body></html>'
+    );
+    normalizeCodeBlocks(document);
+    expect(document.querySelector('.copy-btn')).toBeNull();
+    expect(htmlToMarkdown(document.body.innerHTML)).toContain('actual code');
+  });
+
   it('is a no-op for a plain pre block', () => {
     const { document } = parseHTML(
       '<!doctype html><html><body><pre><code>plain\ntext</code></pre></body></html>'

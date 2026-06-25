@@ -45,12 +45,32 @@ function removeCopyButtons(document: any): void {
     'button, [class*="copy" i], [class*="Copy"], [aria-label*="copy" i]'
   );
   for (const el of candidates) {
+    // Never remove a container that wraps a code block. Some highlighters put a copy-related class
+    // on the <pre>'s wrapper (e.g. Elementor's `<div class="copy-to-clipboard"><pre>…`); removing
+    // it would delete the entire code example, not just the button. Guard on <pre> specifically: a
+    // real copy button never contains a <pre>, but may contain a decorative <code> icon.
+    if (el.querySelector?.('pre')) continue;
     const cls = (el.getAttribute('class') || '').toString();
     const aria = el.getAttribute('aria-label') || '';
     const text = (el.textContent || '').trim();
     if (/copy/i.test(cls) || /copy/i.test(aria) || /^copy$/i.test(text)) {
       el.remove();
     }
+  }
+}
+
+// Some highlighters (e.g. Elementor's code-highlight widget) wrap the authored source in a
+// deprecated <xmp>/<plaintext> element and pretty-print the markup, so <code> is not <pre>'s first
+// child. Turndown's fenced-code rule requires <code> as the first child; without this the block
+// collapses onto a single inline span. Flatten to a clean <pre><code>…</code></pre>.
+function flattenCodeStructure(pre: any, code: any): void {
+  if (code === pre) return;
+  const rawHolder = code.querySelector?.('xmp, plaintext');
+  const raw = rawHolder?.textContent ?? '';
+  if (raw) code.textContent = raw;
+  if (pre.firstChild !== code || pre.childNodes.length > 1) {
+    while (pre.firstChild) pre.removeChild(pre.firstChild);
+    pre.appendChild(code);
   }
 }
 
@@ -69,5 +89,6 @@ export function normalizeCodeBlocks(document: any): void {
       const existing = (code.getAttribute('class') || '').replace(/language-[\w-]+/gi, '').trim();
       code.setAttribute('class', `${existing} language-${language}`.trim());
     }
+    flattenCodeStructure(pre, code);
   }
 }
