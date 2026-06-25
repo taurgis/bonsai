@@ -32,6 +32,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/introduction', activeMatch: '/guide/' },
       { text: 'Reference', link: '/reference/commands', activeMatch: '/reference/' },
+      { text: 'Examples', link: '/examples' },
       { text: 'Troubleshooting', link: '/troubleshooting' },
     ],
 
@@ -56,6 +57,11 @@ export default defineConfig({
           { text: 'Configuration', link: '/reference/configuration' },
           { text: 'Cache Protocol', link: '/reference/cache-protocol' },
         ],
+      },
+      {
+        text: 'Examples',
+        collapsed: false,
+        items: [{ text: 'Agent fetch vs Bonsai', link: '/examples' }],
       },
       {
         text: 'Help',

@@ -10,6 +10,7 @@
  * inside onMounted. https://vitepress.dev/guide/ssr-compat
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { withBase } from 'vitepress';
 
 type Kind = 'leaf' | 'bark';
 interface Pt {
@@ -38,11 +39,16 @@ const tokens = ref(0);
 const reduced = ref(false);
 const ready = ref(false);
 
-// Static so screen readers describe the visual once, rather than re-announcing
-// every time the decorative token counter ticks.
-const ariaLabel =
-  'Animation of a large tree made of text compressing down into a small bonsai tree, ' +
-  'representing how Bonsai prunes documentation to fit a token budget.';
+// The hero is a link to the page with real measured savings. withBase keeps the
+// URL correct under the site's `base` ('/bonsai/'); it is a pure function, so it
+// is safe on the server. https://vitepress.dev/reference/runtime-api#withbase
+const examplesHref = withBase('/examples');
+// Single accessible name for the link: describes both the decorative animation
+// and where the link goes, so screen readers announce one meaningful control
+// (the inner canvas is aria-hidden) rather than re-reading the ticking counter.
+const linkLabel =
+  'A large tree of text compressing into a small bonsai — how Bonsai prunes docs ' +
+  'to fit a token budget. Open the example page with real before-and-after token savings.';
 
 // Letters only, so every particle is a visible glyph.
 const POOL =
@@ -427,17 +433,14 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="wrapEl" class="bonsai-hero">
-    <canvas
-      ref="canvasRef"
-      class="bonsai-hero__canvas"
-      role="img"
-      :aria-label="ariaLabel"
-      @click="replay"
-    />
-    <div v-show="ready" class="bonsai-hero__meta" aria-hidden="true">
-      <span class="bonsai-hero__dot" />
-      <span class="bonsai-hero__count">≈ {{ tokens.toLocaleString() }} tokens</span>
-    </div>
+    <a class="bonsai-hero__link" :href="examplesHref" :aria-label="linkLabel">
+      <canvas ref="canvasRef" class="bonsai-hero__canvas" aria-hidden="true" />
+      <span v-show="ready" class="bonsai-hero__meta" aria-hidden="true">
+        <span class="bonsai-hero__dot" />
+        <span class="bonsai-hero__count">≈ {{ tokens.toLocaleString() }} tokens</span>
+        <span class="bonsai-hero__cta">see the real numbers →</span>
+      </span>
+    </a>
     <button
       v-if="ready && !reduced"
       class="bonsai-hero__replay"
@@ -458,10 +461,17 @@ onBeforeUnmount(() => {
   margin: 0 auto;
 }
 
+.bonsai-hero__link {
+  display: block;
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .bonsai-hero__canvas {
   display: block;
   width: 100%;
-  cursor: pointer;
 }
 
 .bonsai-hero__meta {
@@ -470,8 +480,11 @@ onBeforeUnmount(() => {
   bottom: 6px;
   transform: translateX(-50%);
   display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 4px 8px;
+  max-width: calc(100% - 24px);
   padding: 5px 12px;
   font-family: var(--vp-font-family-mono);
   font-size: 12px;
@@ -480,7 +493,17 @@ onBeforeUnmount(() => {
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
   border-radius: 999px;
-  white-space: nowrap;
+  text-align: center;
+}
+
+.bonsai-hero__cta {
+  color: var(--vp-c-brand-1);
+  font-weight: 700;
+}
+
+.bonsai-hero__link:hover .bonsai-hero__cta,
+.bonsai-hero__link:focus-visible .bonsai-hero__cta {
+  text-decoration: underline;
 }
 
 .bonsai-hero__dot {
@@ -505,7 +528,8 @@ onBeforeUnmount(() => {
   transition: opacity 0.2s ease;
 }
 
-.bonsai-hero:hover .bonsai-hero__replay {
+.bonsai-hero:hover .bonsai-hero__replay,
+.bonsai-hero:focus-within .bonsai-hero__replay {
   opacity: 1;
 }
 
