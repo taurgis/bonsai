@@ -41,6 +41,15 @@
 }
 
 /**
+ * Emphasize the trailing "ai" in the nav-bar "Bonsai" title with the brand
+ * green, so it reads as "Bons·ai" and signals the AI-agent focus. Uses the
+ * mode-aware brand variable so it stays legible in light and dark themes.
+ */
+.VPNavBarTitle .title .brand-ai {
+  color: var(--vp-c-brand-1);
+}
+
+/**
  * On screens below 960px VitePress stacks the hero image above the title and
  * pulls the title up with a -48px bottom margin — meant to tuck under a
  * decorative image. Our hero is a full-bleed text canvas with a token-counter
