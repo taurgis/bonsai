@@ -108,13 +108,6 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     return this.config.bin;
   }
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args, flags } = await this.parse(FetchCommand);
-    this.args = args;
-    this.flags = flags;
-  }
-
   private async executeCacheHit(
     cached: any,
     targetDir: string,
@@ -335,7 +328,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     }
   }
 
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const { url } = this.args;
     const { format, ttl, 'max-age': maxAge, 'dry-run': dryRun } = this.flags;
 
@@ -380,7 +373,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
         redirectedToGlobal
       );
 
-      if (!this.requestedJson()) {
+      if (!this.jsonEnabled()) {
         this.log(content);
       }
       return resultData;

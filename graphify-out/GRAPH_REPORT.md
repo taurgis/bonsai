@@ -1,16 +1,16 @@
-# Graph Report - forward-nexus-research  (2026-06-24)
+# Graph Report - forward-nexus-research  (2026-06-25)
 
 ## Corpus Check
-- 410 files · ~412,204 words
+- 418 files · ~420,534 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3614 nodes · 4303 edges · 312 communities (268 shown, 44 thin omitted)
+- 3631 nodes · 4415 edges · 310 communities (266 shown, 44 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8e84e057`
+- Built from commit: `c31dbb71`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -62,8 +62,6 @@
 - [[_COMMUNITY_Community 44|Community 44]]
 - [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
-- [[_COMMUNITY_Community 47|Community 47]]
-- [[_COMMUNITY_Community 48|Community 48]]
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
 - [[_COMMUNITY_Community 51|Community 51]]
@@ -334,17 +332,17 @@
   testing/regression/run-suite.mjs → src/lib/research/capture.ts
 - `defaultFetcher()` --calls--> `fetchText()`  [EXTRACTED]
   src/lib/research/docs/machine-readable.ts → src/lib/research/fetcher.ts
+- `RevalidationResult` --references--> `ResearchArtifact`  [EXTRACTED]
+  src/lib/research/revalidate.ts → src/lib/research/schema.ts
 - `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
   testing/regression/run-suite.mjs → src/sites/index.ts
 - `FetchCommand` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/fetch.ts → src/base-command.ts
-- `ResearchImport` --inherits--> `BaseCommand`  [EXTRACTED]
-  src/commands/import.ts → src/base-command.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (312 total, 44 thin omitted)
+## Communities (310 total, 44 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -371,8 +369,8 @@ Cohesion: 0.10
 Nodes (20): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. Search before fetching, Bonsai, Command Reference, `config` (+12 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.09
-Nodes (37): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), readScopedConfig(), omitUndefined() (+29 more)
+Cohesion: 0.06
+Nodes (42): ResearchInspect, SectionSummary, ResearchList, ResearchPrune, ResearchStatus, ConfigCommand, configScopeFlags(), ConfigGet (+34 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -406,17 +404,13 @@ Nodes (19): Apex Skill Pattern, API/Framework Skill, CLI Command Skill, Code Blo
 Cohesion: 0.09
 Nodes (21): Behavior, CI Integration, `ci`: Provider-Aware Review Automation, Combined Mode Flags, `config-schema`: Config JSON Schema, `decision-surface`: Structural Decisions, Environment Variables, Fallow CLI Reference (+13 more)
 
-### Community 15 - "Community 15"
-Cohesion: 0.14
-Nodes (3): ResearchImport, deriveCacheKey(), compressMarkdown()
-
 ### Community 16 - "Community 16"
 Cohesion: 0.29
 Nodes (6): Default Workflow, Fallbacks, Freshness Policy, Official Docs Researcher Agent, Response Contract, Scope
 
 ### Community 17 - "Community 17"
-Cohesion: 0.14
-Nodes (14): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+6 more)
+Cohesion: 0.15
+Nodes (12): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+4 more)
 
 ### Community 18 - "Community 18"
 Cohesion: 0.11
@@ -431,7 +425,7 @@ Cohesion: 0.11
 Nodes (17): `captureOutput` — Test a Command Class Directly, Common Patterns, Environment variable flags, OCLIF Testing, Prerequisites, Primary API: `runCommand`, Quick Reference, References (+9 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.26
+Cohesion: 0.29
 Nodes (12): extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseMetadata(), ParserState (+4 more)
 
 ### Community 22 - "Community 22"
@@ -459,12 +453,12 @@ Cohesion: 0.13
 Nodes (14): 1. Network Constraints & Crawler Limits, 2. DNS Safety & Private IP Blocklist (SSRF Protection), 3. Client-Side Hydration (SPA) Limitations, 4. Exit Codes & Common Errors, Blocked Target Blocks (RFC1918 & Localhost), Common Failure Symptoms, Crawler Limits, Exit Code Directory (+6 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.11
-Nodes (9): ResearchInspect, SectionSummary, ResearchList, ResearchPrune, scanCacheDirs(), loadStoreRoots(), projectDataDir(), resolveStoreRoots() (+1 more)
+Cohesion: 0.21
+Nodes (12): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), resolveResearchTarget(), isSafeIp() (+4 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.17
-Nodes (21): FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS, scoreSingleTerm(), assertOk(), FetchOptions, fetchStaticHtml() (+13 more)
+Cohesion: 0.35
+Nodes (12): assertOk(), checkDnsSafety(), FetchOptions, fetchStaticHtml(), fetchText(), fetchWithRedirects(), headerMeta(), notModifiedResult() (+4 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.14
@@ -483,12 +477,12 @@ Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.15
-Nodes (12): Combined Dead Code + Duplication, Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, Production audit (+4 more)
+Cohesion: 0.14
+Nodes (13): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Migration from knip, Production audit, Production vs Full Audit, Step 1: Preview migration, Step 1: Run combined analysis (+5 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.16
-Nodes (18): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), RevalidationResult, ResearchArtifact, SecureWriteResult, KEY_A, KEY_B (+10 more)
+Cohesion: 0.17
+Nodes (18): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), ResearchArtifact, TokenEstimate, SecureWriteResult, KEY_A, KEY_B (+10 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -507,8 +501,8 @@ Cohesion: 0.18
 Nodes (8): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SourceHint, FIXTURES
 
 ### Community 40 - "Community 40"
-Cohesion: 0.20
-Nodes (18): checkDnsSafety(), cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), ALLOWED_DOC_HOSTS (+10 more)
+Cohesion: 0.16
+Nodes (22): waitForLoad(), cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor } (+14 more)
 
 ### Community 41 - "Community 41"
 Cohesion: 0.29
@@ -531,20 +525,16 @@ Cohesion: 0.40
 Nodes (4): Examples, Mandatory Pre-Step, Web Research Requirement, When Not to Use
 
 ### Community 46 - "Community 46"
-Cohesion: 0.40
-Nodes (5): Migration from knip, Step 1: Preview migration, Step 2: Apply migration, Step 3: Compare results, Step 4: Remove knip config
-
-### Community 48 - "Community 48"
 Cohesion: 0.50
-Nodes (4): Class: `fs.StatWatcher`, Common Objects, `watcher.ref()`, `watcher.unref()`
+Nodes (4): Custom Plugin Setup, Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory
 
 ### Community 49 - "Community 49"
-Cohesion: 0.19
-Nodes (9): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, parseTtlToMs(), ResolvedResearchTarget, resolveResearchTarget(), LocatedArtifact, StoreRoots (+1 more)
+Cohesion: 0.15
+Nodes (12): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, handleStaleRevalidationResult(), StorageMode, ResolvedResearchTarget, ResolveResearchTargetOptions, LocatedArtifact (+4 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.33
-Nodes (8): BASE_REMOVE_SELECTORS, buildCaptureScript(), confidenceFor(), ERROR_PATTERNS, fetchSalesforceDoc(), looksLikeSalesforceError(), SalesforceDocOptions, stripBoilerplate()
+Cohesion: 0.17
+Nodes (16): waitForContentReady(), ExtractionResult, CONTENT_SELECTORS, fetchDeveloperPage(), CONTENT_SELECTORS, fetchSalesforcePage(), BASE_REMOVE_SELECTORS, buildCaptureScript() (+8 more)
 
 ### Community 51 - "Community 51"
 Cohesion: 0.67
@@ -699,8 +689,8 @@ Cohesion: 0.25
 Nodes (7): Cache Operations, Fetch Rules, Manual Fallbacks, Required Pre-Step, Source Rules, Web Research Skill, When This Does Not Apply
 
 ### Community 110 - "Community 110"
-Cohesion: 0.16
-Nodes (15): Fixture, fixtures, captureFixture(), ExtractionResult, CONTENT_SELECTORS, fetchDeveloperPage(), salesforceDeveloper, CONTENT_SELECTORS (+7 more)
+Cohesion: 0.25
+Nodes (9): Fixture, fixtures, captureFixture(), salesforceDeveloper, salesforce, detectSite(), getSiteModuleById(), SITES (+1 more)
 
 ### Community 119 - "Community 119"
 Cohesion: 0.40
@@ -1099,8 +1089,8 @@ Cohesion: 0.09
 Nodes (21): server.allowedHosts, server.cors, server.forwardConsole, server.fs.allow, server.fs.deny, server.fs.strict, server.headers, server.hmr (+13 more)
 
 ### Community 331 - "Community 331"
-Cohesion: 0.10
-Nodes (30): SearchProvider, AlgoliaConfig, algoliaQueryUrl(), extractAlgoliaConfig(), parseAlgoliaResponse(), getText(), RemoteSearchDeps, RemoteSearchOutcome (+22 more)
+Cohesion: 0.07
+Nodes (36): FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS, ResearchSearch, scoreSingleTerm(), SearchProvider, AlgoliaConfig (+28 more)
 
 ### Community 332 - "Community 332"
 Cohesion: 0.22
@@ -1123,8 +1113,8 @@ Cohesion: 0.11
 Nodes (18): Path, `path.basename(path[, suffix])`, `path.delimiter`, `path.dirname(path)`, `path.extname(path)`, `path.format(pathObject)`, `path.isAbsolute(path)`, `path.join([...paths])` (+10 more)
 
 ### Community 338 - "Community 338"
-Cohesion: 0.15
-Nodes (20): handleStaleRevalidationResult(), CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness(), StatusAction, StatusResult (+12 more)
+Cohesion: 0.18
+Nodes (19): CacheStatus, describeCacheStatus(), FreshnessStatus, resolveFreshness(), StatusAction, StatusResult, checkMaxAgeExpired(), evaluateFreshness() (+11 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -1187,8 +1177,8 @@ Cohesion: 0.18
 Nodes (11): Class: `fs.Dir`, `dir.close()`, `dir.close(callback)`, `dir.closeSync()`, `dir.path`, `dir.read()`, `dir.read(callback)`, `dir.readSync()` (+3 more)
 
 ### Community 354 - "Community 354"
-Cohesion: 0.29
-Nodes (7): Class: `fs.FSWatcher`, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()`, `watcher.unref()`
+Cohesion: 0.18
+Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
 
 ### Community 355 - "Community 355"
 Cohesion: 0.18
@@ -1375,21 +1365,21 @@ Cohesion: 0.67
 Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
 
 ## Knowledge Gaps
-- **2416 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+2411 more)
+- **2420 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+2415 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **44 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `File system` connect `Community 360` to `Community 48`, `Community 177`, `Community 291`, `Community 308`?**
+- **Why does `File system` connect `Community 360` to `Community 177`, `Community 354`, `Community 291`, `Community 308`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Why does `File system` connect `Community 364` to `Community 305`, `Community 202`, `Community 357`, `Community 310`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `Common Objects` connect `Community 48` to `Community 353`, `Community 354`, `Community 324`, `Community 360`, `Community 361`, `Community 367`, `Community 372`, `Community 316`, `Community 381`, `Community 382`?**
+- **Why does `Common Objects` connect `Community 357` to `Community 384`, `Community 385`, `Community 356`, `Community 325`, `Community 364`, `Community 365`, `Community 368`, `Community 376`, `Community 317`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `husky.sh script`, `__dirname`, `rawArgv` to the rest of the system?**
-  _2416 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _2420 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

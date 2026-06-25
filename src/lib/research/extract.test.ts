@@ -87,6 +87,24 @@ describe('HTML content extraction pipeline', () => {
     );
   });
 
+  it('leaves anchors without an href untouched while resolving the rest', () => {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <body>
+          <main>
+            <h1>Anchors</h1>
+            <p>A paragraph with a <a name="top">bookmark anchor</a> that has no href.</p>
+            <p>And a <a href="/relative">relative link</a> to resolve.</p>
+          </main>
+        </body>
+      </html>
+    `;
+    const result = extractHtmlContent(html, 'https://example.com/page');
+    expect(result.detailedMarkdown).toContain('bookmark anchor');
+    expect(result.detailedMarkdown).toContain('(https://example.com/relative)');
+  });
+
   it('assigns high confidence to longer extracted content', () => {
     // Construct a long text body to trigger high confidence (>=2000 characters)
     let longParagraphs = '';

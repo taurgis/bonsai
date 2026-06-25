@@ -39,14 +39,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args, flags } = await this.parse(ConfigSet);
-    this.args = args;
-    this.flags = flags;
-  }
-
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const { keyArg, valueArg } = splitInlineKeyValue(this.args.key, this.args.value);
 
     if (!keyArg) {
@@ -69,8 +62,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     const formatted = meta.format(parsed);
 
     if (this.flags['dry-run']) {
-      if (!this.requestedJson())
-        this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
+      if (!this.jsonEnabled()) this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
       return { key: keyArg, value: parsed, scope, dryRun: true };
     }
 
@@ -90,7 +82,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
       writeUserConfig(configDir, patch);
     }
 
-    if (!this.requestedJson()) this.log(`Set ${keyArg} = ${formatted} (${scope})`);
+    if (!this.jsonEnabled()) this.log(`Set ${keyArg} = ${formatted} (${scope})`);
     return { key: keyArg, value: parsed, scope, dryRun: false };
   }
 }

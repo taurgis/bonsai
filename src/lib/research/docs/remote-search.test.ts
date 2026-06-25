@@ -47,6 +47,26 @@ describe('Algolia DocSearch connector (T-20, Vue)', () => {
     expect(results[0]!.provider).toBe('algolia-docsearch');
     expect(results.find((r) => r.title === 'ref()')?.url).toContain('#ref');
   });
+
+  it('throws when the response is missing a hits array', () => {
+    expect(() => parseAlgoliaResponse('{"results":[]}', 'https://x/query')).toThrow(
+      /missing "hits"/
+    );
+  });
+
+  it('falls back to the url as the title when no hierarchy is present', () => {
+    const body = JSON.stringify({ hits: [{ url: 'https://docs.x/page', content: 'snip' }] });
+    const results = parseAlgoliaResponse(body, 'https://x/query');
+    expect(results[0]!.title).toBe('https://docs.x/page');
+    expect(results[0]!.snippet).toBe('snip');
+  });
+
+  it('drops hits without a string url', () => {
+    const body = JSON.stringify({ hits: [{ url: 123 }, { url: 'https://docs.x/ok' }] });
+    const results = parseAlgoliaResponse(body, 'https://x/query');
+    expect(results).toHaveLength(1);
+    expect(results[0]!.url).toBe('https://docs.x/ok');
+  });
 });
 
 describe('VitePress local search connector (T-20, Vite)', () => {
@@ -67,5 +87,24 @@ describe('VitePress local search connector (T-20, Vite)', () => {
 
   it('throws on a malformed index', () => {
     expect(() => searchVitePressLocalIndex('{"not":"array"}', indexUrl, base, 'x')).toThrow();
+  });
+
+  it('skips docs with no id and weights title matches heavily', () => {
+    const docs = JSON.stringify([
+      { title: 'no id doc', text: 'router router' }, // skipped: no id
+      { id: 'guide/router.html', title: 'Router', text: 'about routing' },
+      { id: 'guide/misc.html', title: 'Misc', text: 'router mentioned once' },
+    ]);
+    const results = searchVitePressLocalIndex(docs, indexUrl, base, 'router');
+    // The title match ("Router") ranks above the body-only mention.
+    expect(results[0]!.title).toBe('Router');
+    expect(results.every((r) => r.url.startsWith('https://vite.dev/'))).toBe(true);
+    // Only the two docs with an id and a positive score appear.
+    expect(results).toHaveLength(2);
+  });
+
+  it('returns nothing when no doc scores above zero', () => {
+    const docs = JSON.stringify([{ id: 'guide/x.html', title: 'X', text: 'unrelated' }]);
+    expect(searchVitePressLocalIndex(docs, indexUrl, base, 'router')).toHaveLength(0);
   });
 });

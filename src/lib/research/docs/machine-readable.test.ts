@@ -44,6 +44,17 @@ describe('probeLlmsTxt', () => {
     expect(result).toBeNull();
   });
 
+  it('returns null when a candidate responds 304 with no content', async () => {
+    const fetcher: TextFetcher = async (url) => ({
+      content: '',
+      finalUrl: url,
+      status: 304,
+      contentType: null,
+    });
+    const result = await probeLlmsTxt('https://example.com/docs', emptyCapabilities(), fetcher);
+    expect(result).toBeNull();
+  });
+
   it('never probes a cross-origin advertised llms.txt', async () => {
     const caps = emptyCapabilities();
     caps.machineReadable.push({
@@ -79,6 +90,32 @@ describe('probeRouteMarkdown', () => {
     const caps = detectDocsEngine(load('mintlify.html'), 'https://mintlify.com/docs');
     const fetcher = fakeFetcher({ 'https://mintlify.com/docs.md': load('route.md') });
     const result = await probeRouteMarkdown('https://mintlify.com/docs', caps, fetcher);
+    expect(result).toBeNull();
+  });
+
+  it('uses an advertised route-markdown candidate from capabilities', async () => {
+    const caps = emptyCapabilities();
+    caps.machineReadable.push({
+      type: 'route-markdown',
+      url: 'https://example.com/guide/intro.md',
+      evidence: 'signal',
+    });
+    const fetcher = fakeFetcher({ 'https://example.com/guide/intro.md': load('route.md') });
+    const result = await probeRouteMarkdown('https://example.com/guide/intro', caps, fetcher);
+    expect(result?.artifact.type).toBe('route-markdown');
+    expect(result?.artifact.url).toBe('https://example.com/guide/intro.md');
+    expect(result?.body).toContain('# What is VitePress?');
+  });
+
+  it('skips a cross-origin advertised route-markdown candidate', async () => {
+    const caps = emptyCapabilities();
+    caps.machineReadable.push({
+      type: 'route-markdown',
+      url: 'https://evil.com/x.md',
+      evidence: 'signal',
+    });
+    const fetcher = fakeFetcher({ 'https://evil.com/x.md': load('route.md') });
+    const result = await probeRouteMarkdown('https://example.com/x', caps, fetcher);
     expect(result).toBeNull();
   });
 });

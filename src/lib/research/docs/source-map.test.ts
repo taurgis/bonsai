@@ -67,6 +67,12 @@ describe('mapMdnSource', () => {
   it('returns null for non-docs MDN URLs', () => {
     expect(mapMdnSource('https://developer.mozilla.org/en-US/blog/')).toBeNull();
   });
+
+  it('rejects a path-traversal slug', () => {
+    expect(
+      mapMdnSource('https://developer.mozilla.org/en-US/docs/Web/../../etc/passwd')
+    ).toBeNull();
+  });
 });
 
 describe('vitepressRouteMarkdown', () => {
@@ -87,6 +93,10 @@ describe('vitepressRouteMarkdown', () => {
 
   it('returns null when already a .md route', () => {
     expect(vitepressRouteMarkdown('https://vitepress.dev/guide/intro.md')).toBeNull();
+  });
+
+  it('returns null for an unparseable URL', () => {
+    expect(vitepressRouteMarkdown('not a url')).toBeNull();
   });
 });
 

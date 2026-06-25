@@ -7,10 +7,14 @@ import { revalidateCache } from './revalidate.js';
 import { writeArtifact, readArtifact } from './storage.js';
 import type { ResearchArtifact } from './schema.js';
 import * as fetcher from './fetcher.js';
+import * as browser from './browser.js';
 import * as sites from '../../sites/index.js';
 
 vi.mock('./fetcher.js', () => ({
   fetchStaticHtml: vi.fn(),
+}));
+vi.mock('./browser.js', () => ({
+  fetchRenderedHtml: vi.fn(),
 }));
 vi.mock('../../sites/index.js', () => ({
   getSiteModuleById: vi.fn(),
@@ -245,6 +249,60 @@ describe('freshness and revalidation engine', () => {
 
       expect(result.status).toBe('refreshed');
       expect(result.artifact.metadata.site_module_id).toBe('salesforce');
+    });
+
+    it('uses the rendered browser fetch and marks the refreshed artifact browser_fallback', async () => {
+      const newHtml =
+        '<!doctype html><html><body><h1>Rendered</h1><p>A refreshed paragraph long enough to clear the reading length threshold for confidence.</p></body></html>';
+      vi.mocked(browser.fetchRenderedHtml).mockResolvedValue({
+        status: 200,
+        contentType: 'text/html',
+        etag: null,
+        lastModified: null,
+        finalUrl: 'https://example.com/docs',
+        responseSize: newHtml.length,
+        content: newHtml,
+      });
+
+      const currentTime = new Date('2026-07-29T00:00:00.000Z');
+      writeArtifact(tempDir, sampleArtifact.metadata.cache_key, sampleArtifact);
+
+      const result = await revalidateCache(tempDir, sampleArtifact, currentTime, {
+        allowStale: false,
+        rendered: true,
+      });
+
+      expect(result.status).toBe('refreshed');
+      expect(result.artifact.metadata.capture_method).toBe('browser_fallback');
+      expect(browser.fetchRenderedHtml).toHaveBeenCalledWith('https://example.com/docs');
+      expect(fetcher.fetchStaticHtml).not.toHaveBeenCalled();
+    });
+
+    it('sends no conditional headers when the artifact lacks etag and last_modified', async () => {
+      const newHtml =
+        '<!doctype html><html><body><h1>Fresh</h1><p>A refreshed paragraph long enough to clear the reading length threshold for confidence scoring.</p></body></html>';
+      vi.mocked(fetcher.fetchStaticHtml).mockResolvedValue({
+        status: 200,
+        contentType: 'text/html',
+        etag: null,
+        lastModified: null,
+        finalUrl: 'https://example.com/docs',
+        responseSize: newHtml.length,
+        content: newHtml,
+      });
+
+      const noValidators: ResearchArtifact = {
+        ...sampleArtifact,
+        metadata: { ...sampleArtifact.metadata, etag: null, last_modified: null },
+      };
+      const currentTime = new Date('2026-07-29T00:00:00.000Z');
+      writeArtifact(tempDir, noValidators.metadata.cache_key, noValidators);
+
+      await revalidateCache(tempDir, noValidators, currentTime, { allowStale: false });
+
+      expect(fetcher.fetchStaticHtml).toHaveBeenCalledWith('https://example.com/docs', {
+        headers: {},
+      });
     });
 
     it('uses the site module fetchPage on revalidation and preserves site_module_id', async () => {

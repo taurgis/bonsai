@@ -37,14 +37,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args, flags } = await this.parse(ConfigUnset);
-    this.args = args;
-    this.flags = flags;
-  }
-
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const key = this.args.key;
     this.assertKnownKey(key);
     this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
@@ -52,7 +45,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
     const scope = this.writeScope(this.flags.local);
 
     if (this.flags['dry-run']) {
-      if (!this.requestedJson()) this.log(`[dry-run] Would unset ${key} (${scope})`);
+      if (!this.jsonEnabled()) this.log(`[dry-run] Would unset ${key} (${scope})`);
       return { key, scope, dryRun: true };
     }
 
@@ -72,7 +65,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
       writeUserConfig(configDir, patch);
     }
 
-    if (!this.requestedJson()) this.log(`Unset ${key} (${scope})`);
+    if (!this.jsonEnabled()) this.log(`Unset ${key} (${scope})`);
     return { key, scope, dryRun: false };
   }
 }

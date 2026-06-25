@@ -149,6 +149,34 @@ describe('cache storage filesystem management', () => {
     }
   });
 
+  it('readArtifact throws when no artifact exists for the key', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-test-'));
+    try {
+      expect(() => readArtifact(tempDir, 'deadbeef')).toThrow(
+        /Artifact not found for key: deadbeef/
+      );
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('selects an artifact whose validated_at is null over one that has none either (epoch tie)', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-test-'));
+    try {
+      const key = 'abcdef123456';
+      const noValidated = {
+        ...sampleArtifact,
+        metadata: { ...sampleArtifact.metadata, validated_at: null },
+        summary: 'No validated_at',
+      };
+      writeArtifact(tempDir, key, noValidated);
+      const found = findArtifact(tempDir, key);
+      expect(found?.summary).toBe('No validated_at');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   it('ignores temp files and skips/archives corrupt artifacts', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-test-'));
     try {

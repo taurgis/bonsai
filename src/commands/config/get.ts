@@ -32,14 +32,7 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args, flags } = await this.parse(ConfigGet);
-    this.args = args;
-    this.flags = flags;
-  }
-
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const key = this.args.key;
     this.assertKnownKey(key);
     this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
@@ -51,7 +44,7 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
     const displayValue = value !== undefined ? value : BUILT_IN_DEFAULTS[key];
     const formatted = meta.format(displayValue);
     const suffix = value === undefined ? ' (not configured)' : '';
-    if (!this.requestedJson()) this.log(formatted + suffix);
+    if (!this.jsonEnabled()) this.log(formatted + suffix);
 
     return { key, value: displayValue };
   }

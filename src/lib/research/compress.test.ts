@@ -27,6 +27,11 @@ const x = 42;
     expect(compressed.length).toBeLessThan(detailed.length);
   });
 
+  it('returns an empty string for empty or whitespace-only input', () => {
+    expect(compressMarkdown('')).toBe('');
+    expect(compressMarkdown('   \n\n   ')).toBe('');
+  });
+
   it('collapses multiple consecutive newlines', () => {
     const input = 'Line 1\n\n\n\nLine 2\n\n\nLine 3';
     const output = compressMarkdown(input);

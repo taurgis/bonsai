@@ -21,6 +21,21 @@ describe('extractNextRscData (T-26)', () => {
     expect(data.sourcePathHints).toHaveLength(0);
   });
 
+  it('falls back to the route as the title and dedupes repeated routes', () => {
+    // First object has no title within the ~400-char lookahead window, so the title falls back to
+    // the route string. The same route appears again (padded out of window) and is skipped (seen).
+    const filler = ' '.repeat(450);
+    const html =
+      '<script>self.__next_f=[[1,"{\\"route\\":\\"/dup\\"}' +
+      filler +
+      '{\\"route\\":\\"/dup\\",\\"title\\":\\"Second\\"}"]]</script>';
+    const data = extractNextRscData(html);
+    const matches = data.pageMap.filter((p) => p.url === '/dup');
+    expect(matches).toHaveLength(1);
+    expect(matches[0]!.title).toBe('/dup');
+    expect(matches[0]!.sourcePath).toBeUndefined();
+  });
+
   it('does not execute scripts — payload is scanned as text', () => {
     const malicious =
       '<script>self.__next_f=[[1,"{\\"route\\":\\"/x\\",\\"title\\":\\"X\\"}"]];globalThis.PWNED=1</script>';

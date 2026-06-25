@@ -71,13 +71,6 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args, flags } = await this.parse(ResearchSearch);
-    this.args = args;
-    this.flags = flags;
-  }
-
   private validateSearchFlags(): void {
     const limit = this.flags.limit;
     if (limit !== undefined && (limit < 1 || limit > 50)) {
@@ -238,7 +231,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   }
 
   private logSearchResults(finalResults: any[]): void {
-    if (this.requestedJson()) return;
+    if (this.jsonEnabled()) return;
     this.log(`Found ${finalResults.length} matching cached research entries:\n`);
     finalResults.forEach((res, index) => {
       this.log(`${index + 1}. [${res.topic || 'No Topic'}] Score: ${res.score}`);
@@ -254,7 +247,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     heading: string,
     results: ReadonlyArray<{ title: string; url: string; snippet?: string }>
   ): void {
-    if (this.requestedJson()) return;
+    if (this.jsonEnabled()) return;
     this.log(heading);
     results.forEach((r, i) => {
       this.log(`${i + 1}. ${r.title}`);
@@ -289,7 +282,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     }
   }
 
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const { query } = this.args;
     const { domain, remote } = this.flags;
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { htmlToMarkdown } from './markdown.js';
+import { htmlToMarkdown, dropEmptyLinks } from './markdown.js';
 
 describe('htmlToMarkdown GFM tables', () => {
   it('renders a thead/tbody table as a GFM pipe table', () => {
@@ -51,5 +51,33 @@ describe('htmlToMarkdown GFM tables', () => {
     expect(md).toContain('[Real](https://x/y)');
     expect(md).toContain('![](https://x/i.png)');
     expect(md).toContain('Heading');
+  });
+
+  it('emits nothing for a table with no rows', () => {
+    // An empty <table> has no header row, so the rule returns '' (the `if (!header)` branch).
+    const md = htmlToMarkdown('<p>before</p><table></table><p>after</p>');
+    expect(md).toContain('before');
+    expect(md).toContain('after');
+    expect(md).not.toContain('|');
+  });
+
+  it('ignores non-tr/non-section children when collecting a table’s own rows', () => {
+    // A <caption> and a stray <div> are not rows and must not become phantom table lines.
+    const html =
+      '<table><caption>Cap</caption><div>x</div><tr><th>A</th></tr><tr><td>1</td></tr></table>';
+    const md = htmlToMarkdown(html);
+    const tableLines = md.split('\n').filter((l) => l.startsWith('|'));
+    // header + separator + one data row.
+    expect(tableLines).toHaveLength(3);
+    expect(md).toContain('| A |');
+    expect(md).toContain('| 1 |');
+  });
+});
+
+describe('dropEmptyLinks', () => {
+  it('removes text-less links but keeps images and labelled links', () => {
+    expect(dropEmptyLinks('a [](https://x/#h) b')).toBe('a  b');
+    expect(dropEmptyLinks('![](https://x/i.png)')).toBe('![](https://x/i.png)');
+    expect(dropEmptyLinks('[real](https://x/y)')).toBe('[real](https://x/y)');
   });
 });

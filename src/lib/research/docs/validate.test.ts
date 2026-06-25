@@ -24,6 +24,10 @@ describe('isSameDocsOrigin', () => {
     expect(isSameDocsOrigin('https://x.com/llms.txt', 'https://x.com/docs')).toBe(true);
     expect(isSameDocsOrigin('https://evil.com/llms.txt', 'https://x.com/docs')).toBe(false);
   });
+
+  it('returns false when a URL is unparseable', () => {
+    expect(isSameDocsOrigin('not a url', 'https://x.com/docs')).toBe(false);
+  });
 });
 
 describe('validateTextArtifact', () => {
@@ -39,5 +43,13 @@ describe('validateTextArtifact', () => {
 
   it('rejects empty bodies', () => {
     expect(validateTextArtifact('   ').ok).toBe(false);
+  });
+
+  it('rejects a plain-text soft error page with a reason', () => {
+    // Non-HTML body that still reads like an error page (the looksLikeErrorPage branch).
+    expect(validateTextArtifact('404: This page could not be found.')).toEqual({
+      ok: false,
+      reason: 'body looks like an error page',
+    });
   });
 });

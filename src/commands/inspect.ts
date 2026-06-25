@@ -25,13 +25,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args } = await this.parse(ResearchInspect);
-    this.args = args;
-  }
-
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const { url } = this.args;
 
     let target: ReturnType<typeof resolveResearchTarget>;
@@ -56,7 +50,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     const artifactPath = located.path;
     const sections = this.findSections(roots.readRoots, cacheKey);
 
-    if (!this.requestedJson()) {
+    if (!this.jsonEnabled()) {
       this.log(`Cache Key: ${cacheKey}`);
       this.log(`Cache Path: ${artifactPath}`);
       this.log(`--- Metadata ---`);

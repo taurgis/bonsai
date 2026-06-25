@@ -133,4 +133,36 @@ describe('detectDocsEngine', () => {
     const caps = detectDocsEngine(load('slate-404.html'), 'https://example.github.io/slate/');
     expect(caps.framework).toBeUndefined();
   });
+
+  it('records an Algolia DocSearch search signal from inline markup', () => {
+    const html =
+      '<!doctype html><html><body>' +
+      '<div class="DocSearch">search</div><script>algolia docsearch</script>' +
+      '<h1>a</h1><h2>b</h2><h3>c</h3><h4>d</h4><h5>e</h5><h6>f</h6><h2>g</h2><h2>h</h2>' +
+      '</body></html>';
+    const caps = detectDocsEngine(html, 'https://example.com/docs');
+    expect(caps.search?.provider).toBe('algolia-docsearch');
+    expect(caps.search?.evidence).toBe('signal');
+  });
+
+  it('ignores an llms.txt link with an unparseable URL', () => {
+    // The href resolves against a malformed base, so the URL constructor throws and the signal
+    // is silently dropped (the findLlmsTxtSignal catch branch).
+    const html =
+      '<!doctype html><html><body><a href="llms.txt">links</a><p>plain</p></body></html>';
+    const caps = detectDocsEngine(html, 'http://[bad');
+    expect(caps.machineReadable.find((m) => m.type === 'llms.txt')).toBeUndefined();
+  });
+
+  it('adds ReadMe Algolia and OpenAPI signal notes when present', () => {
+    const html =
+      '<!doctype html><html><body class="rm-Guides" data-rm-x>' +
+      '<script>algolia</script><span>openapi oas registry</span>' +
+      '<p>readme.io docs</p></body></html>';
+    const caps = detectDocsEngine(html, 'https://docs.example.com/');
+    expect(caps.framework).toBe('readme');
+    const notes = caps.notes.join(' ');
+    expect(notes).toMatch(/Algolia search metadata present/);
+    expect(notes).toMatch(/OpenAPI registry metadata present/);
+  });
 });

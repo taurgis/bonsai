@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { serializeArtifact, parseArtifact } from './artifact.js';
+import { serializeArtifact, parseArtifact, parseMetadata, extractSection } from './artifact.js';
 import type { ResearchArtifact } from './schema.js';
 
 describe('artifact serialization and parsing', () => {
@@ -90,5 +90,24 @@ describe('artifact serialization and parsing', () => {
     const stripped = serialized.replace(/\nsite_module_id:.*/, '');
     const parsed = parseArtifact(stripped);
     expect(parsed.metadata.site_module_id).toBeNull();
+  });
+
+  it('parses a non-numeric token_estimate value as null', () => {
+    // A nested key under token_estimate whose value is not a number becomes null.
+    const meta = parseMetadata(['token_estimate:', '  compressed: abc', '  detailed: 42']);
+    expect(meta.token_estimate.compressed).toBeNull();
+    expect(meta.token_estimate.detailed).toBe(42);
+  });
+
+  it('ignores stray indented array items and lines without a colon', () => {
+    // A "  - x" item with no active array key is dropped silently; a root line without a colon
+    // is skipped; blank lines are skipped. None of these should corrupt the defaults.
+    const meta = parseMetadata(['  - orphan', 'no-colon-line', '', 'topic: Real Topic']);
+    expect(meta.topic).toBe('Real Topic');
+    expect(meta.tags).toEqual([]);
+  });
+
+  it('extractSection returns empty string for a missing section', () => {
+    expect(extractSection('## Summary\n\ntext', 'Provenance')).toBe('');
   });
 });

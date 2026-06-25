@@ -27,19 +27,13 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { flags } = await this.parse(ConfigList);
-    this.flags = flags;
-  }
-
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
 
     const scope = this.readScope(this.flags.global, this.flags.local);
     const scoped = readScopedConfig(scope, this.config.configDir, process.cwd());
 
-    if (!this.requestedJson()) {
+    if (!this.jsonEnabled()) {
       const width = Math.max(...ALL_KEYS.map((k) => k.length)) + 2;
       for (const key of ALL_KEYS) {
         const raw = scoped[key];

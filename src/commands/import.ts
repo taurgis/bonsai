@@ -87,13 +87,6 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args, flags } = await this.parse(ResearchImport);
-    this.args = args;
-    this.flags = flags;
-  }
-
   private async readStdin(limitBytes: number = 1024 * 1024): Promise<string> {
     return new Promise((resolve, reject) => {
       let data = '';
@@ -299,7 +292,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     };
   }
 
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const hasSingle = Boolean(this.args.url);
     const multiUrls = this.flags['source-url'] || [];
     const hasMulti = multiUrls.length > 0;
@@ -334,7 +327,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       );
     }
 
-    if (!this.requestedJson()) {
+    if (!this.jsonEnabled()) {
       this.log(`Successfully imported research artifact.`);
       this.log(`Cache Key: ${cacheKey}`);
       this.log(`Storage Path: ${storagePath}`);

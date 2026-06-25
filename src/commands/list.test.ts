@@ -77,4 +77,55 @@ describe('list command unit tests', () => {
     const runPromise = ResearchList.run(['--limit', '200']);
     await expect(runPromise).rejects.toThrow(/Limit must be between 1 and 100/);
   });
+
+  it('excludes entries on non-matching artifact-type/capture-method/freshness filters', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Filter Branch Doc');
+    await ResearchImport.run([
+      'https://example.com/filter-branch-test',
+      '--stdin',
+      '--topic',
+      'FilterBranch',
+    ]);
+
+    // Seeded entry is an agent_supplied 'source' that is fresh — each mismatching filter drops it.
+    expect(
+      (
+        (await ResearchList.run([
+          '--topic',
+          'FilterBranch',
+          '--artifact-type',
+          'research_note',
+        ])) as any[]
+      ).length
+    ).toBe(0);
+    expect(
+      (
+        (await ResearchList.run([
+          '--topic',
+          'FilterBranch',
+          '--capture-method',
+          'static_fetch',
+        ])) as any[]
+      ).length
+    ).toBe(0);
+    expect(
+      (
+        (await ResearchList.run([
+          '--topic',
+          'FilterBranch',
+          '--freshness',
+          'stale_expired',
+        ])) as any[]
+      ).length
+    ).toBe(0);
+
+    readSpy.mockRestore();
+  });
+
+  it('returns an empty list when nothing matches the filter', async () => {
+    const result = (await ResearchList.run(['--topic', 'no-such-topic-zzzz'])) as any[];
+    expect(result).toEqual([]);
+  });
 });

@@ -4,20 +4,24 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runContract } from './runner.ts';
 
-// Each test runs the real CLI in an isolated cwd (for the project config + cache) and an isolated
-// XDG_DATA_HOME (for the global cache, so tests never touch the developer's real research cache).
+// Each test runs the real CLI in an isolated cwd (for the project config + cache), an isolated
+// XDG_DATA_HOME (for the global cache), and an isolated XDG_CONFIG_HOME (for the user-level config)
+// so tests never read or write the developer's real research cache or config.
 let cwd: string;
 let xdg: string;
+let cfg: string;
 beforeEach(() => {
   cwd = mkdtempSync(join(tmpdir(), 'fnr-cfg-cwd-'));
   xdg = mkdtempSync(join(tmpdir(), 'fnr-cfg-xdg-'));
+  cfg = mkdtempSync(join(tmpdir(), 'fnr-cfg-home-'));
 });
 afterEach(() => {
   rmSync(cwd, { recursive: true, force: true });
   rmSync(xdg, { recursive: true, force: true });
+  rmSync(cfg, { recursive: true, force: true });
 });
 
-const env = () => ({ XDG_DATA_HOME: xdg });
+const env = () => ({ XDG_DATA_HOME: xdg, XDG_CONFIG_HOME: cfg });
 const PROJECT_CONFIG = '.bonsai.json';
 const PROJECT_CACHE = join('.bonsai', 'research');
 

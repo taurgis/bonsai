@@ -48,12 +48,6 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { flags } = await this.parse(ResearchPrune);
-    this.flags = flags;
-  }
-
   private validatePruneFlags(): void {
     if (!this.flags['older-than'] && !this.flags.inactive && !this.flags['artifact-type']) {
       this.error(
@@ -125,7 +119,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     return prunedCount;
   }
 
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     this.validatePruneFlags();
 
     const roots = loadStoreRoots({
@@ -140,7 +134,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     const count = filesToPrune.length;
 
     if (dryRun) {
-      if (!this.requestedJson()) {
+      if (!this.jsonEnabled()) {
         this.log(`[Dry Run] Found ${count} research cache entries that would be pruned:\n`);
         filesToPrune.forEach((f) => {
           this.log(`- [${f.topic || 'No Topic'}] Key: ${f.cacheKey} (${f.url || 'Imported note'})`);
@@ -148,7 +142,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       }
     } else {
       const prunedCount = this.deletePruneCandidates(filesToPrune);
-      if (!this.requestedJson()) {
+      if (!this.jsonEnabled()) {
         this.log(`Successfully pruned ${prunedCount} of ${count} research cache entries.`);
       }
     }

@@ -22,7 +22,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -129,8 +130,7 @@
       "pluginType": "core",
       "strict": true,
       "summary": "An advanced, locally cached web research tool optimized for LLM ingestion.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
+      "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "import": {
@@ -159,7 +159,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -253,8 +254,7 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Import agent-supplied clean Markdown notes into the local cache.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
+      "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "inspect": {
@@ -269,7 +269,8 @@
       "description": "Inspects local storage and displays full frontmatter metadata for the URL (without printing the content body).",
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -283,8 +284,7 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Inspect cached research metadata for a URL.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
+      "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "list": {
@@ -307,7 +307,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -380,8 +381,7 @@
       "pluginType": "core",
       "strict": true,
       "summary": "List cached research artifacts by metadata filters.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
+      "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "prune": {
@@ -400,7 +400,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -452,8 +453,7 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Clean up old or inactive research cache entries.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
+      "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "search": {
@@ -468,7 +468,8 @@
       "description": "Scans the local research cache database and ranks matching entries based on topic, tags, source URLs, summary, and content.",
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -539,8 +540,7 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Search locally cached research artifacts by keywords.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
+      "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "status": {
@@ -555,7 +555,8 @@
       "description": "Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the root fetch command would take.",
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -597,8 +598,7 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Check the cache status of a URL without fetching or writing.",
-      "enableJsonFlag": false,
-      "jsonEnvelope": false,
+      "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "config:get": {
@@ -623,7 +623,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -674,7 +675,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -736,7 +738,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"
@@ -799,7 +802,8 @@
       ],
       "flags": {
         "json": {
-          "description": "Return the output as a machine-readable JSON object.",
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
           "name": "json",
           "allowNo": false,
           "type": "boolean"

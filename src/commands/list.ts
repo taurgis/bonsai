@@ -55,12 +55,6 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { flags } = await this.parse(ResearchList);
-    this.flags = flags;
-  }
-
   private validateListFlags(): void {
     const limit = this.flags.limit;
     if (limit !== undefined && (limit < 1 || limit > 100)) {
@@ -119,7 +113,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   }
 
   private logListResults(finalResults: any[]): void {
-    if (this.requestedJson()) return;
+    if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No cached research entries found matching filters.');
       return;
@@ -135,7 +129,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
   }
 
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     this.validateListFlags();
 
     const roots = loadStoreRoots({

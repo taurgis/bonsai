@@ -73,14 +73,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
 
   static stdoutIsPrimaryData = true;
 
-  async init(): Promise<void> {
-    await super.init();
-    const { args, flags } = await this.parse(ResearchStatus);
-    this.args = args;
-    this.flags = flags;
-  }
-
-  async execute(): Promise<unknown> {
+  async run(): Promise<unknown> {
     const { url } = this.args;
     const { ttl, tier, 'max-age': maxAge } = this.flags;
 
@@ -110,7 +103,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     // On a hit, report where it actually lives; on a miss, where a fetch would write it.
     const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
 
-    if (!this.requestedJson()) {
+    if (!this.jsonEnabled()) {
       this.log(`URL: ${normalizedUrl}`);
       this.log(`Cache Key: ${cacheKey}`);
       this.log(`Cache Path: ${artifactPath}`);

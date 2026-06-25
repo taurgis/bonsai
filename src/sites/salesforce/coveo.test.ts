@@ -1,10 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   buildSearchPageUrl,
   normalizeHelpDocContentUrl,
   extractCoveoResults,
   isAllowedDocHost,
+  searchCoveoDirect,
 } from './coveo.js';
+import { COVEO_DEFAULTS, type TokenInfo } from './token.js';
 
 describe('salesforce coveo helpers', () => {
   it('buildSearchPageUrl puts the query in the hash, not the search string', () => {
@@ -73,5 +75,100 @@ describe('salesforce coveo helpers', () => {
     expect(extractCoveoResults(null, 10)).toEqual([]);
     expect(extractCoveoResults({}, 10)).toEqual([]);
     expect(extractCoveoResults({ results: 'nope' }, 10)).toEqual([]);
+  });
+
+  it('extractCoveoResults falls back through the raw url fields and to the url as title', () => {
+    const data = {
+      results: [
+        { raw: { sourceurl: 'https://help.salesforce.com/s/articleView?id=sf.s.htm&type=5' } },
+      ],
+    };
+    const [item] = extractCoveoResults(data, 10);
+    expect(item.url).toBe('https://help.salesforce.com/s/articleView?id=sf.s.htm&type=5');
+    expect(item.title).toBe(item.url); // no title field -> url used as the title
+    expect(item.snippet).toBeUndefined();
+  });
+});
+
+describe('searchCoveoDirect', () => {
+  const token: TokenInfo = {
+    accessToken: 'tok-123',
+    organizationId: COVEO_DEFAULTS.organizationId,
+    searchHub: COVEO_DEFAULTS.searchHub,
+    endpointBase: COVEO_DEFAULTS.endpointBase,
+    clientUri: 'https://platform.cloud.coveo.com',
+    filterer: '@source==Help',
+    expiresAtMs: Date.now() + 60_000,
+  };
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('returns the parsed body and sends a bearer header + filterer aq on the first attempt', async () => {
+    const body = { results: [{ title: 'A' }] };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(body),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const out = await searchCoveoDirect(token, 'roles', 5, 'en_US');
+    expect(out).toEqual(body);
+    expect(fetchMock).toHaveBeenCalledOnce();
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(String(url)).toBe('https://platform.cloud.coveo.com/rest/search/v2');
+    expect(init.headers.authorization).toBe('Bearer tok-123');
+    const payload = JSON.parse(init.body);
+    expect(payload.q).toBe('roles');
+    expect(payload.numberOfResults).toBe(5);
+    expect(payload.aq).toBe('@source==Help'); // filterer applied
+  });
+
+  it('retries with a query-string token on a 401 and returns the fallback body', async () => {
+    const fallback = { results: [] };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve(null) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(fallback) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const out = await searchCoveoDirect(token, 'roles', 5);
+    expect(out).toEqual(fallback);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    // Second attempt carries the token in the query string, no bearer header.
+    const [url, init] = fetchMock.mock.calls[1];
+    expect(new URL(String(url)).searchParams.get('access_token')).toBe('tok-123');
+    expect(init.headers.authorization).toBeUndefined();
+  });
+
+  it('returns null on a non-retryable error status (e.g. 500)', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: false, status: 500, json: () => Promise.resolve(null) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    expect(await searchCoveoDirect(token, 'roles', 5)).toBeNull();
+    expect(fetchMock).toHaveBeenCalledOnce(); // no retry for 500
+  });
+
+  it('returns null when fetch throws (network/timeout)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('aborted')));
+    expect(await searchCoveoDirect(token, 'roles', 5)).toBeNull();
+  });
+
+  it('omits the aq filter when the token has no filterer', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ results: [] }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await searchCoveoDirect({ ...token, filterer: null }, 'roles', 5);
+    const payload = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(payload.aq).toBeUndefined();
   });
 });

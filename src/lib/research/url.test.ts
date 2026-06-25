@@ -89,4 +89,29 @@ describe('isSafeIp safety check', () => {
     // Public IPv6
     expect(isSafeIp('2001:4860:4860::8888')).toBe(true);
   });
+
+  it('returns false for strings that are not valid IPs', () => {
+    // isIP() returns 0, so neither v4 nor v6 branch runs.
+    expect(isSafeIp('not-an-ip')).toBe(false);
+    expect(isSafeIp('999.999.999.999')).toBe(false);
+    expect(isSafeIp('')).toBe(false);
+  });
+
+  it('treats an IPv4-mapped IPv6 with a non-IPv4 tail as public (no v4 reclassification)', () => {
+    expect(isSafeIp('::ffff:8.8.8.8')).toBe(true);
+    // A ::ffff: prefix whose tail is not a literal IPv4 falls through to the public default.
+    expect(isSafeIp('::ffff:0:1')).toBe(true);
+  });
+});
+
+describe('normalizeUrl invalid input', () => {
+  it('throws a descriptive error for an unparseable URL', () => {
+    expect(() => normalizeUrl('http://')).toThrow(/Invalid URL/);
+    expect(() => normalizeUrl('not a url')).toThrow(/Invalid URL/);
+  });
+
+  it('clears the http default port and a custom https port stays', () => {
+    expect(normalizeUrl('http://example.com:80/x')).toBe('http://example.com/x');
+    expect(normalizeUrl('https://example.com:8443/x')).toBe('https://example.com:8443/x');
+  });
 });

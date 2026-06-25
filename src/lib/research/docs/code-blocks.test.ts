@@ -47,4 +47,36 @@ describe('normalizeCodeBlocks (T-17)', () => {
     normalizeCodeBlocks(document);
     expect(htmlToMarkdown(document.body.innerHTML)).toContain('plain\ntext');
   });
+
+  it('detects a bare data-language token and tags the code with a language class', () => {
+    const { document } = parseHTML(
+      '<!doctype html><html><body><pre data-language="bash"><code><span class="line">npm i</span></code></pre></body></html>'
+    );
+    normalizeCodeBlocks(document);
+    expect(document.querySelector('code')!.getAttribute('class')).toContain('language-bash');
+  });
+
+  it('removes copy buttons matched by aria-label and by visible text', () => {
+    const { document } = parseHTML(
+      '<!doctype html><html><body>' +
+        '<button aria-label="Copy code">x</button>' +
+        '<span>Copy</span>' +
+        '<button aria-label="other">keep</button>' +
+        '<pre><code>code</code></pre>' +
+        '</body></html>'
+    );
+    normalizeCodeBlocks(document);
+    expect(document.querySelector('[aria-label="Copy code"]')).toBeNull();
+    expect(document.body.textContent).not.toMatch(/^Copy$/m);
+    // A non-copy button is preserved.
+    expect(document.querySelector('[aria-label="other"]')).not.toBeNull();
+  });
+
+  it('handles a pre with no inner code element (code === pre branch)', () => {
+    const { document } = parseHTML(
+      '<!doctype html><html><body><pre><span class="line">line one</span><span class="line">line two</span></pre></body></html>'
+    );
+    normalizeCodeBlocks(document);
+    expect(htmlToMarkdown(document.body.innerHTML)).toContain('line one\nline two');
+  });
 });
