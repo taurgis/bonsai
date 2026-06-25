@@ -1,14 +1,14 @@
 # Caching Protocol Specification
 
-This document details the local caching protocol, storage paths, metadata schemas, freshness calculations, and revalidation behaviors used by Bonsai.
+How Bonsai caches research locally: where files live, what metadata each one carries, how freshness is computed, and when an entry gets revalidated.
 
 ---
 
 ## 1. Storage Location & Directory Resolution
 
-Cached research artifacts are saved as individual Markdown files (`<cache_key>.md`) under the directory resolved by Bonsai's oclif data directory (`this.config.dataDir`).
+Each cached artifact is a single Markdown file (`<cache_key>.md`), written under the directory Bonsai resolves from its oclif data directory (`this.config.dataDir`).
 
-Depending on how the CLI is executed, the database path resolves as follows:
+Where that path lands depends on how the CLI runs:
 * **Standalone Bonsai CLI**: `~/.local/share/bonsai/research/` on Linux-style XDG systems, or the platform-specific oclif data directory for the `bonsai` binary.
 * **Project-local Bonsai cache**: `<project>/.bonsai/research/` when `config set storage project --local` is active.
 * **OS-Specific Standards**:
@@ -40,7 +40,7 @@ never committed.
 
 ## 2. URL Normalization & Cache Key Generation
 
-To maximize cache hits across slightly different URL strings, every requested URL is normalized before resolving its cache key.
+Two URLs that differ only in casing, a trailing slash, or query-parameter order should hit the same cache entry. To make that happen, Bonsai normalizes every requested URL before it resolves the cache key.
 
 ### URL Normalization Rules
 1. **Scheme & Host**: Converted to lowercase.
@@ -61,7 +61,7 @@ For imported multi-source synthesis files (which do not map to a single source U
 
 ## 3. Stored Markdown File Format (YAML Frontmatter)
 
-Every cache entry is stored as a single, human-readable Markdown file. This file contains a **YAML frontmatter** block at the beginning, followed by the content payloads.
+Every cache entry is one human-readable Markdown file: a **YAML frontmatter** block at the top, then the content payloads beneath it.
 
 ### File Structure Example
 ```markdown
@@ -154,7 +154,7 @@ When a custom `--ttl` string (e.g., `--ttl 24h` or `--ttl 90d`) is supplied:
 
 ## 5. Revalidation Flow (Conditional Requests)
 
-When a lookup falls inside the **Grace Window** (status: `stale_grace`), the CLI attempts to revalidate the cache instead of performing a heavy full download.
+When a lookup lands inside the **Grace Window** (status: `stale_grace`), the CLI tries to revalidate the entry rather than download the page again from scratch.
 
 The decision flow at request time:
 
@@ -182,13 +182,13 @@ If the server returns `304 Not Modified`:
 * The local cache file is touched.
 * The `validated_at` timestamp is updated to the current time.
 * The `stale_after` timestamp is recalculated and extended.
-* The command avoids downloading, parsing, and converting any body payload, making it an extremely cheap verification.
+* No body payload is downloaded, parsed, or converted, so the check costs little more than the round trip.
 
 ---
 
 ## 6. Offline Fallback & Stale Serving Policies
 
-If revalidation fails due to a network connection timeout, DNS failure, or target server crash:
+When revalidation fails (connection timeout, DNS failure, or a crashed target server), behavior depends on how stale the entry is:
 
 1. **Inside Grace Window (`stale_grace`)**:
    * If `--allow-stale` is **active**: The CLI serves the cached note and exits normally (exit code `0`).

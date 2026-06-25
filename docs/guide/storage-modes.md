@@ -12,7 +12,7 @@ where new artifacts are written and which caches are read.
 
 Use **global** for personal, machine-wide research that every project on your
 machine can reuse. Use **project** when the cache should travel *with a
-repository* — so teammates and CI reuse the same captured docs.
+repository*, so teammates and CI reuse the same captured docs.
 
 ```bash
 # Store this project's cache inside the repo
@@ -36,7 +36,7 @@ then fall back to the global cache. A key present in both is served from the
 
 The project cache is meant to be committed, so it must never hold credentials.
 Before any write under `project` storage, the artifact's content is scanned for
-known secret patterns — API keys, bearer/JWT tokens, private-key blocks,
+known secret patterns: API keys, bearer/JWT tokens, private-key blocks,
 `secret=` / `token=` assignments, and similar.
 
 On a match the artifact is **redirected to the global cache**:
@@ -48,6 +48,6 @@ Global storage is not scanned, because it is never committed.
 
 ::: tip Committing the project cache
 The `.bonsai/research/` directory is designed to be committed and shared. The
-secret-routing guard is what makes that safe by default — but treat the cache
+secret-routing guard makes that safe by default, but treat the cache
 like any other source artifact and review what lands in it.
 :::

@@ -1,6 +1,6 @@
 # Command Reference
 
-This document provides detailed specifications, flag arguments, and JSON schemas for Bonsai commands.
+Detailed specifications, flag arguments, and JSON schemas for Bonsai commands.
 
 ---
 
@@ -10,7 +10,7 @@ The package is published as `@taurgis/bonsai` and installs a `bonsai` binary. On
 
 ## 1. Root fetch command
 
-The primary crawler and cache retriever command.
+The primary command. It crawls a URL and retrieves from cache.
 
 ### Usage
 ```bash
@@ -234,7 +234,7 @@ The project cache is intended to be shared/committed with a repository. To keep
 secrets out of version control, any artifact whose content matches a known
 credential pattern (API keys, tokens, private keys, `secret=`/`token=`
 assignments, etc.) is **always written to the global cache**, even when
-`project` storage is selected — a warning is printed and the JSON envelope
+`project` storage is selected. A warning is printed, and the JSON envelope
 reports `redirectedToGlobal: true`. The matched secret value is never echoed;
 only the credential *type* is named.
 

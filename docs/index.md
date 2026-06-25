@@ -51,9 +51,9 @@ features:
 
 ## From a sprawling page to a tidy bonsai
 
-The hero above is the whole idea in motion: a verbose page, rendered as text,
-**pruned and compressed** down to the essential shape that fits an agent's
-context window — without losing the structure that matters.
+The hero above shows the whole idea in motion: a verbose page, rendered as text,
+then **pruned and compressed** to the essential shape that fits an agent's
+context window. The structure that matters stays intact.
 
 ```bash
 # Fetch, extract, convert to Markdown, and cache — one command

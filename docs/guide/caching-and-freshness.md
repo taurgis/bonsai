@@ -58,7 +58,7 @@ instead of re-downloading:
 3. **Stale (in grace)** → if the entry stored an `ETag` or `Last-Modified`,
    send a conditional request (`If-None-Match` / `If-Modified-Since`):
    - **304 Not Modified** → touch the entry, extend `stale_after`, serve the
-     cached copy. No body is downloaded or parsed — extremely cheap.
+     cached copy. No body is downloaded or parsed, so it stays cheap.
    - **200 OK** → scrape the new HTML and update the cache.
    - **Network error / offline** → see below.
 

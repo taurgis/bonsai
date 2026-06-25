@@ -11,18 +11,18 @@ Bonsai has two configuration keys. Both can be set persistently with the
 | `summary` | `conservative`, `balanced`, `aggressive` | `conservative` | How aggressively the `compressed` variant is shortened when structural compression alone leaves it close to `detailed`. See [Compression](/guide/compression). |
 
 Headings, code blocks, tables, and lists are always preserved regardless of the
-`summary` value — only prose is condensed, and never with an LLM.
+`summary` value. Only prose is condensed, and never with an LLM.
 
 ## Precedence
 
 Configuration is layered. For a given run the effective value is resolved in
 this order (first match wins):
 
-1. Per-command flag — `--storage` (`fetch`/`import`)
-2. Environment variable — `BONSAI_STORAGE` / `BONSAI_SUMMARY`
-3. Project config — `.bonsai.json` in the current working directory
-4. User config — `config.json` in the OCLIF config directory
-5. Built-in default — `storage=global`, `summary=conservative`
+1. Per-command flag: `--storage` (`fetch`/`import`)
+2. Environment variable: `BONSAI_STORAGE` / `BONSAI_SUMMARY`
+3. Project config: `.bonsai.json` in the current working directory
+4. User config: `config.json` in the OCLIF config directory
+5. Built-in default: `storage=global`, `summary=conservative`
 
 ## Managing values
 
@@ -44,10 +44,10 @@ npx @taurgis/bonsai config unset storage --local
 
 ### Flags
 
-- `--global` / `-g` — target the user-level config file (default for `set`/`unset`).
-- `--local` / `--project` / `-p` — target the project-level file (`.bonsai.json`).
-- `--dry-run` — show the change without writing.
-- `--json` — machine-readable envelope.
+- `--global` / `-g`: target the user-level config file (default for `set`/`unset`).
+- `--local` / `--project` / `-p`: target the project-level file (`.bonsai.json`).
+- `--dry-run`: show the change without writing.
+- `--json`: machine-readable envelope.
 
 ## File locations
 

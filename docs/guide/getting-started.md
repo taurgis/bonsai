@@ -44,7 +44,7 @@ to Markdown, estimates token size, and stores it locally.
 npx @taurgis/bonsai https://nodejs.org/api/url.html
 ```
 
-The second run returns from cache while the entry is still fresh — no network
+The second run returns from cache while the entry is still fresh, with no network
 request needed. See [Caching & Freshness](/guide/caching-and-freshness) for how
 "fresh" is decided.
 
@@ -69,7 +69,7 @@ echo "# Synthesized React Cache Guide" | npx @taurgis/bonsai import --stdin \
   --source-url https://react.dev/b
 ```
 
-Use [`import`](/reference/commands#import) for agent-synthesized notes, private
+Use [`import`](/guide/importing-synthesis) for agent-synthesized notes, private
 docs, or pages that the static fetcher cannot read.
 
 ### 5. Search before fetching
@@ -78,10 +78,11 @@ docs, or pages that the static fetcher cannot read.
 npx @taurgis/bonsai search "node api url"
 ```
 
-Searching the local cache first is the cheapest way to reuse prior research.
+Searching the local cache first is the cheapest way to reuse prior research. See
+[Search](/guide/search) for ranking, filters, and live site discovery.
 
 ## Next steps
 
-- [Compression & Token Budgeting](/guide/compression) — choose `compressed` vs `detailed`.
-- [Storage Modes](/guide/storage-modes) — global vs project caches.
-- [Command Reference](/reference/commands) — every flag and JSON schema.
+- [Compression & Token Budgeting](/guide/compression): choose `compressed` vs `detailed`.
+- [Storage Modes](/guide/storage-modes): global vs project caches.
+- [Command Reference](/reference/commands): every flag and JSON schema.

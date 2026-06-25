@@ -1,12 +1,12 @@
 # Troubleshooting & Limitations
 
-This document lists the design limits, security blocklists, technical constraints, and common troubleshooting steps for Bonsai.
+Bonsai's design limits, security blocklists, and known constraints, plus what to do when a fetch goes wrong.
 
 ---
 
 ## 1. Network Constraints & Crawler Limits
 
-To prevent infinite loops, resource exhaustion, and denial of service (DoS) attacks on both local and remote systems, the static HTML fetcher enforces several hard limits.
+The static HTML fetcher enforces a few hard limits. They keep a single fetch from looping forever, exhausting memory, or being turned into a denial-of-service vector against a remote host.
 
 ### Crawler Limits
 * **Response Body Size Limit**: **2 MiB** (`2,097,152` bytes).
@@ -23,7 +23,7 @@ To prevent infinite loops, resource exhaustion, and denial of service (DoS) atta
 
 ## 2. DNS Safety & Private IP Blocklist (SSRF Protection)
 
-To prevent Server-Side Request Forgery (SSRF) attacks, the CLI intercepts all hostname resolutions before making a network request. It resolves the hostname to its underlying IP addresses (IPv4 and IPv6) and validates them against standard private and local IP blocks.
+To guard against Server-Side Request Forgery (SSRF), the CLI intercepts hostname resolution before any network request goes out. It resolves the hostname to its IPv4 and IPv6 addresses and checks each one against the standard private and local IP blocks.
 
 ### Blocked Target Blocks (RFC1918 & Localhost)
 The crawler will block the request if the resolved IP falls within any of the following blocks:
@@ -53,7 +53,7 @@ The crawler will block the request if the resolved IP falls within any of the fo
 
 ## 3. Client-Side Hydration (SPA) Limitations
 
-Bonsai prioritizes light CPU/memory footprints and fast execution. It executes a **static HTML fetch** using Node's native fetch API and parses the response into a virtual DOM via `linkedom`.
+Bonsai stays light on CPU and memory by doing a **static HTML fetch** with Node's native fetch API, then parsing the response into a virtual DOM with `linkedom`. Speed comes at a cost: there is no browser in the loop.
 
 ### The Constraint
 * **No Javascript Runtime**: The crawler **does not execute client-side JavaScript**. It cannot hydrate pages, click cookie consent banners, or wait for asynchronous API calls to render content.
@@ -71,7 +71,7 @@ Bonsai prioritizes light CPU/memory footprints and fast execution. It executes a
 
 ## 4. Exit Codes & Common Errors
 
-Bonsai returns distinct exit codes depending on the result status to allow machine callers (like AI agents) to programmatically handle errors.
+Bonsai returns a distinct exit code for each result status, so a machine caller such as an AI agent can branch on the outcome without parsing output.
 
 ### Exit Code Directory
 

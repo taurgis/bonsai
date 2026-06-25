@@ -39,3 +39,17 @@
 
   --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #3dd68c 30%, #a8e6cf);
 }
+
+/**
+ * On screens below 960px VitePress stacks the hero image above the title and
+ * pulls the title up with a -48px bottom margin — meant to tuck under a
+ * decorative image. Our hero is a full-bleed text canvas with a token-counter
+ * pill at its base, so that overlap collides the pill with the "Bonsai" title.
+ * Drop the negative bottom margin so the title sits cleanly below the canvas.
+ * https://vitepress.dev/guide/extending-default-theme#customizing-css
+ */
+@media (max-width: 959px) {
+  .VPHero.has-image .image {
+    margin-bottom: 0;
+  }
+}

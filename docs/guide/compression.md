@@ -3,8 +3,8 @@
 Bonsai stores every page in two variants so you can trade detail for tokens
 without re-fetching:
 
-- **`compressed`** (default) — trimmed to fit a tight context window.
-- **`detailed`** — the full semantic content for when exact wording matters.
+- **`compressed`** (default): trimmed to fit a tight context window.
+- **`detailed`**: the full semantic content for when exact wording matters.
 
 Choose one with `--format` (`-f`):
 
@@ -17,24 +17,24 @@ size of each (`{ compressed, detailed }`) so an agent can pick the variant that
 fits its budget.
 
 See [Agent web fetch vs Bonsai](/examples) for a measured, head-to-head comparison
-on popular library docs — including how a built-in agent web fetch silently drops
+on popular library docs, including how a built-in agent web fetch silently drops
 or refuses content that Bonsai keeps.
 
 ## What compression does
 
-Compression runs in layers and is **deterministic — there is no LLM in the
-loop**:
+Compression runs in layers and is **deterministic: there is no LLM in the
+loop**.
 
-1. **Structural** — strip images, simplify links, and collapse blank lines.
-2. **Extractive** — condense prose by selecting representative sentences, while
+1. **Structural:** strip images, simplify links, and collapse blank lines.
+2. **Extractive:** condense prose by selecting representative sentences, while
    **always preserving headings, code blocks, tables, and lists**. The shape of
    the document survives; only the verbose prose is trimmed.
-3. **Safety** — if the compressed result would be invalid or barely smaller than
+3. **Safety:** if the compressed result would be invalid or barely smaller than
    the detailed text, Bonsai falls back to a structural-only or detailed result
    rather than emitting something broken.
 
-The guarantee that matters: the parts an agent reasons over most — code, tables,
-and structure — are never thrown away.
+The guarantee that matters: the parts an agent reasons over most (code, tables,
+and structure) are never thrown away.
 
 ## Summary aggressiveness
 
@@ -62,6 +62,6 @@ See [Configuration](/reference/configuration) for precedence rules.
 ## When to use which
 
 - **`compressed`** for routine research, broad surveys, and anything where the
-  agent needs the gist and the structure — the default for a reason.
+  agent needs the gist and the structure. It is the default for a reason.
 - **`detailed`** when you need exact API signatures, full prose, or are about to
   quote the source verbatim.

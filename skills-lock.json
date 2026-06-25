@@ -20,6 +20,25 @@
       "sourceVersion": "1.0.0",
       "installVersion": "1.0.0"
     },
+    "anti-ai-writing": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "d8bb8f5635b4782f146b3c57a6b651810b63431867c67b2178fa5514d426ff47",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/anti-ai-writing/SKILL.md",
+      "installPath": ".agents/skills/anti-ai-writing",
+      "installHash": "ee5d331be5f2526fc806bc22d193a952db46054742058469b7e643d164e31b37",
+      "sourceHash": "d8bb8f5635b4782f146b3c57a6b651810b63431867c67b2178fa5514d426ff47",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
     "cli-design-principles": {
       "source": "Forward-Services-NV/forward-nexus-projects",
       "sourceType": "github",
@@ -92,6 +111,25 @@
       "installPath": ".agents/skills/graphify",
       "installHash": "e3ab7fe81f5ced0a78b02a9fb13479551421563f19ec57c14abb418d6ac4d9cc",
       "sourceHash": "959b61737a592998e251bb9271520d5f9014e93e7038f6222b4d98378edeb18d",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "human-prose-editing": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "010119e2b62f57645e2327187306503d4d3b98bc5bc03662388b5addea8a2789",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/human-prose-editing/SKILL.md",
+      "installPath": ".agents/skills/human-prose-editing",
+      "installHash": "dc03ccfe78e951681a770a22c44dc09e8ff0f3652c1e3553a865774b82ef3054",
+      "sourceHash": "010119e2b62f57645e2327187306503d4d3b98bc5bc03662388b5addea8a2789",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.0.0",

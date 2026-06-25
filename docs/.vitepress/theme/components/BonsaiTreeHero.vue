@@ -11,13 +11,19 @@
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { withBase } from 'vitepress';
+import {
+  GLYPH_POOL,
+  centroid,
+  drawBonsaiCanopy,
+  drawBonsaiTrunkPot,
+  drawTreeCanopy,
+  drawTreeTrunk,
+  readBonsaiColors,
+  samplePoints,
+  sortByDistance,
+  subsample,
+} from './lib/bonsai-canvas';
 
-type Kind = 'leaf' | 'bark';
-interface Pt {
-  x: number;
-  y: number;
-  kind: Kind;
-}
 interface Particle {
   ch: string;
   fromX: number;
@@ -36,6 +42,7 @@ interface Particle {
 const wrapEl = ref<HTMLDivElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const tokens = ref(0);
+const savings = ref(0);
 const reduced = ref(false);
 const ready = ref(false);
 
@@ -50,20 +57,20 @@ const linkLabel =
   'A large tree of text compressing into a small bonsai — how Bonsai prunes docs ' +
   'to fit a token budget. Open the example page with real before-and-after token savings.';
 
-// Letters only, so every particle is a visible glyph.
-const POOL =
-  'BonsaiFetchesThePageExtractsTheMainArticleConvertsItToMarkdownSanitizesUnsafeMarkup' +
-  'EstimatesTokensPrunesProseKeepsHeadingsCodeTablesAndListsThenCachesTheResultSoAgents' +
-  'ReuseItInsteadOfScrapingAgainCompressedDetailedFreshStaleRevalidateEtagLastModified'.split(
-    '',
-  );
-
 const ASSEMBLE = 900;
 const HOLD = 450;
 const COMPRESS = 1800;
 const SETTLE = ASSEMBLE + HOLD + COMPRESS;
 const MAX_PARTICLES = 720;
-const TOKENS_PER_GLYPH = 8;
+
+// Real measured averages from the agent comparison on /examples (captured
+// 2026-06-25): the mean built-in web-fetch across 5 agents × 4 docs pages
+// (37,905 tokens) vs Bonsai's compressed cache for the same pages (4,256) —
+// an 89% reduction. The counter falls from one to the other as the tree
+// compresses, so the headline savings are real, not decorative. See
+// docs/examples.md for the per-agent, per-page figures behind these means.
+const AVG_WEBFETCH_TOKENS = 37905;
+const AVG_COMPRESSED_TOKENS = 4256;
 
 let ctx: CanvasRenderingContext2D | null = null;
 let raf = 0;
@@ -91,134 +98,18 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 function readColors(): void {
   const el = canvasRef.value;
   if (!el) return;
-  const cs = getComputedStyle(el);
-  const v = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
-  leaf = v('--bonsai-leaf', leaf);
-  leafSoft = v('--bonsai-leaf-soft', leafSoft);
-  bark = v('--bonsai-bark', bark);
-}
-
-/** Draw `drawFn` to an offscreen canvas and return one point per filled grid cell. */
-function samplePoints(
-  w: number,
-  h: number,
-  step: number,
-  kind: Kind,
-  drawFn: (c: CanvasRenderingContext2D) => void,
-): Pt[] {
-  const off = document.createElement('canvas');
-  off.width = w;
-  off.height = h;
-  const octx = off.getContext('2d');
-  if (!octx) return [];
-  octx.fillStyle = '#000';
-  octx.strokeStyle = '#000';
-  drawFn(octx);
-  const data = octx.getImageData(0, 0, w, h).data;
-  const pts: Pt[] = [];
-  for (let y = 0; y < h; y += step) {
-    for (let x = 0; x < w; x += step) {
-      if (data[(y * w + x) * 4 + 3] > 128) pts.push({ x, y, kind });
-    }
-  }
-  return pts;
-}
-
-function blobs(c: CanvasRenderingContext2D, cx: number, cy: number, r: number, specs: number[][]): void {
-  c.beginPath();
-  for (const [dx, dy, br] of specs) {
-    c.moveTo(cx + dx * r + br * r, cy + dy * r);
-    c.arc(cx + dx * r, cy + dy * r, br * r, 0, Math.PI * 2);
-  }
-  c.fill();
-}
-
-function drawTreeCanopy(c: CanvasRenderingContext2D, w: number, h: number): void {
-  blobs(c, w * 0.5, h * 0.32, Math.min(w, h) * 0.3, [
-    [0, 0, 1],
-    [-0.6, 0.18, 0.62],
-    [0.6, 0.14, 0.64],
-    [-0.32, -0.4, 0.56],
-    [0.34, -0.36, 0.56],
-    [0, 0.4, 0.6],
-  ]);
-}
-
-function drawTreeTrunk(c: CanvasRenderingContext2D, w: number, h: number): void {
-  const cx = w * 0.5;
-  c.beginPath();
-  c.moveTo(cx - w * 0.06, h * 0.98);
-  c.lineTo(cx - w * 0.022, h * 0.4);
-  c.lineTo(cx + w * 0.022, h * 0.4);
-  c.lineTo(cx + w * 0.06, h * 0.98);
-  c.closePath();
-  c.fill();
-}
-
-function drawBonsaiCanopy(c: CanvasRenderingContext2D, w: number, h: number): void {
-  const cx = w * 0.5;
-  const cy = h * 0.4;
-  const pads: number[][] = [
-    [0, 0, 0.22, 0.1],
-    [-0.21, 0.04, 0.12, 0.06],
-    [0.22, -0.01, 0.13, 0.07],
-    [0.02, -0.11, 0.12, 0.06],
-  ];
-  for (const [dx, dy, rx, ry] of pads) {
-    c.beginPath();
-    c.ellipse(cx + dx * w, cy + dy * h * 1.4, rx * w, ry * h, 0, 0, Math.PI * 2);
-    c.fill();
-  }
-}
-
-function drawBonsaiTrunkPot(c: CanvasRenderingContext2D, w: number, h: number): void {
-  const cx = w * 0.5;
-  // trunk
-  c.lineWidth = w * 0.05;
-  c.lineCap = 'round';
-  c.beginPath();
-  c.moveTo(cx, h * 0.78);
-  c.quadraticCurveTo(cx - w * 0.12, h * 0.62, cx - w * 0.05, h * 0.48);
-  c.stroke();
-  // a low branch
-  c.lineWidth = w * 0.03;
-  c.beginPath();
-  c.moveTo(cx - w * 0.04, h * 0.66);
-  c.quadraticCurveTo(cx + w * 0.12, h * 0.62, cx + w * 0.18, h * 0.52);
-  c.stroke();
-  // pot
-  c.beginPath();
-  c.moveTo(cx - w * 0.2, h * 0.79);
-  c.lineTo(cx + w * 0.2, h * 0.79);
-  c.lineTo(cx + w * 0.13, h * 0.93);
-  c.lineTo(cx - w * 0.13, h * 0.93);
-  c.closePath();
-  c.fill();
-  c.fillRect(cx - w * 0.22, h * 0.76, w * 0.44, h * 0.04);
-}
-
-function subsample<T>(arr: T[], max: number): T[] {
-  if (arr.length <= max) return arr;
-  const out: T[] = [];
-  const stride = arr.length / max;
-  for (let i = 0; i < max; i++) out.push(arr[Math.floor(i * stride)]);
-  return out;
-}
-
-function centroid(pts: Pt[]): { x: number; y: number } {
-  let sx = 0;
-  let sy = 0;
-  for (const p of pts) {
-    sx += p.x;
-    sy += p.y;
-  }
-  return { x: sx / pts.length, y: sy / pts.length };
+  const c = readBonsaiColors(el, { leaf, leafSoft, bark });
+  leaf = c.leaf;
+  leafSoft = c.leafSoft;
+  bark = c.bark;
 }
 
 function build(): void {
   if (!cssW || !cssH) return;
-  const step = Math.max(6, Math.round(cssW / 52));
-  fontSize = step + 4;
+  const step = Math.max(7, Math.round(cssW / 52));
+  // Scale the glyph to the grid cell rather than adding a fixed offset, so the
+  // tree stays equally dense at narrow mobile widths instead of overlapping.
+  fontSize = Math.round(step * 1.3);
 
   let tree = subsample(
     samplePoints(cssW, cssH, step, 'leaf', (c) => drawTreeCanopy(c, cssW, cssH)).concat(
@@ -236,10 +127,8 @@ function build(): void {
   // and the kept inner text collapses toward the bonsai's core.
   const treeC = centroid(tree);
   const bonC = centroid(bonsai);
-  const byDist = (c: { x: number; y: number }) => (a: Pt, b: Pt) =>
-    (a.x - c.x) ** 2 + (a.y - c.y) ** 2 - ((b.x - c.x) ** 2 + (b.y - c.y) ** 2);
-  tree = tree.slice().sort(byDist(treeC));
-  bonsai = bonsai.slice().sort(byDist(bonC));
+  tree = sortByDistance(tree, treeC);
+  bonsai = sortByDistance(bonsai, bonC);
 
   const keptCount = bonsai.length;
   particles = tree.map((t, i): Particle => {
@@ -249,7 +138,7 @@ function build(): void {
     const color = kind === 'bark' ? bark : i % 3 === 0 ? leafSoft : leaf;
     const ang = (i * 2.399) % (Math.PI * 2);
     return {
-      ch: POOL[i % POOL.length],
+      ch: GLYPH_POOL[i % GLYPH_POOL.length],
       fromX: t.x,
       fromY: t.y,
       toX: dest.x,
@@ -264,12 +153,13 @@ function build(): void {
     };
   });
 
-  startTokens = tree.length * TOKENS_PER_GLYPH;
-  endTokens = keptCount * TOKENS_PER_GLYPH;
+  startTokens = AVG_WEBFETCH_TOKENS;
+  endTokens = AVG_COMPRESSED_TOKENS;
   // Seed the visible count so the first paint shows the start value rather than
   // flashing "0" for one frame before the first requestAnimationFrame runs.
   lastTokenDisplay = Math.round(startTokens / 10) * 10;
   tokens.value = lastTokenDisplay;
+  savings.value = 0;
   startTime = performance.now();
   ready.value = true;
 }
@@ -279,6 +169,8 @@ function setTokens(value: number): void {
   if (rounded !== lastTokenDisplay) {
     lastTokenDisplay = rounded;
     tokens.value = rounded;
+    // Savings climbs from 0 to ~89% as the page compresses toward the cache.
+    savings.value = startTokens > 0 ? Math.round((1 - value / startTokens) * 100) : 0;
   }
 }
 
@@ -374,7 +266,9 @@ function resize(): void {
   // height below, and only the width drives our layout.
   if (!width || width === cssW) return;
   cssW = width;
-  cssH = Math.max(320, Math.min(Math.round(width * 1.04), 460));
+  // Keep the canvas no taller than it is wide so it fits inside VitePress's
+  // square hero image container on mobile instead of overflowing onto the title.
+  cssH = Math.max(280, Math.min(width, 460));
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   el.width = Math.round(cssW * dpr);
   el.height = Math.round(cssH * dpr);
@@ -438,6 +332,7 @@ onBeforeUnmount(() => {
       <span v-show="ready" class="bonsai-hero__meta" aria-hidden="true">
         <span class="bonsai-hero__dot" />
         <span class="bonsai-hero__count">≈ {{ tokens.toLocaleString() }} tokens</span>
+        <span v-show="savings > 0" class="bonsai-hero__save">{{ savings }}% smaller</span>
         <span class="bonsai-hero__cta">see the real numbers →</span>
       </span>
     </a>
@@ -494,6 +389,14 @@ onBeforeUnmount(() => {
   border: 1px solid var(--vp-c-divider);
   border-radius: 999px;
   text-align: center;
+}
+
+.bonsai-hero__save {
+  padding: 1px 8px;
+  font-weight: 700;
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  border-radius: 999px;
 }
 
 .bonsai-hero__cta {

@@ -44,7 +44,7 @@ shape:
 }
 ```
 
-The `data` block differs per command — see the [Command Reference](/reference/commands)
+The `data` block differs per command. See the [Command Reference](/reference/commands)
 for each command's schema. `cache.status`, `cache.freshness`, and
 `source.extractionConfidence` are the fields agents most often branch on.
 
@@ -64,7 +64,7 @@ text:
 
 Agents get the most value by checking the cache before reaching for the network:
 
-1. **Search** existing research first — it is the cheapest path:
+1. **Search** existing research first; it is the cheapest path:
    ```bash
    bonsai search "node url api" --json
    ```
@@ -77,12 +77,13 @@ Agents get the most value by checking the cache before reaching for the network:
    ```bash
    bonsai https://nodejs.org/api/url.html --dry-run --json
    ```
-4. **Synthesize** multi-source notes back into the cache with `import` and
-   repeated `--source-url` flags so the synthesis stays source-cited:
+4. **Synthesize** multi-source notes back into the cache with
+   [`import`](/guide/importing-synthesis) and repeated `--source-url` flags so
+   the synthesis stays source-cited:
    ```bash
    cat synthesis.md | bonsai import --stdin --topic "Auth" \
      --source-url https://a.example --source-url https://b.example --json
    ```
 
 Because URLs are normalized and output is deterministic, the same request yields
-the same cache key and the same bytes — repeatable across runs and machines.
+the same cache key and the same bytes, repeatable across runs and machines.

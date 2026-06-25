@@ -46,6 +46,9 @@ export default defineConfig({
           { text: 'Caching & Freshness', link: '/guide/caching-and-freshness' },
           { text: 'Compression & Token Budgeting', link: '/guide/compression' },
           { text: 'Storage Modes', link: '/guide/storage-modes' },
+          { text: 'Search', link: '/guide/search' },
+          { text: 'Importing Synthesis', link: '/guide/importing-synthesis' },
+          { text: 'Site Modules', link: '/guide/site-modules' },
           { text: 'Agent Integration', link: '/guide/agent-integration' },
         ],
       },
@@ -66,7 +69,10 @@ export default defineConfig({
       {
         text: 'Help',
         collapsed: false,
-        items: [{ text: 'Troubleshooting & Limits', link: '/troubleshooting' }],
+        items: [
+          { text: 'Isn’t this just like memory?', link: '/vs-memory' },
+          { text: 'Troubleshooting & Limits', link: '/troubleshooting' },
+        ],
       },
     ],
 
