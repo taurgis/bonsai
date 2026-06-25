@@ -156,30 +156,22 @@ When a custom `--ttl` string (e.g., `--ttl 24h` or `--ttl 90d`) is supplied:
 
 When a lookup falls inside the **Grace Window** (status: `stale_grace`), the CLI attempts to revalidate the cache instead of performing a heavy full download.
 
-```mermaid
-graph TD
-    A[Start Request] --> B{Cache Key Found?}
-    B -- No --> C[Full Fetch & Scrape]
-    B -- Yes --> D{Evaluate Freshness}
-    
-    D -- Fresh --> E[Serve Local Cached File]
-    D -- Expired --> C
-    D -- Stale Grace --> F{ETag or Last-Modified present?}
-    
-    F -- No --> C
-    F -- Yes --> G[Conditional HTTP Request]
-    
-    G --> H{Server Response}
-    H -- "304 Not Modified" --> I[Update validated_at & stale_after timestamps]
-    I --> E
-    
-    H -- "200 OK (New Content)" --> J[Scrape new HTML & update cache]
-    J --> E
-    
-    H -- "Network Error / Offline" --> K{--allow-stale flag set?}
-    K -- Yes --> E
-    K -- No --> L[Output Stale Content + Exit Code 5]
-```
+The decision flow at request time:
+
+1. **Cache key not found** → full fetch & scrape.
+2. **Cache key found** → evaluate freshness:
+   - **Fresh** → serve the local cached file.
+   - **Expired** (past the grace window) → full fetch & scrape.
+   - **Stale (in grace window)** → check for revalidation metadata:
+     - **No `ETag` / `Last-Modified`** → full fetch & scrape.
+     - **Has `ETag` / `Last-Modified`** → send a conditional HTTP request:
+       - **`304 Not Modified`** → update `validated_at` / `stale_after`, then
+         serve the local cached file (no body downloaded).
+       - **`200 OK` (new content)** → scrape the new HTML, update the cache,
+         then serve it.
+       - **Network error / offline** → if `--allow-stale` is set, serve the
+         cached file (exit `0`); otherwise output the stale content and exit
+         with code `5`.
 
 ### Conditional HTTP Headers
 If the stored frontmatter contains `etag` or `last_modified`:

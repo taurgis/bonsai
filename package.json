@@ -2,6 +2,11 @@
   "name": "@taurgis/bonsai",
   "version": "1.0.3",
   "description": "Bonsai is a standalone local research cache CLI for AI agents",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taurgis/bonsai.git"
+  },
+  "homepage": "https://taurgis.github.io/bonsai/",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
@@ -29,7 +34,10 @@
     "nexus:sync": "npx forward-nexus update && npx forward-nexus sync",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "lint-staged": {
     "src/**/*.ts": "prettier --write",
@@ -55,7 +63,9 @@
     "oclif": "^4.23.21",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.17"
+    "vitepress": "^1.6.4",
+    "vitest": "^4.0.17",
+    "vue": "^3.5.39"
   },
   "engines": {
     "node": ">=22"
