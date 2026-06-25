@@ -38,8 +38,8 @@ still fresh. Repeated research becomes a near-instant, deterministic lookup.
 | **Token budgeting** | Returns `compressed` or `detailed` Markdown variants | Fitting research into limited context windows without losing full detail |
 | **Freshness tiers** | Supports `stable`, `standard`, `volatile`, custom TTLs, and stale revalidation | Handling standards differently from release notes or beta docs |
 | **Browser fallback** | Uses `--rendered` for pages that need client-side JavaScript | Capturing SPA documentation when static HTML is incomplete |
-| **[Manual import](/guide/importing-synthesis)** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
-| **[Search](/guide/search)** | Ranks local cache entries by topic, tags, snippets, fuzzy terms, and phrases | Finding existing research before fetching again |
+| **[Manual import](/how-to/importing-synthesis)** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
+| **[Search](/how-to/search)** | Ranks local cache entries by topic, tags, snippets, fuzzy terms, and phrases | Finding existing research before fetching again |
 
 ## Safe by default
 
@@ -54,8 +54,8 @@ still fresh. Repeated research becomes a near-instant, deterministic lookup.
 ## Where to next
 
 - [Getting Started](/guide/getting-started): install and fetch your first page.
-- [Caching & Freshness](/guide/caching-and-freshness): how reuse and tiers work.
-- [Compression & Token Budgeting](/guide/compression): `compressed` vs `detailed`.
-- [Search](/guide/search): rank the cache, then reach past it when nothing matches.
-- [Importing Synthesis](/guide/importing-synthesis): cache an agent's own research.
-- [Agent Integration](/guide/agent-integration): the JSON envelope and exit codes.
+- [Caching & Freshness](/concepts/caching-and-freshness): how reuse and tiers work.
+- [Compression & Token Budgeting](/concepts/compression): `compressed` vs `detailed`.
+- [Search](/how-to/search): rank the cache, then reach past it when nothing matches.
+- [Importing Synthesis](/how-to/importing-synthesis): cache an agent's own research.
+- [Agent Integration](/how-to/agent-integration): the JSON envelope and exit codes.

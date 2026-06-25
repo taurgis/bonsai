@@ -1,8 +1,16 @@
 # Getting Started
 
+This is a first run from an empty cache. By the end you will have fetched a page,
+served it again from the local cache with no network call, inspected what got
+stored, and searched for it by keyword. Five commands, a few minutes, no
+configuration.
+
+We use the Node.js URL docs throughout because they are public, stable, and
+small enough to read in full.
+
 ## Requirements
 
-Bonsai requires **Node.js 22 or newer**.
+Bonsai requires **Node.js 22 or newer**. Check with `node --version`.
 
 ## Install
 
@@ -19,7 +27,7 @@ npm install -g @taurgis/bonsai
 bonsai https://nodejs.org/api/url.html
 ```
 
-Use the local development binary from inside the repository:
+Or use the local development binary from inside the repository:
 
 ```bash
 pnpm install
@@ -27,62 +35,122 @@ pnpm build
 node bin/cli.mjs --help
 ```
 
-## Quick start
+::: tip Use the scoped name
+The package is scoped, so the one-shot command is `npx @taurgis/bonsai …`.
+Plain `npx bonsai` resolves to a different, unrelated package.
+:::
 
-### 1. Fetch and cache a URL
-
-```bash
-npx @taurgis/bonsai https://nodejs.org/api/url.html
-```
-
-The first run fetches the page, extracts the main article content, converts it
-to Markdown, estimates token size, and stores it locally.
-
-### 2. Reuse the cache
+## 1. Fetch and cache a page
 
 ```bash
 npx @taurgis/bonsai https://nodejs.org/api/url.html
 ```
 
-The second run returns from cache while the entry is still fresh, with no network
-request needed. See [Caching & Freshness](/guide/caching-and-freshness) for how
-"fresh" is decided.
+The first run fetches the page, extracts the main article, converts it to
+Markdown, estimates its token size, and writes it to the cache. What prints is
+the cleaned Markdown itself — the compressed variant, ready to drop into a
+context window:
 
-### 3. Check cache state and metadata
+```
+# URL
+
+The `node:url` module provides utilities for URL resolution and parsing...
+
+## URL strings and URL objects
+...
+```
+
+That output is the whole point: a large HTML page reduced to the structure that
+matters, with the headings, code, and tables intact.
+
+## 2. Run it again — straight from cache
+
+Run the exact same command a second time:
+
+```bash
+npx @taurgis/bonsai https://nodejs.org/api/url.html
+```
+
+The output is identical, but this run made **no network request**. While the
+entry is fresh, Bonsai serves the stored copy. That is the difference between
+re-scraping a page and reusing it. [Caching & Freshness](/concepts/caching-and-freshness)
+explains how "fresh" is decided.
+
+## 3. See what's cached, without fetching
+
+`status` reports what a fetch *would* do, and touches nothing:
 
 ```bash
 npx @taurgis/bonsai status https://nodejs.org/api/url.html
+```
+
+```
+URL: https://nodejs.org/api/url.html
+Cache Key: 7f3a…c9e1
+Cache Path: ~/.local/share/bonsai/research/7f3a…c9e1.md
+Status: hit
+Freshness: fresh
+Action: would_return_cached
+```
+
+`Action: would_return_cached` confirms the next fetch is a free cache read. Use
+`inspect` to see the full stored metadata (tier, tags, timestamps, capture
+method):
+
+```bash
 npx @taurgis/bonsai inspect https://nodejs.org/api/url.html
 ```
 
-`status` reports what *would* happen without fetching; `inspect` prints the
-stored frontmatter metadata.
+## 4. Import a note of your own
 
-### 4. Import manual research notes
-
-```bash
-echo "# My Custom Node API Notes" | npx @taurgis/bonsai import https://nodejs.org/api/url.html --stdin
-
-echo "# Synthesized React Cache Guide" | npx @taurgis/bonsai import --stdin \
-  --topic "React Suspense" \
-  --source-url https://react.dev/a \
-  --source-url https://react.dev/b
-```
-
-Use [`import`](/guide/importing-synthesis) for agent-synthesized notes, private
-docs, or pages that the static fetcher cannot read.
-
-### 5. Search before fetching
+Not everything comes from a fetch. Pipe in your own Markdown and Bonsai caches it
+under the same rules:
 
 ```bash
-npx @taurgis/bonsai search "node api url"
+echo "# Node URL API: field notes" | \
+  npx @taurgis/bonsai import https://nodejs.org/api/url.html --stdin
 ```
 
-Searching the local cache first is the cheapest way to reuse prior research. See
-[Search](/guide/search) for ranking, filters, and live site discovery.
+Because the key matches the page's URL, a later fetch of that URL serves your
+note. To store a synthesis drawn from several pages, give it a topic and list its
+sources:
 
-## Next steps
+```bash
+echo "# Synthesized React data-fetching guide" | npx @taurgis/bonsai import --stdin \
+  --topic "React data fetching" \
+  --source-url https://react.dev/reference/react/useEffect \
+  --source-url https://tanstack.com/query/latest
+```
 
-- [Compression & Token Budgeting](/guide/compression): choose `compressed` vs `detailed`.
-- [Storage Modes](/guide/storage-modes): global vs project caches.
-- [Command Reference](/reference/commands): every flag and JSON schema.
+See [Import synthesized research](/how-to/importing-synthesis) for the difference
+between the two shapes.
+
+## 5. Search before you fetch again
+
+Searching the cache is the cheapest way to reuse prior research:
+
+```bash
+npx @taurgis/bonsai search "node url api"
+```
+
+```
+Found 2 matching cached research entries:
+
+1. [No Topic] Score: 137
+   Cache Key: 7f3a…c9e1
+   Snippet: The `node:url` module provides utilities for URL resolution...
+   Source URLs: https://nodejs.org/api/url.html
+```
+
+You now have the full loop: fetch once, reuse for free, import your own notes,
+and find any of it again by keyword.
+
+## What's next
+
+- **Understand the model:** [Caching & Freshness](/concepts/caching-and-freshness)
+  and [Compression & Token Budgeting](/concepts/compression).
+- **Do a specific task:** [Share your cache with a team](/how-to/share-cache-with-your-team)
+  or [Cache pages you can't fetch](/how-to/cache-pages-you-cant-fetch).
+- **Look it up:** the [Command Reference](/reference/commands) lists every flag
+  and JSON schema, and the [Glossary](/reference/glossary) defines the terms used
+  across these docs.

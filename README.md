@@ -146,6 +146,22 @@ Search cached research by metadata and content snippets.
 npx @taurgis/bonsai search "<keywords>" [flags]
 ```
 
+### `list`
+
+List cached artifacts by metadata filters (`--topic`, `--tags`, `--freshness`, `--artifact-type`, `--capture-method`, `--limit`), newest first, without printing content.
+
+```bash
+npx @taurgis/bonsai list [flags]
+```
+
+### `prune`
+
+Delete old or inactive cache entries. Requires a filter (`--older-than`, `--inactive`, or `--artifact-type`) and either `--dry-run` or `--yes`.
+
+```bash
+npx @taurgis/bonsai prune --older-than 90d --dry-run
+```
+
 ### `config`
 
 Two keys are configurable:
@@ -247,9 +263,9 @@ The full documentation site lives at
 VitePress from the [`docs/`](docs/) folder). Key pages:
 
 * [Getting Started](docs/guide/getting-started.md)
-* [Caching & Freshness](docs/guide/caching-and-freshness.md)
-* [Compression & Token Budgeting](docs/guide/compression.md)
-* [Agent Integration](docs/guide/agent-integration.md)
+* [Caching & Freshness](docs/concepts/caching-and-freshness.md)
+* [Compression & Token Budgeting](docs/concepts/compression.md)
+* [Agent Integration](docs/how-to/agent-integration.md)
 * [Command Reference](docs/reference/commands.md)
 * [Caching Protocol Specification](docs/reference/cache-protocol.md)
 * [Troubleshooting and Limitations](docs/troubleshooting.md)

@@ -20,12 +20,12 @@ features:
   - icon: 🌿
     title: Freshness tiers
     details: stable, standard, and volatile policies plus custom TTLs. Stale entries are revalidated with cheap conditional requests before any full refetch.
-    link: /guide/caching-and-freshness
+    link: /concepts/caching-and-freshness
     linkText: How caching works
   - icon: ✂️
     title: Token budgeting
     details: Every page is stored as a compressed and a detailed variant. Compression prunes prose while always keeping headings, code, tables, and lists.
-    link: /guide/compression
+    link: /concepts/compression
     linkText: Compression deep-dive
   - icon: 🔁
     title: Cache-first by design
@@ -35,7 +35,7 @@ features:
   - icon: 🤖
     title: Agent-native output
     details: A stable JSON envelope and deterministic exit codes let AI agents and scripts handle hits, misses, and stale content programmatically.
-    link: /guide/agent-integration
+    link: /how-to/agent-integration
     linkText: Agent integration
   - icon: 🛡️
     title: Safe by default

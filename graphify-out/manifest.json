@@ -570,12 +570,12 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1782398187.786393,
-    "ast_hash": "828bed27580265e5e20da91eb34d4a8a",
+    "mtime": 1782406890.136731,
+    "ast_hash": "62afcc9490c453c34b7fa66a784c770b",
     "semantic_hash": ""
   },
   "docs/troubleshooting.md": {
-    "mtime": 1782405021.4802434,
+    "mtime": 1782406947.9911366,
     "ast_hash": "17e59dac7c254ca01fe65f4821807900",
     "semantic_hash": ""
   },
@@ -3875,58 +3875,38 @@
     "semantic_hash": ""
   },
   "docs/examples.md": {
-    "mtime": 1782405147.9334202,
-    "ast_hash": "d04bc2b6290a9f5a6372bccbb3af683a",
-    "semantic_hash": ""
-  },
-  "docs/guide/agent-integration.md": {
-    "mtime": 1782405475.0414264,
-    "ast_hash": "4f4e9942dae5672e0ff07797eeea4db7",
-    "semantic_hash": ""
-  },
-  "docs/guide/caching-and-freshness.md": {
-    "mtime": 1782404988.140656,
-    "ast_hash": "3ef84171780ebfae7ccfd1be1facb6b1",
-    "semantic_hash": ""
-  },
-  "docs/guide/compression.md": {
-    "mtime": 1782405073.6716206,
-    "ast_hash": "7b4251f4dac1dcd27ec9338aed9dd4c7",
+    "mtime": 1782406947.9890723,
+    "ast_hash": "6aa17b6e1fdf6d35cda4954059c74438",
     "semantic_hash": ""
   },
   "docs/guide/getting-started.md": {
-    "mtime": 1782405509.6079905,
-    "ast_hash": "933e2ca7231a9bdf9e66f302d4a07588",
+    "mtime": 1782406947.9973521,
+    "ast_hash": "30c9543091f9ebfdee3f157db005ee50",
     "semantic_hash": ""
   },
   "docs/guide/introduction.md": {
-    "mtime": 1782405492.3496468,
-    "ast_hash": "a230965d12d6c2bb590ad63b6474d0a3",
-    "semantic_hash": ""
-  },
-  "docs/guide/storage-modes.md": {
-    "mtime": 1782404971.8520067,
-    "ast_hash": "5723090b37e24577803bf8e12cd18583",
+    "mtime": 1782406947.9954848,
+    "ast_hash": "56ca190c74f3af572cf68b3b09ccc3bc",
     "semantic_hash": ""
   },
   "docs/index.md": {
-    "mtime": 1782404979.1009398,
-    "ast_hash": "736e59cd5e565aced786c7ba1b008610",
+    "mtime": 1782406947.9929805,
+    "ast_hash": "7d2fafd85b6a116895c1a2f964cf8e03",
     "semantic_hash": ""
   },
   "docs/reference/cache-protocol.md": {
-    "mtime": 1782404990.6300147,
+    "mtime": 1782406948.027448,
     "ast_hash": "a89bd12e5f656e081430630945878fd2",
     "semantic_hash": ""
   },
   "docs/reference/commands.md": {
-    "mtime": 1782404969.0452986,
-    "ast_hash": "14128f69be2d708f5a832def288cc9d9",
+    "mtime": 1782406948.0220609,
+    "ast_hash": "3359b8e6c2d22b2092a1258a9a995788",
     "semantic_hash": ""
   },
   "docs/reference/configuration.md": {
-    "mtime": 1782404989.9248657,
-    "ast_hash": "683e240d7b5956e38fbda24927ebfa94",
+    "mtime": 1782406948.0260987,
+    "ast_hash": "d2b2d534e014d27a58676d2680924bf7",
     "semantic_hash": ""
   },
   "docs/public/favicon.svg": {
@@ -3989,24 +3969,64 @@
     "ast_hash": "b120889a59bd7207fd192130809d2e3e",
     "semantic_hash": ""
   },
-  "docs/guide/importing-synthesis.md": {
-    "mtime": 1782405539.142062,
-    "ast_hash": "703a57b6a921d2e3a6f3da397ba19921",
+  ".bonsai.json": {
+    "mtime": 1782406887.7754598,
+    "ast_hash": "49c1c93ff8a05b6d5b73318d32807bde",
     "semantic_hash": ""
   },
-  "docs/guide/search.md": {
-    "mtime": 1782405398.7330663,
-    "ast_hash": "9690d085008eb60966f05d2f362130a5",
+  "docs/concepts/caching-and-freshness.md": {
+    "mtime": 1782406948.0168061,
+    "ast_hash": "bada20362a94bf89b99f013d3a1ae6c9",
     "semantic_hash": ""
   },
-  "docs/guide/site-modules.md": {
-    "mtime": 1782405044.3287652,
+  "docs/concepts/compression.md": {
+    "mtime": 1782406948.0202405,
+    "ast_hash": "7b4251f4dac1dcd27ec9338aed9dd4c7",
+    "semantic_hash": ""
+  },
+  "docs/concepts/storage-modes.md": {
+    "mtime": 1782406948.0179055,
+    "ast_hash": "5723090b37e24577803bf8e12cd18583",
+    "semantic_hash": ""
+  },
+  "docs/concepts/vs-memory.md": {
+    "mtime": 1782406948.0190442,
+    "ast_hash": "c35ae1924937f9a5efe8d008fc5ccf6b",
+    "semantic_hash": ""
+  },
+  "docs/how-to/agent-integration.md": {
+    "mtime": 1782406948.0115898,
+    "ast_hash": "bb3a3ed86df2dd7a410f8f8e9a77a7c4",
+    "semantic_hash": ""
+  },
+  "docs/how-to/cache-pages-you-cant-fetch.md": {
+    "mtime": 1782406948.0088887,
+    "ast_hash": "ff33eee5034a5e4e52f02da5a3cb0197",
+    "semantic_hash": ""
+  },
+  "docs/how-to/importing-synthesis.md": {
+    "mtime": 1782407188.5179794,
+    "ast_hash": "120effefed38b281f7396f8e4de687da",
+    "semantic_hash": ""
+  },
+  "docs/how-to/search.md": {
+    "mtime": 1782406948.00172,
+    "ast_hash": "6483560ef37f97ae2190f7040f92dafe",
+    "semantic_hash": ""
+  },
+  "docs/how-to/share-cache-with-your-team.md": {
+    "mtime": 1782407104.246459,
+    "ast_hash": "a8b26a5f7cf1e48a81edb2671c44e505",
+    "semantic_hash": ""
+  },
+  "docs/reference/glossary.md": {
+    "mtime": 1782406948.0232048,
+    "ast_hash": "ce8acbee6f0f6ae3006215509e94f3ae",
+    "semantic_hash": ""
+  },
+  "docs/reference/site-modules.md": {
+    "mtime": 1782406948.0249004,
     "ast_hash": "ede8dce551bf195d80d0384998010bd2",
-    "semantic_hash": ""
-  },
-  "docs/vs-memory.md": {
-    "mtime": 1782405678.2748735,
-    "ast_hash": "58add25b6c4c7b113520844856ca0ccf",
     "semantic_hash": ""
   }
 }

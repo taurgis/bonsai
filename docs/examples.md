@@ -426,9 +426,9 @@ This part is agent-agnostic. It holds no matter which agent's fetch you compare
 against. Bonsai's pipeline is **deterministic: there is no LLM in the loop.** It
 extracts the main article, converts it to Markdown, and **always preserves
 headings, code, tables, and lists** (see
-[Compression & Token Budgeting](/guide/compression)). Then it caches the result
+[Compression & Token Budgeting](/concepts/compression)). Then it caches the result
 with freshness tiers so the next read is served from disk, no re-fetch and no
-model (see [Caching & Freshness](/guide/caching-and-freshness)). Every page is
+model (see [Caching & Freshness](/concepts/caching-and-freshness)). Every page is
 stored as both a `compressed` and a `detailed` variant, so an agent can pick the
 one that fits its budget without losing the structure it reasons over.
 

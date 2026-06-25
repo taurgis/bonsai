@@ -7,8 +7,8 @@ Bonsai has two configuration keys. Both can be set persistently with the
 
 | Key | Values | Default | Effect |
 | --- | --- | --- | --- |
-| `storage` | `global`, `project` | `global` | Where new research artifacts are cached. See [Storage Modes](/guide/storage-modes). |
-| `summary` | `conservative`, `balanced`, `aggressive` | `conservative` | How aggressively the `compressed` variant is shortened when structural compression alone leaves it close to `detailed`. See [Compression](/guide/compression). |
+| `storage` | `global`, `project` | `global` | Where new research artifacts are cached. See [Storage Modes](/concepts/storage-modes). |
+| `summary` | `conservative`, `balanced`, `aggressive` | `conservative` | How aggressively the `compressed` variant is shortened when structural compression alone leaves it close to `detailed`. See [Compression](/concepts/compression). |
 
 Headings, code blocks, tables, and lists are always preserved regardless of the
 `summary` value. Only prose is condensed, and never with an LLM.

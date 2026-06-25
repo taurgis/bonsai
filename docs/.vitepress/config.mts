@@ -30,7 +30,8 @@ export default defineConfig({
 
   themeConfig: {
     nav: [
-      { text: 'Guide', link: '/guide/introduction', activeMatch: '/guide/' },
+      { text: 'Guide', link: '/guide/introduction', activeMatch: '/guide/(introduction|getting-started)' },
+      { text: 'How-to', link: '/how-to/share-cache-with-your-team', activeMatch: '/how-to/' },
       { text: 'Reference', link: '/reference/commands', activeMatch: '/reference/' },
       { text: 'Examples', link: '/examples' },
       { text: 'Troubleshooting', link: '/troubleshooting' },
@@ -43,13 +44,27 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/guide/introduction' },
           { text: 'Getting Started', link: '/guide/getting-started' },
-          { text: 'Caching & Freshness', link: '/guide/caching-and-freshness' },
-          { text: 'Compression & Token Budgeting', link: '/guide/compression' },
-          { text: 'Storage Modes', link: '/guide/storage-modes' },
-          { text: 'Search', link: '/guide/search' },
-          { text: 'Importing Synthesis', link: '/guide/importing-synthesis' },
-          { text: 'Site Modules', link: '/guide/site-modules' },
-          { text: 'Agent Integration', link: '/guide/agent-integration' },
+        ],
+      },
+      {
+        text: 'Core concepts',
+        collapsed: false,
+        items: [
+          { text: 'Caching & Freshness', link: '/concepts/caching-and-freshness' },
+          { text: 'Compression & Token Budgeting', link: '/concepts/compression' },
+          { text: 'Storage Modes', link: '/concepts/storage-modes' },
+          { text: 'Isn’t this just memory?', link: '/concepts/vs-memory' },
+        ],
+      },
+      {
+        text: 'How-to guides',
+        collapsed: false,
+        items: [
+          { text: 'Share your cache with a team', link: '/how-to/share-cache-with-your-team' },
+          { text: 'Cache pages you can’t fetch', link: '/how-to/cache-pages-you-cant-fetch' },
+          { text: 'Search your research', link: '/how-to/search' },
+          { text: 'Import synthesized research', link: '/how-to/importing-synthesis' },
+          { text: 'Drive Bonsai from an agent', link: '/how-to/agent-integration' },
         ],
       },
       {
@@ -59,6 +74,8 @@ export default defineConfig({
           { text: 'Command Reference', link: '/reference/commands' },
           { text: 'Configuration', link: '/reference/configuration' },
           { text: 'Cache Protocol', link: '/reference/cache-protocol' },
+          { text: 'Site Modules', link: '/reference/site-modules' },
+          { text: 'Glossary', link: '/reference/glossary' },
         ],
       },
       {
@@ -69,10 +86,7 @@ export default defineConfig({
       {
         text: 'Help',
         collapsed: false,
-        items: [
-          { text: 'Isn’t this just like memory?', link: '/vs-memory' },
-          { text: 'Troubleshooting & Limits', link: '/troubleshooting' },
-        ],
+        items: [{ text: 'Troubleshooting & Limits', link: '/troubleshooting' }],
       },
     ],
 

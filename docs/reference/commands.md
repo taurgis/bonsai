@@ -216,7 +216,106 @@ npx @taurgis/bonsai search "<query>" [flags]
 
 ---
 
-## 6. `config`
+## 6. `list`
+
+Browse the cache by metadata, without printing page content. Where `search`
+ranks entries against a query, `list` filters the whole cache and sorts the
+matches newest-first, so it answers "what do I have?" rather than "what matches
+this?".
+
+### Usage
+```bash
+npx @taurgis/bonsai list [flags]
+```
+
+`list` takes no positional argument; every filter is a flag, and with no flags
+it returns the most recent entries across all read roots.
+
+### Command-Line Flags
+| Flag | Short | Type | Default | Description |
+| --- | --- | --- | --- | --- |
+| `--topic` | `-t` | string | — | Keep only entries with this exact topic (case-insensitive). |
+| `--tags` | `-g` | string | — | Keep entries carrying **all** the given tags (repeatable). |
+| `--freshness` | — | choice | — | Filter by freshness: `fresh`, `stale_grace`, or `stale_expired`. |
+| `--artifact-type` | — | choice | — | Filter by type: `source` or `research_note`. |
+| `--capture-method` | — | choice | — | Filter by capture method: `static_fetch`, `browser_fallback`, or `agent_supplied`. |
+| `--limit` | — | integer | `50` | Cap the result count (1–100). |
+| `--json` | — | boolean | `false` | Return the machine-readable envelope. |
+
+Results are sorted by `validated_at` (falling back to `fetched_at`), newest
+first, then truncated to `--limit`.
+
+### JSON Output envelope `data` block
+```json
+[
+  {
+    "cacheKey": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
+    "path": "/path/to/cache/0f115db0...e9d7.md",
+    "artifactType": "source" | "research_note",
+    "sourceUrls": ["https://example.com"],
+    "topic": "example",
+    "tags": ["test"],
+    "freshness": "fresh" | "stale_grace" | "stale_expired",
+    "captureMethod": "static_fetch" | "browser_fallback" | "agent_supplied",
+    "tokenEstimate": { "compressed": 29, "detailed": 65 },
+    "qualityNotes": ["readability extracted main article"],
+    "fetchedAt": "2026-06-24T07:33:20.519Z",
+    "validatedAt": "2026-06-24T07:33:20.519Z"
+  }
+]
+```
+
+---
+
+## 7. `prune`
+
+Delete cached entries by age, inactivity, or type to reclaim disk space. Pruning
+spans **every read root** (project and global), so a key present in both is
+deleted from both.
+
+### Usage
+```bash
+npx @taurgis/bonsai prune [flags]
+```
+
+Two guardrails make accidental deletion hard:
+
+- At least one of `--older-than`, `--inactive`, or `--artifact-type` is
+  **required**; running `prune` with no filter exits `2` rather than matching
+  everything.
+- The command refuses to delete unless you pass `--yes`. Use `--dry-run` first
+  to see exactly what would go.
+
+### Command-Line Flags
+| Flag | Short | Type | Default | Description |
+| --- | --- | --- | --- | --- |
+| `--older-than` | — | duration | — | Prune entries older than this age, e.g. `30d`, `90d`. |
+| `--inactive` | — | duration | — | Prune entries not validated or fetched within this window, e.g. `14d`. |
+| `--artifact-type` | — | choice | — | Limit pruning to `source` or `research_note`. |
+| `--dry-run` | — | boolean | `false` | List what would be deleted, delete nothing. |
+| `--yes` | `-y` | boolean | `false` | Confirm deletion. Required for a real prune. |
+| `--json` | — | boolean | `false` | Return the machine-readable envelope. |
+
+Age is measured from the more recent of `validated_at` and `fetched_at`.
+
+### JSON Output envelope `data` block
+```json
+{
+  "dryRun": true,
+  "prunedCount": 0,
+  "candidateCount": 3,
+  "files": [
+    { "cacheKey": "0f115db0...e9d7", "path": "/path/to/cache/0f115db0...e9d7.md" }
+  ]
+}
+```
+
+On a dry run, `prunedCount` is `0` and `candidateCount` reports what a real run
+would delete. On a real run, `prunedCount` is the number actually removed.
+
+---
+
+## 8. `config`
 
 Manage where the research cache is stored. Configuration is layered, resolved in
 precedence order: per-command `--storage` flag > `BONSAI_STORAGE` env var >
