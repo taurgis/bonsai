@@ -65,6 +65,23 @@ describe('artifact serialization and parsing', () => {
     expect(() => parseArtifact('---\nsome: field')).toThrow(/Frontmatter missing ending boundary/);
   });
 
+  it('roundtrips content that starts with and contains its own "##" headings', () => {
+    // Compressed/detailed bodies legitimately begin with a markdown heading (e.g. a summarized page).
+    // The section parser must bound on the next *known* section header, not the next "## " heading,
+    // or it truncates this content to nothing.
+    const withHeadings = {
+      ...sampleArtifact,
+      compressed: '## node-summarizer\n\nIntro paragraph.\n\n## Usage\n\nDo the thing.',
+      detailed:
+        '## node-summarizer\n\nFull intro.\n\n## Usage\n\nDo the thing in detail.\n\n## Notes\n\nCaveats.',
+    };
+    const parsed = parseArtifact(serializeArtifact(withHeadings));
+    expect(parsed.compressed).toBe(withHeadings.compressed);
+    expect(parsed.detailed).toBe(withHeadings.detailed);
+    expect(parsed.summary).toBe(withHeadings.summary);
+    expect(parsed.provenance).toBe(withHeadings.provenance);
+  });
+
   it('roundtrips site_module_id correctly', () => {
     const withModule = {
       ...sampleArtifact,

@@ -2,7 +2,14 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { resolveStorageMode, parseEnvStorage, STORAGE_ENV_VAR } from './resolve.js';
+import {
+  resolveStorageMode,
+  resolveSummaryLevel,
+  parseEnvStorage,
+  parseEnvSummary,
+  STORAGE_ENV_VAR,
+  SUMMARY_ENV_VAR,
+} from './resolve.js';
 import {
   readUserConfig,
   readProjectConfig,
@@ -59,6 +66,49 @@ describe('parseEnvStorage', () => {
     expect(parseEnvStorage({ [STORAGE_ENV_VAR]: ' global ' })).toBe('global');
     expect(parseEnvStorage({ [STORAGE_ENV_VAR]: 'bogus' })).toBeUndefined();
     expect(parseEnvStorage({})).toBeUndefined();
+  });
+});
+
+describe('resolveSummaryLevel precedence', () => {
+  const base = { env: {}, projectConfig: {}, userConfig: {} };
+
+  it('defaults to conservative when nothing is set', () => {
+    expect(resolveSummaryLevel(base)).toBe('conservative');
+  });
+
+  it('uses the user file, then project file overrides it', () => {
+    expect(resolveSummaryLevel({ ...base, userConfig: { summary: 'balanced' } })).toBe('balanced');
+    expect(
+      resolveSummaryLevel({
+        ...base,
+        userConfig: { summary: 'balanced' },
+        projectConfig: { summary: 'aggressive' },
+      })
+    ).toBe('aggressive');
+  });
+
+  it('lets env override both files, and flag override everything', () => {
+    const env = { [SUMMARY_ENV_VAR]: 'balanced' };
+    expect(resolveSummaryLevel({ ...base, env, projectConfig: { summary: 'aggressive' } })).toBe(
+      'balanced'
+    );
+    expect(
+      resolveSummaryLevel({
+        flag: 'aggressive',
+        env,
+        projectConfig: { summary: 'conservative' },
+        userConfig: {},
+      })
+    ).toBe('aggressive');
+  });
+});
+
+describe('parseEnvSummary', () => {
+  it('accepts valid levels and rejects junk', () => {
+    expect(parseEnvSummary({ [SUMMARY_ENV_VAR]: 'balanced' })).toBe('balanced');
+    expect(parseEnvSummary({ [SUMMARY_ENV_VAR]: ' aggressive ' })).toBe('aggressive');
+    expect(parseEnvSummary({ [SUMMARY_ENV_VAR]: 'bogus' })).toBeUndefined();
+    expect(parseEnvSummary({})).toBeUndefined();
   });
 });
 

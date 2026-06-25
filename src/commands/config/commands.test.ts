@@ -149,7 +149,7 @@ describe('config get', () => {
 describe('config list', () => {
   it('returns the effective values', async () => {
     const result = (await ConfigList.run([])) as any;
-    expect(result).toEqual({ storage: 'global' });
+    expect(result).toEqual({ storage: 'global', summary: 'conservative' });
   });
 
   it('reflects a project-level value', async () => {

@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import type { ResearchArtifact } from '../schema.js';
-import { compressMarkdown } from '../compress.js';
+import type { SummaryLevel } from '../../config/schema.js';
+import { buildCompressed } from '../compress.js';
 import { estimateTokens } from '../token-estimate.js';
 import { scanCacheDir, writeArtifact } from '../storage.js';
 import { splitMarkdownSections } from './sections.js';
@@ -24,7 +25,8 @@ function childKey(parentKey: string, anchor: string): string {
  */
 export function buildSectionArtifacts(
   parent: ResearchArtifact,
-  currentTime: Date
+  currentTime: Date,
+  summaryLevel: SummaryLevel
 ): ResearchArtifact[] {
   if (estimateTokens(parent.detailed) <= SECTION_TOKEN_THRESHOLD) return [];
   const sections = splitMarkdownSections(parent.detailed);
@@ -33,7 +35,7 @@ export function buildSectionArtifacts(
   return sections.map((section) => {
     const key = childKey(pm.cache_key, section.anchor);
     const detailed = section.content;
-    const compressed = compressMarkdown(detailed);
+    const compressed = buildCompressed(detailed, summaryLevel);
     return {
       metadata: {
         ...pm,
@@ -74,9 +76,10 @@ function activeChildrenOf(dataDir: string, parentKey: string): ResearchArtifact[
 export function persistSectionArtifacts(
   dataDir: string,
   parent: ResearchArtifact,
-  currentTime: Date
+  currentTime: Date,
+  summaryLevel: SummaryLevel
 ): number {
-  const children = buildSectionArtifacts(parent, currentTime);
+  const children = buildSectionArtifacts(parent, currentTime, summaryLevel);
   const freshKeys = new Set(children.map((c) => c.metadata.cache_key));
 
   for (const orphan of activeChildrenOf(dataDir, parent.metadata.cache_key)) {

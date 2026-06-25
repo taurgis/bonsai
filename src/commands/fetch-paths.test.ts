@@ -116,7 +116,8 @@ function seedCachedArtifact(
     fakeExtraction(LONG_MARKDOWN),
     tier,
     null,
-    fetchedAt
+    fetchedAt,
+    'conservative'
   );
   writeArtifact(dataDir, cacheKey, artifact);
   return { cacheKey, normalizedUrl, artifact };

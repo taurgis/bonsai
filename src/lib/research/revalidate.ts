@@ -5,7 +5,8 @@ import { fetchStaticHtml } from './fetcher.js';
 import { extractHtmlContent } from './extract.js';
 import { writeArtifact } from './storage.js';
 import { evaluateFreshness, getPolicy } from './freshness.js';
-import { compressMarkdown } from './compress.js';
+import { buildCompressed } from './compress.js';
+import type { SummaryLevel } from '../config/schema.js';
 import { applyAutoTags } from './keywords.js';
 import { estimateTokens } from './token-estimate.js';
 import { fetchRenderedHtml } from './browser.js';
@@ -142,7 +143,8 @@ export function createArtifactFromFetch(
   },
   tier: 'stable' | 'standard' | 'volatile',
   ttl: string | null,
-  currentTime: Date
+  currentTime: Date,
+  summaryLevel: SummaryLevel
 ): ResearchArtifact {
   // A managed platform / SPA can return HTTP 200 but render only a "not found" / "something went
   // wrong" shell. Cache a compact marker for those instead of the full error markdown, so repeat
@@ -160,7 +162,7 @@ export function createArtifactFromFetch(
     );
   }
 
-  const compressed = compressMarkdown(extraction.detailedMarkdown);
+  const compressed = buildCompressed(extraction.detailedMarkdown, summaryLevel);
   const metadata = buildMetadata(
     url,
     normalizedUrl,
@@ -207,7 +209,7 @@ function persistRefreshedArtifact(
   fetchResult: Parameters<typeof createArtifactFromFetch>[3],
   extraction: Parameters<typeof createArtifactFromFetch>[4],
   currentTime: Date,
-  options: { ttlOverride?: string | null; rendered?: boolean }
+  options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel }
 ): RevalidationResult {
   const refreshed = createArtifactFromFetch(
     meta.source_url,
@@ -217,7 +219,8 @@ function persistRefreshedArtifact(
     extraction,
     meta.tier,
     options.ttlOverride || meta.ttl,
-    currentTime
+    currentTime,
+    options.summaryLevel
   );
   preserveUserMetadata(meta, refreshed, options.rendered);
   // Back-fill keyword tags when the carried-over set is empty (e.g. an artifact first cached before
@@ -232,7 +235,7 @@ async function handleRevalidateResponse(
   existing: ResearchArtifact,
   fetchResult: any,
   currentTime: Date,
-  options: { ttlOverride?: string | null; rendered?: boolean }
+  options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel }
 ): Promise<RevalidationResult> {
   const meta = existing.metadata;
 
@@ -270,6 +273,7 @@ export async function revalidateCache(
     allowStale: boolean;
     ttlOverride?: string | null;
     rendered?: boolean;
+    summaryLevel: SummaryLevel;
   }
 ): Promise<RevalidationResult> {
   const meta = existing.metadata;

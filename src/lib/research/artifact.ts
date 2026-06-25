@@ -204,16 +204,20 @@ export function parseMetadata(lines: string[]): ResearchArtifactMetadata {
 }
 
 /**
- * Extracts a named markdown section (e.g. ## Summary) from body text.
+ * Extracts a named markdown section (e.g. ## Summary) from body text. The section ends at the next
+ * known section header (`nextSection`), matched as the exact serialized separator `\n\n## <name>` —
+ * NOT at the next `## ` heading, because section bodies legitimately contain their own `##` headings
+ * (a compressed/detailed page often *starts* with one). Bounding on a generic heading would truncate
+ * such content to nothing. Omit `nextSection` for the final section to read to end-of-body.
  */
-export function extractSection(body: string, sectionName: string): string {
+export function extractSection(body: string, sectionName: string, nextSection?: string): string {
   const header = `## ${sectionName}`;
   const idx = body.indexOf(header);
   if (idx === -1) return '';
 
   const start = idx + header.length;
-  const nextHeadingIdx = body.indexOf('\n## ', start);
-  const rawText = nextHeadingIdx === -1 ? body.slice(start) : body.slice(start, nextHeadingIdx);
+  const endIdx = nextSection ? body.indexOf(`\n\n## ${nextSection}`, start) : -1;
+  const rawText = endIdx === -1 ? body.slice(start) : body.slice(start, endIdx);
   return rawText.trim();
 }
 
@@ -252,9 +256,9 @@ export function parseArtifact(content: string): ResearchArtifact {
   const bodyText = bodyLines.join('\n');
 
   const metadata = parseMetadata(frontmatterLines);
-  const summary = extractSection(bodyText, 'Summary');
-  const compressed = extractSection(bodyText, 'Compressed');
-  const detailed = extractSection(bodyText, 'Detailed');
+  const summary = extractSection(bodyText, 'Summary', 'Compressed');
+  const compressed = extractSection(bodyText, 'Compressed', 'Detailed');
+  const detailed = extractSection(bodyText, 'Detailed', 'Provenance');
   const provenance = extractSection(bodyText, 'Provenance');
 
   return { metadata, summary, compressed, detailed, provenance };

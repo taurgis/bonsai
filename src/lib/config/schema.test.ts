@@ -21,9 +21,16 @@ describe('schema key guards', () => {
   });
 
   it('lists valid keys for error messages', () => {
-    expect(validKeysHint()).toBe('storage');
+    expect(validKeysHint()).toBe('storage, summary');
     expect(ALL_KEYS).toContain('storage');
+    expect(ALL_KEYS).toContain('summary');
     expect(BUILT_IN_DEFAULTS.storage).toBe('global');
+    expect(BUILT_IN_DEFAULTS.summary).toBe('conservative');
+  });
+
+  it('recognises the summary key and suggests it for a fuzzy input', () => {
+    expect(isKnownKey('summary')).toBe(true);
+    expect(suggestKey('summ')).toBe('summary');
   });
 });
 
@@ -36,5 +43,18 @@ describe('KEY_META.storage', () => {
     expect(meta.isValid('bogus')).toBe(false);
     expect(meta.format('project')).toBe('project');
     expect(meta.values).toEqual(['global', 'project']);
+  });
+});
+
+describe('KEY_META.summary', () => {
+  const meta = KEY_META.summary;
+  it('parses, validates, and formats values', () => {
+    expect(meta.parseValue('  balanced ')).toBe('balanced');
+    expect(meta.isValid('conservative')).toBe(true);
+    expect(meta.isValid('balanced')).toBe(true);
+    expect(meta.isValid('aggressive')).toBe(true);
+    expect(meta.isValid('bogus')).toBe(false);
+    expect(meta.format('aggressive')).toBe('aggressive');
+    expect(meta.values).toEqual(['conservative', 'balanced', 'aggressive']);
   });
 });

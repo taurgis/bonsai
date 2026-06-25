@@ -146,13 +146,19 @@ npx @taurgis/bonsai search "<keywords>" [flags]
 
 ### `config`
 
-Choose global or project-local cache storage.
+Two keys are configurable:
+
+| Key | Values | Default | Effect |
+| --- | --- | --- | --- |
+| `storage` | `global`, `project` | `global` | Where cache files are stored. |
+| `summary` | `conservative`, `balanced`, `aggressive` | `conservative` | How aggressively the `compressed` format is shortened when structural compression alone leaves it close to `detailed`. Prose is condensed extractively (no LLM); headings, code blocks, tables, and lists are always preserved. |
 
 ```bash
 npx @taurgis/bonsai config set storage project --local
+npx @taurgis/bonsai config set summary balanced
 ```
 
-Project config is stored in `.bonsai.json`; project cache files are stored under `.bonsai/research/`.
+Both keys can also be overridden per-invocation via the `BONSAI_STORAGE` and `BONSAI_SUMMARY` environment variables. Project config is stored in `.bonsai.json`; project cache files are stored under `.bonsai/research/`.
 
 ---
 

@@ -60,12 +60,14 @@ function makeParent(detailed: string): ResearchArtifact {
 
 describe('buildSectionArtifacts (T-22)', () => {
   it('returns [] for a short page', () => {
-    expect(buildSectionArtifacts(makeParent('# Short\n\ntiny'), new Date())).toHaveLength(0);
+    expect(
+      buildSectionArtifacts(makeParent('# Short\n\ntiny'), new Date(), 'conservative')
+    ).toHaveLength(0);
   });
 
   it('builds hex-keyed section children linked to the parent', () => {
     const parent = makeParent(longDoc(['Alpha', 'Beta', 'Gamma']));
-    const children = buildSectionArtifacts(parent, new Date());
+    const children = buildSectionArtifacts(parent, new Date(), 'conservative');
     expect(children.length).toBe(3);
     for (const child of children) {
       expect(child.metadata.artifact_type).toBe('section');
@@ -88,11 +90,11 @@ describe('persistSectionArtifacts (T-22)', () => {
 
   it('writes children and archives orphaned sections on regeneration', () => {
     const first = makeParent(longDoc(['Alpha', 'Beta', 'Gamma']));
-    expect(persistSectionArtifacts(dir, first, new Date())).toBe(3);
+    expect(persistSectionArtifacts(dir, first, new Date(), 'conservative')).toBe(3);
 
     // Regenerate with Gamma removed -> its child must be archived, not left active.
     const second = makeParent(longDoc(['Alpha', 'Beta']));
-    expect(persistSectionArtifacts(dir, second, new Date())).toBe(2);
+    expect(persistSectionArtifacts(dir, second, new Date(), 'conservative')).toBe(2);
 
     const active = scanCacheDir(join(dir, 'research'), (a) =>
       a.metadata.artifact_type === 'section' && a.metadata.status === 'active'
@@ -109,8 +111,8 @@ describe('persistSectionArtifacts (T-22)', () => {
 
   it('makes child sections findable by their own cache key', () => {
     const parent = makeParent(longDoc(['Alpha', 'Beta']));
-    const children = buildSectionArtifacts(parent, new Date());
-    persistSectionArtifacts(dir, parent, new Date());
+    const children = buildSectionArtifacts(parent, new Date(), 'conservative');
+    persistSectionArtifacts(dir, parent, new Date(), 'conservative');
     const found = findArtifact(dir, children[0]!.metadata.cache_key);
     expect(found?.metadata.artifact_type).toBe('section');
   });

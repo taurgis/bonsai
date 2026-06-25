@@ -9,7 +9,7 @@ const AUTO_TAG_NOTE = 'auto-generated tags via keyword extraction';
 
 // Common English function words plus a few markdown/doc-noise words. Kept inline (no dependency)
 // because the list is small and stable.
-const STOPWORDS = new Set([
+export const STOPWORDS = new Set([
   'the',
   'a',
   'an',
@@ -151,7 +151,7 @@ const STOPWORDS = new Set([
 
 // Splits text into candidate tokens, keeping tech-flavoured shapes intact (e.g. "node.js", "c#",
 // "asp.net") while trimming leading/trailing separators left over from sentence punctuation.
-function tokenize(text: string): string[] {
+export function tokenize(text: string): string[] {
   const raw = text.toLowerCase().match(/[a-z0-9][a-z0-9+#.-]*/g) ?? [];
   return raw.map((w) => w.replace(/^[.\-]+|[.\-]+$/g, '')).filter(Boolean);
 }

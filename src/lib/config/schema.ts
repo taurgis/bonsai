@@ -6,8 +6,12 @@
 
 export type StorageMode = 'global' | 'project';
 
+// How aggressively the extractive summarizer condenses prose for the `compressed` format.
+export type SummaryLevel = 'conservative' | 'balanced' | 'aggressive';
+
 export interface ConfigValues {
   storage?: StorageMode;
+  summary?: SummaryLevel;
 }
 
 export type ResolvedConfig = Required<ConfigValues>;
@@ -17,11 +21,15 @@ export const SCHEMA_VERSION = 1;
 
 export const STORAGE_MODES: readonly StorageMode[] = ['global', 'project'];
 
-export const ALL_KEYS: readonly ConfigKey[] = ['storage'];
+export const SUMMARY_LEVELS: readonly SummaryLevel[] = ['conservative', 'balanced', 'aggressive'];
+
+export const ALL_KEYS: readonly ConfigKey[] = ['storage', 'summary'];
 
 export const BUILT_IN_DEFAULTS: ResolvedConfig = {
   // Default to global so existing installs keep using the OCLIF data dir unchanged.
   storage: 'global',
+  // Default to the gentlest summarization so cached content keeps the most detail out of the box.
+  summary: 'conservative',
 };
 
 export interface KeyMeta {
@@ -39,6 +47,13 @@ export const KEY_META: Record<ConfigKey, KeyMeta> = {
     values: STORAGE_MODES,
     parseValue: (raw) => raw.trim(),
     isValid: (v) => (STORAGE_MODES as readonly string[]).includes(String(v)),
+    format: (v) => String(v),
+  },
+  summary: {
+    description: `How aggressively the compressed format is summarized (${SUMMARY_LEVELS.join('|')}).`,
+    values: SUMMARY_LEVELS,
+    parseValue: (raw) => raw.trim(),
+    isValid: (v) => (SUMMARY_LEVELS as readonly string[]).includes(String(v)),
     format: (v) => String(v),
   },
 };

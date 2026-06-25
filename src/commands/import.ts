@@ -8,9 +8,9 @@ import { deriveCacheKey } from '../lib/research/cache-key.js';
 import { getArtifactPath } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { writeArtifactSecurely } from '../lib/research/secure-write.js';
-import type { StorageMode } from '../lib/config/index.js';
+import { loadSummaryLevel, type StorageMode } from '../lib/config/index.js';
 import { getPolicy } from '../lib/research/freshness.js';
-import { compressMarkdown } from '../lib/research/compress.js';
+import { buildCompressed } from '../lib/research/compress.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { estimateTokens } from '../lib/research/token-estimate.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from '../lib/research/schema.js';
@@ -242,7 +242,12 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
     const inputFormat = this.flags['input-format'];
     const detailed = rawInput;
-    const compressed = inputFormat === 'detailed' ? compressMarkdown(rawInput) : rawInput;
+    // A caller-supplied compressed input is trusted as-is; only a detailed import is condensed here,
+    // and it shares the same buildCompressed policy (structural pass + extractive fallback) as fetch.
+    const compressed =
+      inputFormat === 'detailed'
+        ? buildCompressed(rawInput, loadSummaryLevel(this.config.configDir, process.cwd()))
+        : rawInput;
     const contentHash = createHash('sha256').update(detailed).digest('hex');
 
     const metadata: ResearchArtifactMetadata = {

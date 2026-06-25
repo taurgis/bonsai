@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-25)
 
 ## Corpus Check
-- 620 files · ~654,043 words
+- 645 files · ~710,994 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 6224 nodes · 6867 edges · 564 communities (516 shown, 48 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
+- 6561 nodes · 7253 edges · 601 communities (554 shown, 47 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `334473f8`
+- Built from commit: `5c4637f9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -568,6 +568,43 @@
 - [[_COMMUNITY_Community 561|Community 561]]
 - [[_COMMUNITY_Community 562|Community 562]]
 - [[_COMMUNITY_Community 563|Community 563]]
+- [[_COMMUNITY_Community 564|Community 564]]
+- [[_COMMUNITY_Community 565|Community 565]]
+- [[_COMMUNITY_Community 566|Community 566]]
+- [[_COMMUNITY_Community 567|Community 567]]
+- [[_COMMUNITY_Community 568|Community 568]]
+- [[_COMMUNITY_Community 569|Community 569]]
+- [[_COMMUNITY_Community 570|Community 570]]
+- [[_COMMUNITY_Community 571|Community 571]]
+- [[_COMMUNITY_Community 572|Community 572]]
+- [[_COMMUNITY_Community 573|Community 573]]
+- [[_COMMUNITY_Community 574|Community 574]]
+- [[_COMMUNITY_Community 575|Community 575]]
+- [[_COMMUNITY_Community 576|Community 576]]
+- [[_COMMUNITY_Community 577|Community 577]]
+- [[_COMMUNITY_Community 578|Community 578]]
+- [[_COMMUNITY_Community 579|Community 579]]
+- [[_COMMUNITY_Community 580|Community 580]]
+- [[_COMMUNITY_Community 581|Community 581]]
+- [[_COMMUNITY_Community 582|Community 582]]
+- [[_COMMUNITY_Community 583|Community 583]]
+- [[_COMMUNITY_Community 584|Community 584]]
+- [[_COMMUNITY_Community 585|Community 585]]
+- [[_COMMUNITY_Community 586|Community 586]]
+- [[_COMMUNITY_Community 587|Community 587]]
+- [[_COMMUNITY_Community 588|Community 588]]
+- [[_COMMUNITY_Community 589|Community 589]]
+- [[_COMMUNITY_Community 590|Community 590]]
+- [[_COMMUNITY_Community 591|Community 591]]
+- [[_COMMUNITY_Community 592|Community 592]]
+- [[_COMMUNITY_Community 593|Community 593]]
+- [[_COMMUNITY_Community 594|Community 594]]
+- [[_COMMUNITY_Community 595|Community 595]]
+- [[_COMMUNITY_Community 596|Community 596]]
+- [[_COMMUNITY_Community 597|Community 597]]
+- [[_COMMUNITY_Community 598|Community 598]]
+- [[_COMMUNITY_Community 599|Community 599]]
+- [[_COMMUNITY_Community 600|Community 600]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Callback API` - 55 edges
@@ -586,17 +623,17 @@
   testing/regression/run-suite.mjs → src/sites/index.ts
 - `ResolveResearchTargetOptions` --references--> `StorageMode`  [EXTRACTED]
   src/lib/research/resolve-target.ts → src/lib/config/schema.ts
+- `SummarizeOptions` --references--> `SummaryLevel`  [EXTRACTED]
+  src/lib/research/summarize.ts → src/lib/config/schema.ts
 - `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
   testing/regression/run-suite.mjs → src/lib/research/capture.ts
-- `defaultFetcher()` --calls--> `fetchText()`  [EXTRACTED]
-  src/lib/research/docs/machine-readable.ts → src/lib/research/fetcher.ts
-- `FetchCommand` --inherits--> `BaseCommand`  [EXTRACTED]
-  src/commands/fetch.ts → src/base-command.ts
+- `MachineReadableResult` --references--> `MachineReadableArtifact`  [EXTRACTED]
+  src/lib/research/docs/machine-readable.ts → src/lib/research/docs/capabilities.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (564 total, 48 thin omitted)
+## Communities (601 total, 47 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -623,8 +660,8 @@ Cohesion: 0.10
 Nodes (20): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. Search before fetching, Bonsai, Command Reference, `config` (+12 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.11
-Nodes (35): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), readScopedConfig(), omitUndefined() (+27 more)
+Cohesion: 0.10
+Nodes (40): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel(), readScopedConfig() (+32 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -679,8 +716,8 @@ Cohesion: 0.11
 Nodes (17): `captureOutput` — Test a Command Class Directly, Common Patterns, Environment variable flags, OCLIF Testing, Prerequisites, Primary API: `runCommand`, Quick Reference, References (+9 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.08
-Nodes (19): ResearchInspect, SectionSummary, ResearchList, ResearchPrune, FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS (+11 more)
+Cohesion: 0.13
+Nodes (6): ResearchList, ResearchPrune, loadStoreRoots(), projectDataDir(), resolveStoreRoots(), BaseCommand
 
 ### Community 22 - "Community 22"
 Cohesion: 0.12
@@ -707,8 +744,8 @@ Cohesion: 0.13
 Nodes (14): 1. Network Constraints & Crawler Limits, 2. DNS Safety & Private IP Blocklist (SSRF Protection), 3. Client-Side Hydration (SPA) Limitations, 4. Exit Codes & Common Errors, Blocked Target Blocks (RFC1918 & Localhost), Common Failure Symptoms, Crawler Limits, Exit Code Directory (+6 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.15
-Nodes (22): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), assertOk(), FetchOptions (+14 more)
+Cohesion: 0.25
+Nodes (17): assertOk(), checkDnsSafety(), FetchOptions, fetchStaticHtml(), fetchText(), fetchWithRedirects(), headerMeta(), notModifiedResult() (+9 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.18
@@ -722,6 +759,10 @@ Nodes (13): Analytics in `postrun`, Auth check in `prerun`, `command_not_found`,
 Cohesion: 0.12
 Nodes (15): 1. Storage Location & Directory Resolution, 2. URL Normalization & Cache Key Generation, 3. Stored Markdown File Format (YAML Frontmatter), 4. Freshness Policy & Tiers, 5. Revalidation Flow (Conditional Requests), 6. Offline Fallback & Stale Serving Policies, Cache Key Formula, Caching Protocol Specification (+7 more)
 
+### Community 32 - "Community 32"
+Cohesion: 0.13
+Nodes (11): FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS, ResearchSearch, scoreSingleTerm(), Fixture, fixtures (+3 more)
+
 ### Community 33 - "Community 33"
 Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
@@ -731,8 +772,8 @@ Cohesion: 0.14
 Nodes (13): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Migration from knip, Production audit, Production vs Full Audit, Step 1: Preview migration, Step 1: Run combined analysis (+5 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.12
-Nodes (25): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow() (+17 more)
+Cohesion: 0.11
+Nodes (26): ResearchInspect, SectionSummary, atomicWriteFile(), RevalidationResult, ResearchArtifact, fileSignature(), getOrUpdateIndexEntry(), IndexEntry (+18 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -751,8 +792,8 @@ Cohesion: 0.14
 Nodes (14): AGENTS.md, Architecture, Best practices, Code Style, How rules work, Importing Rules, Improvements, Nested AGENTS.md support (+6 more)
 
 ### Community 40 - "Community 40"
-Cohesion: 0.06
-Nodes (53): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+45 more)
+Cohesion: 0.14
+Nodes (19): waitForContentReady(), CONTENT_SELECTORS, fetchDeveloperPage(), salesforceDeveloper, CONTENT_SELECTORS, fetchSalesforcePage(), salesforce, BASE_REMOVE_SELECTORS (+11 more)
 
 ### Community 41 - "Community 41"
 Cohesion: 0.29
@@ -783,8 +824,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, Organize rules with `.claude/rules/`, Organize rules with `.claude/rules/`, Path-specific rules, Path-specific rules, Provenance, Set up rules (+4 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.17
-Nodes (17): ResolvedResearchTarget, ResolveResearchTargetOptions, SecureWriteResult, KEY_A, KEY_B, writeArtifactSecurely(), findArtifact(), getArtifactPath() (+9 more)
+Cohesion: 0.11
+Nodes (15): applyCaptureMetadata(), FetchCommand, handleStaleRevalidationResult(), fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact() (+7 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.15
@@ -1227,8 +1268,8 @@ Cohesion: 0.40
 Nodes (5): Audit and edit your memory, Auto memory, Enable or disable auto memory, How it works, Storage location
 
 ### Community 174 - "Community 174"
-Cohesion: 0.13
-Nodes (25): MachineReadableArtifact, SiteCapabilities, detectDocsEngine(), MachineReadableResult, TextFetcher, captureFixture(), CaptureDeps, CaptureOptions (+17 more)
+Cohesion: 0.15
+Nodes (21): MachineReadableArtifact, SiteCapabilities, TextFetcher, captureFixture(), CaptureDeps, CaptureOptions, CaptureOutcome, capturePage() (+13 more)
 
 ### Community 175 - "Community 175"
 Cohesion: 0.29
@@ -1491,8 +1532,8 @@ Cohesion: 0.18
 Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
 
 ### Community 240 - "Community 240"
-Cohesion: 0.20
-Nodes (10): Callback example, File descriptors, File system, File system flags, Notes, Ordering of callback and promise-based operations, Promise example, Provenance (+2 more)
+Cohesion: 0.12
+Nodes (16): Buffer paths, Callback example, File descriptors, File paths, File system, File system flags, File URL paths, Notes (+8 more)
 
 ### Community 241 - "Community 241"
 Cohesion: 0.20
@@ -1755,8 +1796,8 @@ Cohesion: 0.07
 Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
 
 ### Community 326 - "Community 326"
-Cohesion: 0.11
-Nodes (27): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SourceHint, DetectContext (+19 more)
+Cohesion: 0.09
+Nodes (30): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SourceHint, DetectContext (+22 more)
 
 ### Community 327 - "Community 327"
 Cohesion: 0.09
@@ -1779,8 +1820,8 @@ Cohesion: 0.10
 Nodes (30): SearchProvider, AlgoliaConfig, algoliaQueryUrl(), extractAlgoliaConfig(), parseAlgoliaResponse(), getText(), RemoteSearchDeps, RemoteSearchOutcome (+22 more)
 
 ### Community 332 - "Community 332"
-Cohesion: 0.17
-Nodes (14): advertisesRouteMarkdown(), defaultFetcher(), llmsTxtCandidates(), probeLlmsTxt(), probeRouteMarkdown(), FIXTURES, tryFetchValidText(), ArtifactValidation (+6 more)
+Cohesion: 0.19
+Nodes (15): advertisesRouteMarkdown(), defaultFetcher(), llmsTxtCandidates(), MachineReadableResult, probeLlmsTxt(), probeRouteMarkdown(), tryFetchValidText(), ArtifactValidation (+7 more)
 
 ### Community 333 - "Community 333"
 Cohesion: 0.11
@@ -1803,8 +1844,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
 
 ### Community 338 - "Community 338"
-Cohesion: 0.09
-Nodes (31): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, handleStaleRevalidationResult(), resolveFreshness(), Fixture, fixtures, checkMaxAgeExpired() (+23 more)
+Cohesion: 0.14
+Nodes (25): CAPTURE_DEPS, resolveFreshness(), buildCompressed(), compressMarkdown(), checkMaxAgeExpired(), evaluateFreshness(), FreshnessPolicy, getPolicy() (+17 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -1891,8 +1932,8 @@ Cohesion: 0.20
 Nodes (9): Creating a dynamic segment, Creating a layout, Creating a nested route, Creating a page, Linking between pages, Nesting layouts, Rendering with search params, Route Props Helpers (+1 more)
 
 ### Community 360 - "Community 360"
-Cohesion: 0.12
-Nodes (15): Buffer paths, Callback example, File descriptors, File paths, File system, File system flags, File URL paths, Notes (+7 more)
+Cohesion: 0.20
+Nodes (9): Callback example, File descriptors, File system, File system flags, Notes, Ordering of callback and promise-based operations, Promise example, Synchronous example (+1 more)
 
 ### Community 361 - "Community 361"
 Cohesion: 0.20
@@ -2587,8 +2628,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fsPromises.stat(path[, options])`, `fsPromises.stat(path[, options])`, Provenance, Summary
 
 ### Community 552 - "Community 552"
-Cohesion: 0.33
-Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
+Cohesion: 0.05
+Nodes (36): Adding the Chunk Size and Configuration, Adding the Chunk Size and Configuration, Advantages of "total-count", Advantages of "total-count", An example, An example, before-step-function, before-step-function (+28 more)
 
 ### Community 553 - "Community 553"
 Cohesion: 0.40
@@ -2618,22 +2659,170 @@ Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performan
 Cohesion: 0.67
 Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
 
+### Community 564 - "Community 564"
+Cohesion: 0.12
+Nodes (28): ABBREVIATIONS, applySalienceBoost(), BlockState, buildFrequencies(), collectHeadingTerms(), collectSentences(), contentTokens(), findBoundaryEnd() (+20 more)
+
+### Community 565 - "Community 565"
+Cohesion: 0.17
+Nodes (21): waitForLoad(), cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor } (+13 more)
+
+### Community 566 - "Community 566"
+Cohesion: 0.15
+Nodes (12): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+4 more)
+
+### Community 567 - "Community 567"
+Cohesion: 0.11
+Nodes (18): Cloud storage gateway, Cloud storage gateway, Compressed, Content delivery network, Content delivery network, Detailed, Examples of hardware caches, Examples of hardware caches (+10 more)
+
+### Community 568 - "Community 568"
+Cohesion: 0.11
+Nodes (18): Cloud storage gateway, Cloud storage gateway, Compressed, Content delivery network, Content delivery network, Detailed, Examples of hardware caches, Examples of hardware caches (+10 more)
+
+### Community 569 - "Community 569"
+Cohesion: 0.13
+Nodes (14): Bimodal RRIP (BRRIP), Bimodal RRIP (BRRIP), Compressed, Detailed, Dynamic RRIP (DRRIP), Dynamic RRIP (DRRIP), Provenance, Re-Reference Interval Prediction (RRIP) (+6 more)
+
+### Community 570 - "Community 570"
+Cohesion: 0.13
+Nodes (14): Compressed, Detailed, Least Recently Used (LRU), Least Recently Used (LRU), Most Recently Used (MRU), Most Recently Used (MRU), Provenance, Segmented LRU (SLRU) (+6 more)
+
+### Community 571 - "Community 571"
+Cohesion: 0.28
+Nodes (13): extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow(), parseMetadata() (+5 more)
+
+### Community 572 - "Community 572"
+Cohesion: 0.15
+Nodes (12): Compressed, Detailed, Least frequent recently used (LFRU), Least frequent recently used (LFRU), Least frequently used (LFU), Least frequently used (LFU), LFU with dynamic aging (LFUDA), LFU with dynamic aging (LFUDA) (+4 more)
+
+### Community 573 - "Community 573"
+Cohesion: 0.15
+Nodes (12): Adaptive replacement cache, Adaptive replacement cache, Clock with adaptive replacement, Clock with adaptive replacement, Compressed, Detailed, Low inter-reference recency set (LIRS), Low inter-reference recency set (LIRS) (+4 more)
+
+### Community 574 - "Community 574"
+Cohesion: 0.18
+Nodes (10): Compressed, Detailed, Information-centric networking, Information-centric networking, Least frequent recently used, Least frequent recently used, Provenance, Summary (+2 more)
+
+### Community 575 - "Community 575"
+Cohesion: 0.18
+Nodes (10): Compressed, Detailed, Information-centric networking, Information-centric networking, Least frequent recently used, Least frequent recently used, Provenance, Summary (+2 more)
+
+### Community 576 - "Community 576"
+Cohesion: 0.18
+Nodes (10): Compressed, Detailed, First in first out (FIFO), First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Last in first out (LIFO) or First in last out (FILO), Provenance, Simple queue-based policies (+2 more)
+
+### Community 577 - "Community 577"
+Cohesion: 0.28
+Nodes (6): CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, StatusAction, StatusResult
+
+### Community 578 - "Community 578"
+Cohesion: 0.22
+Nodes (8): Compressed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Provenance, Random replacement (RR), Simple queue-based policies, Summary
+
+### Community 579 - "Community 579"
+Cohesion: 0.29
+Nodes (6): Cache Systems, Cache Systems, Compressed, Detailed, Provenance, Summary
+
+### Community 580 - "Community 580"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Examples of hardware caches, Examples of hardware caches, Provenance, Summary
+
+### Community 581 - "Community 581"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Examples of hardware caches, Examples of hardware caches, Provenance, Summary
+
+### Community 582 - "Community 582"
+Cohesion: 0.29
+Nodes (6): Cache Systems, Cache Systems, Compressed, Detailed, Provenance, Summary
+
+### Community 583 - "Community 583"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Random replacement (RR), Random replacement (RR), Summary
+
+### Community 584 - "Community 584"
+Cohesion: 0.29
+Nodes (6): Compressed, Content delivery network, Content delivery network, Detailed, Provenance, Summary
+
+### Community 585 - "Community 585"
+Cohesion: 0.29
+Nodes (6): Compressed, Content delivery network, Content delivery network, Detailed, Provenance, Summary
+
+### Community 586 - "Community 586"
+Cohesion: 0.29
+Nodes (6): Cloud storage gateway, Cloud storage gateway, Compressed, Detailed, Provenance, Summary
+
+### Community 587 - "Community 587"
+Cohesion: 0.29
+Nodes (6): Cloud storage gateway, Cloud storage gateway, Compressed, Detailed, Provenance, Summary
+
+### Community 588 - "Community 588"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Policies approximating Bélády's algorithm, Policies approximating Bélády's algorithm, Provenance, Summary
+
+### Community 589 - "Community 589"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Translation lookaside buffer, Translation lookaside buffer
+
+### Community 590 - "Community 590"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Translation lookaside buffer, Translation lookaside buffer
+
+### Community 591 - "Community 591"
+Cohesion: 0.33
+Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
+
+### Community 592 - "Community 592"
+Cohesion: 0.33
+Nodes (6): Detailed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Random replacement (RR), Simple queue-based policies
+
+### Community 593 - "Community 593"
+Cohesion: 0.40
+Nodes (5): Bimodal RRIP (BRRIP), Dynamic RRIP (DRRIP), Re-Reference Interval Prediction (RRIP), RRIP-style policies, Static RRIP (SRRIP)
+
+### Community 594 - "Community 594"
+Cohesion: 0.40
+Nodes (5): Bimodal RRIP (BRRIP), Dynamic RRIP (DRRIP), Re-Reference Interval Prediction (RRIP), RRIP-style policies, Static RRIP (SRRIP)
+
+### Community 595 - "Community 595"
+Cohesion: 0.40
+Nodes (5): Least Recently Used (LRU), Most Recently Used (MRU), Segmented LRU (SLRU), Simple recency-based policies, Time-Aware, Least Recently Used (TLRU)
+
+### Community 596 - "Community 596"
+Cohesion: 0.40
+Nodes (5): Least Recently Used (LRU), Most Recently Used (MRU), Segmented LRU (SLRU), Simple recency-based policies, Time-Aware, Least Recently Used (TLRU)
+
+### Community 597 - "Community 597"
+Cohesion: 0.50
+Nodes (4): Adaptive replacement cache, Clock with adaptive replacement, Low inter-reference recency set (LIRS), Machine-learning policies
+
+### Community 598 - "Community 598"
+Cohesion: 0.50
+Nodes (4): Adaptive replacement cache, Clock with adaptive replacement, Low inter-reference recency set (LIRS), Machine-learning policies
+
+### Community 599 - "Community 599"
+Cohesion: 0.50
+Nodes (4): Least frequent recently used (LFRU), Least frequently used (LFU), LFU with dynamic aging (LFUDA), Simple frequency-based policies
+
+### Community 600 - "Community 600"
+Cohesion: 0.50
+Nodes (4): Least frequent recently used (LFRU), Least frequently used (LFU), LFU with dynamic aging (LFUDA), Simple frequency-based policies
+
 ## Knowledge Gaps
-- **4287 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+4282 more)
+- **4488 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+4483 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **48 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **47 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `File system` connect `Community 240` to `Community 110`, `Community 207`, `Community 239`, `Community 210`, `Community 249`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `Common Objects` connect `Community 239` to `Community 248`, `Community 237`, `Community 240`, `Community 242`, `Community 214`, `Community 536`, `Community 538`, `Community 251`, `Community 220`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `Common Objects` connect `Community 238` to `Community 535`, `Community 249`, `Community 236`, `Community 241`, `Community 213`, `Community 247`, `Community 537`, `Community 250`, `Community 219`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `File system` connect `Community 360` to `Community 177`, `Community 354`, `Community 291`, `Community 308`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **Why does `File system` connect `Community 249` to `Community 194`, `Community 235`, `Community 238`, `Community 209`, `Community 61`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **What connects `husky.sh script`, `__dirname`, `rawArgv` to the rest of the system?**
-  _4287 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _4488 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

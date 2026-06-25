@@ -120,13 +120,13 @@
     "semantic_hash": ""
   },
   "src/lib/research/artifact.test.ts": {
-    "mtime": 1782383015.0455182,
-    "ast_hash": "be9ffced8b11f8661523d81d4b27994a",
+    "mtime": 1782389521.5795066,
+    "ast_hash": "ff54d98a9d2cf7d3786cd08cd3561a5c",
     "semantic_hash": ""
   },
   "src/lib/research/artifact.ts": {
-    "mtime": 1782382875.0901623,
-    "ast_hash": "7b2392a921ab1330902896d099c39d62",
+    "mtime": 1782389215.0756109,
+    "ast_hash": "cf2eac56edb20fa75cea321d23c63576",
     "semantic_hash": ""
   },
   "src/lib/research/cache-key.test.ts": {
@@ -140,13 +140,13 @@
     "semantic_hash": ""
   },
   "src/lib/research/compress.test.ts": {
-    "mtime": 1782373886.9126582,
-    "ast_hash": "5194f8470f77943b1e4932cea2c9b230",
+    "mtime": 1782389521.5966635,
+    "ast_hash": "22392ababb3bb7d943994556307bb81d",
     "semantic_hash": ""
   },
   "src/lib/research/compress.ts": {
-    "mtime": 1782286203.0781066,
-    "ast_hash": "0e5fbbedcfbac25bbd365b548fd72315",
+    "mtime": 1782389385.4234254,
+    "ast_hash": "7cf61f63ed8dee37e5a441a117b07c61",
     "semantic_hash": ""
   },
   "src/lib/research/extract.test.ts": {
@@ -185,13 +185,13 @@
     "semantic_hash": ""
   },
   "src/lib/research/revalidate.test.ts": {
-    "mtime": 1782381534.9105194,
-    "ast_hash": "0c33592de0e2dd615439798df4a3b933",
+    "mtime": 1782385433.7349539,
+    "ast_hash": "d98ca06bd9a343f33266068804110a0c",
     "semantic_hash": ""
   },
   "src/lib/research/revalidate.ts": {
-    "mtime": 1782382867.566473,
-    "ast_hash": "1f89da40c958bb18d4a97515a86b57e2",
+    "mtime": 1782385163.171743,
+    "ast_hash": "31498605151c5332e7594ae8c769679c",
     "semantic_hash": ""
   },
   "src/lib/research/schema.ts": {
@@ -570,8 +570,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1782383131.467323,
-    "ast_hash": "8c5aeafd1d9d8d7805f004b25ca56fa4",
+    "mtime": 1782386515.3793924,
+    "ast_hash": "570202714e4c56106c286ae44149ea83",
     "semantic_hash": ""
   },
   "docs/cache-protocol.md": {
@@ -1290,13 +1290,13 @@
     "semantic_hash": ""
   },
   "src/lib/research/docs/section-artifacts.test.ts": {
-    "mtime": 1782319903.6715305,
-    "ast_hash": "47f34445b58dbe7bbb7b23cdaa0845c2",
+    "mtime": 1782389521.6058073,
+    "ast_hash": "7ab9921e87c180c4f89a3ee80ee5ae92",
     "semantic_hash": ""
   },
   "src/lib/research/docs/section-artifacts.ts": {
-    "mtime": 1782319903.679253,
-    "ast_hash": "8112fd23aeb2827ca31e1dbd0c961ed9",
+    "mtime": 1782386439.9589162,
+    "ast_hash": "b962a1dd83461e06ae5d2fced3450b75",
     "semantic_hash": ""
   },
   "src/lib/research/docs/sections.test.ts": {
@@ -2025,13 +2025,13 @@
     "semantic_hash": ""
   },
   "src/lib/config/config.test.ts": {
-    "mtime": 1782327058.9821963,
-    "ast_hash": "ad1e51b801f725fc6da6109e31790f0a",
+    "mtime": 1782385685.5888999,
+    "ast_hash": "3f36a7f2b2a33fc20fe3b3b8cfcd7bf2",
     "semantic_hash": ""
   },
   "src/lib/config/index.ts": {
-    "mtime": 1782325625.1064348,
-    "ast_hash": "b2ba7984b8297b59644be247ff441319",
+    "mtime": 1782385083.220939,
+    "ast_hash": "19e80d4dfea491ab56009f9eced49dfd",
     "semantic_hash": ""
   },
   "src/lib/config/io.ts": {
@@ -2040,18 +2040,18 @@
     "semantic_hash": ""
   },
   "src/lib/config/resolve.ts": {
-    "mtime": 1782325199.8070085,
-    "ast_hash": "08c7ae9e050160ce37b3112bc6006d2b",
+    "mtime": 1782389521.5636911,
+    "ast_hash": "cb9d98e5ee41ab3847f0318fe975bdb3",
     "semantic_hash": ""
   },
   "src/lib/config/schema.test.ts": {
-    "mtime": 1782325159.952062,
-    "ast_hash": "457e32ab54e47ec788f6bb0373c24835",
+    "mtime": 1782385659.322533,
+    "ast_hash": "d6c969b3baea21e00bebb7917a1ddccd",
     "semantic_hash": ""
   },
   "src/lib/config/schema.ts": {
-    "mtime": 1782325134.7712116,
-    "ast_hash": "9627e0c1f8ff938d05184f7e2c79bef4",
+    "mtime": 1782385044.2016191,
+    "ast_hash": "50621546835fd6a2b66adb55b644653e",
     "semantic_hash": ""
   },
   "src/lib/research/resolve-target.ts": {
@@ -2135,8 +2135,8 @@
     "semantic_hash": ""
   },
   "src/commands/import.ts": {
-    "mtime": 1782382839.7790782,
-    "ast_hash": "5f9121bfb8019704c45e672286fd18b9",
+    "mtime": 1782385261.240255,
+    "ast_hash": "2b54e01522e710a885b5193a47c0c872",
     "semantic_hash": ""
   },
   "src/commands/inspect.test.ts": {
@@ -2195,8 +2195,8 @@
     "semantic_hash": ""
   },
   "src/commands/fetch.ts": {
-    "mtime": 1782382853.253549,
-    "ast_hash": "9030011362cfa3a1c695b72b4d425b91",
+    "mtime": 1782386451.1026523,
+    "ast_hash": "acbe04b5e979a99c38cbc63179615988",
     "semantic_hash": ""
   },
   "src/lib/atomic-write.ts": {
@@ -2210,13 +2210,13 @@
     "semantic_hash": ""
   },
   "src/commands/config/commands.test.ts": {
-    "mtime": 1782375912.116541,
-    "ast_hash": "f1dc84e5809ca63a3d9f425f0298c108",
+    "mtime": 1782385663.8256845,
+    "ast_hash": "c0054e739534356c727176bcc9943e29",
     "semantic_hash": ""
   },
   "src/commands/fetch-paths.test.ts": {
-    "mtime": 1782375912.1620944,
-    "ast_hash": "771ceeeac662d7ac0d75ca27f5fc0032",
+    "mtime": 1782385377.3228633,
+    "ast_hash": "368ef5e9ab11be28171dbe317efc195c",
     "semantic_hash": ""
   },
   "src/lib/atomic-write.test.ts": {
@@ -2385,8 +2385,8 @@
     "semantic_hash": ""
   },
   "src/lib/research/keywords.ts": {
-    "mtime": 1782383882.143256,
-    "ast_hash": "553bf1ce154d85b83b8a18a0260e2518",
+    "mtime": 1782384693.766723,
+    "ast_hash": "d10f21bd054c80817626ec5b405f987e",
     "semantic_hash": ""
   },
   "src/lib/research/search-index.test.ts": {
@@ -3252,6 +3252,131 @@
   ".bonsai/research/fd8d6e12bfc7d00964306bb8bb6a22191e2eda1413097c1ce89e8dbb7ac90908.md": {
     "mtime": 1782381875.936115,
     "ast_hash": "26dc68ffe1b909916c5c8cb042e7ea01",
+    "semantic_hash": ""
+  },
+  "src/lib/research/summarize.test.ts": {
+    "mtime": 1782389521.6477664,
+    "ast_hash": "5036ea8de0b8ef8bcc13ff70c0f614c5",
+    "semantic_hash": ""
+  },
+  "src/lib/research/summarize.ts": {
+    "mtime": 1782389755.7827702,
+    "ast_hash": "5074119e48c2ec7bda42ce0e4fcb4acb",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/0488452ca1f3e35ef3699fb6032aa1be227372f0d21899f6b44751fccba9c8de.md": {
+    "mtime": 1782386284.3596756,
+    "ast_hash": "a5cf40c43724bfa80730621cf2b7bf13",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/0c923c5ffb516ca54ef526cfc1c5a83eeaea5a4e6da9dbe0ae550d3524d17042.md": {
+    "mtime": 1782386568.6041245,
+    "ast_hash": "65307ddd9726f5d6cbdf4e1876710a75",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/0c923c5ffb516ca54ef526cfc1c5a83eeaea5a4e6da9dbe0ae550d3524d17042.superseded.1782386568604.md": {
+    "mtime": 1782386568.604639,
+    "ast_hash": "b9afa1d025f50d287f514bbc33846d53",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/147fb792733c4c5a35aa8dad96f93b1e826fa93478085cfc15029167e8671c91.md": {
+    "mtime": 1782386293.7152886,
+    "ast_hash": "4aceb5402d901f235851b68af8989353",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/1f2a2fab57b1b762960ff75e62e6d9250c73c687a5969bea77e70c532048d7de.md": {
+    "mtime": 1782386205.6397164,
+    "ast_hash": "ba41dbfdca6b196cffb4ee825d344189",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/31b603c4724f7e499f839fa051de3836f9333c827053bb0c4719aa44dc1f29ca.md": {
+    "mtime": 1782386205.63912,
+    "ast_hash": "82003f62919ba01cbbafded6de629b1e",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/368fc174f6b5da3b33380d814c72e6630d236f49640e4c8d7c6f6313de03f81f.md": {
+    "mtime": 1782389560.6671548,
+    "ast_hash": "1a3f1f6592ade96983f4a89db8b39033",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/395b7f8f7e50fb757fbc3f76678dd972f267f2d304c263c47d477d304b1d249d.md": {
+    "mtime": 1782386568.6055381,
+    "ast_hash": "5611ffce1e703e1d9c4afff41467a3d9",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/395b7f8f7e50fb757fbc3f76678dd972f267f2d304c263c47d477d304b1d249d.superseded.1782386568605.md": {
+    "mtime": 1782386568.6060226,
+    "ast_hash": "cba660a474e6698c2d6135b1a888a41c",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/4f972ed1bd1355c89e28ef682341b24e3fc9d289cc4bb0d3e2ae8ca0cd1fbb63.md": {
+    "mtime": 1782386205.6384976,
+    "ast_hash": "1564ec806e47d987165b4d84240278d5",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/7eb72c2cf04044722a2760e1e4017d3978f08333d99cf77d809b41d2f709b881.md": {
+    "mtime": 1782386205.6373591,
+    "ast_hash": "d1d4ef8c09ccca80623fff9a49ee41b2",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/883869254a74f9c9655854e5cf9dac9e49cb8fa41d6fc730b5eaa5f834ef0b3f.md": {
+    "mtime": 1782386568.488689,
+    "ast_hash": "3631ada78f16bd26fdac5ca970cd521e",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/883869254a74f9c9655854e5cf9dac9e49cb8fa41d6fc730b5eaa5f834ef0b3f.superseded.1782386568488.md": {
+    "mtime": 1782386568.489216,
+    "ast_hash": "38475c082871ba2162715890b31e9db9",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/8be15330392516e5f8932040f632f124f33328eb31173a41a9da10877746ff06.md": {
+    "mtime": 1782386205.6380024,
+    "ast_hash": "c63c2f6a7a378b4459db375ead1f565a",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/993b251e28f056004ab2128e402ef3626d7c1be3031cc48d8d8c61af86c93182.md": {
+    "mtime": 1782386568.6063297,
+    "ast_hash": "fda086f47d61ad91d8beaeee42b79ff0",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/993b251e28f056004ab2128e402ef3626d7c1be3031cc48d8d8c61af86c93182.superseded.1782386568606.md": {
+    "mtime": 1782386568.6068,
+    "ast_hash": "ae8c19ad89ea8de90297e286295ea646",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/9c1c5c1183276fb17f6c374dfc0a5996c1068c79aa9ed404b1ad05b721ae2e27.md": {
+    "mtime": 1782386205.4157317,
+    "ast_hash": "0adbb45fce0adf1559263e837aabe027",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/a637a8be06fe7b6fa2b5172dec30945d1498c8e3f139e88e7f72487c52dd9713.md": {
+    "mtime": 1782386568.60711,
+    "ast_hash": "a999e1ef3351bb3f0cc09d62b2a45f45",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/a637a8be06fe7b6fa2b5172dec30945d1498c8e3f139e88e7f72487c52dd9713.superseded.1782386568607.md": {
+    "mtime": 1782386568.6074982,
+    "ast_hash": "207f6902ff58a4581ff505c44ef686cc",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/db8a42e2587d2e5f613743e0de4cefadd0272be14d76ff381c3a7a98976447d8.md": {
+    "mtime": 1782386205.6402223,
+    "ast_hash": "c427ed08d7d0a494b15ac4cf95fcd653",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/e1f34c70d981fe2a481564fe0c09fca289c8ca0a653215b2aca1a7bfabe8398a.md": {
+    "mtime": 1782386568.6048734,
+    "ast_hash": "009c716328d361b94efd5f51a3e0756a",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/e1f34c70d981fe2a481564fe0c09fca289c8ca0a653215b2aca1a7bfabe8398a.superseded.1782386568605.md": {
+    "mtime": 1782386568.6052594,
+    "ast_hash": "d407c0720cf02cadd469a4405469ec0d",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/f31ec5e385e81c6291c7011f90738112efebe14e46c51e82e82236316155a42a.md": {
+    "mtime": 1782386205.6408262,
+    "ast_hash": "0ec09e6f456be9667323933c057a35c5",
     "semantic_hash": ""
   }
 }

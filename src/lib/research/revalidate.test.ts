@@ -131,7 +131,8 @@ describe('freshness and revalidation engine', () => {
         errorExtraction,
         'standard',
         null,
-        currentTime
+        currentTime,
+        'conservative'
       );
 
       expect(artifact.metadata.extraction_status).toBe('failed');
@@ -162,7 +163,8 @@ describe('freshness and revalidation engine', () => {
         goodExtraction,
         'standard',
         null,
-        currentTime
+        currentTime,
+        'conservative'
       );
 
       expect(artifact.metadata.extraction_status).toBe('extracted');
@@ -185,6 +187,7 @@ describe('freshness and revalidation engine', () => {
       const currentTime = new Date('2026-06-25T00:00:00.000Z'); // 1 day later
       const result = await revalidateCache(tempDir, sampleArtifact, currentTime, {
         allowStale: false,
+        summaryLevel: 'conservative',
       });
 
       expect(result.status).toBe('revalidated');
@@ -208,6 +211,7 @@ describe('freshness and revalidation engine', () => {
 
       const result = await revalidateCache(tempDir, sampleArtifact, currentTime, {
         allowStale: false,
+        summaryLevel: 'conservative',
       });
 
       expect(result.status).toBe('revalidated');
@@ -247,6 +251,7 @@ describe('freshness and revalidation engine', () => {
 
       const result = await revalidateCache(tempDir, sampleArtifact, currentTime, {
         allowStale: false,
+        summaryLevel: 'conservative',
       });
 
       expect(result.status).toBe('refreshed');
@@ -264,6 +269,7 @@ describe('freshness and revalidation engine', () => {
       // Scenario A: allowStale = true
       const resA = await revalidateCache(tempDir, sampleArtifact, currentTime, {
         allowStale: true,
+        summaryLevel: 'conservative',
       });
       expect(resA.status).toBe('stale');
       expect(resA.allowed).toBe(true);
@@ -273,6 +279,7 @@ describe('freshness and revalidation engine', () => {
       // Scenario B: allowStale = false (exits 5 status)
       const resB = await revalidateCache(tempDir, sampleArtifact, currentTime, {
         allowStale: false,
+        summaryLevel: 'conservative',
       });
       expect(resB.status).toBe('stale');
       expect(resB.allowed).toBe(false);
@@ -285,7 +292,10 @@ describe('freshness and revalidation engine', () => {
       writeArtifact(tempDir, sampleArtifact.metadata.cache_key, sampleArtifact);
 
       await expect(
-        revalidateCache(tempDir, sampleArtifact, currentTime, { allowStale: true })
+        revalidateCache(tempDir, sampleArtifact, currentTime, {
+          allowStale: true,
+          summaryLevel: 'conservative',
+        })
       ).rejects.toThrow(/expired beyond the grace period/);
     });
 
@@ -311,6 +321,7 @@ describe('freshness and revalidation engine', () => {
 
       const result = await revalidateCache(tempDir, artifactWithModule, currentTime, {
         allowStale: false,
+        summaryLevel: 'conservative',
       });
 
       expect(result.status).toBe('refreshed');
@@ -335,6 +346,7 @@ describe('freshness and revalidation engine', () => {
 
       const result = await revalidateCache(tempDir, sampleArtifact, currentTime, {
         allowStale: false,
+        summaryLevel: 'conservative',
         rendered: true,
       });
 
@@ -364,7 +376,10 @@ describe('freshness and revalidation engine', () => {
       const currentTime = new Date('2026-07-29T00:00:00.000Z');
       writeArtifact(tempDir, noValidators.metadata.cache_key, noValidators);
 
-      await revalidateCache(tempDir, noValidators, currentTime, { allowStale: false });
+      await revalidateCache(tempDir, noValidators, currentTime, {
+        allowStale: false,
+        summaryLevel: 'conservative',
+      });
 
       expect(fetcher.fetchStaticHtml).toHaveBeenCalledWith('https://example.com/docs', {
         headers: {},
@@ -404,6 +419,7 @@ describe('freshness and revalidation engine', () => {
 
       const result = await revalidateCache(tempDir, artifactWithModule, currentTime, {
         allowStale: false,
+        summaryLevel: 'conservative',
       });
 
       expect(result.status).toBe('refreshed');

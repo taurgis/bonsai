@@ -6,7 +6,7 @@ import { BaseCommand } from '../base-command.js';
 import { writeArtifact, getArtifactPath, type LocatedArtifact } from '../lib/research/storage.js';
 import { loadStoreRoots, type StoreRoots } from '../lib/research/store-roots.js';
 import { writeArtifactSecurely } from '../lib/research/secure-write.js';
-import type { StorageMode } from '../lib/config/index.js';
+import { loadSummaryLevel, type StorageMode, type SummaryLevel } from '../lib/config/index.js';
 import { evaluateFreshness, parseTtlToMs, checkMaxAgeExpired } from '../lib/research/freshness.js';
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
@@ -112,7 +112,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   private async executeCacheHit(
     cached: any,
     targetDir: string,
-    currentTime: Date
+    currentTime: Date,
+    summaryLevel: SummaryLevel
   ): Promise<{ cacheStatus: any; freshnessState: any; artifact: any }> {
     const { ttl, 'max-age': maxAge, 'allow-stale': allowStale, rendered } = this.flags;
 
@@ -129,6 +130,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       allowStale: Boolean(allowStale),
       ttlOverride: ttl,
       rendered: Boolean(rendered),
+      summaryLevel,
     });
 
     handleStaleRevalidationResult(this, revalResult);
@@ -143,7 +145,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   private async executeCacheMiss(
     normalizedUrl: string,
     currentTime: Date,
-    cacheKey: string
+    cacheKey: string,
+    summaryLevel: SummaryLevel
   ): Promise<any> {
     const { topic, tags, tier, ttl, rendered } = this.flags;
 
@@ -170,7 +173,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       extraction,
       tier,
       ttl || null,
-      currentTime
+      currentTime,
+      summaryLevel
     );
 
     artifact.metadata.topic = topic || null;
@@ -259,7 +263,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     roots: StoreRoots,
     tmpDir: string | null,
     currentTime: Date,
-    located: LocatedArtifact | null
+    located: LocatedArtifact | null,
+    summaryLevel: SummaryLevel
   ): Promise<{
     cacheStatus: any;
     freshnessState: any;
@@ -272,11 +277,16 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       // never mutated. ponytail: revalidation rewrites in place, so a refreshed project entry that
       // gains a secret is not re-routed — only first-time project writes are scanned.
       const revalDir = tmpDir ?? located.dataDir;
-      const hit = await this.executeCacheHit(located.artifact, revalDir, currentTime);
+      const hit = await this.executeCacheHit(located.artifact, revalDir, currentTime, summaryLevel);
       return { ...hit, storageDir: located.dataDir, redirectedToGlobal: false };
     }
 
-    const artifact = await this.executeCacheMiss(normalizedUrl, currentTime, cacheKey);
+    const artifact = await this.executeCacheMiss(
+      normalizedUrl,
+      currentTime,
+      cacheKey,
+      summaryLevel
+    );
     const { dir, redirectedToGlobal } = this.persistFreshArtifact(
       roots,
       tmpDir,
@@ -321,11 +331,12 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     targetDir: string,
     artifact: any,
     currentTime: Date,
-    cacheStatus: any
+    cacheStatus: any,
+    summaryLevel: SummaryLevel
   ): void {
     if (cacheStatus !== 'miss' && cacheStatus !== 'refreshed') return;
     try {
-      persistSectionArtifacts(targetDir, artifact, currentTime);
+      persistSectionArtifacts(targetDir, artifact, currentTime, summaryLevel);
     } catch {
       /* section generation is non-essential; ignore failures */
     }
@@ -352,14 +363,29 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     }
 
     const { cacheKey, located, normalizedUrl, roots } = target;
+    const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());
     const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;
     const currentTime = new Date();
 
     try {
       const { cacheStatus, freshnessState, artifact, storageDir, redirectedToGlobal } =
-        await this.resolveArtifact(normalizedUrl, cacheKey, roots, tmpDir, currentTime, located);
+        await this.resolveArtifact(
+          normalizedUrl,
+          cacheKey,
+          roots,
+          tmpDir,
+          currentTime,
+          located,
+          summaryLevel
+        );
 
-      this.persistSectionsIfFresh(tmpDir ?? storageDir, artifact, currentTime, cacheStatus);
+      this.persistSectionsIfFresh(
+        tmpDir ?? storageDir,
+        artifact,
+        currentTime,
+        cacheStatus,
+        summaryLevel
+      );
 
       const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
       const resultData = this.buildResultData(
