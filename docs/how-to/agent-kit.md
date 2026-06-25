@@ -2,9 +2,9 @@
 
 Bonsai ships a small kit that teaches an AI coding agent to research the
 cache-first way: search what's already captured, fetch through Bonsai when the
-cache misses, and import anything it had to read by hand. The kit is three files
-— a skill, an instruction, and a subagent — and you install it into your own
-agent's config.
+cache misses, and import anything it had to read by hand. The core kit is three
+files — a skill, an instruction, and a subagent — plus an optional Salesforce
+variant, and you install it into your own agent's config.
 
 The source files live in [`agents/`](https://github.com/taurgis/bonsai/tree/main/agents)
 in the Bonsai repo, written in GitHub Copilot format. The installer converts them
@@ -21,6 +21,25 @@ or Cursor.
 
 The skill is the engine, the instruction decides when it fires, and the subagent
 isolates the heavy research. You can install all three or just the skill.
+
+### Optional: Salesforce variant
+
+The kit also ships a Salesforce specialization of the instruction and subagent,
+for teams whose research targets Salesforce docs. They reuse the same
+`web-research` skill but add Bonsai's [Salesforce site modules](/reference/site-modules):
+searching Help live with `--domain help.salesforce.com`, and letting the modules
+render and extract the JavaScript-only Help and Developer pages.
+
+| Piece | File | What it does |
+| --- | --- | --- |
+| **Instruction** | `salesforce-research` | Requires verifying current Salesforce docs before Salesforce-related changes, and points at the site-module workflow. |
+| **Subagent** | `salesforce-docs-researcher` | The researcher specialized for Salesforce Help and Developer docs; returns source-cited findings. |
+
+- [View the instruction source →](https://github.com/taurgis/bonsai/blob/main/agents/instructions/salesforce-research.instructions.md)
+- [View the subagent source →](https://github.com/taurgis/bonsai/blob/main/agents/agents/salesforce-docs-researcher.agent.md)
+
+`--all` installs these alongside the generic pieces; omit them if you don't
+research Salesforce.
 
 ## Install with forward-nexus
 
