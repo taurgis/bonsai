@@ -9,7 +9,7 @@ that **a built-in web fetch quietly drops, summarizes, or refuses content**,
 while Bonsai returns the complete page every time, deterministically, and caches
 it for reuse.
 
-One section per agent. **Claude Code**, **Antigravity**, **Codex**, and **Cursor** are documented below; GitHub Copilot will follow ([see below](#other-agents)).
+One section per agent. **Claude Code**, **Antigravity**, **Codex**, **Cursor**, and **Mistral Vibe** are documented below; GitHub Copilot will follow ([see below](#other-agents)).
 
 ## Claude Code
 
@@ -323,6 +323,104 @@ npx @taurgis/bonsai inspect https://react.dev/reference/react/useEffect --json
 and reusable — versus a 14,442-token fetch that costs more and still drops
 structured warnings.
 
+## Mistral Vibe
+
+> **Agent: Mistral Vibe** — its built-in **`web_fetch`** tool fetches the URL,
+> converts the entire HTML page to Markdown, and returns the complete document
+> as readable text. There is **no model in the loop** and **no content extraction**.
+
+::: info How we measured (tools used)
+- **Agent web fetch** — Mistral Vibe's built-in **`web_fetch`** tool with its
+  HTML-to-Markdown conversion. Output is the full page converted verbatim.
+- **Bonsai** — the `@taurgis/bonsai` CLI with **default settings** (`compressed`
+  format, `conservative` summary). Both cached variants come from one fetch.
+- **Raw page** — a plain HTTP GET of the URL.
+- **Tokens** are an estimate (`≈ chars / 4`) applied identically to every result,
+  so the columns are comparable. Captured **2026-06-25** with `@taurgis/bonsai`
+  **v1.0.3**. `web_fetch` output is deterministic (no LLM) but includes full page.
+:::
+
+### Results
+
+| Page | What web_fetch returned | web_fetch | Bonsai `compressed` | Bonsai `detailed` | Raw page |
+| --- | --- | --: | --: | --: | --: |
+| React – `useEffect` | **Full page** — navigation, sidebar, main content, and footer all converted to Markdown | 41,279 | **8,119** | 11,296 | 604,148 |
+| TypeScript – Everyday Types | **Full page** — complete document structure including all navigation and footer | 41,289 | **4,983** | 6,903 | 321,756 |
+| Vue – Introduction | **Full page** — entire guide with navigation, sponsor links, language selector | 8,359 | **1,520** | 2,105 | 114,346 |
+| Next.js – Layouts and Pages | **Full page** — heavy SPA with extensive navigation and client-side structure | 182,451 | **2,401** | 2,968 | 985,216 |
+
+### What web_fetch left behind
+
+Unlike other agents that summarize or drop content, Mistral Vibe's `web_fetch` converts
+**the entire HTML document** to Markdown:
+
+::: warning Page chrome included vs Bonsai's article-only extraction
+- **React – `useEffect`** — **3.65× more tokens** (41,279 vs 11,296): full sidebar
+  navigation, header, footer, and version links are all preserved.
+- **TypeScript – Everyday Types** — **5.98× more tokens** (41,289 vs 6,903):
+  the complete docs navigation tree and page footer are included.
+- **Vue – Introduction** — **3.97× more tokens** (8,359 vs 2,105): sponsor banner,
+  language selector, and full navigation remain.
+- **Next.js – Layouts and Pages** — **61.5× more tokens** (182,451 vs 2,968):
+  the SPA's heavy client-side navigation, multiple sidebars, and footer content
+  dominate the output.
+
+In every case, `web_fetch` returns more content than Bonsai — but most of that
+**additional content is page chrome, not documentation**. Bonsai's extraction
+removes 75–95% of the non-article text before conversion.
+:::
+
+### Why web_fetch behaves this way
+
+The tool performs a **direct, unfiltered HTML-to-Markdown conversion**:
+
+- **No Readability extraction** — the entire document body is converted, including
+  all navigation, sidebars, footers, and decorative page elements.
+- **No chrome cleaning** — unlike Bonsai's `cleanDocsChrome` preprocessing, all
+  structural markup becomes Markdown.
+- **Deterministic** — same URL returns same Markdown shape every time (no LLM
+  summarization).
+- **Complete but not focused** — you get the full page fidelity at significant token
+  cost, with no separation between article and chrome.
+
+For SPAs like Next.js docs, this difference is dramatic: Bonsai finds and
+caches the public Markdown source or extracts the rendered article, while `web_fetch`
+converts the full client-rendered HTML, including navigation that may exceed the
+article word count by an order of magnitude.
+
+### Worked example: React's `useEffect`
+
+What Mistral Vibe's `web_fetch` returns:
+
+```text
+web_fetch(url: "https://react.dev/reference/react/useEffect")
+→ 41,279 tokens — full page including sidebar navigation,
+  React logo, version selector, footer links, and copyright.
+```
+
+The same page through Bonsai, with defaults:
+
+```bash
+npx @taurgis/bonsai https://react.dev/reference/react/useEffect
+npx @taurgis/bonsai inspect https://react.dev/reference/react/useEffect --json
+```
+
+```json
+{
+  "source_url": "https://react.dev/reference/react/useEffect",
+  "capture_method": "static_fetch",
+  "extraction_status": "extracted",
+  "token_estimate": {
+    "compressed": 8119,
+    "detailed": 11296
+  }
+}
+```
+
+41,279 tokens for the **complete page with chrome** — versus 11,296 tokens for
+Bonsai's **article-only** capture. The difference (29,983 tokens) is navigation,
+footers, and structural elements, not documentation content.
+
 ## Why Bonsai is different
 
 This part is agent-agnostic — it's true no matter which agent's fetch you compare
@@ -351,7 +449,7 @@ need exact wording.
 
 ## Other agents
 
-Claude Code, Antigravity, Codex, and Cursor are measured here. The same four pages
+Claude Code, Antigravity, Codex, Cursor, and Mistral Vibe are measured here. The same four pages
 are being run through the built-in fetch tools of other agents — **GitHub Copilot**
 will get its own section above, measured the same way. Bonsai is the constant:
 one deterministic, reusable cache, whichever agent is doing the reading.

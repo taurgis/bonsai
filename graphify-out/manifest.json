@@ -3875,8 +3875,8 @@
     "semantic_hash": ""
   },
   "docs/examples.md": {
-    "mtime": 1782399321.5496206,
-    "ast_hash": "da34159e8e4dc1dfd05c97b6e9ab294c",
+    "mtime": 1782400610.0764916,
+    "ast_hash": "88702c7fd5118335722ac2f7f875560c",
     "semantic_hash": ""
   },
   "docs/guide/agent-integration.md": {
@@ -3932,6 +3932,11 @@
   "docs/public/favicon.svg": {
     "mtime": 1782398187.8248267,
     "ast_hash": "2fd723b0cdeafcec78fbf8593c59e680",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/5ed6243446bcb1cd836e5c9a9771fc183bb8cbe794b08a07ce1fb04d24b7a8ba.md": {
+    "mtime": 1782399546.477538,
+    "ast_hash": "f14ef5cacc019396ee5fa84188b23b06",
     "semantic_hash": ""
   }
 }
