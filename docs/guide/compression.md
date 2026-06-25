@@ -16,6 +16,10 @@ Both variants are cached together, and the stored `token_estimate` records the
 size of each (`{ compressed, detailed }`) so an agent can pick the variant that
 fits its budget.
 
+See [Agent web fetch vs Bonsai](/examples) for a measured, head-to-head comparison
+on popular library docs — including how a built-in agent web fetch silently drops
+or refuses content that Bonsai keeps.
+
 ## What compression does
 
 Compression runs in layers and is **deterministic — there is no LLM in the
