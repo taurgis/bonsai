@@ -53,3 +53,18 @@
     margin-bottom: 0;
   }
 }
+
+/**
+ * Below 640px VitePress locks the hero image container to a fixed 320x320 box,
+ * which renders the bonsai canvas small and cramped on phones. Let the container
+ * fill the available width (capped at the canvas's own 460px max) and take its
+ * height from the canvas, so the tree is shown larger and uncropped on mobile.
+ * https://vitepress.dev/guide/extending-default-theme#customizing-css
+ */
+@media (max-width: 639px) {
+  .VPHero.has-image .image-container {
+    width: 100%;
+    max-width: 460px;
+    height: auto;
+  }
+}
