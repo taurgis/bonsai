@@ -379,6 +379,13 @@ onBeforeUnmount(() => {
   justify-content: center;
   align-items: center;
   gap: 4px 8px;
+  /*
+   * Without a min-width the pill shrink-wraps to its widest line, so its wrapped
+   * rows sit pressed against the rounded sides. Hold it at least ~320px wide (but
+   * never past the hero) so the centered rows keep breathing room from the edges.
+   * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Aligning_items_in_a_flex_container
+   */
+  min-width: min(100%, 320px);
   max-width: calc(100% - 24px);
   padding: 5px 12px;
   font-family: var(--vp-font-family-mono);
