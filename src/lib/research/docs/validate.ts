@@ -16,6 +16,9 @@ const ERROR_PAGE_PATTERNS = [
   /\bnot\s*found\b/i,
   /there\s*isn'?t\s*a\s*github\s*pages\s*site\s*here/i,
   /site\s*not\s*found/i,
+  // Client-rendered (SPA) failure shells that return HTTP 200 but render only an error notice.
+  /something\s+went\s+wrong/i,
+  /an?\s+error\s+occurred/i,
 ];
 
 /** True when short text reads like an error/soft-404 page rather than real content. */

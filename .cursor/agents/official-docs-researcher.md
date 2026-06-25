@@ -24,20 +24,20 @@ Do not research from memory alone. Training-data knowledge does not satisfy this
 2. Search the Bonsai cache first:
 
    ```bash
-   bonsai research search "<topic or keywords>"
+   bonsai search "<topic or keywords>"
    ```
 
 3. If the cache misses or does not cover the question, locate official source URLs. Prefer vendor docs, standards bodies, API references, and official release notes.
 4. Capture each source through Bonsai:
 
    ```bash
-   bonsai research <official-url> --format detailed
+   bonsai <official-url> --format detailed
    ```
 
 5. Use `--rendered` for SPAs or pages where static extraction is incomplete:
 
    ```bash
-   bonsai research <official-url> --rendered --format detailed
+   bonsai <official-url> --rendered --format detailed
    ```
 
 6. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
@@ -45,14 +45,14 @@ Do not research from memory alone. Training-data knowledge does not satisfy this
 Inside the Bonsai repository, use the development binary instead of an installed global command:
 
 ```bash
-node bin/cli.mjs research search "<topic or keywords>" --json
-node bin/cli.mjs research <official-url> --format detailed --json
+node bin/cli.mjs search "<topic or keywords>" --json
+node bin/cli.mjs <official-url> --format detailed --json
 ```
 
 For one-shot published usage outside this repo, use the scoped package name:
 
 ```bash
-npx @taurgis/bonsai research <official-url> --format detailed
+npx @taurgis/bonsai <official-url> --format detailed
 ```
 
 Do not document or run bare `npx bonsai` unless an unscoped npm shim is actually published.
@@ -72,13 +72,13 @@ Stale volatile sources must be revalidated before they are trusted. Never overwr
 If direct web access was unavoidable because Bonsai could not fetch the content, import the synthesized notes back into Bonsai before returning:
 
 ```bash
-bonsai research import <url> --file <path>
+bonsai import <url> --file <path>
 ```
 
 For multi-source synthesis:
 
 ```bash
-bonsai research import \
+bonsai import \
   --topic "<descriptive topic>" \
   --source-url <url1> \
   --source-url <url2> \

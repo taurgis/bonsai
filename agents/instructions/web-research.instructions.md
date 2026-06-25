@@ -1,19 +1,31 @@
 ---
-description: 'Require the Official Docs Researcher subagent before technical repo changes.'
+description: 'Verify current official docs before technical repo changes — inline via the web-research skill for minor research, via the Official Docs Researcher subagent for extensive research.'
 applyTo: '**'
 skills:
   - web-research
 metadata:
-  version: '3.0.0'
+  version: '3.1.0'
 ---
 
 # Web Research Requirement
 
 ## Mandatory Pre-Step
 
-- Run the **Official Docs Researcher** subagent before creating, updating, refactoring, scaffolding, or deleting technical content.
-- Use its findings to apply current official documentation and references in the change.
-- The researcher keeps a freshness-tiered Bonsai cache (its data directory or project-local `.bonsai/research/`): it reuses fresh notes, cheaply revalidates stale ones, and re-fetches only on a miss. Re-running on a recent topic is cheap — invoke it rather than skipping research to "save" a fetch.
+- Verify the relevant current official documentation **in the same task** before creating, updating, refactoring, scaffolding, or deleting technical content.
+- Apply what you find — cite official source URLs when the change relies on platform behavior or standards.
+- Research is the requirement; how you run it scales with scope (below). Training-data knowledge never satisfies this — only docs fetched in the current task do.
+
+## Choose How to Research by Scope
+
+- **Minor research — run it inline.** For a single known page, one platform, or a quick flag/API/version check, the main agent invokes the **web-research** skill directly. A separate subagent is not required.
+- **Extensive research — delegate to a subagent.** For multiple sources or platforms, unfamiliar territory, broad audits, or anything that produces verbose output you do not want in the main context, run the **Official Docs Researcher** subagent and apply its findings.
+- The main agent may always use the **web-research** skill directly — choose the subagent to isolate large research, not because inline research is disallowed.
+- When unsure, start inline and escalate to the subagent once the work spans several sources.
+
+## Shared Cache
+
+- Both paths use the same freshness-tiered Bonsai cache (data directory or project-local `.bonsai/research/`): it reuses fresh notes, cheaply revalidates stale ones, and re-fetches only on a miss.
+- Re-running on a recent topic is cheap — research the topic rather than skipping it to "save" a fetch.
 
 ## When Not to Use
 
@@ -23,7 +35,8 @@ metadata:
 
 ## Examples
 
-- ✅ Before editing instructions, prompts, agents, skills, workflows, or docs.
-- ✅ Before auditing or refactoring source — reading source code does not replace checking current platform guidance.
+- ✅ Confirming one platform's current flag or frontmatter field before a small edit → run the web-research skill inline.
+- ✅ Comparing conventions across several platforms, or auditing/refactoring source broadly → delegate to the Official Docs Researcher subagent.
+- ✅ Before editing instructions, prompts, agents, skills, workflows, or docs — reading source code does not replace checking current platform guidance.
 - ✅ Include official source URLs when the change references platform behavior or standards.
-- ❌ Don't modify technical content without running the subagent first, or treat cached/training knowledge as equivalent — official guidance evolves and must be verified per task.
+- ❌ Don't modify technical content without researching first, and don't treat cached or training knowledge as equivalent — official guidance evolves and must be verified per task.

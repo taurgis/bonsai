@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { evaluateFreshness, getPolicy } from './freshness.js';
-import { revalidateCache } from './revalidate.js';
+import { revalidateCache, createArtifactFromFetch } from './revalidate.js';
 import { writeArtifact, readArtifact } from './storage.js';
 import type { ResearchArtifact } from './schema.js';
 import * as fetcher from './fetcher.js';
@@ -101,6 +101,72 @@ describe('freshness and revalidation engine', () => {
       // Set explicit TTL to 2 hours
       const currentTime = new Date('2026-06-24T03:00:00.000Z');
       expect(evaluateFreshness(meta, currentTime, '2h')).toBe('stale_expired');
+    });
+  });
+
+  describe('createArtifactFromFetch error pages', () => {
+    const fetchResult = {
+      contentType: 'text/html',
+      etag: null,
+      lastModified: null,
+      finalUrl: 'https://docs.example.com/missing',
+      responseSize: 80,
+      content: '',
+    };
+    const currentTime = new Date('2026-06-25T00:00:00.000Z');
+
+    it('caches a compact error marker instead of the full error page', () => {
+      const errorExtraction = {
+        title: 'Something went wrong',
+        detailedMarkdown: '## Something went wrong\n\nAn error occurred while loading this page.',
+        confidence: 'low' as const,
+        qualityNotes: ['warning: extracted content is very short (less than 500 characters)'],
+      };
+
+      const artifact = createArtifactFromFetch(
+        'https://docs.example.com/missing',
+        'https://docs.example.com/missing',
+        'abc123',
+        fetchResult,
+        errorExtraction,
+        'standard',
+        null,
+        currentTime
+      );
+
+      expect(artifact.metadata.extraction_status).toBe('failed');
+      expect(artifact.metadata.extraction_confidence).toBeNull();
+      // Stays 'active' so the cache lookup still serves the marker on subsequent calls.
+      expect(artifact.metadata.status).toBe('active');
+      // The full error markdown is dropped; only a one-line marker is stored.
+      expect(artifact.detailed).not.toContain('An error occurred while loading');
+      expect(artifact.compressed).toBe(artifact.detailed);
+      expect(artifact.detailed).toContain('could not be cached');
+    });
+
+    it('caches real content normally (no false positive)', () => {
+      const goodExtraction = {
+        title: 'Real Doc',
+        detailedMarkdown:
+          '# Real Doc\n\n' +
+          'This is a substantial documentation page with real content. '.repeat(20),
+        confidence: 'high' as const,
+        qualityNotes: ['readability extracted main article'],
+      };
+
+      const artifact = createArtifactFromFetch(
+        'https://docs.example.com/real',
+        'https://docs.example.com/real',
+        'def456',
+        fetchResult,
+        goodExtraction,
+        'standard',
+        null,
+        currentTime
+      );
+
+      expect(artifact.metadata.extraction_status).toBe('extracted');
+      expect(artifact.detailed).toContain('substantial documentation page');
     });
   });
 

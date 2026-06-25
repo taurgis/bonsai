@@ -313,7 +313,7 @@
     "web-research": {
       "source": "/Users/thomastheunen/Documents/Projects/forward-nexus-research/agents",
       "sourceType": "local",
-      "computedHash": "98a3bded9931bd4dc03635e048273b10d60f1c98b2b79d3cda6d878f8ee8686d",
+      "computedHash": "a234557c3062e023d6a0b3f59f37b282e98ac4fbfdd56c9c866f3c7924bd7fff",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -322,8 +322,8 @@
       ],
       "repoPath": "skills/web-research/SKILL.md",
       "installPath": ".agents/skills/web-research",
-      "installHash": "58bb7ff624f2640648ca1398159e5ae77117e94b97bac04dcacd636e31c5ffc9",
-      "sourceHash": "98a3bded9931bd4dc03635e048273b10d60f1c98b2b79d3cda6d878f8ee8686d",
+      "installHash": "1a2cb41ed215f07d9a310ce70a0549b5e33bed4bc741fb1627bc16948823fae0",
+      "sourceHash": "a234557c3062e023d6a0b3f59f37b282e98ac4fbfdd56c9c866f3c7924bd7fff",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "2.1.0",
@@ -439,7 +439,7 @@
       "sourceType": "local",
       "repoPath": "instructions/web-research.instructions.md",
       "installPath": ".github/instructions/web-research.instructions.md",
-      "computedHash": "0688d5632bd856d92e8fb0893bbb3bdda83d0b8b1423720f9500f48996ea2c54",
+      "computedHash": "4afd832abf2a530f04b0af0dc6b9e28e101a4c604cede77e934f7b64584d4b6f",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -449,12 +449,12 @@
       "linkedSkills": [
         "web-research"
       ],
-      "installHash": "0688d5632bd856d92e8fb0893bbb3bdda83d0b8b1423720f9500f48996ea2c54",
-      "sourceHash": "726da9f8a50b980212085732bc9ad8d11b1711eeadb22c6219595ca667edf689",
+      "installHash": "4afd832abf2a530f04b0af0dc6b9e28e101a4c604cede77e934f7b64584d4b6f",
+      "sourceHash": "600b88b38827512379b1cf13649503886b2beb6c9c6c85bb83d246a504eeb80b",
       "versionPolicy": "minor",
       "includePrerelease": false,
-      "sourceVersion": "3.0.0",
-      "installVersion": "3.0.0"
+      "sourceVersion": "3.1.0",
+      "installVersion": "3.1.0"
     }
   },
   "customAgents": {
@@ -463,15 +463,15 @@
       "sourceType": "local",
       "repoPath": "agents/official-docs-researcher.agent.md",
       "installPath": ".github/agents/official-docs-researcher.agent.md",
-      "computedHash": "70e393689107e8477673fa5c13e2cf38216840e7a387d06142cf8d10b89b81bc",
+      "computedHash": "0ac3a1e5694f7351bade263c2ace2714e491fa69a7064a0209b93980d698c82d",
       "agents": [
         "github-copilot",
         "claude-code",
         "cursor",
         "antigravity"
       ],
-      "installHash": "70e393689107e8477673fa5c13e2cf38216840e7a387d06142cf8d10b89b81bc",
-      "sourceHash": "68e1a7aa7febbe53196947e0c7d886354a85649865e91b000eac5c8cf0fa81ad",
+      "installHash": "0ac3a1e5694f7351bade263c2ace2714e491fa69a7064a0209b93980d698c82d",
+      "sourceHash": "5e6620a7f695f2ce72e9fc3002af0dcf2eb4a7d52d7e1977df67158f77a76544",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "3.0.0",

@@ -1,6 +1,6 @@
 {
   "name": "@taurgis/bonsai",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Bonsai is a standalone local research cache CLI for AI agents",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,7 @@
     "regression:suite": "tsc -b && node testing/regression/run-suite.mjs",
     "regression:promote": "tsc -b && node testing/regression/run-suite.mjs --promote",
     "regression:check": "tsc -b && node testing/regression/run-suite.mjs --strict",
+    "nexus:sync": "npx forward-nexus update && npx forward-nexus sync",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit"

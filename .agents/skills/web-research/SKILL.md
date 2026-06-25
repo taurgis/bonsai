@@ -18,26 +18,26 @@ Before creating, updating, refactoring, scaffolding, or deleting technical conte
 Search the cache first:
 
 ```bash
-bonsai research search "<topic or keywords>"
+bonsai search "<topic or keywords>"
 ```
 
 If the cache misses or does not cover the question, fetch the source through Bonsai:
 
 ```bash
-bonsai research <official-url> --format detailed
+bonsai <official-url> --format detailed
 ```
 
 Inside the Bonsai repository, use the development binary:
 
 ```bash
-node bin/cli.mjs research search "<topic or keywords>" --json
-node bin/cli.mjs research <official-url> --format detailed --json
+node bin/cli.mjs search "<topic or keywords>" --json
+node bin/cli.mjs <official-url> --format detailed --json
 ```
 
 For one-shot published usage outside this repo, use the scoped package name:
 
 ```bash
-npx @taurgis/bonsai research <official-url> --format detailed
+npx @taurgis/bonsai <official-url> --format detailed
 ```
 
 Do not document or run bare `npx bonsai` unless an unscoped npm shim is actually published.
@@ -57,7 +57,7 @@ Use `--format compressed` for context-budgeted reading and `--format detailed` f
 Use `--rendered` when static extraction is incomplete or the page is an SPA:
 
 ```bash
-bonsai research <official-url> --rendered --format detailed
+bonsai <official-url> --rendered --format detailed
 ```
 
 Never reach for direct `WebFetch` or `WebSearch` to retrieve a specific page when Bonsai can fetch it. Bonsai returns reusable Markdown and keeps it cached for future agents.
@@ -71,19 +71,19 @@ If direct web access was unavoidable because of authentication, browser interact
 Single-source import:
 
 ```bash
-bonsai research import <url> --file path/to/notes.md
+bonsai import <url> --file path/to/notes.md
 ```
 
 Stdin import:
 
 ```bash
-echo "# My Synthesis Note" | bonsai research import <url> --stdin
+echo "# My Synthesis Note" | bonsai import <url> --stdin
 ```
 
 Multi-source synthesis:
 
 ```bash
-bonsai research import \
+bonsai import \
   --topic "<descriptive topic>" \
   --source-url <url1> \
   --source-url <url2> \
@@ -95,27 +95,27 @@ bonsai research import \
 Check status without fetching:
 
 ```bash
-bonsai research status <url>
+bonsai status <url>
 ```
 
 Inspect stored metadata:
 
 ```bash
-bonsai research inspect <url>
+bonsai inspect <url>
 ```
 
 List or search cached entries:
 
 ```bash
-bonsai research list --tags node
-bonsai research search "react suspense"
+bonsai list --tags node
+bonsai search "react suspense"
 ```
 
 Preview pruning before deleting:
 
 ```bash
-bonsai research prune --older-than 90d --dry-run
-bonsai research prune --older-than 90d --yes
+bonsai prune --older-than 90d --dry-run
+bonsai prune --older-than 90d --yes
 ```
 
 ## When This Does Not Apply

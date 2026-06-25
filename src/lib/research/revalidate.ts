@@ -8,6 +8,7 @@ import { evaluateFreshness, getPolicy } from './freshness.js';
 import { compressMarkdown } from './compress.js';
 import { estimateTokens } from './token-estimate.js';
 import { fetchRenderedHtml } from './browser.js';
+import { looksLikeErrorPage } from './docs/validate.js';
 
 export interface RevalidationResult {
   status: 'revalidated' | 'refreshed' | 'stale';
@@ -72,6 +73,51 @@ function buildMetadata(
   };
 }
 
+// Builds a compact error marker instead of caching a full error page. Subsequent lookups serve this
+// tiny marker (a handful of tokens) instead of re-fetching, and revalidation re-checks it when stale
+// so a transient failure recovers into a real artifact.
+function buildErrorArtifact(
+  url: string,
+  normalizedUrl: string,
+  cacheKey: string,
+  fetchResult: Parameters<typeof createArtifactFromFetch>[3],
+  tier: 'stable' | 'standard' | 'volatile',
+  ttl: string | null,
+  currentTime: Date,
+  reason: string
+): ResearchArtifact {
+  const marker =
+    `Error: ${url} could not be cached — ${reason}. ` +
+    'The page returned an error, so its content was not stored; it will be re-fetched when this entry goes stale.';
+  const extraction = {
+    title: `Error: ${reason}`,
+    detailedMarkdown: marker,
+    confidence: 'low' as const,
+    qualityNotes: [`error: ${reason}`],
+  };
+  const metadata = buildMetadata(
+    url,
+    normalizedUrl,
+    cacheKey,
+    fetchResult,
+    extraction,
+    tier,
+    ttl,
+    currentTime,
+    marker
+  );
+  metadata.extraction_status = 'failed';
+  metadata.extraction_confidence = null;
+
+  return {
+    metadata,
+    summary: extraction.title,
+    compressed: marker,
+    detailed: marker,
+    provenance: `Fetched from ${url} on ${currentTime.toISOString()} (error page; content not cached)`,
+  };
+}
+
 /**
  * Helper to construct a ResearchArtifact from a fresh HTML fetch.
  */
@@ -97,6 +143,22 @@ export function createArtifactFromFetch(
   ttl: string | null,
   currentTime: Date
 ): ResearchArtifact {
+  // A managed platform / SPA can return HTTP 200 but render only a "not found" / "something went
+  // wrong" shell. Cache a compact marker for those instead of the full error markdown, so repeat
+  // lookups cost a few tokens and revalidation still re-checks the page when the entry goes stale.
+  if (looksLikeErrorPage(extraction.detailedMarkdown)) {
+    return buildErrorArtifact(
+      url,
+      normalizedUrl,
+      cacheKey,
+      fetchResult,
+      tier,
+      ttl,
+      currentTime,
+      'page reported an error or was not found'
+    );
+  }
+
   const compressed = compressMarkdown(extraction.detailedMarkdown);
   const metadata = buildMetadata(
     url,

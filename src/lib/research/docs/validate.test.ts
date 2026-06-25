@@ -17,6 +17,11 @@ describe('looksLikeErrorPage', () => {
     const article = 'HTTP status codes. '.repeat(120) + 'The 404 code means not found.';
     expect(looksLikeErrorPage(article)).toBe(false);
   });
+
+  it('flags SPA error shells that return HTTP 200', () => {
+    expect(looksLikeErrorPage('## Something went wrong')).toBe(true);
+    expect(looksLikeErrorPage('An error occurred while loading this page.')).toBe(true);
+  });
 });
 
 describe('isSameDocsOrigin', () => {

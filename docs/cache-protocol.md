@@ -120,7 +120,7 @@ This section contains the Markdown representation. The file maintains both detai
 * `validated_at`: (ISO string | null) Timestamp of the last freshness verification.
 * `stale_after`: (ISO string | null) Timestamp when the fresh window expires.
 * `capture_method`: (string | null) `static_fetch`, `browser_fallback`, or `agent_supplied`.
-* `extraction_status`: (string | null) `extracted`, `agent_supplied`, or `failed`.
+* `extraction_status`: (string | null) `extracted`, `agent_supplied`, or `failed`. A page that resolves to an error/"not found" shell (including SPA pages that return HTTP 200 but render only an error notice) is stored as `failed`: the full error markdown is discarded and a compact one-line marker is cached in its place, so repeat lookups cost a handful of tokens and revalidation re-fetches the page when the entry goes stale.
 * `extraction_confidence`: (string | null) `high`, `medium`, or `low`.
 * `quality_notes`: (array of strings) Informative tags about the scrape quality.
 * `etag`: (string | null) HTTP response `ETag` header.
