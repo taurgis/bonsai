@@ -260,7 +260,10 @@ function build(): void {
 
   startTokens = tree.length * TOKENS_PER_GLYPH;
   endTokens = keptCount * TOKENS_PER_GLYPH;
-  lastTokenDisplay = -1;
+  // Seed the visible count so the first paint shows the start value rather than
+  // flashing "0" for one frame before the first requestAnimationFrame runs.
+  lastTokenDisplay = Math.round(startTokens / 10) * 10;
+  tokens.value = lastTokenDisplay;
   startTime = performance.now();
   ready.value = true;
 }
