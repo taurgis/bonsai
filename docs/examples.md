@@ -9,7 +9,7 @@ that **a built-in web fetch quietly drops, summarizes, or refuses content**,
 while Bonsai returns the complete page every time, deterministically, and caches
 it for reuse.
 
-One section per agent. **Claude Code** and **Antigravity** are documented below; Codex and GitHub Copilot will follow ([see below](#other-agents)).
+One section per agent. **Claude Code**, **Antigravity**, and **Codex** are documented below; GitHub Copilot will follow ([see below](#other-agents)).
 
 ## Claude Code
 
@@ -159,6 +159,63 @@ Unlike Claude Code's model-backed tool which summarizes or drops sections, Antig
 
 The tool does not run a browser fallback or perform main-content extraction (like Readability/Turndown). It retrieves the HTTP response body and writes it directly to disk. For Single Page Applications, this results in missing content; for server-rendered pages, it results in huge, cluttered HTML inputs that flood the model's context window.
 
+## Codex
+
+> **Agent: Codex** — its native web tool opens the URL as a line-indexed,
+> citation-aware text view of the page.
+
+::: info How we measured (tools used)
+- **Agent web fetch** — Codex's native web `open` tool. We measured the
+  normalized visible text exposed by the page view (`≈ chars / 4`), excluding raw
+  HTML scripts and styles but including docs chrome that the tool exposes.
+- **Bonsai** — the `@taurgis/bonsai` CLI with **default settings** (`compressed`
+  format, `conservative` summary). Both cached variants come from one fetch.
+- **Raw page** — a plain HTTP GET of the URL.
+- **Tokens** are an estimate (`≈ chars / 4`) applied identically to every result,
+  so the columns are comparable. Captured **2026-06-25** with `@taurgis/bonsai`
+  **v1.0.3**.
+:::
+
+### Results
+
+| Page | What Codex web `open` returned | Codex web `open` | Bonsai `compressed` | Bonsai `detailed` | Raw page |
+| --- | --- | --: | --: | --: | --: |
+| React – `useEffect` | **Line-indexed text** — article text, examples, citations, and docs navigation | 10,101 | **8,119** | 11,296 | 150,883 |
+| TypeScript – Everyday Types | **Line-indexed text** — article text plus docs navigation/footer chrome | 7,434 | **4,983** | 6,903 | 80,398 |
+| Vue – Introduction | **Line-indexed text** — article text plus navigation; no reusable Markdown artifact | 2,692 | **1,520** | 2,105 | 28,523 |
+| Next.js – Layouts and Pages | **Line-indexed text** — article text plus large navigation; page advertises a Markdown source | 3,599 | **2,401** | 2,968 | 246,298 |
+
+### What Codex web `open` left behind
+
+Codex's web tool is much better than a raw HTML dump: it exposes readable page
+text instead of scripts, inline data, and styles. The tradeoff is that the result
+is still a one-shot agent view, not a durable research artifact:
+
+- **React, TypeScript, Vue, Next.js** — **No refusal and no obvious article-level
+  loss in this snapshot**, but the returned text includes docs chrome,
+  navigation, citation markers, and line-view overhead that Bonsai strips or
+  preserves as structured Markdown.
+- **Vue and Next.js** — Bonsai found the public Markdown/MDX source routes and
+  cached those deterministic source forms. Codex showed the readable rendered
+  page text, but did not create a reusable cache entry for future agents.
+- **Token cost** — Bonsai `compressed` is **20% to 44% smaller** than Codex's
+  line view on these four pages while keeping a separate `detailed` version for
+  exact technical details.
+
+### Why Codex web `open` behaves this way
+
+The tool is optimized for interactive browsing inside the current conversation.
+It can inspect a page, jump to line ranges, and cite sources, which is useful for
+answering a live question. It is not a documentation cache:
+
+- **Not persistent** — another agent or a later session has to fetch and inspect
+  the page again.
+- **Not deterministic artifact storage** — there is no frontmatter, freshness
+  tier, normalized URL hash, content hash, or reusable compressed/detailed pair.
+- **Still carries page chrome** — navigation, footer text, citation markers, and
+  line-index scaffolding consume context that Bonsai removes from the cached
+  research note.
+
 ## Why Bonsai is different
 
 This part is agent-agnostic — it's true no matter which agent's fetch you compare
@@ -187,9 +244,9 @@ need exact wording.
 
 ## Other agents
 
-Claude Code and Antigravity are measured here. The same four pages are being run
-through the built-in fetch tools of other agents — **Codex** and **GitHub Copilot** —
-and each will get its own section above, measured the same way. Bonsai is the constant:
+Claude Code, Antigravity, and Codex are measured here. The same four pages are
+being run through the built-in fetch tools of other agents — **GitHub Copilot**
+will get its own section above, measured the same way. Bonsai is the constant:
 one deterministic, reusable cache, whichever agent is doing the reading.
 
 ## Try it yourself
