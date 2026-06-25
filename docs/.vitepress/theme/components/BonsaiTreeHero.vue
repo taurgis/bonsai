@@ -391,6 +391,20 @@ onBeforeUnmount(() => {
   text-align: center;
 }
 
+/*
+ * On phones the hero canvas spans the full viewport width, but the pill
+ * shrink-wraps to its widest line, so its wrapped rows sit hugging the sides.
+ * Let it fill the canvas width (the base max-width keeps a small screen inset)
+ * so the centered rows gain even horizontal breathing room.
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Aligning_items_in_a_flex_container
+ */
+@media (max-width: 639px) {
+  .bonsai-hero__meta {
+    display: flex;
+    width: 100%;
+  }
+}
+
 .bonsai-hero__save {
   padding: 1px 8px;
   font-weight: 700;
