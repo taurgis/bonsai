@@ -65,6 +65,7 @@ export default defineConfig({
           { text: 'Search your research', link: '/how-to/search' },
           { text: 'Import synthesized research', link: '/how-to/importing-synthesis' },
           { text: 'Drive Bonsai from an agent', link: '/how-to/agent-integration' },
+          { text: 'Install the agent kit', link: '/how-to/agent-kit' },
         ],
       },
       {

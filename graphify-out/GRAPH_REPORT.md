@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-25)
 
 ## Corpus Check
-- 772 files · ~831,332 words
+- 803 files · ~877,843 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7871 nodes · 8455 edges · 754 communities (696 shown, 58 thin omitted)
+- 8301 nodes · 8854 edges · 807 communities (750 shown, 57 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `296b4247`
+- Built from commit: `60cc7594`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -758,6 +758,59 @@
 - [[_COMMUNITY_Community 751|Community 751]]
 - [[_COMMUNITY_Community 752|Community 752]]
 - [[_COMMUNITY_Community 753|Community 753]]
+- [[_COMMUNITY_Community 754|Community 754]]
+- [[_COMMUNITY_Community 755|Community 755]]
+- [[_COMMUNITY_Community 756|Community 756]]
+- [[_COMMUNITY_Community 757|Community 757]]
+- [[_COMMUNITY_Community 758|Community 758]]
+- [[_COMMUNITY_Community 759|Community 759]]
+- [[_COMMUNITY_Community 760|Community 760]]
+- [[_COMMUNITY_Community 761|Community 761]]
+- [[_COMMUNITY_Community 762|Community 762]]
+- [[_COMMUNITY_Community 763|Community 763]]
+- [[_COMMUNITY_Community 764|Community 764]]
+- [[_COMMUNITY_Community 765|Community 765]]
+- [[_COMMUNITY_Community 766|Community 766]]
+- [[_COMMUNITY_Community 767|Community 767]]
+- [[_COMMUNITY_Community 768|Community 768]]
+- [[_COMMUNITY_Community 769|Community 769]]
+- [[_COMMUNITY_Community 770|Community 770]]
+- [[_COMMUNITY_Community 771|Community 771]]
+- [[_COMMUNITY_Community 772|Community 772]]
+- [[_COMMUNITY_Community 773|Community 773]]
+- [[_COMMUNITY_Community 774|Community 774]]
+- [[_COMMUNITY_Community 775|Community 775]]
+- [[_COMMUNITY_Community 776|Community 776]]
+- [[_COMMUNITY_Community 777|Community 777]]
+- [[_COMMUNITY_Community 778|Community 778]]
+- [[_COMMUNITY_Community 779|Community 779]]
+- [[_COMMUNITY_Community 780|Community 780]]
+- [[_COMMUNITY_Community 781|Community 781]]
+- [[_COMMUNITY_Community 782|Community 782]]
+- [[_COMMUNITY_Community 783|Community 783]]
+- [[_COMMUNITY_Community 784|Community 784]]
+- [[_COMMUNITY_Community 785|Community 785]]
+- [[_COMMUNITY_Community 786|Community 786]]
+- [[_COMMUNITY_Community 787|Community 787]]
+- [[_COMMUNITY_Community 788|Community 788]]
+- [[_COMMUNITY_Community 789|Community 789]]
+- [[_COMMUNITY_Community 790|Community 790]]
+- [[_COMMUNITY_Community 791|Community 791]]
+- [[_COMMUNITY_Community 792|Community 792]]
+- [[_COMMUNITY_Community 793|Community 793]]
+- [[_COMMUNITY_Community 794|Community 794]]
+- [[_COMMUNITY_Community 795|Community 795]]
+- [[_COMMUNITY_Community 796|Community 796]]
+- [[_COMMUNITY_Community 797|Community 797]]
+- [[_COMMUNITY_Community 798|Community 798]]
+- [[_COMMUNITY_Community 799|Community 799]]
+- [[_COMMUNITY_Community 800|Community 800]]
+- [[_COMMUNITY_Community 801|Community 801]]
+- [[_COMMUNITY_Community 802|Community 802]]
+- [[_COMMUNITY_Community 803|Community 803]]
+- [[_COMMUNITY_Community 804|Community 804]]
+- [[_COMMUNITY_Community 805|Community 805]]
+- [[_COMMUNITY_Community 806|Community 806]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Callback API` - 55 edges
@@ -774,19 +827,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
   testing/regression/run-suite.mjs → src/lib/research/capture.ts
-- `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
-  testing/regression/run-suite.mjs → src/sites/index.ts
 - `SummarizeOptions` --references--> `SummaryLevel`  [EXTRACTED]
   src/lib/research/summarize.ts → src/lib/config/schema.ts
+- `MachineReadableResult` --references--> `MachineReadableArtifact`  [EXTRACTED]
+  src/lib/research/docs/machine-readable.ts → src/lib/research/docs/capabilities.ts
 - `defaultFetcher()` --calls--> `fetchText()`  [EXTRACTED]
   src/lib/research/docs/machine-readable.ts → src/lib/research/fetcher.ts
-- `FetchCommand` --inherits--> `BaseCommand`  [EXTRACTED]
-  src/commands/fetch.ts → src/base-command.ts
+- `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
+  testing/regression/run-suite.mjs → src/sites/index.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (754 total, 58 thin omitted)
+## Communities (807 total, 57 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -814,7 +867,7 @@ Nodes (22): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state a
 
 ### Community 6 - "Community 6"
 Cohesion: 0.10
-Nodes (39): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel(), readScopedConfig() (+31 more)
+Nodes (38): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel(), readScopedConfig() (+30 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -850,7 +903,7 @@ Nodes (21): Behavior, CI Integration, `ci`: Provider-Aware Review Automation, Co
 
 ### Community 15 - "Community 15"
 Cohesion: 0.15
-Nodes (12): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+4 more)
+Nodes (13): BLOCKED_ASSET_URLS, BrowserFetchOptions, BrowserFetchResult, CdpClient, CdpPage, fetchRenderedHtml(), findChromePath(), openCdpPage() (+5 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.29
@@ -873,8 +926,8 @@ Cohesion: 0.11
 Nodes (17): `captureOutput` — Test a Command Class Directly, Common Patterns, Environment variable flags, OCLIF Testing, Prerequisites, Primary API: `runCommand`, Quick Reference, References (+9 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.09
-Nodes (11): ResearchInspect, SectionSummary, ResearchList, FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS, ResearchSearch (+3 more)
+Cohesion: 0.07
+Nodes (21): ResearchImport, ResearchInspect, SectionSummary, ResearchList, ResearchPrune, FRESHNESS_BONUS, isFuzzyMatch(), levenshtein() (+13 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.12
@@ -905,8 +958,8 @@ Cohesion: 0.09
 Nodes (22): Compressed, Creating a dynamic segment, Creating a dynamic segment, Creating a layout, Creating a layout, Creating a nested route, Creating a nested route, Creating a page (+14 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.18
-Nodes (14): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, analyzeMarkdownQuality(), countMatches(), hasCollapsedCode() (+6 more)
+Cohesion: 0.16
+Nodes (17): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, detectLanguage(), flattenCodeStructure(), normalizeCodeBlocks() (+9 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.14
@@ -929,8 +982,8 @@ Cohesion: 0.15
 Nodes (12): Combined Dead Code + Duplication, Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, Production audit (+4 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.09
-Nodes (35): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow() (+27 more)
+Cohesion: 0.11
+Nodes (31): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow() (+23 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -949,8 +1002,8 @@ Cohesion: 0.14
 Nodes (14): AGENTS.md, Architecture, Best practices, Code Style, How rules work, Importing Rules, Improvements, Nested AGENTS.md support (+6 more)
 
 ### Community 40 - "Community 40"
-Cohesion: 0.36
-Nodes (8): detectLanguage(), flattenCodeStructure(), normalizeCodeBlocks(), reconstructLines(), removeCopyButtons(), FIXTURES, load(), toMarkdown()
+Cohesion: 0.21
+Nodes (11): analyzeMarkdownQuality(), countMatches(), hasCollapsedCode(), proseLineCount(), QualitySignals, ArtifactValidation, ERROR_PAGE_PATTERNS, looksLikeErrorPage() (+3 more)
 
 ### Community 41 - "Community 41"
 Cohesion: 0.29
@@ -981,8 +1034,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, Organize rules with `.claude/rules/`, Organize rules with `.claude/rules/`, Path-specific rules, Path-specific rules, Provenance, Set up rules (+4 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.13
-Nodes (17): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, handleStaleRevalidationResult(), StorageMode, SummaryLevel, deriveCacheKey(), ResolvedResearchTarget (+9 more)
+Cohesion: 0.12
+Nodes (17): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, handleStaleRevalidationResult(), StorageMode, SummaryLevel, ResolvedResearchTarget, ResolveResearchTargetOptions (+9 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.15
@@ -1015,6 +1068,10 @@ Nodes (10): [About personal custom instructions for Copilot Chat], [About person
 ### Community 57 - "Community 57"
 Cohesion: 0.20
 Nodes (9): Approval Bar, Core Prompt, Non-Negotiable Additional Standards, Output Expectations, Preferred Remedies, Primary Review Questions, Review Tone, Thermo-Nuclear Code Quality Review (+1 more)
+
+### Community 58 - "Community 58"
+Cohesion: 0.28
+Nodes (13): collectDocIndices(), parseSphinxObject(), queryTerms(), resolve(), scoreSphinxDocs(), scoreText(), searchJekyllIndex(), searchMkDocsIndex() (+5 more)
 
 ### Community 59 - "Community 59"
 Cohesion: 0.22
@@ -1146,7 +1203,7 @@ Nodes (6): Default Workflow, Guardrails, Primary Objective, Reporting Format, Re
 
 ### Community 91 - "Community 91"
 Cohesion: 0.09
-Nodes (22): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, captureFixture(), CURRENT_DIR, filters, FIXTURES_PATH (+14 more)
+Nodes (21): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, CURRENT_DIR, filters, FIXTURES_PATH, flags (+13 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.29
@@ -1421,8 +1478,8 @@ Cohesion: 0.40
 Nodes (5): Audit and edit your memory, Auto memory, Enable or disable auto memory, How it works, Storage location
 
 ### Community 174 - "Community 174"
-Cohesion: 0.14
-Nodes (22): SiteCapabilities, detectDocsEngine(), getMetaGenerator(), TextFetcher, CaptureDeps, CaptureOptions, CaptureOutcome, capturePage() (+14 more)
+Cohesion: 0.15
+Nodes (22): MachineReadableArtifact, SiteCapabilities, TextFetcher, CaptureDeps, CaptureOptions, CaptureOutcome, capturePage(), captureRendered() (+14 more)
 
 ### Community 175 - "Community 175"
 Cohesion: 0.29
@@ -1505,8 +1562,8 @@ Cohesion: 0.04
 Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
 
 ### Community 195 - "Community 195"
-Cohesion: 0.22
-Nodes (11): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading() (+3 more)
+Cohesion: 0.21
+Nodes (10): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading() (+2 more)
 
 ### Community 196 - "Community 196"
 Cohesion: 0.22
@@ -1697,8 +1754,8 @@ Cohesion: 0.20
 Nodes (10): Class: `fs.Dirent`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isDirectory()`, `dirent.isFIFO()`, `dirent.isFile()`, `dirent.isSocket()`, `dirent.isSymbolicLink()` (+2 more)
 
 ### Community 243 - "Community 243"
-Cohesion: 0.17
-Nodes (22): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), assertOk(), checkDnsSafety(), FetchOptions (+14 more)
+Cohesion: 0.16
+Nodes (23): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), assertOk(), checkDnsSafety() (+15 more)
 
 ### Community 244 - "Community 244"
 Cohesion: 0.22
@@ -1949,8 +2006,8 @@ Cohesion: 0.07
 Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
 
 ### Community 326 - "Community 326"
-Cohesion: 0.09
-Nodes (32): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, PageMapEntry, SearchCapability, SourceHint (+24 more)
+Cohesion: 0.10
+Nodes (31): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, PageMapEntry, SearchCapability, SourceHint (+23 more)
 
 ### Community 327 - "Community 327"
 Cohesion: 0.09
@@ -1969,8 +2026,8 @@ Cohesion: 0.09
 Nodes (21): server.allowedHosts, server.cors, server.forwardConsole, server.fs.allow, server.fs.deny, server.fs.strict, server.headers, server.hmr (+13 more)
 
 ### Community 331 - "Community 331"
-Cohesion: 0.10
-Nodes (30): SearchProvider, AlgoliaConfig, algoliaQueryUrl(), extractAlgoliaConfig(), parseAlgoliaResponse(), getText(), RemoteSearchDeps, RemoteSearchOutcome (+22 more)
+Cohesion: 0.11
+Nodes (20): SearchProvider, detectDocsEngine(), getMetaGenerator(), FIXTURES, AlgoliaConfig, algoliaQueryUrl(), extractAlgoliaConfig(), parseAlgoliaResponse() (+12 more)
 
 ### Community 332 - "Community 332"
 Cohesion: 0.14
@@ -1997,8 +2054,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
 
 ### Community 338 - "Community 338"
-Cohesion: 0.16
-Nodes (21): CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness(), StatusAction, StatusResult, checkMaxAgeExpired() (+13 more)
+Cohesion: 0.14
+Nodes (24): resolveFreshness(), buildCompressed(), compressMarkdown(), checkMaxAgeExpired(), evaluateFreshness(), FreshnessPolicy, getPolicy(), parseTtlToMs() (+16 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -2159,10 +2216,6 @@ Nodes (7): Configure the Vite plugin, Create your project, Import Tailwind CSS, 
 ### Community 378 - "Community 378"
 Cohesion: 0.25
 Nodes (7): API Styles {#api-styles}, Composition API {#composition-api}, Introduction {#introduction}, Options API {#options-api}, Single-File Components {#single-file-components}, The Progressive Framework {#the-progressive-framework}, What is Vue? {#what-is-vue}
-
-### Community 379 - "Community 379"
-Cohesion: 0.50
-Nodes (6): GithubSource, mapMdnSource(), mapNodeApiSource(), mapUrlToSource(), parseGithubSourceLink(), vitepressRouteMarkdown()
 
 ### Community 380 - "Community 380"
 Cohesion: 0.29
@@ -2961,8 +3014,8 @@ Cohesion: 0.50
 Nodes (4): Least frequent recently used (LFRU), Least frequently used (LFU), LFU with dynamic aging (LFUDA), Simple frequency-based policies
 
 ### Community 601 - "Community 601"
-Cohesion: 0.15
-Nodes (16): MachineReadableArtifact, advertisesRouteMarkdown(), defaultFetcher(), llmsTxtCandidates(), MachineReadableResult, probeLlmsTxt(), probeRouteMarkdown(), FIXTURES (+8 more)
+Cohesion: 0.18
+Nodes (15): advertisesRouteMarkdown(), defaultFetcher(), llmsTxtCandidates(), MachineReadableResult, probeLlmsTxt(), probeRouteMarkdown(), FIXTURES, tryFetchValidText() (+7 more)
 
 ### Community 602 - "Community 602"
 Cohesion: 0.18
@@ -3105,8 +3158,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, [FCFS matching], [FCFS matching](https://prismjs.com/extending.html#fcfs-matching), Provenance, Summary
 
 ### Community 637 - "Community 637"
-Cohesion: 0.18
-Nodes (19): cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor }, RESULTS (+11 more)
+Cohesion: 0.17
+Nodes (20): cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor }, RESULTS (+12 more)
 
 ### Community 638 - "Community 638"
 Cohesion: 0.10
@@ -3157,8 +3210,8 @@ Cohesion: 0.13
 Nodes (15): Connecting to an external system, Controlling a non-React widget, Custom `useChatRoom` Hook, Deep Dive, Displaying different content on the server and the client, Examples of wrapping Effects in custom Hooks, Fetching data with Effects, Reading the latest props and state from an Effect (+7 more)
 
 ### Community 650 - "Community 650"
-Cohesion: 0.18
-Nodes (13): Fixture, fixtures, ExtractionResult, CONTENT_SELECTORS, fetchDeveloperPage(), salesforceDeveloper, salesforce, detectSite() (+5 more)
+Cohesion: 0.19
+Nodes (11): Fixture, fixtures, captureFixture(), normalizeHelpDocContentUrl(), salesforceDeveloper, CONTENT_SELECTORS, fetchSalesforcePage(), salesforce (+3 more)
 
 ### Community 651 - "Community 651"
 Cohesion: 0.14
@@ -3453,8 +3506,8 @@ Cohesion: 0.67
 Nodes (3): Examples of passing reactive dependencies, Passing a dependency array, Pitfall
 
 ### Community 733 - "Community 733"
-Cohesion: 0.20
-Nodes (14): waitForContentReady(), waitForLoad(), normalizeHelpDocContentUrl(), CONTENT_SELECTORS, fetchSalesforcePage(), BASE_REMOVE_SELECTORS, buildCaptureScript(), confidenceFor() (+6 more)
+Cohesion: 0.21
+Nodes (13): waitForContentReady(), CONTENT_SELECTORS, fetchDeveloperPage(), BASE_REMOVE_SELECTORS, buildCaptureScript(), confidenceFor(), ERROR_PATTERNS, fetchSalesforceDoc() (+5 more)
 
 ### Community 734 - "Community 734"
 Cohesion: 0.12
@@ -3485,8 +3538,12 @@ Cohesion: 0.40
 Nodes (4): Compression & Token Budgeting, Summary aggressiveness, What compression does, When to use which
 
 ### Community 741 - "Community 741"
-Cohesion: 0.38
-Nodes (7): applyAutoTags(), calculateFrequencies(), cleanNoise(), extractKeywords(), getHeadingTerms(), STOPWORDS, tokenize()
+Cohesion: 0.14
+Nodes (14): Deploy App, Detailed, How skills work, Installing skills from GitHub, Learn more, Migrating rules and commands to skills, Nested skill directories, Optional directories (+6 more)
+
+### Community 742 - "Community 742"
+Cohesion: 0.14
+Nodes (14): Auto-compaction, Chain subagents, Choose between subagents and main conversation, Common patterns, Invoke subagents explicitly, Isolate high-volume operations, Manage subagent context, Resume subagents (+6 more)
 
 ### Community 743 - "Community 743"
 Cohesion: 0.29
@@ -3528,22 +3585,234 @@ Nodes (4): External Links, Internal Links, Links, Page Suffix
 Cohesion: 0.67
 Nodes (3): PR Dead Code Check, Step 1: Analyze changed files, Step 2: If issues found, show specifics
 
+### Community 754 - "Community 754"
+Cohesion: 0.14
+Nodes (14): Auto-compaction, Chain subagents, Choose between subagents and main conversation, Common patterns, Invoke subagents explicitly, Isolate high-volume operations, Manage subagent context, Resume subagents (+6 more)
+
+### Community 755 - "Community 755"
+Cohesion: 0.14
+Nodes (14): Built-in subagents, Code reviewer, Create custom subagents, Data scientist, Database query validator, Debugger, Detailed, Example subagents (+6 more)
+
+### Community 756 - "Community 756"
+Cohesion: 0.15
+Nodes (12): Automatic discovery from parent and nested directories, Automatic discovery from parent and nested directories, Compressed, Detailed, Live change detection, Live change detection, Provenance, Skills from additional directories (+4 more)
+
+### Community 757 - "Community 757"
+Cohesion: 0.15
+Nodes (12): Built-in subagents, Code reviewer, Compressed, Create custom subagents, Data scientist, Database query validator, Debugger, Example subagents (+4 more)
+
+### Community 758 - "Community 758"
+Cohesion: 0.17
+Nodes (11): Cursor, GitHub Copilot (the source format), Install the agent kit, Install with forward-nexus, Instruction → `.claude/rules/web-research.md`, Other agents, Skill → `.claude/skills/web-research/SKILL.md`, Subagent → `.claude/agents/official-docs-researcher.md` (+3 more)
+
+### Community 759 - "Community 759"
+Cohesion: 0.17
+Nodes (11): Bundled skills, Bundled skills, Compressed, Detailed, Evaluate and iterate on a skill, Generate visual output, Provenance, Run and verify your app (+3 more)
+
+### Community 760 - "Community 760"
+Cohesion: 0.18
+Nodes (10): Available string substitutions, Available string substitutions, Compressed, Detailed, Frontmatter reference, Frontmatter reference, How a skill gets its command name, How a skill gets its command name (+2 more)
+
+### Community 761 - "Community 761"
+Cohesion: 0.20
+Nodes (9): Compressed, Disabling automatic invocation, How skills work, Including scripts in skills, Nested skill directories, React component patterns, Skill directories, SKILL.md file format (+1 more)
+
+### Community 762 - "Community 762"
+Cohesion: 0.20
+Nodes (10): Deploy App, Installing skills from GitHub, Learn more, Migrating rules and commands to skills, Optional directories, Pre-deployment Validation, Provenance, Sitemap (+2 more)
+
+### Community 763 - "Community 763"
+Cohesion: 0.20
+Nodes (10): Add supporting files, Available string substitutions, Configure skills, Control who invokes a skill, Frontmatter reference, How a skill gets its command name, Pass arguments to skills, Pre-approve tools for a skill (+2 more)
+
+### Community 764 - "Community 764"
+Cohesion: 0.20
+Nodes (10): Add supporting files, Available string substitutions, Configure skills, Control who invokes a skill, Frontmatter reference, How a skill gets its command name, Pass arguments to skills, Pre-approve tools for a skill (+2 more)
+
+### Community 765 - "Community 765"
+Cohesion: 0.20
+Nodes (10): Available tools, Conditional rules with hooks, Control subagent capabilities, Disable specific subagents, Enable persistent memory, Permission modes, Persistent memory tips, Preload skills into subagents (+2 more)
+
+### Community 766 - "Community 766"
+Cohesion: 0.20
+Nodes (10): Available tools, Conditional rules with hooks, Control subagent capabilities, Disable specific subagents, Enable persistent memory, Permission modes, Persistent memory tips, Preload skills into subagents (+2 more)
+
+### Community 767 - "Community 767"
+Cohesion: 0.22
+Nodes (9): Choose a model, Choose the subagent scope, Configure subagents, Define hooks for subagents, Hooks in subagent frontmatter, Project-level hooks for subagent events, Supported frontmatter fields, Use the /agents command (+1 more)
+
+### Community 768 - "Community 768"
+Cohesion: 0.22
+Nodes (9): Choose a model, Choose the subagent scope, Configure subagents, Define hooks for subagents, Hooks in subagent frontmatter, Project-level hooks for subagent events, Supported frontmatter fields, Use the /agents command (+1 more)
+
+### Community 769 - "Community 769"
+Cohesion: 0.22
+Nodes (8): Compressed, Detailed, Example: Research skill using Explore agent, Example: Research skill using Explore agent, Provenance, Run skills in a subagent, Run skills in a subagent, Summary
+
+### Community 770 - "Community 770"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Skill content lifecycle, Skill content lifecycle, Summary
+
+### Community 771 - "Community 771"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Generate visual output, Generate visual output, Provenance, Summary
+
+### Community 772 - "Community 772"
+Cohesion: 0.29
+Nodes (6): Bundled skills, Bundled skills, Compressed, Detailed, Provenance, Summary
+
+### Community 773 - "Community 773"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Skill not triggering, Skill not triggering, Summary
+
+### Community 774 - "Community 774"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Run and verify your app, Run and verify your app, Summary
+
+### Community 775 - "Community 775"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Override skill visibility from settings, Override skill visibility from settings, Provenance, Summary
+
+### Community 776 - "Community 776"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Skill descriptions are cut short, Skill descriptions are cut short, Summary
+
+### Community 777 - "Community 777"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Evaluate and iterate on a skill, Evaluate and iterate on a skill, Provenance, Summary
+
+### Community 778 - "Community 778"
+Cohesion: 0.29
+Nodes (6): Compressed, Create your first skill, Create your first skill, Detailed, Provenance, Summary
+
+### Community 779 - "Community 779"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Pass arguments to skills, Pass arguments to skills, Provenance, Summary
+
+### Community 780 - "Community 780"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Types of skill content, Types of skill content
+
+### Community 781 - "Community 781"
+Cohesion: 0.29
+Nodes (6): Compressed, Control who invokes a skill, Control who invokes a skill, Detailed, Provenance, Summary
+
+### Community 782 - "Community 782"
+Cohesion: 0.29
+Nodes (6): Advanced patterns, Advanced patterns, Compressed, Detailed, Provenance, Summary
+
+### Community 783 - "Community 783"
+Cohesion: 0.29
+Nodes (6): Add supporting files, Add supporting files, Compressed, Detailed, Provenance, Summary
+
+### Community 784 - "Community 784"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Run evals with skill-creator, Run evals with skill-creator, Summary
+
+### Community 785 - "Community 785"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Pre-approve tools for a skill, Pre-approve tools for a skill, Provenance, Summary
+
+### Community 786 - "Community 786"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Getting started, Getting started, Provenance, Summary
+
+### Community 787 - "Community 787"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Restrict Claude’s skill access, Restrict Claude’s skill access, Summary
+
+### Community 788 - "Community 788"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Inject dynamic context, Inject dynamic context, Provenance, Summary
+
+### Community 789 - "Community 789"
+Cohesion: 0.29
+Nodes (6): Compressed, Configure skills, Configure skills, Detailed, Provenance, Summary
+
+### Community 790 - "Community 790"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Troubleshooting, Troubleshooting
+
+### Community 791 - "Community 791"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Skill triggers too often, Skill triggers too often, Summary
+
+### Community 792 - "Community 792"
+Cohesion: 0.33
+Nodes (6): Advanced patterns, Example: Research skill using Explore agent, Inject dynamic context, Override skill visibility from settings, Restrict Claude’s skill access, Run skills in a subagent
+
+### Community 793 - "Community 793"
+Cohesion: 0.33
+Nodes (6): Advanced patterns, Example: Research skill using Explore agent, Inject dynamic context, Override skill visibility from settings, Restrict Claude’s skill access, Run skills in a subagent
+
+### Community 794 - "Community 794"
+Cohesion: 0.33
+Nodes (6): Automatic discovery from parent and nested directories, Create your first skill, Getting started, Live change detection, Skills from additional directories, Where skills live
+
+### Community 795 - "Community 795"
+Cohesion: 0.33
+Nodes (6): Automatic discovery from parent and nested directories, Create your first skill, Getting started, Live change detection, Skills from additional directories, Where skills live
+
+### Community 796 - "Community 796"
+Cohesion: 0.40
+Nodes (5): Actionable, Portable, Progressive, Version-controlled, What are skills?
+
+### Community 797 - "Community 797"
+Cohesion: 0.40
+Nodes (5): Actionable, Portable, Progressive, Version-controlled, What are skills?
+
+### Community 798 - "Community 798"
+Cohesion: 0.40
+Nodes (5): Frontmatter fields, Instructions, My Skill, Scoping a skill to specific files, When to Use
+
+### Community 799 - "Community 799"
+Cohesion: 0.40
+Nodes (5): Frontmatter fields, Instructions, My Skill, Scoping a skill to specific files, When to Use
+
+### Community 800 - "Community 800"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 801 - "Community 801"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 802 - "Community 802"
+Cohesion: 0.50
+Nodes (4): Skill descriptions are cut short, Skill not triggering, Skill triggers too often, Troubleshooting
+
+### Community 803 - "Community 803"
+Cohesion: 0.50
+Nodes (4): Skill descriptions are cut short, Skill not triggering, Skill triggers too often, Troubleshooting
+
+### Community 804 - "Community 804"
+Cohesion: 0.50
+Nodes (4): Fork the current conversation, How forks differ from named subagents, Limitations, Observe and steer running forks
+
+### Community 805 - "Community 805"
+Cohesion: 0.67
+Nodes (3): Disabling automatic invocation, Including scripts in skills, React component patterns
+
+### Community 806 - "Community 806"
+Cohesion: 0.67
+Nodes (3): Evaluate and iterate on a skill, Generate visual output, Run evals with skill-creator
+
 ## Knowledge Gaps
-- **5453 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `Kind`, `Pt` (+5448 more)
+- **5753 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `Kind`, `Pt` (+5748 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **58 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **57 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `File system` connect `Community 249` to `Community 194`, `Community 235`, `Community 238`, `Community 209`, `Community 61`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Why does `File system` connect `Community 240` to `Community 110`, `Community 207`, `Community 239`, `Community 210`, `Community 249`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `Callback API` connect `Community 110` to `Community 556`, `Community 559`, `Community 240`, `Community 561`, `Community 563`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Why does `File system` connect `Community 249` to `Community 194`, `Community 235`, `Community 238`, `Community 209`, `Community 61`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Why does `Common Objects` connect `Community 238` to `Community 535`, `Community 249`, `Community 236`, `Community 241`, `Community 213`, `Community 247`, `Community 537`, `Community 250`, `Community 219`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **What connects `husky.sh script`, `__dirname`, `rawArgv` to the rest of the system?**
-  _5453 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _5753 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
