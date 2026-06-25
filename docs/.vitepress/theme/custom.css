@@ -1,0 +1,41 @@
+/**
+ * Bonsai brand palette — a green/earthy theme that matches the "prune and
+ * shape" metaphor. Values mirror VitePress's own green scale from vars.css.
+ * https://vitepress.dev/guide/extending-default-theme#customizing-css
+ */
+:root {
+  --vp-c-brand-1: #18794e;
+  --vp-c-brand-2: #299764;
+  --vp-c-brand-3: #30a46c;
+  --vp-c-brand-soft: rgba(16, 185, 129, 0.14);
+
+  /* Bonsai-specific accents reused by the hero animation and callouts. */
+  --bonsai-bark: #6f4a2f;
+  --bonsai-leaf: #2f9e57;
+  --bonsai-leaf-soft: #a8e6cf;
+
+  /* Gradient headline on the home hero. */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #18794e 30%, #6cd49a);
+
+  /* Soft glow behind the animated hero. */
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    rgba(24, 121, 78, 0.45) 50%,
+    rgba(108, 212, 154, 0.45) 50%
+  );
+  --vp-home-hero-image-filter: blur(56px);
+}
+
+.dark {
+  --vp-c-brand-1: #3dd68c;
+  --vp-c-brand-2: #30a46c;
+  --vp-c-brand-3: #298459;
+  --vp-c-brand-soft: rgba(16, 185, 129, 0.16);
+
+  --bonsai-bark: #b07d57;
+  --bonsai-leaf: #4cc47e;
+  --bonsai-leaf-soft: #1f6b45;
+
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #3dd68c 30%, #a8e6cf);
+}

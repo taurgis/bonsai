@@ -32,6 +32,7 @@ npx @taurgis/bonsai <url> [flags]
 | `--force` | — | boolean | `false` | Ignore cached copies and force a full network crawl. |
 | `--dry-run` | — | boolean | `false` | Crawl and extract without writing to cache. |
 | `--allow-stale` | — | boolean | `false` | Allow serving stale entries if remote server is offline. |
+| `--rendered` | — | boolean | `false` | Force browser-rendered extraction for pages that require client-side JavaScript (e.g. SPA docs). |
 | `--storage` | — | choice | (configured) | Override cache location for this run: `global` or `project`. Secret-bearing pages are always stored globally. |
 | `--json` | — | boolean | `false` | Format command response as machine-readable JSON. |
 
@@ -267,3 +268,4 @@ npx @taurgis/bonsai config unset storage --local
 | Key | Values | Default | Description |
 | --- | --- | --- | --- |
 | `storage` | `global`, `project` | `global` | Where new research artifacts are cached. |
+| `summary` | `conservative`, `balanced`, `aggressive` | `conservative` | How aggressively the `compressed` variant condenses prose (headings, code blocks, tables, and lists are always preserved). Also settable via `BONSAI_SUMMARY`. |
