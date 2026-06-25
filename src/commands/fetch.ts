@@ -14,6 +14,7 @@ import { fetchRenderedHtml } from '../lib/research/browser.js';
 import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
 import { resolveResearchTarget } from '../lib/research/resolve-target.js';
+import { applyAutoTags } from '../lib/research/keywords.js';
 import { detectSite } from '../sites/index.js';
 import type { SiteFetchResult } from '../sites/types.js';
 
@@ -181,7 +182,9 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       artifact.metadata.capture_method = 'browser_fallback';
     }
 
-    return artifact;
+    // Auto-tag from the fetched content when the caller supplied none, keeping cached pages
+    // searchable by keyword. Explicit --tags always win (handled in applyAutoTags).
+    return applyAutoTags(artifact);
   }
 
   private buildResultData(

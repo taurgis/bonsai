@@ -11,7 +11,7 @@ import { atomicWriteFile } from '../atomic-write.js';
 import { parseArtifact, serializeArtifact } from './artifact.js';
 import type { ResearchArtifact } from './schema.js';
 
-function isResearchFile(file: string): boolean {
+export function isResearchFile(file: string): boolean {
   return (
     file.endsWith('.md') &&
     !file.includes('.tmp') &&

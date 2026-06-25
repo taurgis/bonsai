@@ -101,7 +101,7 @@ npx @taurgis/bonsai <url> [flags]
 Common flags:
 
 * `--topic`, `-t`: Primary category/topic for metadata tagging.
-* `--tags`, `-g`: Searchable tags. Can be repeated.
+* `--tags`, `-g`: Searchable tags. Can be repeated. When omitted, tags are auto-generated from the content by keyword detection (recorded with an `auto-generated tags via keyword extraction` quality note); passing `--tags` always takes precedence.
 * `--format`, `-f`: Output density: `compressed` or `detailed`.
 * `--tier`: Freshness tier: `stable`, `standard`, or `volatile`.
 * `--ttl`, `-l`: Custom predicted lifespan, such as `2h`, `7d`, or `30d`.
@@ -114,7 +114,7 @@ Common flags:
 
 ### `import [url]`
 
-Save custom Markdown notes directly to the cache.
+Save custom Markdown notes directly to the cache. As with `fetch`, when `--tags` is omitted the tags are auto-generated from the note content by keyword detection.
 
 ```bash
 npx @taurgis/bonsai import [url] --stdin [flags]

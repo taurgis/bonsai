@@ -218,6 +218,23 @@ export function extractSection(body: string, sectionName: string): string {
 }
 
 /**
+ * Parses an artifact for search/listing without materializing the (often large) Detailed and
+ * Provenance bodies. Truncates at the Detailed section boundary before parsing so megabyte-scale
+ * detailed content is never split or sliced. `detailed` and `provenance` come back empty — callers
+ * that need them must use {@link parseArtifact}. Shares all parsing rules with parseArtifact.
+ */
+export function parseArtifactShallow(content: string): ResearchArtifact {
+  // Only look for the Detailed boundary in the body (after the closing frontmatter fence) and match
+  // the exact serialized separator `\n\n## Detailed`, so neither a frontmatter value nor an earlier
+  // body heading named "Detailed" can truncate the content prematurely.
+  const bodyStart = content.indexOf('\n---', 3);
+  const searchFrom = bodyStart === -1 ? 0 : bodyStart + 4;
+  const detailedIdx = content.indexOf('\n\n## Detailed', searchFrom);
+  const sliced = detailedIdx === -1 ? content : content.slice(0, detailedIdx);
+  return parseArtifact(sliced);
+}
+
+/**
  * Parses full Markdown content into a structured ResearchArtifact.
  */
 export function parseArtifact(content: string): ResearchArtifact {

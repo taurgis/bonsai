@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { serializeArtifact, parseArtifact, parseMetadata, extractSection } from './artifact.js';
+import {
+  serializeArtifact,
+  parseArtifact,
+  parseArtifactShallow,
+  parseMetadata,
+  extractSection,
+} from './artifact.js';
 import type { ResearchArtifact } from './schema.js';
 
 describe('artifact serialization and parsing', () => {
@@ -109,5 +115,52 @@ describe('artifact serialization and parsing', () => {
 
   it('extractSection returns empty string for a missing section', () => {
     expect(extractSection('## Summary\n\ntext', 'Provenance')).toBe('');
+  });
+
+  describe('parseArtifactShallow', () => {
+    it('parses metadata/summary/compressed but skips the detailed and provenance bodies', () => {
+      const parsed = parseArtifactShallow(serializeArtifact(sampleArtifact));
+      expect(parsed.metadata).toEqual(sampleArtifact.metadata);
+      expect(parsed.summary).toBe(sampleArtifact.summary);
+      expect(parsed.compressed).toBe(sampleArtifact.compressed);
+      expect(parsed.detailed).toBe('');
+      expect(parsed.provenance).toBe('');
+    });
+
+    it('matches parseArtifact on summary/compressed even when the body contains a "## Detailed" line', () => {
+      // Content that includes a "## Detailed" heading collides with the section delimiter — but that
+      // is an inherent property of the format that parseArtifact shares. The contract is parity: the
+      // shallow parser must never return different summary/compressed than the full parser.
+      const tricky: ResearchArtifact = {
+        ...sampleArtifact,
+        compressed: 'Formats include:\n\n## Detailed\nthat heading is part of the prose here.',
+      };
+      const serialized = serializeArtifact(tricky);
+      const shallow = parseArtifactShallow(serialized);
+      const full = parseArtifact(serialized);
+      expect(shallow.summary).toBe(full.summary);
+      expect(shallow.compressed).toBe(full.compressed);
+    });
+
+    it('is not fooled by the marker appearing inside a frontmatter value', () => {
+      // The frontmatter is searched past before looking for the Detailed boundary, so a marker-like
+      // value can't truncate the body.
+      const withMarkerInMeta: ResearchArtifact = {
+        ...sampleArtifact,
+        metadata: { ...sampleArtifact.metadata, topic: 'about\n## Detailed sections' },
+      };
+      const serialized = serializeArtifact(withMarkerInMeta);
+      const shallow = parseArtifactShallow(serialized);
+      const full = parseArtifact(serialized);
+      expect(shallow.summary).toBe(full.summary);
+      expect(shallow.compressed).toBe(full.compressed);
+    });
+
+    it('returns the full body when there is no Detailed section', () => {
+      const noDetailed = `---\nschema_version: 1\ncache_key: abc\n---\n\n## Summary\n\nonly a summary`;
+      const parsed = parseArtifactShallow(noDetailed);
+      expect(parsed.summary).toBe('only a summary');
+      expect(parsed.detailed).toBe('');
+    });
   });
 });

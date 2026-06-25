@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-25)
 
 ## Corpus Check
-- 445 files · ~448,113 words
+- 620 files · ~654,043 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3992 nodes · 4755 edges · 353 communities (309 shown, 44 thin omitted)
+- 6224 nodes · 6867 edges · 564 communities (516 shown, 48 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `407cbb05`
+- Built from commit: `334473f8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -204,6 +204,8 @@
 - [[_COMMUNITY_Community 190|Community 190]]
 - [[_COMMUNITY_Community 191|Community 191]]
 - [[_COMMUNITY_Community 192|Community 192]]
+- [[_COMMUNITY_Community 193|Community 193]]
+- [[_COMMUNITY_Community 194|Community 194]]
 - [[_COMMUNITY_Community 195|Community 195]]
 - [[_COMMUNITY_Community 196|Community 196]]
 - [[_COMMUNITY_Community 197|Community 197]]
@@ -216,11 +218,65 @@
 - [[_COMMUNITY_Community 204|Community 204]]
 - [[_COMMUNITY_Community 205|Community 205]]
 - [[_COMMUNITY_Community 206|Community 206]]
+- [[_COMMUNITY_Community 207|Community 207]]
+- [[_COMMUNITY_Community 208|Community 208]]
+- [[_COMMUNITY_Community 209|Community 209]]
+- [[_COMMUNITY_Community 210|Community 210]]
+- [[_COMMUNITY_Community 211|Community 211]]
+- [[_COMMUNITY_Community 212|Community 212]]
+- [[_COMMUNITY_Community 213|Community 213]]
+- [[_COMMUNITY_Community 214|Community 214]]
+- [[_COMMUNITY_Community 215|Community 215]]
+- [[_COMMUNITY_Community 216|Community 216]]
+- [[_COMMUNITY_Community 217|Community 217]]
+- [[_COMMUNITY_Community 218|Community 218]]
+- [[_COMMUNITY_Community 219|Community 219]]
+- [[_COMMUNITY_Community 220|Community 220]]
+- [[_COMMUNITY_Community 221|Community 221]]
+- [[_COMMUNITY_Community 222|Community 222]]
+- [[_COMMUNITY_Community 223|Community 223]]
+- [[_COMMUNITY_Community 224|Community 224]]
+- [[_COMMUNITY_Community 225|Community 225]]
+- [[_COMMUNITY_Community 226|Community 226]]
+- [[_COMMUNITY_Community 227|Community 227]]
+- [[_COMMUNITY_Community 228|Community 228]]
+- [[_COMMUNITY_Community 229|Community 229]]
+- [[_COMMUNITY_Community 230|Community 230]]
+- [[_COMMUNITY_Community 231|Community 231]]
+- [[_COMMUNITY_Community 232|Community 232]]
+- [[_COMMUNITY_Community 233|Community 233]]
+- [[_COMMUNITY_Community 234|Community 234]]
+- [[_COMMUNITY_Community 235|Community 235]]
+- [[_COMMUNITY_Community 236|Community 236]]
+- [[_COMMUNITY_Community 237|Community 237]]
+- [[_COMMUNITY_Community 238|Community 238]]
+- [[_COMMUNITY_Community 239|Community 239]]
+- [[_COMMUNITY_Community 240|Community 240]]
+- [[_COMMUNITY_Community 241|Community 241]]
+- [[_COMMUNITY_Community 242|Community 242]]
+- [[_COMMUNITY_Community 243|Community 243]]
+- [[_COMMUNITY_Community 244|Community 244]]
+- [[_COMMUNITY_Community 245|Community 245]]
+- [[_COMMUNITY_Community 246|Community 246]]
+- [[_COMMUNITY_Community 247|Community 247]]
+- [[_COMMUNITY_Community 248|Community 248]]
+- [[_COMMUNITY_Community 249|Community 249]]
+- [[_COMMUNITY_Community 250|Community 250]]
+- [[_COMMUNITY_Community 251|Community 251]]
+- [[_COMMUNITY_Community 252|Community 252]]
+- [[_COMMUNITY_Community 253|Community 253]]
+- [[_COMMUNITY_Community 254|Community 254]]
+- [[_COMMUNITY_Community 255|Community 255]]
+- [[_COMMUNITY_Community 256|Community 256]]
+- [[_COMMUNITY_Community 257|Community 257]]
 - [[_COMMUNITY_Community 258|Community 258]]
 - [[_COMMUNITY_Community 259|Community 259]]
+- [[_COMMUNITY_Community 260|Community 260]]
+- [[_COMMUNITY_Community 261|Community 261]]
 - [[_COMMUNITY_Community 262|Community 262]]
 - [[_COMMUNITY_Community 263|Community 263]]
 - [[_COMMUNITY_Community 264|Community 264]]
+- [[_COMMUNITY_Community 265|Community 265]]
 - [[_COMMUNITY_Community 266|Community 266]]
 - [[_COMMUNITY_Community 267|Community 267]]
 - [[_COMMUNITY_Community 268|Community 268]]
@@ -229,8 +285,12 @@
 - [[_COMMUNITY_Community 271|Community 271]]
 - [[_COMMUNITY_Community 272|Community 272]]
 - [[_COMMUNITY_Community 273|Community 273]]
+- [[_COMMUNITY_Community 274|Community 274]]
+- [[_COMMUNITY_Community 275|Community 275]]
 - [[_COMMUNITY_Community 276|Community 276]]
 - [[_COMMUNITY_Community 277|Community 277]]
+- [[_COMMUNITY_Community 278|Community 278]]
+- [[_COMMUNITY_Community 279|Community 279]]
 - [[_COMMUNITY_Community 280|Community 280]]
 - [[_COMMUNITY_Community 281|Community 281]]
 - [[_COMMUNITY_Community 282|Community 282]]
@@ -241,6 +301,7 @@
 - [[_COMMUNITY_Community 287|Community 287]]
 - [[_COMMUNITY_Community 288|Community 288]]
 - [[_COMMUNITY_Community 289|Community 289]]
+- [[_COMMUNITY_Community 290|Community 290]]
 - [[_COMMUNITY_Community 291|Community 291]]
 - [[_COMMUNITY_Community 292|Community 292]]
 - [[_COMMUNITY_Community 293|Community 293]]
@@ -252,6 +313,9 @@
 - [[_COMMUNITY_Community 299|Community 299]]
 - [[_COMMUNITY_Community 300|Community 300]]
 - [[_COMMUNITY_Community 301|Community 301]]
+- [[_COMMUNITY_Community 302|Community 302]]
+- [[_COMMUNITY_Community 303|Community 303]]
+- [[_COMMUNITY_Community 304|Community 304]]
 - [[_COMMUNITY_Community 305|Community 305]]
 - [[_COMMUNITY_Community 306|Community 306]]
 - [[_COMMUNITY_Community 307|Community 307]]
@@ -284,6 +348,7 @@
 - [[_COMMUNITY_Community 334|Community 334]]
 - [[_COMMUNITY_Community 335|Community 335]]
 - [[_COMMUNITY_Community 336|Community 336]]
+- [[_COMMUNITY_Community 337|Community 337]]
 - [[_COMMUNITY_Community 338|Community 338]]
 - [[_COMMUNITY_Community 339|Community 339]]
 - [[_COMMUNITY_Community 340|Community 340]]
@@ -315,6 +380,8 @@
 - [[_COMMUNITY_Community 366|Community 366]]
 - [[_COMMUNITY_Community 367|Community 367]]
 - [[_COMMUNITY_Community 368|Community 368]]
+- [[_COMMUNITY_Community 369|Community 369]]
+- [[_COMMUNITY_Community 370|Community 370]]
 - [[_COMMUNITY_Community 371|Community 371]]
 - [[_COMMUNITY_Community 372|Community 372]]
 - [[_COMMUNITY_Community 373|Community 373]]
@@ -330,6 +397,7 @@
 - [[_COMMUNITY_Community 383|Community 383]]
 - [[_COMMUNITY_Community 384|Community 384]]
 - [[_COMMUNITY_Community 385|Community 385]]
+- [[_COMMUNITY_Community 386|Community 386]]
 - [[_COMMUNITY_Community 387|Community 387]]
 - [[_COMMUNITY_Community 388|Community 388]]
 - [[_COMMUNITY_Community 389|Community 389]]
@@ -350,6 +418,7 @@
 - [[_COMMUNITY_Community 404|Community 404]]
 - [[_COMMUNITY_Community 405|Community 405]]
 - [[_COMMUNITY_Community 406|Community 406]]
+- [[_COMMUNITY_Community 407|Community 407]]
 - [[_COMMUNITY_Community 408|Community 408]]
 - [[_COMMUNITY_Community 409|Community 409]]
 - [[_COMMUNITY_Community 410|Community 410]]
@@ -357,35 +426,177 @@
 - [[_COMMUNITY_Community 412|Community 412]]
 - [[_COMMUNITY_Community 413|Community 413]]
 - [[_COMMUNITY_Community 414|Community 414]]
+- [[_COMMUNITY_Community 422|Community 422]]
+- [[_COMMUNITY_Community 423|Community 423]]
+- [[_COMMUNITY_Community 424|Community 424]]
+- [[_COMMUNITY_Community 425|Community 425]]
+- [[_COMMUNITY_Community 426|Community 426]]
+- [[_COMMUNITY_Community 427|Community 427]]
+- [[_COMMUNITY_Community 428|Community 428]]
+- [[_COMMUNITY_Community 429|Community 429]]
+- [[_COMMUNITY_Community 430|Community 430]]
+- [[_COMMUNITY_Community 431|Community 431]]
+- [[_COMMUNITY_Community 432|Community 432]]
+- [[_COMMUNITY_Community 433|Community 433]]
+- [[_COMMUNITY_Community 434|Community 434]]
+- [[_COMMUNITY_Community 435|Community 435]]
+- [[_COMMUNITY_Community 436|Community 436]]
+- [[_COMMUNITY_Community 437|Community 437]]
+- [[_COMMUNITY_Community 438|Community 438]]
+- [[_COMMUNITY_Community 439|Community 439]]
+- [[_COMMUNITY_Community 440|Community 440]]
+- [[_COMMUNITY_Community 441|Community 441]]
+- [[_COMMUNITY_Community 442|Community 442]]
+- [[_COMMUNITY_Community 443|Community 443]]
+- [[_COMMUNITY_Community 444|Community 444]]
+- [[_COMMUNITY_Community 445|Community 445]]
+- [[_COMMUNITY_Community 446|Community 446]]
+- [[_COMMUNITY_Community 447|Community 447]]
+- [[_COMMUNITY_Community 448|Community 448]]
+- [[_COMMUNITY_Community 449|Community 449]]
+- [[_COMMUNITY_Community 450|Community 450]]
+- [[_COMMUNITY_Community 451|Community 451]]
+- [[_COMMUNITY_Community 452|Community 452]]
+- [[_COMMUNITY_Community 453|Community 453]]
+- [[_COMMUNITY_Community 454|Community 454]]
+- [[_COMMUNITY_Community 455|Community 455]]
+- [[_COMMUNITY_Community 456|Community 456]]
+- [[_COMMUNITY_Community 457|Community 457]]
+- [[_COMMUNITY_Community 458|Community 458]]
+- [[_COMMUNITY_Community 459|Community 459]]
+- [[_COMMUNITY_Community 460|Community 460]]
+- [[_COMMUNITY_Community 461|Community 461]]
+- [[_COMMUNITY_Community 462|Community 462]]
+- [[_COMMUNITY_Community 463|Community 463]]
+- [[_COMMUNITY_Community 464|Community 464]]
+- [[_COMMUNITY_Community 465|Community 465]]
+- [[_COMMUNITY_Community 466|Community 466]]
+- [[_COMMUNITY_Community 467|Community 467]]
+- [[_COMMUNITY_Community 468|Community 468]]
+- [[_COMMUNITY_Community 469|Community 469]]
+- [[_COMMUNITY_Community 470|Community 470]]
+- [[_COMMUNITY_Community 471|Community 471]]
+- [[_COMMUNITY_Community 472|Community 472]]
+- [[_COMMUNITY_Community 473|Community 473]]
+- [[_COMMUNITY_Community 474|Community 474]]
+- [[_COMMUNITY_Community 475|Community 475]]
+- [[_COMMUNITY_Community 476|Community 476]]
+- [[_COMMUNITY_Community 477|Community 477]]
+- [[_COMMUNITY_Community 478|Community 478]]
+- [[_COMMUNITY_Community 479|Community 479]]
+- [[_COMMUNITY_Community 480|Community 480]]
+- [[_COMMUNITY_Community 481|Community 481]]
+- [[_COMMUNITY_Community 482|Community 482]]
+- [[_COMMUNITY_Community 483|Community 483]]
+- [[_COMMUNITY_Community 484|Community 484]]
+- [[_COMMUNITY_Community 485|Community 485]]
+- [[_COMMUNITY_Community 486|Community 486]]
+- [[_COMMUNITY_Community 487|Community 487]]
+- [[_COMMUNITY_Community 488|Community 488]]
+- [[_COMMUNITY_Community 489|Community 489]]
+- [[_COMMUNITY_Community 490|Community 490]]
+- [[_COMMUNITY_Community 491|Community 491]]
+- [[_COMMUNITY_Community 492|Community 492]]
+- [[_COMMUNITY_Community 493|Community 493]]
+- [[_COMMUNITY_Community 494|Community 494]]
+- [[_COMMUNITY_Community 495|Community 495]]
+- [[_COMMUNITY_Community 496|Community 496]]
+- [[_COMMUNITY_Community 497|Community 497]]
+- [[_COMMUNITY_Community 498|Community 498]]
+- [[_COMMUNITY_Community 499|Community 499]]
+- [[_COMMUNITY_Community 500|Community 500]]
+- [[_COMMUNITY_Community 501|Community 501]]
+- [[_COMMUNITY_Community 502|Community 502]]
+- [[_COMMUNITY_Community 503|Community 503]]
+- [[_COMMUNITY_Community 504|Community 504]]
+- [[_COMMUNITY_Community 505|Community 505]]
+- [[_COMMUNITY_Community 506|Community 506]]
+- [[_COMMUNITY_Community 507|Community 507]]
+- [[_COMMUNITY_Community 508|Community 508]]
+- [[_COMMUNITY_Community 509|Community 509]]
+- [[_COMMUNITY_Community 510|Community 510]]
+- [[_COMMUNITY_Community 511|Community 511]]
+- [[_COMMUNITY_Community 512|Community 512]]
+- [[_COMMUNITY_Community 513|Community 513]]
+- [[_COMMUNITY_Community 514|Community 514]]
+- [[_COMMUNITY_Community 515|Community 515]]
+- [[_COMMUNITY_Community 516|Community 516]]
+- [[_COMMUNITY_Community 517|Community 517]]
+- [[_COMMUNITY_Community 518|Community 518]]
+- [[_COMMUNITY_Community 519|Community 519]]
+- [[_COMMUNITY_Community 520|Community 520]]
+- [[_COMMUNITY_Community 521|Community 521]]
+- [[_COMMUNITY_Community 522|Community 522]]
+- [[_COMMUNITY_Community 523|Community 523]]
+- [[_COMMUNITY_Community 524|Community 524]]
+- [[_COMMUNITY_Community 525|Community 525]]
+- [[_COMMUNITY_Community 526|Community 526]]
+- [[_COMMUNITY_Community 527|Community 527]]
+- [[_COMMUNITY_Community 528|Community 528]]
+- [[_COMMUNITY_Community 529|Community 529]]
+- [[_COMMUNITY_Community 530|Community 530]]
+- [[_COMMUNITY_Community 531|Community 531]]
+- [[_COMMUNITY_Community 532|Community 532]]
+- [[_COMMUNITY_Community 533|Community 533]]
+- [[_COMMUNITY_Community 534|Community 534]]
+- [[_COMMUNITY_Community 535|Community 535]]
+- [[_COMMUNITY_Community 536|Community 536]]
+- [[_COMMUNITY_Community 537|Community 537]]
+- [[_COMMUNITY_Community 538|Community 538]]
+- [[_COMMUNITY_Community 539|Community 539]]
+- [[_COMMUNITY_Community 540|Community 540]]
+- [[_COMMUNITY_Community 541|Community 541]]
+- [[_COMMUNITY_Community 542|Community 542]]
+- [[_COMMUNITY_Community 543|Community 543]]
+- [[_COMMUNITY_Community 544|Community 544]]
+- [[_COMMUNITY_Community 545|Community 545]]
+- [[_COMMUNITY_Community 546|Community 546]]
+- [[_COMMUNITY_Community 547|Community 547]]
+- [[_COMMUNITY_Community 548|Community 548]]
+- [[_COMMUNITY_Community 549|Community 549]]
+- [[_COMMUNITY_Community 550|Community 550]]
+- [[_COMMUNITY_Community 551|Community 551]]
+- [[_COMMUNITY_Community 552|Community 552]]
+- [[_COMMUNITY_Community 553|Community 553]]
+- [[_COMMUNITY_Community 554|Community 554]]
+- [[_COMMUNITY_Community 555|Community 555]]
+- [[_COMMUNITY_Community 556|Community 556]]
+- [[_COMMUNITY_Community 557|Community 557]]
+- [[_COMMUNITY_Community 558|Community 558]]
+- [[_COMMUNITY_Community 559|Community 559]]
+- [[_COMMUNITY_Community 560|Community 560]]
+- [[_COMMUNITY_Community 561|Community 561]]
+- [[_COMMUNITY_Community 562|Community 562]]
+- [[_COMMUNITY_Community 563|Community 563]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Callback API` - 55 edges
 2. `Callback API` - 55 edges
-3. `Synchronous API` - 49 edges
-4. `Synchronous API` - 49 edges
-5. `Fallow: Critical Gotchas` - 35 edges
-6. `Promises API` - 35 edges
-7. `Promises API` - 35 edges
-8. `Fallow CLI Reference` - 33 edges
-9. `Class: `fs.Stats`` - 31 edges
-10. `Class: `fs.Stats`` - 31 edges
+3. `Callback API` - 55 edges
+4. `Callback API` - 55 edges
+5. `Synchronous API` - 49 edges
+6. `Synchronous API` - 49 edges
+7. `Synchronous API` - 49 edges
+8. `Synchronous API` - 49 edges
+9. `Fallow: Critical Gotchas` - 35 edges
+10. `Promises API` - 35 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
   testing/regression/run-suite.mjs → src/sites/index.ts
+- `ResolveResearchTargetOptions` --references--> `StorageMode`  [EXTRACTED]
+  src/lib/research/resolve-target.ts → src/lib/config/schema.ts
 - `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
   testing/regression/run-suite.mjs → src/lib/research/capture.ts
 - `defaultFetcher()` --calls--> `fetchText()`  [EXTRACTED]
   src/lib/research/docs/machine-readable.ts → src/lib/research/fetcher.ts
-- `RevalidationResult` --references--> `ResearchArtifact`  [EXTRACTED]
-  src/lib/research/revalidate.ts → src/lib/research/schema.ts
 - `FetchCommand` --inherits--> `BaseCommand`  [EXTRACTED]
   src/commands/fetch.ts → src/base-command.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (353 total, 44 thin omitted)
+## Communities (564 total, 48 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -412,8 +623,8 @@ Cohesion: 0.10
 Nodes (20): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. Search before fetching, Bonsai, Command Reference, `config` (+12 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.10
-Nodes (37): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), readScopedConfig(), omitUndefined() (+29 more)
+Cohesion: 0.11
+Nodes (35): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), readScopedConfig(), omitUndefined() (+27 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -447,10 +658,6 @@ Nodes (19): Apex Skill Pattern, API/Framework Skill, CLI Command Skill, Code Blo
 Cohesion: 0.09
 Nodes (21): Behavior, CI Integration, `ci`: Provider-Aware Review Automation, Combined Mode Flags, `config-schema`: Config JSON Schema, `decision-surface`: Structural Decisions, Environment Variables, Fallow CLI Reference (+13 more)
 
-### Community 15 - "Community 15"
-Cohesion: 0.20
-Nodes (3): ResearchImport, compressMarkdown(), writeArtifactSecurely()
-
 ### Community 16 - "Community 16"
 Cohesion: 0.29
 Nodes (6): Default Workflow, Fallbacks, Freshness Policy, Official Docs Researcher Agent, Response Contract, Scope
@@ -472,8 +679,8 @@ Cohesion: 0.11
 Nodes (17): `captureOutput` — Test a Command Class Directly, Common Patterns, Environment variable flags, OCLIF Testing, Prerequisites, Primary API: `runCommand`, Quick Reference, References (+9 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.14
-Nodes (6): ResearchInspect, SectionSummary, ResearchList, ResearchStatus, scanCacheDirs(), BaseCommand
+Cohesion: 0.08
+Nodes (19): ResearchInspect, SectionSummary, ResearchList, ResearchPrune, FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS (+11 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.12
@@ -500,12 +707,12 @@ Cohesion: 0.13
 Nodes (14): 1. Network Constraints & Crawler Limits, 2. DNS Safety & Private IP Blocklist (SSRF Protection), 3. Client-Side Hydration (SPA) Limitations, 4. Exit Codes & Common Errors, Blocked Target Blocks (RFC1918 & Localhost), Common Failure Symptoms, Crawler Limits, Exit Code Directory (+6 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.12
-Nodes (26): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), FRESHNESS_BONUS, isFuzzyMatch(), levenshtein() (+18 more)
+Cohesion: 0.15
+Nodes (22): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), assertOk(), FetchOptions (+14 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.17
-Nodes (15): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, analyzeMarkdownQuality(), countMatches(), hasCollapsedCode() (+7 more)
+Cohesion: 0.18
+Nodes (14): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, analyzeMarkdownQuality(), countMatches(), hasCollapsedCode() (+6 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.14
@@ -525,7 +732,7 @@ Nodes (13): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns &
 
 ### Community 35 - "Community 35"
 Cohesion: 0.12
-Nodes (26): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField() (+18 more)
+Nodes (25): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow() (+17 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -576,8 +783,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, Organize rules with `.claude/rules/`, Organize rules with `.claude/rules/`, Path-specific rules, Path-specific rules, Provenance, Set up rules (+4 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.14
-Nodes (13): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, handleStaleRevalidationResult(), ResolvedResearchTarget, resolveResearchTarget(), getArtifactPath(), locateArtifact() (+5 more)
+Cohesion: 0.17
+Nodes (17): ResolvedResearchTarget, ResolveResearchTargetOptions, SecureWriteResult, KEY_A, KEY_B, writeArtifactSecurely(), findArtifact(), getArtifactPath() (+9 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.15
@@ -622,6 +829,10 @@ Nodes (8): Compressed, Detailed, How CLAUDE.md files load, How CLAUDE.md files l
 ### Community 60 - "Community 60"
 Cohesion: 0.22
 Nodes (8): CLAUDE.md vs auto memory, CLAUDE.md vs auto memory, Compressed, Detailed, Provenance, Summary, View and edit with `/memory`, View and edit with `/memory`
+
+### Community 61 - "Community 61"
+Cohesion: 0.04
+Nodes (51): Callback API, `fs.access(path[, mode], callback)`, `fs.appendFile(path, data[, options], callback)`, `fs.chown(path, uid, gid, callback)`, `fs.close(fd[, callback])`, `fs.copyFile(src, dest[, mode], callback)`, `fs.cp(src, dest[, options], callback)`, `fs.createReadStream(path[, options])` (+43 more)
 
 ### Community 62 - "Community 62"
 Cohesion: 0.25
@@ -816,8 +1027,8 @@ Cohesion: 0.25
 Nodes (7): Cache Operations, Fetch Rules, Manual Fallbacks, Required Pre-Step, Source Rules, Web Research Skill, When This Does Not Apply
 
 ### Community 110 - "Community 110"
-Cohesion: 0.43
-Nodes (5): Fixture, fixtures, detectSite(), getSiteModuleById(), SITES
+Cohesion: 0.04
+Nodes (51): Callback API, `fs.access(path[, mode], callback)`, `fs.appendFile(path, data[, options], callback)`, `fs.chown(path, uid, gid, callback)`, `fs.close(fd[, callback])`, `fs.copyFile(src, dest[, mode], callback)`, `fs.cp(src, dest[, options], callback)`, `fs.createReadStream(path[, options])` (+43 more)
 
 ### Community 111 - "Community 111"
 Cohesion: 0.29
@@ -1016,8 +1227,8 @@ Cohesion: 0.40
 Nodes (5): Audit and edit your memory, Auto memory, Enable or disable auto memory, How it works, Storage location
 
 ### Community 174 - "Community 174"
-Cohesion: 0.14
-Nodes (24): emptyCapabilities(), MachineReadableArtifact, SiteCapabilities, MachineReadableResult, TextFetcher, captureFixture(), CaptureDeps, CaptureOptions (+16 more)
+Cohesion: 0.13
+Nodes (25): MachineReadableArtifact, SiteCapabilities, detectDocsEngine(), MachineReadableResult, TextFetcher, captureFixture(), CaptureDeps, CaptureOptions (+17 more)
 
 ### Community 175 - "Community 175"
 Cohesion: 0.29
@@ -1091,9 +1302,17 @@ Nodes (10): Considerations for Agentforce Guided Shopping for B2B Commerce, Eins
 Cohesion: 0.50
 Nodes (4): Organize rules with `.claude/rules/`, Path-specific rules, Set up rules, User-level rules
 
+### Community 193 - "Community 193"
+Cohesion: 0.04
+Nodes (34): 1\. Install, 1\. Install, 2\. Usage, 2\. Usage, 3\. Method Details, 3\. Method Details, 4\. How it Works, 4\. How it Works (+26 more)
+
+### Community 194 - "Community 194"
+Cohesion: 0.04
+Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
+
 ### Community 195 - "Community 195"
-Cohesion: 0.43
-Nodes (6): breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading(), splitMarkdownSections()
+Cohesion: 0.21
+Nodes (10): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading() (+2 more)
 
 ### Community 196 - "Community 196"
 Cohesion: 0.22
@@ -1139,6 +1358,210 @@ Nodes (7): Authentication Steps, Common JWT Scenario: Transferring a Basket From
 Cohesion: 0.25
 Nodes (7): Business Manager Import Location, Coupon Import, Coupon Redemptions Import/Export in B2C Commerce, Coupons and Coupon Code Object Import/Export in B2C Commerce, Coupons Import/Export for Promotions in B2C Commerce, Pipelets, Sample Coupon XML File in B2C Commerce
 
+### Community 207 - "Community 207"
+Cohesion: 0.04
+Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
+
+### Community 208 - "Community 208"
+Cohesion: 0.06
+Nodes (34): Abstractive-based summarization, Abstractive-based summarization, Adaptive summarization, Adaptive summarization, Aided summarization, Aided summarization, Applications and systems for summarization, Applications and systems for summarization (+26 more)
+
+### Community 209 - "Community 209"
+Cohesion: 0.06
+Nodes (34): `fsPromises.access(path[, mode])`, `fsPromises.appendFile(path, data[, options])`, `fsPromises.chmod(path, mode)`, `fsPromises.chown(path, uid, gid)`, `fsPromises.constants`, `fsPromises.copyFile(src, dest[, mode])`, `fsPromises.cp(src, dest[, options])`, `fsPromises.glob(pattern[, options])` (+26 more)
+
+### Community 210 - "Community 210"
+Cohesion: 0.06
+Nodes (34): `fsPromises.access(path[, mode])`, `fsPromises.appendFile(path, data[, options])`, `fsPromises.chmod(path, mode)`, `fsPromises.chown(path, uid, gid)`, `fsPromises.constants`, `fsPromises.copyFile(src, dest[, mode])`, `fsPromises.cp(src, dest[, options])`, `fsPromises.glob(pattern[, options])` (+26 more)
+
+### Community 211 - "Community 211"
+Cohesion: 0.06
+Nodes (31): Class: `fs.Stats`, Stat time values, `stats.atime`, `stats.atimeMs`, `stats.atimeNs`, `stats.birthtime`, `stats.birthtimeMs`, `stats.birthtimeNs` (+23 more)
+
+### Community 212 - "Community 212"
+Cohesion: 0.06
+Nodes (31): Class: `fs.Stats`, Stat time values, `stats.atime`, `stats.atimeMs`, `stats.atimeNs`, `stats.birthtime`, `stats.birthtimeMs`, `stats.birthtimeNs` (+23 more)
+
+### Community 213 - "Community 213"
+Cohesion: 0.06
+Nodes (31): Class: `fs.Stats`, Stat time values, `stats.atime`, `stats.atimeMs`, `stats.atimeNs`, `stats.birthtime`, `stats.birthtimeMs`, `stats.birthtimeNs` (+23 more)
+
+### Community 214 - "Community 214"
+Cohesion: 0.06
+Nodes (31): Class: `fs.Stats`, Stat time values, `stats.atime`, `stats.atimeMs`, `stats.atimeNs`, `stats.birthtime`, `stats.birthtimeMs`, `stats.birthtimeNs` (+23 more)
+
+### Community 215 - "Community 215"
+Cohesion: 0.07
+Nodes (30): Class: `FileHandle`, Event: `'close'`, `filehandle.appendFile(data[, options])`, `filehandle.chmod(mode)`, `filehandle.chown(uid, gid)`, `filehandle.close()`, `filehandle.createReadStream([options])`, `filehandle.createWriteStream([options])` (+22 more)
+
+### Community 216 - "Community 216"
+Cohesion: 0.07
+Nodes (30): Class: `FileHandle`, Event: `'close'`, `filehandle.appendFile(data[, options])`, `filehandle.chmod(mode)`, `filehandle.chown(uid, gid)`, `filehandle.close()`, `filehandle.createReadStream([options])`, `filehandle.createWriteStream([options])` (+22 more)
+
+### Community 217 - "Community 217"
+Cohesion: 0.07
+Nodes (30): Class: `FileHandle`, Event: `'close'`, `filehandle.appendFile(data[, options])`, `filehandle.chmod(mode)`, `filehandle.chown(uid, gid)`, `filehandle.close()`, `filehandle.createReadStream([options])`, `filehandle.createWriteStream([options])` (+22 more)
+
+### Community 218 - "Community 218"
+Cohesion: 0.07
+Nodes (30): Class: `FileHandle`, Event: `'close'`, `filehandle.appendFile(data[, options])`, `filehandle.chmod(mode)`, `filehandle.chown(uid, gid)`, `filehandle.close()`, `filehandle.createReadStream([options])`, `filehandle.createWriteStream([options])` (+22 more)
+
+### Community 219 - "Community 219"
+Cohesion: 0.07
+Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
+
+### Community 220 - "Community 220"
+Cohesion: 0.07
+Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
+
+### Community 221 - "Community 221"
+Cohesion: 0.07
+Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
+
+### Community 222 - "Community 222"
+Cohesion: 0.07
+Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
+
+### Community 223 - "Community 223"
+Cohesion: 0.07
+Nodes (26): Class: `fs.Dir`, Class: `fs.Dir`, Compressed, Detailed, `dir.close()`, `dir.close()`, `dir.close(callback)`, `dir.close(callback)` (+18 more)
+
+### Community 224 - "Community 224"
+Cohesion: 0.08
+Nodes (24): Class: `fs.Dirent`, Class: `fs.Dirent`, Compressed, Detailed, `dirent.isBlockDevice()`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isCharacterDevice()` (+16 more)
+
+### Community 225 - "Community 225"
+Cohesion: 0.09
+Nodes (22): Class: `fs.StatFs`, Class: `fs.StatFs`, Compressed, Detailed, Provenance, `statfs.bavail`, `statfs.bavail`, `statfs.bfree` (+14 more)
+
+### Community 226 - "Community 226"
+Cohesion: 0.10
+Nodes (20): Class: `fs.WriteStream`, Class: `fs.WriteStream`, Compressed, Detailed, Event: `'close'`, Event: `'close'`, Event: `'open'`, Event: `'open'` (+12 more)
+
+### Community 227 - "Community 227"
+Cohesion: 0.11
+Nodes (18): Compressed, Detailed, File access constants, File access constants, File copy constants, File copy constants, File mode constants, File mode constants (+10 more)
+
+### Community 228 - "Community 228"
+Cohesion: 0.11
+Nodes (18): Class: `fs.FSWatcher`, Class: `fs.FSWatcher`, Compressed, Detailed, Event: `'change'`, Event: `'change'`, Event: `'close'`, Event: `'close'` (+10 more)
+
+### Community 229 - "Community 229"
+Cohesion: 0.11
+Nodes (18): Class: `fs.ReadStream`, Class: `fs.ReadStream`, Compressed, Detailed, Event: `'close'`, Event: `'close'`, Event: `'open'`, Event: `'open'` (+10 more)
+
+### Community 230 - "Community 230"
+Cohesion: 0.12
+Nodes (16): Adaptive summarization, Adaptive summarization, Compressed, Detailed, Document summarization, Document summarization, Maximum entropy-based summarization, Maximum entropy-based summarization (+8 more)
+
+### Community 231 - "Community 231"
+Cohesion: 0.12
+Nodes (16): Buffer paths, Buffer paths, Compressed, Detailed, File paths, File paths, File URL paths, File URL paths (+8 more)
+
+### Community 232 - "Community 232"
+Cohesion: 0.13
+Nodes (14): Availability, Availability, Caveats, Caveats, Compressed, Detailed, Filename argument, Filename argument (+6 more)
+
+### Community 233 - "Community 233"
+Cohesion: 0.18
+Nodes (10): Compressed, Detailed, File descriptors, File descriptors, `fs.readFile(path[, options], callback)`, `fs.readFile(path[, options], callback)`, Performance Considerations, Performance Considerations (+2 more)
+
+### Community 234 - "Community 234"
+Cohesion: 0.18
+Nodes (10): Class: `fs.StatWatcher`, Class: `fs.StatWatcher`, Compressed, Detailed, Provenance, Summary, `watcher.ref()`, `watcher.ref()` (+2 more)
+
+### Community 235 - "Community 235"
+Cohesion: 0.18
+Nodes (11): Buffer paths, File descriptors, File paths, File system flags, File URL paths, Notes, Ordering of callback and promise-based operations, Per-drive working directories on Windows (+3 more)
+
+### Community 236 - "Community 236"
+Cohesion: 0.18
+Nodes (11): Class: `fs.Dir`, `dir.close()`, `dir.close(callback)`, `dir.closeSync()`, `dir.path`, `dir.read()`, `dir.read(callback)`, `dir.readSync()` (+3 more)
+
+### Community 237 - "Community 237"
+Cohesion: 0.18
+Nodes (11): Class: `fs.Dir`, `dir.close()`, `dir.close(callback)`, `dir.closeSync()`, `dir.path`, `dir.read()`, `dir.read(callback)`, `dir.readSync()` (+3 more)
+
+### Community 238 - "Community 238"
+Cohesion: 0.18
+Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
+
+### Community 239 - "Community 239"
+Cohesion: 0.18
+Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
+
+### Community 240 - "Community 240"
+Cohesion: 0.20
+Nodes (10): Callback example, File descriptors, File system, File system flags, Notes, Ordering of callback and promise-based operations, Promise example, Provenance (+2 more)
+
+### Community 241 - "Community 241"
+Cohesion: 0.20
+Nodes (10): Class: `fs.Dirent`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isDirectory()`, `dirent.isFIFO()`, `dirent.isFile()`, `dirent.isSocket()`, `dirent.isSymbolicLink()` (+2 more)
+
+### Community 242 - "Community 242"
+Cohesion: 0.20
+Nodes (10): Class: `fs.Dirent`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isDirectory()`, `dirent.isFIFO()`, `dirent.isFile()`, `dirent.isSocket()`, `dirent.isSymbolicLink()` (+2 more)
+
+### Community 243 - "Community 243"
+Cohesion: 0.33
+Nodes (6): PageMapEntry, dedupe(), extractNextRscData(), NextRscData, FIXTURES, unescapeFlight()
+
+### Community 244 - "Community 244"
+Cohesion: 0.22
+Nodes (8): Compressed, Detailed, File modes, File modes, `fs.chmod(path, mode, callback)`, `fs.chmod(path, mode, callback)`, Provenance, Summary
+
+### Community 245 - "Community 245"
+Cohesion: 0.22
+Nodes (8): Compressed, Detailed, `fs.writeFile(file, data[, options], callback)`, `fs.writeFile(file, data[, options], callback)`, Provenance, Summary, Using `fs.writeFile()` with file descriptors, Using `fs.writeFile()` with file descriptors
+
+### Community 246 - "Community 246"
+Cohesion: 0.22
+Nodes (8): Applications and systems for summarization, Applications and systems for summarization, Compressed, Detailed, Provenance, Summary, Supervised learning approaches, Supervised learning approaches
+
+### Community 247 - "Community 247"
+Cohesion: 0.22
+Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`, `statfs.bsize`, `statfs.ffree`, `statfs.files`, `statfs.frsize` (+1 more)
+
+### Community 248 - "Community 248"
+Cohesion: 0.22
+Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`, `statfs.bsize`, `statfs.ffree`, `statfs.files`, `statfs.frsize` (+1 more)
+
+### Community 249 - "Community 249"
+Cohesion: 0.25
+Nodes (7): Callback example, Compressed, Detailed, File system, Promise example, Summary, Synchronous example
+
+### Community 250 - "Community 250"
+Cohesion: 0.25
+Nodes (8): Class: `fs.WriteStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `writeStream.bytesWritten`, `writeStream.close([callback])`, `writeStream.path`, `writeStream.pending`
+
+### Community 251 - "Community 251"
+Cohesion: 0.25
+Nodes (8): Class: `fs.WriteStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `writeStream.bytesWritten`, `writeStream.close([callback])`, `writeStream.path`, `writeStream.pending`
+
+### Community 252 - "Community 252"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.readlink(path[, options])`, `fsPromises.readlink(path[, options])`, Provenance, Summary
+
+### Community 253 - "Community 253"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.constants`, `fsPromises.constants`, Provenance, Summary
+
+### Community 254 - "Community 254"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.lstat(path[, options])`, `fsPromises.lstat(path[, options])`, Provenance, Summary
+
+### Community 255 - "Community 255"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.truncate(path[, len], callback)`, `fs.truncate(path[, len], callback)`, Provenance, Summary
+
+### Community 256 - "Community 256"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.utimes(path, atime, mtime)`, `fsPromises.utimes(path, atime, mtime)`, Provenance, Summary
+
+### Community 257 - "Community 257"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.exists(path, callback)`, `fs.exists(path, callback)`, Provenance, Summary
+
 ### Community 258 - "Community 258"
 Cohesion: 0.29
 Nodes (6): Custom Properties Example, Custom Properties Value Types, DATA API, Document Types Supporting Custom Properties, OCAPI Custom Properties, SHOP API
@@ -1146,6 +1569,14 @@ Nodes (6): Custom Properties Example, Custom Properties Value Types, DATA API, D
 ### Community 259 - "Community 259"
 Cohesion: 0.29
 Nodes (6): Custom Properties Example, Custom Properties Value Types, DATA API, Document Types Supporting Custom Properties, OCAPI Custom Properties, SHOP API
+
+### Community 260 - "Community 260"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lutimes(path, atime, mtime, callback)`, `fs.lutimes(path, atime, mtime, callback)`, Provenance, Summary
+
+### Community 261 - "Community 261"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.statfsSync(path[, options])`, `fs.statfsSync(path[, options])`, Provenance, Summary
 
 ### Community 262 - "Community 262"
 Cohesion: 0.33
@@ -1158,6 +1589,10 @@ Nodes (5): Export a Site, Import a Site, Required Editions, Required Editions, U
 ### Community 264 - "Community 264"
 Cohesion: 0.29
 Nodes (6): Coverage, Layout, Regression suite, The "semi requirement", Usage, Workflow when output changes
+
+### Community 265 - "Community 265"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.realpath(path[, options])`, `fsPromises.realpath(path[, options])`, Provenance, Summary
 
 ### Community 266 - "Community 266"
 Cohesion: 0.40
@@ -1191,6 +1626,14 @@ Nodes (4): Api Key, Basic Authentication, OAuth 2.0, Settings
 Cohesion: 0.40
 Nodes (4): Api Key, Basic Authentication, OAuth 2.0, Settings
 
+### Community 274 - "Community 274"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fchmodSync(fd, mode)`, `fs.fchmodSync(fd, mode)`, Provenance, Summary
+
+### Community 275 - "Community 275"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Promise example, Promise example, Provenance, Summary
+
 ### Community 276 - "Community 276"
 Cohesion: 0.50
 Nodes (3): Create a Guided Shopping Agent for a B2B Store, Required Editions, See Also
@@ -1199,9 +1642,33 @@ Nodes (3): Create a Guided Shopping Agent for a B2B Store, Required Editions, Se
 Cohesion: 0.50
 Nodes (3): Create a Guided Shopping Agent for a B2B Store, Required Editions, See Also
 
+### Community 278 - "Community 278"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readdirSync(path[, options])`, `fs.readdirSync(path[, options])`, Provenance, Summary
+
+### Community 279 - "Community 279"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.mkdtempSync(prefix[, options])`, `fs.mkdtempSync(prefix[, options])`, Provenance, Summary
+
+### Community 290 - "Community 290"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.rmdir(path[, options], callback)`, `fs.rmdir(path[, options], callback)`, Provenance, Summary
+
 ### Community 291 - "Community 291"
 Cohesion: 0.04
 Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
+
+### Community 302 - "Community 302"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.truncateSync(path[, len])`, `fs.truncateSync(path[, len])`, Provenance, Summary
+
+### Community 303 - "Community 303"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.cp(src, dest[, options])`, `fsPromises.cp(src, dest[, options])`, Provenance, Summary
+
+### Community 304 - "Community 304"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.watch(filename[, options])`, `fsPromises.watch(filename[, options])`, Provenance, Summary
 
 ### Community 305 - "Community 305"
 Cohesion: 0.04
@@ -1288,8 +1755,8 @@ Cohesion: 0.07
 Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
 
 ### Community 326 - "Community 326"
-Cohesion: 0.09
-Nodes (31): DocsEngine, DocsFramework, Evidence, MachineReadableType, PageMapEntry, SearchCapability, SourceHint, DetectContext (+23 more)
+Cohesion: 0.11
+Nodes (27): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SourceHint, DetectContext (+19 more)
 
 ### Community 327 - "Community 327"
 Cohesion: 0.09
@@ -1309,7 +1776,7 @@ Nodes (21): server.allowedHosts, server.cors, server.forwardConsole, server.fs.a
 
 ### Community 331 - "Community 331"
 Cohesion: 0.10
-Nodes (32): SearchProvider, detectDocsEngine(), getMetaGenerator(), AlgoliaConfig, algoliaQueryUrl(), extractAlgoliaConfig(), parseAlgoliaResponse(), getText() (+24 more)
+Nodes (30): SearchProvider, AlgoliaConfig, algoliaQueryUrl(), extractAlgoliaConfig(), parseAlgoliaResponse(), getText(), RemoteSearchDeps, RemoteSearchOutcome (+22 more)
 
 ### Community 332 - "Community 332"
 Cohesion: 0.17
@@ -1331,9 +1798,13 @@ Nodes (18): Advanced Example, Basic Example, Chained Promises, Constructor, Desc
 Cohesion: 0.11
 Nodes (18): Path, `path.basename(path[, suffix])`, `path.delimiter`, `path.dirname(path)`, `path.extname(path)`, `path.format(pathObject)`, `path.isAbsolute(path)`, `path.join([...paths])` (+10 more)
 
+### Community 337 - "Community 337"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
+
 ### Community 338 - "Community 338"
-Cohesion: 0.18
-Nodes (21): CacheStatus, describeCacheStatus(), FreshnessStatus, resolveFreshness(), StatusAction, StatusResult, checkMaxAgeExpired(), evaluateFreshness() (+13 more)
+Cohesion: 0.09
+Nodes (31): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, handleStaleRevalidationResult(), resolveFreshness(), Fixture, fixtures, checkMaxAgeExpired() (+23 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -1420,8 +1891,8 @@ Cohesion: 0.20
 Nodes (9): Creating a dynamic segment, Creating a layout, Creating a nested route, Creating a page, Linking between pages, Nesting layouts, Rendering with search params, Route Props Helpers (+1 more)
 
 ### Community 360 - "Community 360"
-Cohesion: 0.20
-Nodes (9): Callback example, File descriptors, File system, File system flags, Notes, Ordering of callback and promise-based operations, Promise example, Synchronous example (+1 more)
+Cohesion: 0.12
+Nodes (15): Buffer paths, Callback example, File descriptors, File paths, File system, File system flags, File URL paths, Notes (+7 more)
 
 ### Community 361 - "Community 361"
 Cohesion: 0.20
@@ -1436,8 +1907,8 @@ Cohesion: 0.20
 Nodes (9): Creating a dynamic segment, Creating a layout, Creating a nested route, Creating a page, Linking between pages, Nesting layouts, Rendering with search params, Route Props Helpers (+1 more)
 
 ### Community 364 - "Community 364"
-Cohesion: 0.20
-Nodes (9): Callback example, File descriptors, File system, File system flags, Notes, Ordering of callback and promise-based operations, Promise example, Synchronous example (+1 more)
+Cohesion: 0.12
+Nodes (15): Buffer paths, Callback example, File descriptors, File paths, File system, File system flags, File URL paths, Notes (+7 more)
 
 ### Community 365 - "Community 365"
 Cohesion: 0.20
@@ -1454,6 +1925,14 @@ Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`,
 ### Community 368 - "Community 368"
 Cohesion: 0.22
 Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`, `statfs.bsize`, `statfs.ffree`, `statfs.files`, `statfs.frsize` (+1 more)
+
+### Community 369 - "Community 369"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.link(existingPath, newPath)`, `fsPromises.link(existingPath, newPath)`, Provenance, Summary
+
+### Community 370 - "Community 370"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Notes, Notes, Provenance, Summary
 
 ### Community 371 - "Community 371"
 Cohesion: 0.25
@@ -1515,6 +1994,10 @@ Nodes (7): Class: `fs.ReadStream`, Event: `'close'`, Event: `'open'`, Event: `'r
 Cohesion: 0.29
 Nodes (7): File access constants, File copy constants, File mode constants, File open constants, File type constants, `fs.constants`, FS constants
 
+### Community 386 - "Community 386"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.unwatchFile(filename[, listener])`, `fs.unwatchFile(filename[, listener])`, Provenance, Summary
+
 ### Community 387 - "Community 387"
 Cohesion: 0.33
 Nodes (5): Before you begin, Deploy your documentation site, Make your first change, Next steps, View your deployed site
@@ -1524,8 +2007,8 @@ Cohesion: 0.33
 Nodes (5): Getting started, Installation, with docker, with git, with pip <small>recommended</small> { #with-pip data-toc-label="with pip" }
 
 ### Community 389 - "Community 389"
-Cohesion: 0.33
-Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.rm(path[, options], callback)`, `fs.rm(path[, options], callback)`, Provenance, Summary
 
 ### Community 390 - "Community 390"
 Cohesion: 0.33
@@ -1544,8 +2027,8 @@ Cohesion: 0.33
 Nodes (5): Getting started, Installation, with docker, with git, with pip <small>recommended</small> { #with-pip data-toc-label="with pip" }
 
 ### Community 394 - "Community 394"
-Cohesion: 0.33
-Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.linkSync(existingPath, newPath)`, `fs.linkSync(existingPath, newPath)`, Provenance, Summary
 
 ### Community 395 - "Community 395"
 Cohesion: 0.33
@@ -1579,22 +2062,578 @@ Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performan
 Cohesion: 0.67
 Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
 
+### Community 407 - "Community 407"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.createReadStream(path[, options])`, `fs.createReadStream(path[, options])`, Provenance, Summary
+
+### Community 422 - "Community 422"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readlink(path[, options], callback)`, `fs.readlink(path[, options], callback)`, Provenance, Summary
+
+### Community 423 - "Community 423"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lstat(path[, options], callback)`, `fs.lstat(path[, options], callback)`, Provenance, Summary
+
+### Community 424 - "Community 424"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.realpathSync.native(path[, options])`, `fs.realpathSync.native(path[, options])`, Provenance, Summary
+
+### Community 425 - "Community 425"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lutimesSync(path, atime, mtime)`, `fs.lutimesSync(path, atime, mtime)`, Provenance, Summary
+
+### Community 426 - "Community 426"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lchown(path, uid, gid, callback)`, `fs.lchown(path, uid, gid, callback)`, Provenance, Summary
+
+### Community 427 - "Community 427"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.utimesSync(path, atime, mtime)`, `fs.utimesSync(path, atime, mtime)`, Provenance, Summary
+
+### Community 428 - "Community 428"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.appendFile(path, data[, options])`, `fsPromises.appendFile(path, data[, options])`, Provenance, Summary
+
+### Community 429 - "Community 429"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.writeFileSync(file, data[, options])`, `fs.writeFileSync(file, data[, options])`, Provenance, Summary
+
+### Community 430 - "Community 430"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fsyncSync(fd)`, `fs.fsyncSync(fd)`, Provenance, Summary
+
+### Community 431 - "Community 431"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.realpath(path[, options], callback)`, `fs.realpath(path[, options], callback)`, Provenance, Summary
+
+### Community 432 - "Community 432"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.read(fd[, options], callback)`, `fs.read(fd[, options], callback)`, Provenance, Summary
+
+### Community 433 - "Community 433"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.utimes(path, atime, mtime, callback)`, `fs.utimes(path, atime, mtime, callback)`, Provenance, Summary
+
+### Community 434 - "Community 434"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.chown(path, uid, gid)`, `fsPromises.chown(path, uid, gid)`, Provenance, Summary
+
+### Community 435 - "Community 435"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.stat(path[, options], callback)`, `fs.stat(path[, options], callback)`, Provenance, Summary
+
+### Community 436 - "Community 436"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readSync(fd, buffer[, options])`, `fs.readSync(fd, buffer[, options])`, Provenance, Summary
+
+### Community 437 - "Community 437"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.lchmod(path, mode)`, `fsPromises.lchmod(path, mode)`, Provenance, Summary
+
+### Community 438 - "Community 438"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, File descriptors, File descriptors, Provenance, Summary
+
+### Community 439 - "Community 439"
+Cohesion: 0.29
+Nodes (6): Commercial products, Commercial products, Compressed, Detailed, Provenance, Summary
+
+### Community 440 - "Community 440"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.mkdirSync(path[, options])`, `fs.mkdirSync(path[, options])`, Provenance, Summary
+
+### Community 441 - "Community 441"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fdatasync(fd, callback)`, `fs.fdatasync(fd, callback)`, Provenance, Summary
+
+### Community 442 - "Community 442"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.writev(fd, buffers[, position], callback)`, `fs.writev(fd, buffers[, position], callback)`, Provenance, Summary
+
+### Community 443 - "Community 443"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readFileSync(path[, options])`, `fs.readFileSync(path[, options])`, Provenance, Summary
+
+### Community 444 - "Community 444"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.read(fd, buffer, offset, length, position, callback)`, `fs.read(fd, buffer, offset, length, position, callback)`, Provenance, Summary
+
+### Community 445 - "Community 445"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.rmSync(path[, options])`, `fs.rmSync(path[, options])`, Provenance, Summary
+
+### Community 446 - "Community 446"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Submodular functions as generic tools for summarization, Submodular functions as generic tools for summarization, Summary
+
+### Community 447 - "Community 447"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.statfs(path[, options])`, `fsPromises.statfs(path[, options])`, Provenance, Summary
+
+### Community 448 - "Community 448"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.renameSync(oldPath, newPath)`, `fs.renameSync(oldPath, newPath)`, Provenance, Summary
+
+### Community 449 - "Community 449"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.write(fd, buffer, offset[, length[, position]], callback)`, `fs.write(fd, buffer, offset[, length[, position]], callback)`, Provenance, Summary
+
+### Community 450 - "Community 450"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Ordering of callback and promise-based operations, Ordering of callback and promise-based operations, Provenance, Summary
+
+### Community 451 - "Community 451"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lchownSync(path, uid, gid)`, `fs.lchownSync(path, uid, gid)`, Provenance, Summary
+
+### Community 452 - "Community 452"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.writeSync(fd, buffer[, options])`, `fs.writeSync(fd, buffer[, options])`, Provenance, Summary
+
+### Community 453 - "Community 453"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.chmod(path, mode)`, `fsPromises.chmod(path, mode)`, Provenance, Summary
+
+### Community 454 - "Community 454"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fchownSync(fd, uid, gid)`, `fs.fchownSync(fd, uid, gid)`, Provenance, Summary
+
+### Community 455 - "Community 455"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.symlinkSync(target, path[, type])`, `fs.symlinkSync(target, path[, type])`, Provenance, Summary
+
+### Community 456 - "Community 456"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.write(fd, string[, position[, encoding]], callback)`, `fs.write(fd, string[, position[, encoding]], callback)`, Provenance, Summary
+
+### Community 457 - "Community 457"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readlinkSync(path[, options])`, `fs.readlinkSync(path[, options])`, Provenance, Summary
+
+### Community 458 - "Community 458"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.copyFileSync(src, dest[, mode])`, `fs.copyFileSync(src, dest[, mode])`, Provenance, Summary
+
+### Community 459 - "Community 459"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lchmod(path, mode, callback)`, `fs.lchmod(path, mode, callback)`, Provenance, Summary
+
+### Community 460 - "Community 460"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.mkdir(path[, options], callback)`, `fs.mkdir(path[, options], callback)`, Provenance, Summary
+
+### Community 461 - "Community 461"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readdir(path[, options], callback)`, `fs.readdir(path[, options], callback)`, Provenance, Summary
+
+### Community 462 - "Community 462"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.glob(pattern[, options])`, `fsPromises.glob(pattern[, options])`, Provenance, Summary
+
+### Community 463 - "Community 463"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.futimesSync(fd, atime, mtime)`, `fs.futimesSync(fd, atime, mtime)`, Provenance, Summary
+
+### Community 464 - "Community 464"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fstatSync(fd[, options])`, `fs.fstatSync(fd[, options])`, Provenance, Summary
+
+### Community 465 - "Community 465"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.copyFile(src, dest[, mode])`, `fsPromises.copyFile(src, dest[, mode])`, Provenance, Summary
+
+### Community 466 - "Community 466"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.readdir(path[, options])`, `fsPromises.readdir(path[, options])`, Provenance, Summary
+
+### Community 467 - "Community 467"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Inter-textual versus intra-textual, Inter-textual versus intra-textual, Provenance, Summary
+
+### Community 468 - "Community 468"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readv(fd, buffers[, position], callback)`, `fs.readv(fd, buffers[, position], callback)`, Provenance, Summary
+
+### Community 469 - "Community 469"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.lutimes(path, atime, mtime)`, `fsPromises.lutimes(path, atime, mtime)`, Provenance, Summary
+
+### Community 470 - "Community 470"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.truncate(path[, len])`, `fsPromises.truncate(path[, len])`, Provenance, Summary
+
+### Community 471 - "Community 471"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.opendirSync(path[, options])`, `fs.opendirSync(path[, options])`, Provenance, Summary
+
+### Community 472 - "Community 472"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.rm(path[, options])`, `fsPromises.rm(path[, options])`, Provenance, Summary
+
+### Community 473 - "Community 473"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.writeSync(fd, string[, position[, encoding]])`, `fs.writeSync(fd, string[, position[, encoding]])`, Provenance, Summary
+
+### Community 474 - "Community 474"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.globSync(pattern[, options])`, `fs.globSync(pattern[, options])`, Provenance, Summary
+
+### Community 475 - "Community 475"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.open(path[, flags[, mode]], callback)`, `fs.open(path[, flags[, mode]], callback)`, Provenance, Summary
+
+### Community 476 - "Community 476"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.accessSync(path[, mode])`, `fs.accessSync(path[, mode])`, Provenance, Summary
+
+### Community 477 - "Community 477"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.appendFile(path, data[, options], callback)`, `fs.appendFile(path, data[, options], callback)`, Provenance, Summary
+
+### Community 478 - "Community 478"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.writeSync(fd, buffer, offset[, length[, position]])`, `fs.writeSync(fd, buffer, offset[, length[, position]])`, Provenance, Summary
+
+### Community 479 - "Community 479"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.mkdtempDisposableSync(prefix[, options])`, `fs.mkdtempDisposableSync(prefix[, options])`, Provenance, Summary
+
+### Community 480 - "Community 480"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.futimes(fd, atime, mtime, callback)`, `fs.futimes(fd, atime, mtime, callback)`, Provenance, Summary
+
+### Community 481 - "Community 481"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.ftruncate(fd[, len], callback)`, `fs.ftruncate(fd[, len], callback)`, Provenance, Summary
+
+### Community 482 - "Community 482"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.close(fd[, callback])`, `fs.close(fd[, callback])`, Provenance, Summary
+
+### Community 483 - "Community 483"
+Cohesion: 0.29
+Nodes (6): Abstractive-based summarization, Abstractive-based summarization, Compressed, Detailed, Provenance, Summary
+
+### Community 484 - "Community 484"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.rmdir(path[, options])`, `fsPromises.rmdir(path[, options])`, Provenance, Summary
+
+### Community 485 - "Community 485"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.realpath.native(path[, options], callback)`, `fs.realpath.native(path[, options], callback)`, Provenance, Summary
+
+### Community 486 - "Community 486"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readSync(fd, buffer, offset, length[, position])`, `fs.readSync(fd, buffer, offset, length[, position])`, Provenance, Summary
+
+### Community 487 - "Community 487"
+Cohesion: 0.29
+Nodes (6): Callback example, Callback example, Compressed, Detailed, Provenance, Summary
+
+### Community 488 - "Community 488"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.rename(oldPath, newPath, callback)`, `fs.rename(oldPath, newPath, callback)`, Provenance, Summary
+
+### Community 489 - "Community 489"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.opendir(path[, options])`, `fsPromises.opendir(path[, options])`, Provenance, Summary
+
+### Community 490 - "Community 490"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.openAsBlob(path[, options])`, `fs.openAsBlob(path[, options])`, Provenance, Summary
+
+### Community 491 - "Community 491"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fchown(fd, uid, gid, callback)`, `fs.fchown(fd, uid, gid, callback)`, Provenance, Summary
+
+### Community 492 - "Community 492"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.chmodSync(path, mode)`, `fs.chmodSync(path, mode)`, Provenance, Summary
+
+### Community 493 - "Community 493"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.unlink(path, callback)`, `fs.unlink(path, callback)`, Provenance, Summary
+
+### Community 494 - "Community 494"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.chownSync(path, uid, gid)`, `fs.chownSync(path, uid, gid)`, Provenance, Summary
+
+### Community 495 - "Community 495"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.watchFile(filename[, options], listener)`, `fs.watchFile(filename[, options], listener)`, Provenance, Summary
+
+### Community 496 - "Community 496"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.realpathSync(path[, options])`, `fs.realpathSync(path[, options])`, Provenance, Summary
+
+### Community 497 - "Community 497"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.access(path[, mode], callback)`, `fs.access(path[, mode], callback)`, Provenance, Summary
+
+### Community 498 - "Community 498"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Domain-specific versus domain-independent summarization, Domain-specific versus domain-independent summarization, Provenance, Summary
+
+### Community 499 - "Community 499"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Threadpool usage, Threadpool usage
+
+### Community 500 - "Community 500"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fchmod(fd, mode, callback)`, `fs.fchmod(fd, mode, callback)`, Provenance, Summary
+
+### Community 501 - "Community 501"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.statSync(path[, options])`, `fs.statSync(path[, options])`, Provenance, Summary
+
+### Community 502 - "Community 502"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.rmdirSync(path[, options])`, `fs.rmdirSync(path[, options])`, Provenance, Summary
+
+### Community 503 - "Community 503"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Promises API, Promises API, Provenance, Summary
+
+### Community 504 - "Community 504"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.opendir(path[, options], callback)`, `fs.opendir(path[, options], callback)`, Provenance, Summary
+
+### Community 505 - "Community 505"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, File system flags, File system flags, Provenance, Summary
+
+### Community 506 - "Community 506"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.copyFile(src, dest[, mode], callback)`, `fs.copyFile(src, dest[, mode], callback)`, Provenance, Summary
+
+### Community 507 - "Community 507"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.mkdtemp(prefix[, options])`, `fsPromises.mkdtemp(prefix[, options])`, Provenance, Summary
+
+### Community 508 - "Community 508"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.cp(src, dest[, options], callback)`, `fs.cp(src, dest[, options], callback)`, Provenance, Summary
+
+### Community 509 - "Community 509"
+Cohesion: 0.29
+Nodes (6): Aided summarization, Aided summarization, Compressed, Detailed, Provenance, Summary
+
+### Community 510 - "Community 510"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fdatasyncSync(fd)`, `fs.fdatasyncSync(fd)`, Provenance, Summary
+
+### Community 511 - "Community 511"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.readFile(path[, options])`, `fsPromises.readFile(path[, options])`, Provenance, Summary
+
+### Community 512 - "Community 512"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.appendFileSync(path, data[, options])`, `fs.appendFileSync(path, data[, options])`, Provenance, Summary
+
+### Community 513 - "Community 513"
+Cohesion: 0.29
+Nodes (6): Callback API, Callback API, Compressed, Detailed, Provenance, Summary
+
+### Community 514 - "Community 514"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.statfs(path[, options], callback)`, `fs.statfs(path[, options], callback)`, Provenance, Summary
+
+### Community 515 - "Community 515"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Synchronous example, Synchronous example
+
+### Community 516 - "Community 516"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fsync(fd, callback)`, `fs.fsync(fd, callback)`, Provenance, Summary
+
+### Community 517 - "Community 517"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.fstat(fd[, options], callback)`, `fs.fstat(fd[, options], callback)`, Provenance, Summary
+
+### Community 518 - "Community 518"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.closeSync(fd)`, `fs.closeSync(fd)`, Provenance, Summary
+
+### Community 519 - "Community 519"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.mkdir(path[, options])`, `fsPromises.mkdir(path[, options])`, Provenance, Summary
+
+### Community 520 - "Community 520"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.createWriteStream(path[, options])`, `fs.createWriteStream(path[, options])`, Provenance, Summary
+
+### Community 521 - "Community 521"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.symlink(target, path[, type])`, `fsPromises.symlink(target, path[, type])`, Provenance, Summary
+
+### Community 522 - "Community 522"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.mkdtemp(prefix[, options], callback)`, `fs.mkdtemp(prefix[, options], callback)`, Provenance, Summary
+
+### Community 523 - "Community 523"
+Cohesion: 0.29
+Nodes (6): Common Objects, Common Objects, Compressed, Detailed, Provenance, Summary
+
+### Community 524 - "Community 524"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.existsSync(path)`, `fs.existsSync(path)`, Provenance, Summary
+
+### Community 525 - "Community 525"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.unlinkSync(path)`, `fs.unlinkSync(path)`, Provenance, Summary
+
+### Community 526 - "Community 526"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.write(fd, buffer[, options], callback)`, `fs.write(fd, buffer[, options], callback)`, Provenance, Summary
+
+### Community 527 - "Community 527"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.open(path, flags[, mode])`, `fsPromises.open(path, flags[, mode])`, Provenance, Summary
+
+### Community 528 - "Community 528"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lstatSync(path[, options])`, `fs.lstatSync(path[, options])`, Provenance, Summary
+
+### Community 529 - "Community 529"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.mkdtempDisposable(prefix[, options])`, `fsPromises.mkdtempDisposable(prefix[, options])`, Provenance, Summary
+
+### Community 530 - "Community 530"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.symlink(target, path[, type], callback)`, `fs.symlink(target, path[, type], callback)`, Provenance, Summary
+
+### Community 531 - "Community 531"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.access(path[, mode])`, `fsPromises.access(path[, mode])`, Provenance, Summary
+
+### Community 532 - "Community 532"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.openSync(path[, flags[, mode]])`, `fs.openSync(path[, flags[, mode]])`, Provenance, Summary
+
+### Community 533 - "Community 533"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.read(fd, buffer[, options], callback)`, `fs.read(fd, buffer[, options], callback)`, Provenance, Summary
+
+### Community 534 - "Community 534"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.writeFile(file, data[, options])`, `fsPromises.writeFile(file, data[, options])`, Provenance, Summary
+
+### Community 535 - "Community 535"
+Cohesion: 0.29
+Nodes (7): Class: `fs.ReadStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `readStream.bytesRead`, `readStream.path`, `readStream.pending`
+
+### Community 536 - "Community 536"
+Cohesion: 0.29
+Nodes (7): Class: `fs.ReadStream`, Event: `'close'`, Event: `'open'`, Event: `'ready'`, `readStream.bytesRead`, `readStream.path`, `readStream.pending`
+
+### Community 537 - "Community 537"
+Cohesion: 0.29
+Nodes (7): File access constants, File copy constants, File mode constants, File open constants, File type constants, `fs.constants`, FS constants
+
+### Community 538 - "Community 538"
+Cohesion: 0.29
+Nodes (7): File access constants, File copy constants, File mode constants, File open constants, File type constants, `fs.constants`, FS constants
+
+### Community 539 - "Community 539"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.rename(oldPath, newPath)`, `fsPromises.rename(oldPath, newPath)`, Provenance, Summary
+
+### Community 540 - "Community 540"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.lchmodSync(path, mode)`, `fs.lchmodSync(path, mode)`, Provenance, Summary
+
+### Community 541 - "Community 541"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.writevSync(fd, buffers[, position])`, `fs.writevSync(fd, buffers[, position])`, Provenance, Summary
+
+### Community 542 - "Community 542"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Synchronous API, Synchronous API
+
+### Community 543 - "Community 543"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Intrinsic versus extrinsic, Intrinsic versus extrinsic, Provenance, Summary
+
+### Community 544 - "Community 544"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.readvSync(fd, buffers[, position])`, `fs.readvSync(fd, buffers[, position])`, Provenance, Summary
+
+### Community 545 - "Community 545"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.link(existingPath, newPath, callback)`, `fs.link(existingPath, newPath, callback)`, Provenance, Summary
+
+### Community 546 - "Community 546"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.glob(pattern[, options], callback)`, `fs.glob(pattern[, options], callback)`, Provenance, Summary
+
+### Community 547 - "Community 547"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.lchown(path, uid, gid)`, `fsPromises.lchown(path, uid, gid)`, Provenance, Summary
+
+### Community 548 - "Community 548"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.unlink(path)`, `fsPromises.unlink(path)`, Provenance, Summary
+
+### Community 549 - "Community 549"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.ftruncateSync(fd[, len])`, `fs.ftruncateSync(fd[, len])`, Provenance, Summary
+
+### Community 550 - "Community 550"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fs.chown(path, uid, gid, callback)`, `fs.chown(path, uid, gid, callback)`, Provenance, Summary
+
+### Community 551 - "Community 551"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, `fsPromises.stat(path[, options])`, `fsPromises.stat(path[, options])`, Provenance, Summary
+
+### Community 552 - "Community 552"
+Cohesion: 0.33
+Nodes (6): Buffer paths, File paths, File URL paths, Per-drive working directories on Windows, Platform-specific considerations, String paths
+
+### Community 553 - "Community 553"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 554 - "Community 554"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 555 - "Community 555"
+Cohesion: 0.40
+Nodes (5): Availability, Caveats, Filename argument, `fs.watch(filename[, options][, listener])`, Inodes
+
+### Community 556 - "Community 556"
+Cohesion: 0.40
+Nodes (5): Availability, Caveats, Filename argument, `fs.watch(filename[, options][, listener])`, Inodes
+
+### Community 557 - "Community 557"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 558 - "Community 558"
+Cohesion: 0.67
+Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
+
+### Community 559 - "Community 559"
+Cohesion: 0.67
+Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
+
 ## Knowledge Gaps
-- **2681 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+2676 more)
+- **4287 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `name`, `version` (+4282 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **44 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **48 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `File system` connect `Community 360` to `Community 177`, `Community 354`, `Community 291`, `Community 308`?**
+- **Why does `File system` connect `Community 240` to `Community 110`, `Community 207`, `Community 239`, `Community 210`, `Community 249`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `File system` connect `Community 364` to `Community 305`, `Community 202`, `Community 357`, `Community 310`?**
+- **Why does `Common Objects` connect `Community 239` to `Community 248`, `Community 237`, `Community 240`, `Community 242`, `Community 214`, `Community 536`, `Community 538`, `Community 251`, `Community 220`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `File system` connect `Community 249` to `Community 194`, `Community 235`, `Community 238`, `Community 209`, `Community 61`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `Common Objects` connect `Community 354` to `Community 353`, `Community 324`, `Community 360`, `Community 361`, `Community 367`, `Community 372`, `Community 316`, `Community 381`, `Community 382`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `husky.sh script`, `__dirname`, `rawArgv` to the rest of the system?**
-  _2681 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _4287 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

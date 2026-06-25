@@ -19,6 +19,9 @@ logs/
 .fallow/
 .eslintcache
 
+# Derived search index (rebuilt on demand from cached artifacts)
+**/.search-index.json
+
 # IDEs and editors
 .idea/
 .vscode/

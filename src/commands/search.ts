@@ -1,6 +1,6 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { scanCacheDirs } from '../lib/research/storage.js';
+import { loadSearchableArtifacts } from '../lib/research/search-index.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
 import { detectSite } from '../sites/index.js';
@@ -187,8 +187,9 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     queryTerms: string[],
     currentTime: Date
   ): any[] {
-    return scanCacheDirs(readRoots, (artifact, filePath) => {
-      if (artifact.metadata.status !== 'active') return null;
+    const results: any[] = [];
+    for (const { artifact, filePath } of loadSearchableArtifacts(readRoots)) {
+      if (artifact.metadata.status !== 'active') continue;
       const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
       if (
         !this.matchesFilters(
@@ -200,7 +201,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
           Boolean(this.flags['include-stale'])
         )
       )
-        return null;
+        continue;
       let score = this.calculateScore(
         artifact.metadata,
         artifact.summary,
@@ -208,12 +209,12 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
         queryTerms,
         freshness
       );
-      if (score <= 0) return null;
+      if (score <= 0) continue;
       // Section children are more precise than the whole page, so rank a section hit slightly
       // above its parent for the same query (T-22).
       if (artifact.metadata.artifact_type === 'section') score += 15;
       const snippetText = [artifact.summary, artifact.compressed].filter(Boolean).join('\n');
-      return {
+      results.push({
         cacheKey: artifact.metadata.cache_key,
         path: filePath,
         artifactType: artifact.metadata.artifact_type,
@@ -226,8 +227,9 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
         snippet: this.makeSnippet(snippetText, queryTerms),
         siteModuleId: artifact.metadata.site_module_id,
         score,
-      };
-    });
+      });
+    }
+    return results;
   }
 
   private logSearchResults(finalResults: any[]): void {

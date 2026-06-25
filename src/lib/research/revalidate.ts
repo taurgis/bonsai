@@ -6,6 +6,7 @@ import { extractHtmlContent } from './extract.js';
 import { writeArtifact } from './storage.js';
 import { evaluateFreshness, getPolicy } from './freshness.js';
 import { compressMarkdown } from './compress.js';
+import { applyAutoTags } from './keywords.js';
 import { estimateTokens } from './token-estimate.js';
 import { fetchRenderedHtml } from './browser.js';
 import { looksLikeErrorPage } from './docs/validate.js';
@@ -219,6 +220,9 @@ function persistRefreshedArtifact(
     currentTime
   );
   preserveUserMetadata(meta, refreshed, options.rendered);
+  // Back-fill keyword tags when the carried-over set is empty (e.g. an artifact first cached before
+  // auto-tagging, or one originally stored without tags), so refreshing keeps it searchable.
+  applyAutoTags(refreshed);
   writeArtifact(dataDir, meta.cache_key, refreshed);
   return { status: 'refreshed', artifact: refreshed };
 }

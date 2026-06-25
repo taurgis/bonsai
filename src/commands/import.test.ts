@@ -134,4 +134,31 @@ describe('import command unit tests', () => {
 
     readSpy.mockRestore();
   });
+
+  it('auto-generates tags and records a quality note when no --tags are supplied', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Webhooks\nWebhooks deliver events. Webhooks retry on failure.');
+
+    const result = (await ResearchImport.run(['https://example.com/auto-tag', '--stdin'])) as any;
+
+    expect(result.source.qualityNotes).toContain('auto-generated tags via keyword extraction');
+    readSpy.mockRestore();
+  });
+
+  it('does not auto-tag when explicit --tags are supplied', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Webhooks\nWebhooks deliver events. Webhooks retry on failure.');
+
+    const result = (await ResearchImport.run([
+      'https://example.com/manual-tag',
+      '--stdin',
+      '--tags',
+      'manual',
+    ])) as any;
+
+    expect(result.source.qualityNotes).not.toContain('auto-generated tags via keyword extraction');
+    readSpy.mockRestore();
+  });
 });

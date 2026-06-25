@@ -11,6 +11,7 @@ import { writeArtifactSecurely } from '../lib/research/secure-write.js';
 import type { StorageMode } from '../lib/config/index.js';
 import { getPolicy } from '../lib/research/freshness.js';
 import { compressMarkdown } from '../lib/research/compress.js';
+import { applyAutoTags } from '../lib/research/keywords.js';
 import { estimateTokens } from '../lib/research/token-estimate.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from '../lib/research/schema.js';
 
@@ -283,13 +284,15 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       section_heading_path: null,
     };
 
-    return {
+    // Auto-tag from the content when the caller supplied none, so imported notes stay searchable by
+    // keyword without forcing manual tagging. Explicit --tags always win (handled in applyAutoTags).
+    return applyAutoTags({
       metadata,
       summary: `Synthesized research for ${hasSingle ? singleNormalizedUrl : this.flags.topic}`,
       compressed,
       detailed,
       provenance: `Imported via agent-supplied research at ${currentTime.toISOString()}`,
-    };
+    });
   }
 
   async run(): Promise<unknown> {
@@ -351,7 +354,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         captureMethod: 'agent_supplied',
         extractionStatus: 'agent_supplied',
         extractionConfidence: 'high',
-        qualityNotes: ['agent-supplied research import'],
+        qualityNotes: artifact.metadata.quality_notes,
         fetchedAt: null,
         validatedAt: artifact.metadata.validated_at,
         staleAfter: artifact.metadata.stale_after,
