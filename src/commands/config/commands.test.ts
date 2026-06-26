@@ -1,42 +1,22 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdtempSync, rmSync, existsSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import ConfigGet from './get.js';
 import ConfigSet from './set.js';
 import ConfigList from './list.js';
 import ConfigUnset from './unset.js';
+import { useIsolatedCache } from '../../../tests/helpers/isolated-cache.js';
 
-// Drive the config commands in-process. Each test gets an isolated user-config dir
-// (XDG_CONFIG_HOME) and an isolated project cwd, so commands never touch the developer's real
+// Drive the config commands in-process. useIsolatedCache points XDG_CONFIG_HOME (user config) and
+// the cwd (project config) at per-test temp dirs, so commands never touch the developer's real
 // config. oclif's logJson routes through console.log, captured here for --json envelope assertions.
-let cfg: string;
-let work: string;
-let prevCwd: string;
-let prevXdg: string | undefined;
-let prevExit: number | string | undefined;
-
-beforeEach(() => {
-  cfg = mkdtempSync(join(tmpdir(), 'bonsai-cfg-'));
-  work = mkdtempSync(join(tmpdir(), 'bonsai-cwd-'));
-  prevXdg = process.env.XDG_CONFIG_HOME;
-  process.env.XDG_CONFIG_HOME = cfg;
-  prevCwd = process.cwd();
-  process.chdir(work);
-  prevExit = process.exitCode;
-});
+const iso = useIsolatedCache();
 
 afterEach(() => {
-  process.chdir(prevCwd);
-  if (prevXdg === undefined) delete process.env.XDG_CONFIG_HOME;
-  else process.env.XDG_CONFIG_HOME = prevXdg;
-  process.exitCode = prevExit;
-  rmSync(cfg, { recursive: true, force: true });
-  rmSync(work, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
 
-const projectConfig = () => join(work, '.bonsai.json');
+const projectConfig = () => join(iso.cwd, '.bonsai.json');
 
 async function captureLog(fn: () => Promise<unknown>): Promise<string[]> {
   const lines: string[] = [];

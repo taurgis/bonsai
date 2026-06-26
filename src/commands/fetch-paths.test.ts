@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mkdtempSync, rmSync, existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 // Mock the network/browser/IO boundary so the command never touches the wire. The clean seam is
 // capturePage (the cache-MISS fetch path), fetchRenderedHtml / fetchStaticHtml / fetchText (the
@@ -140,45 +141,20 @@ async function captureEnvelope(
 }
 
 describe('fetch command branch coverage', () => {
-  let dataHome: string;
-  let configHome: string;
-  let workCwd: string;
-  let prevCwd: string;
-  let prevExitCode: typeof process.exitCode;
-  const prevEnv = {
-    XDG_DATA_HOME: process.env.XDG_DATA_HOME,
-    XDG_CONFIG_HOME: process.env.XDG_CONFIG_HOME,
-  };
+  // Isolates XDG dirs + cwd per test so the cache lands in throwaway space, never the repo.
+  const iso = useIsolatedCache();
 
   beforeEach(() => {
-    dataHome = mkdtempSync(join(tmpdir(), 'fnr-data-'));
-    configHome = mkdtempSync(join(tmpdir(), 'fnr-config-'));
-    workCwd = mkdtempSync(join(tmpdir(), 'fnr-cwd-'));
-    // oclif's Config reads XDG_* at load time to derive dataDir/configDir; point them at temp dirs
-    // so the global cache and config live in isolated throwaway space, never the user's home.
-    process.env.XDG_DATA_HOME = dataHome;
-    process.env.XDG_CONFIG_HOME = configHome;
-    prevCwd = process.cwd();
-    process.chdir(workCwd);
-    prevExitCode = process.exitCode;
-
     // Default: no custom site module. Individual tests override detectSite when needed.
     mocks.detectSite.mockReturnValue(undefined);
     mocks.getSiteModuleById.mockReturnValue(undefined);
   });
 
   afterEach(() => {
-    process.chdir(prevCwd);
-    process.exitCode = prevExitCode;
-    for (const [key, val] of Object.entries(prevEnv)) {
-      if (val === undefined) delete process.env[key];
-      else process.env[key] = val;
-    }
+    // Vitest 4: restoreAllMocks only resets vi.spyOn spies, so factory mocks (vi.hoisted) need an
+    // explicit resetAllMocks too.
     vi.resetAllMocks();
     vi.restoreAllMocks();
-    rmSync(dataHome, { recursive: true, force: true });
-    rmSync(configHome, { recursive: true, force: true });
-    rmSync(workCwd, { recursive: true, force: true });
   });
 
   // The oclif global data dir the command will use. Under vitest Config.load resolves from oclif's
@@ -335,7 +311,7 @@ describe('fetch command branch coverage', () => {
 
     expect(result.cache.storage).toBe('project');
     expect(result.cache.redirectedToGlobal).toBe(false);
-    const projectDir = join(workCwd, '.bonsai');
+    const projectDir = join(iso.cwd, '.bonsai');
     expect(existsSync(getArtifactPath(projectDir, result.cache.key))).toBe(true);
   });
 
@@ -349,7 +325,7 @@ describe('fetch command branch coverage', () => {
     expect(result.cache.redirectedToGlobal).toBe(true);
     // Stored in global, not the project dir.
     expect(existsSync(getArtifactPath(await globalDataDir(), result.cache.key))).toBe(true);
-    expect(existsSync(getArtifactPath(join(workCwd, '.bonsai'), result.cache.key))).toBe(false);
+    expect(existsSync(getArtifactPath(join(iso.cwd, '.bonsai'), result.cache.key))).toBe(false);
   });
 
   it('--format detailed: returns the detailed body and detailed token estimate', async () => {
