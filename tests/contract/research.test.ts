@@ -92,6 +92,39 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stdout).toContain('$ bonsai https://');
   });
 
+  it('multi-source stdin import succeeds (stdin is not swallowed into the url arg)', () => {
+    // Regression: oclif fills an omitted optional positional from piped stdin, which made
+    // `import --stdin --source-url ...` wrongly report a positional/--source-url conflict. The
+    // url arg sets ignoreStdin to prevent that. Writes to a project cache in the scratch cwd.
+    const result = runContract(
+      [
+        'import',
+        '--stdin',
+        '--topic',
+        'React docs',
+        '--source-url',
+        'https://react.dev/a',
+        '--source-url',
+        'https://react.dev/b',
+      ],
+      { input: '# Synthesized notes\n\nCombined research.\n', env: { BONSAI_STORAGE: 'project' } }
+    );
+    expect(result.stderr).not.toContain('Cannot specify both');
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Successfully imported');
+  });
+
+  it('import with both an explicit url and --source-url still conflicts (exit 2)', () => {
+    // ignoreStdin must not weaken the genuine conflict: an explicit positional token is still
+    // assigned to url, so supplying both it and --source-url is a usage error even with stdin piped.
+    const result = runContract(
+      ['import', 'https://example.com/x', '--source-url', 'https://example.com/y', '--stdin'],
+      { input: '# Notes\n\nContent.\n', env: { BONSAI_STORAGE: 'project' } }
+    );
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Cannot specify both');
+  });
+
   it('URL shorthand with an unknown flag fails cleanly (exit 2, no stack trace)', () => {
     const result = runContract(['https://example.com', '--bogus']);
     expect(result.exitCode).toBe(2);

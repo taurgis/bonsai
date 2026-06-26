@@ -40,6 +40,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   static args = {
     url: Args.string({
       required: false,
+      // oclif fills an omitted optional arg from piped stdin unless ignoreStdin is set. Without
+      // this, the Markdown piped for `--stdin` is swallowed into `url`, making multi-source import
+      // (`import --stdin --source-url ...`) wrongly look like it also got a positional URL.
+      ignoreStdin: true,
       description: 'The single source URL of the page (only for single-source import).',
     }),
   };

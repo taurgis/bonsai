@@ -123,7 +123,10 @@ export function findChromePath(): string {
     }
   } catch {}
 
-  throw new Error('Chrome executable not found. Please set CHROME_PATH environment variable.');
+  throw new Error(
+    'No Chrome or Chromium browser found for browser-based extraction. Install Chrome/Chromium or ' +
+      'set CHROME_PATH to the browser executable. Static (non-rendered) fetching does not require a browser.'
+  );
 }
 
 async function spawnChrome(
