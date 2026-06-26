@@ -144,4 +144,80 @@ describe('search command unit tests', () => {
 
     readSpy.mockRestore();
   });
+
+  it('signals truncation in the human heading when more entries match than --limit', async () => {
+    const fake = Array.from({ length: 3 }, (_, i) => ({
+      cacheKey: `k${i}`,
+      path: `/x/k${i}.md`,
+      artifactType: 'source',
+      sourceUrls: [`https://example.com/${i}`],
+      topic: 'T',
+      tags: [],
+      freshness: 'fresh',
+      captureMethod: 'agent_supplied',
+      tokenEstimate: { compressed: 1, detailed: 1 },
+      snippet: 's',
+      siteModuleId: null,
+      score: 100 - i,
+    }));
+    const scanSpy = vi
+      .spyOn(ResearchSearch.prototype as any, 'scanCacheDirForResults')
+      .mockReturnValue(fake);
+    const logged: string[] = [];
+    const logSpy = vi
+      .spyOn(ResearchSearch.prototype as any, 'log')
+      .mockImplementation((msg: string) => logged.push(msg));
+
+    const truncated = (await ResearchSearch.run(['anything', '--limit', '2'])) as any[];
+    expect(truncated.length).toBe(2);
+    expect(logged[0]).toContain('Found 3');
+    expect(logged[0]).toContain('showing top 2');
+
+    logged.length = 0;
+    const full = (await ResearchSearch.run(['anything', '--limit', '10'])) as any[];
+    expect(full.length).toBe(3);
+    expect(logged[0]).toBe('Found 3 matching cached research entries:\n');
+
+    scanSpy.mockRestore();
+    logSpy.mockRestore();
+  });
+
+  it('warns on stderr (not stdout) when --json results are truncated', async () => {
+    const fake = Array.from({ length: 3 }, (_, i) => ({
+      cacheKey: `k${i}`,
+      path: `/x/k${i}.md`,
+      artifactType: 'source',
+      sourceUrls: [`https://example.com/${i}`],
+      topic: 'T',
+      tags: [],
+      freshness: 'fresh',
+      captureMethod: 'agent_supplied',
+      tokenEstimate: { compressed: 1, detailed: 1 },
+      snippet: 's',
+      siteModuleId: null,
+      score: 100 - i,
+    }));
+    const scanSpy = vi
+      .spyOn(ResearchSearch.prototype as any, 'scanCacheDirForResults')
+      .mockReturnValue(fake);
+    const warned: string[] = [];
+    const warnSpy = vi
+      .spyOn(ResearchSearch.prototype as any, 'warn')
+      .mockImplementation((msg: string) => {
+        warned.push(msg);
+        return msg;
+      });
+
+    await ResearchSearch.run(['anything', '--limit', '2', '--json']);
+    expect(warned.length).toBe(1);
+    expect(warned[0]).toContain('3 entries matched');
+    expect(warned[0]).toContain('max 50');
+
+    warned.length = 0;
+    await ResearchSearch.run(['anything', '--limit', '10', '--json']);
+    expect(warned.length).toBe(0);
+
+    scanSpy.mockRestore();
+    warnSpy.mockRestore();
+  });
 });

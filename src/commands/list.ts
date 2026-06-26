@@ -3,7 +3,10 @@ import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
-import { pluralize } from '../lib/text.js';
+import { resultListHeading, truncationNotice, type ResultListLabels } from '../lib/text.js';
+
+// Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
+const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
 
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static id = 'list';
@@ -113,14 +116,13 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
   }
 
-  private logListResults(finalResults: any[]): void {
+  private logListResults(finalResults: any[], totalMatched: number): void {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No cached research entries found matching filters.');
       return;
     }
-    const noun = pluralize(finalResults.length, 'entry', 'entries');
-    this.log(`Found ${finalResults.length} cached research ${noun}:\n`);
+    this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);
     finalResults.forEach((res, index) => {
       this.log(`${index + 1}. [${res.topic || 'No Topic'}] Key: ${res.cacheKey}`);
       this.log(`   Type: ${res.artifactType} | Freshness: ${res.freshness}`);
@@ -152,7 +154,13 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
     const finalResults = results.slice(0, this.flags.limit);
 
-    this.logListResults(finalResults);
+    // Under --json the human heading is suppressed, so surface truncation on stderr instead (warn
+    // always emits, even in --json) without touching the stdout envelope. Human mode already shows
+    // it in the heading, so only warn under --json.
+    const notice = truncationNotice(results.length, finalResults.length, LIST_LABELS);
+    if (notice && this.jsonEnabled()) this.warn(notice);
+
+    this.logListResults(finalResults, results.length);
 
     return finalResults;
   }
