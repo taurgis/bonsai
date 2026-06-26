@@ -1,7 +1,7 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { loadSearchableArtifacts } from '../lib/research/search-index.js';
-import { pluralize } from '../lib/text.js';
+import { resultListHeading, truncationNotice, type ResultListLabels } from '../lib/text.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
 import { detectSite } from '../sites/index.js';
@@ -10,6 +10,13 @@ import {
   runRemoteDocsSearch,
   type RemoteSearchDeps,
 } from '../lib/research/docs/remote-search-runner.js';
+
+// Results are ranked, so the truncation word is "top"; --limit caps at 50.
+const SEARCH_LABELS: ResultListLabels = {
+  noun: 'matching cached research',
+  order: 'top',
+  maxLimit: 50,
+};
 
 const REMOTE_SEARCH_DEPS: RemoteSearchDeps = {
   fetchStatic: async (url) => {
@@ -239,12 +246,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       this.log('No matching cached research entries found.');
       return;
     }
-    const noun = pluralize(totalMatched, 'entry', 'entries');
-    const truncated = totalMatched > finalResults.length;
-    const heading = truncated
-      ? `Found ${totalMatched} matching cached research ${noun} (showing top ${finalResults.length}; raise --limit to see more):`
-      : `Found ${totalMatched} matching cached research ${noun}:`;
-    this.log(`${heading}\n`);
+    this.log(`${resultListHeading(totalMatched, finalResults.length, SEARCH_LABELS)}\n`);
     finalResults.forEach((res, index) => {
       this.log(`${index + 1}. [${res.topic || 'No Topic'}] Score: ${res.score}`);
       this.log(`   Cache Key: ${res.cacheKey}`);
@@ -322,6 +324,12 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
 
     results.sort((a, b) => b.score - a.score);
     const finalResults = results.slice(0, this.flags.limit);
+
+    // Under --json the human heading is suppressed, so surface truncation on stderr instead (warn
+    // always emits, even in --json) without touching the stdout envelope. Human mode already shows
+    // it in the heading, so only warn under --json.
+    const notice = truncationNotice(results.length, finalResults.length, SEARCH_LABELS);
+    if (notice && this.jsonEnabled()) this.warn(notice);
 
     this.logSearchResults(finalResults, results.length);
 

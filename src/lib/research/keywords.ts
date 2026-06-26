@@ -213,13 +213,41 @@ export function extractKeywords(text: string, max = 5): string[] {
 }
 
 /**
+ * Removes duplicate and blank tags, comparing case-insensitively (search/list filtering already
+ * matches tags case-insensitively, so "node" and "Node" are the same tag) while preserving
+ * first-seen order and the original casing of the kept tag. Whitespace is trimmed.
+ */
+export function dedupeTags(tags: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const tag of tags) {
+    const trimmed = tag.trim();
+    const key = trimmed.toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    result.push(trimmed);
+  }
+  return result;
+}
+
+/**
  * Back-fills keyword tags for an artifact that has none, deriving them from its detailed content and
- * recording a quality note. No-op when tags are already present, so user- or caller-supplied tags
- * always win. Mutates and returns the same artifact. This is the single entry point every ingestion
- * path (import, fetch, revalidation) uses, so the auto-tag policy lives in exactly one place.
+ * recording a quality note. When tags are already present they win, but are still deduped/trimmed so
+ * caller-supplied tags do not persist blank or duplicate entries. Mutates and returns the same
+ * artifact. This is the single entry point every ingestion path (import, fetch, revalidation) uses,
+ * so tag hygiene lives in exactly one place.
  */
 export function applyAutoTags(artifact: ResearchArtifact): ResearchArtifact {
-  if (artifact.metadata.tags.length > 0) return artifact;
+  if (artifact.metadata.tags.length > 0) {
+    const deduped = dedupeTags(artifact.metadata.tags);
+    // If the caller supplied only blank entries, deduped is empty — treat that as "no tags" and fall
+    // through to auto-tagging rather than persisting a tagless artifact.
+    if (deduped.length > 0) {
+      artifact.metadata.tags = deduped;
+      return artifact;
+    }
+    artifact.metadata.tags = [];
+  }
   const tags = extractKeywords(artifact.detailed);
   if (tags.length === 0) return artifact;
   artifact.metadata.tags = tags;

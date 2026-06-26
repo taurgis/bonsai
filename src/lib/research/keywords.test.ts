@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractKeywords, applyAutoTags } from './keywords.js';
+import { extractKeywords, applyAutoTags, dedupeTags } from './keywords.js';
 import type { ResearchArtifact } from './schema.js';
 
 function artifactWith(tags: string[], detailed: string): ResearchArtifact {
@@ -93,6 +93,15 @@ describe('extractKeywords', () => {
   });
 });
 
+describe('dedupeTags', () => {
+  it('drops case-insensitive duplicates and blanks, preserving first-seen order and casing', () => {
+    expect(dedupeTags(['Node', 'node', 'NODE', 'react'])).toEqual(['Node', 'react']);
+    expect(dedupeTags([' spaced ', 'spaced'])).toEqual(['spaced']);
+    expect(dedupeTags(['', '   ', 'a'])).toEqual(['a']);
+    expect(dedupeTags([])).toEqual([]);
+  });
+});
+
 describe('applyAutoTags', () => {
   it('derives tags from detailed content and appends a quality note when tags are empty', () => {
     const artifact = artifactWith(
@@ -112,6 +121,29 @@ describe('applyAutoTags', () => {
     applyAutoTags(artifact);
     expect(artifact.metadata.tags).toEqual(['manual']);
     expect(artifact.metadata.quality_notes).toEqual(['existing note']);
+  });
+
+  it('dedupes and trims caller-supplied tags without adding a note', () => {
+    const artifact = artifactWith(
+      ['node', 'node', 'Node', ' spaced ', ''],
+      'Webhooks deliver events repeatedly here.'
+    );
+    applyAutoTags(artifact);
+    expect(artifact.metadata.tags).toEqual(['node', 'spaced']);
+    expect(artifact.metadata.quality_notes).toEqual(['existing note']);
+  });
+
+  it('falls through to auto-tagging when caller-supplied tags are all blank', () => {
+    const artifact = artifactWith(
+      ['', '   '],
+      'Webhooks deliver events. Webhooks retry. Webhooks sign events.'
+    );
+    applyAutoTags(artifact);
+    expect(artifact.metadata.tags).toContain('webhooks');
+    expect(artifact.metadata.quality_notes).toEqual([
+      'existing note',
+      'auto-generated tags via keyword extraction',
+    ]);
   });
 
   it('does not add a note when content yields no keywords', () => {
