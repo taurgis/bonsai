@@ -28,7 +28,7 @@ describe('status command unit tests', () => {
   });
 
   it('rejects an invalid URL with exit 2', async () => {
-    await expect(ResearchStatus.run(['not a url'])).rejects.toThrow(/Invalid URL/);
+    await expect(ResearchStatus.run(['not a url'])).rejects.toThrow(/Invalid URL: Could not parse/);
   });
 
   it('rejects an invalid --max-age on a cached URL with exit 2', async () => {

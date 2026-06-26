@@ -90,8 +90,13 @@ export function normalizeUrl(input: string): string {
   let url: URL;
   try {
     url = new URL(input);
-  } catch (err: any) {
-    throw new Error(`Invalid URL "${input}": ${err.message}`);
+  } catch {
+    // new URL() only ever throws the constant "Invalid URL" (no structured cause worth keeping),
+    // and every caller prefixes its own "Invalid URL:" — forwarding the native text would stutter.
+    // Drop the binding and emit an actionable, self-contained reason instead.
+    throw new Error(
+      `Could not parse "${input}" as a URL; provide a full http(s) URL like https://example.com/page.`
+    );
   }
 
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {

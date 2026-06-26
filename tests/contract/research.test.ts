@@ -114,6 +114,15 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stdout).toContain('Successfully imported');
   });
 
+  it('a malformed URL reports an actionable error without stuttering "Invalid URL"', () => {
+    const result = runContract(['inspect', 'notaurl']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Could not parse');
+    // Regression: the native URL error ("Invalid URL") used to be appended to the command's own
+    // "Invalid URL:" prefix, producing "Invalid URL: Invalid URL ... : Invalid URL".
+    expect(result.stderr).not.toContain('Invalid URL: Invalid URL');
+  });
+
   it('import with both an explicit url and --source-url still conflicts (exit 2)', () => {
     // ignoreStdin must not weaken the genuine conflict: an explicit positional token is still
     // assigned to url, so supplying both it and --source-url is a usage error even with stdin piped.

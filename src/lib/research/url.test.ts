@@ -106,8 +106,8 @@ describe('isSafeIp safety check', () => {
 
 describe('normalizeUrl invalid input', () => {
   it('throws a descriptive error for an unparseable URL', () => {
-    expect(() => normalizeUrl('http://')).toThrow(/Invalid URL/);
-    expect(() => normalizeUrl('not a url')).toThrow(/Invalid URL/);
+    expect(() => normalizeUrl('http://')).toThrow(/Could not parse/);
+    expect(() => normalizeUrl('not a url')).toThrow(/Could not parse/);
   });
 
   it('clears the http default port and a custom https port stays', () => {
