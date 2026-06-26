@@ -11,6 +11,25 @@ export interface SectionChunk {
 
 const HEADING_RE = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 
+// Reduce a heading's inline Markdown to the plain text GitHub anchors and breadcrumbs are built from.
+// GitHub strips formatting (links, emphasis, code) and slugs the *rendered* text, so a heading like
+// `## [API documentation](https://prismjs.com/extending.html#api-documentation)` must collapse to
+// "API documentation" — not the raw link syntax, which otherwise leaks the URL into the anchor and
+// breadcrumb. Confirmed against github-slugger, which documents that it operates on plain heading
+// text rather than parsing Markdown: https://github.com/Flet/github-slugger
+export function headingPlainText(raw: string): string {
+  // The `\(…\)` part tolerates one level of balanced parens so a real-world target like
+  // `URL_(disambiguation)` doesn't leave a dangling ")" in the rendered breadcrumb text.
+  return raw
+    .replace(/!\[([^\]]*)\]\([^()]*(?:\([^()]*\)[^()]*)*\)/g, '$1') // images: ![alt](url) -> alt
+    .replace(/\[([^\]]*)\]\([^()]*(?:\([^()]*\)[^()]*)*\)/g, '$1') // inline links: [text](url) -> text
+    .replace(/\[([^\]]*)\]\[[^\]]*\]/g, '$1') // reference links: [text][ref] -> text
+    .replace(/`([^`]*)`/g, '$1') // inline code: `code` -> code
+    .replace(/[*_~]/g, '') // emphasis / strikethrough markers
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // GitHub-style anchor slug: lowercase, drop punctuation, spaces -> hyphens.
 export function slugifyHeading(text: string): string {
   return text
@@ -35,7 +54,7 @@ function findHeadings(lines: string[]): HeadingLine[] {
     if (/^\s*```/.test(lines[i]!)) inFence = !inFence;
     if (inFence) continue;
     const match = lines[i]!.match(HEADING_RE);
-    if (match) out.push({ index: i, level: match[1]!.length, text: match[2]!.trim() });
+    if (match) out.push({ index: i, level: match[1]!.length, text: headingPlainText(match[2]!) });
   }
   return out;
 }
