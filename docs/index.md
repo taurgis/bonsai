@@ -9,12 +9,12 @@ hero:
     - theme: brand
       text: Get Started
       link: /guide/getting-started
+    - theme: brand
+      text: Teach your agent to research
+      link: /how-to/agent-kit
     - theme: alt
       text: Why Bonsai?
       link: /guide/introduction
-    - theme: alt
-      text: View on GitHub
-      link: https://github.com/taurgis/bonsai
 
 features:
   - icon: 🌿
