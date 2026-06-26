@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-26)
 
 ## Corpus Check
-- 929 files · ~951,794 words
+- 929 files · ~952,019 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 9410 nodes · 9926 edges · 944 communities (881 shown, 63 thin omitted)
+- 9410 nodes · 9926 edges · 945 communities (881 shown, 64 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `230f4643`
+- Built from commit: `194d38e5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -941,6 +941,7 @@
 - [[_COMMUNITY_Community 934|Community 934]]
 - [[_COMMUNITY_Community 935|Community 935]]
 - [[_COMMUNITY_Community 936|Community 936]]
+- [[_COMMUNITY_Community 937|Community 937]]
 - [[_COMMUNITY_Community 938|Community 938]]
 - [[_COMMUNITY_Community 939|Community 939]]
 - [[_COMMUNITY_Community 940|Community 940]]
@@ -976,7 +977,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (944 total, 63 thin omitted)
+## Communities (945 total, 64 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -1115,8 +1116,8 @@ Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.14
-Nodes (13): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Migration from knip, Production audit, Production vs Full Audit, Step 1: Preview migration, Step 1: Run combined analysis (+5 more)
+Cohesion: 0.15
+Nodes (12): Combined Dead Code + Duplication, Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, Production audit (+4 more)
 
 ### Community 35 - "Community 35"
 Cohesion: 0.10
@@ -3943,8 +3944,8 @@ Cohesion: 0.36
 Nodes (8): detectLanguage(), flattenCodeStructure(), normalizeCodeBlocks(), reconstructLines(), removeCopyButtons(), FIXTURES, load(), toMarkdown()
 
 ### Community 808 - "Community 808"
-Cohesion: 0.50
-Nodes (4): Custom Plugin Setup, Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory
+Cohesion: 0.40
+Nodes (5): Migration from knip, Step 1: Preview migration, Step 2: Apply migration, Step 3: Compare results, Step 4: Remove knip config
 
 ### Community 809 - "Community 809"
 Cohesion: 0.25
@@ -3988,11 +3989,11 @@ Nodes (21): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecut
 
 ### Community 819 - "Community 819"
 Cohesion: 0.09
-Nodes (22): Cloud Distribution (Enterprise Only), Command-Based Hooks, Compressed, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types (+14 more)
+Nodes (23): Agent security and safety, Cloud Distribution (Enterprise Only), Code security and best practices, Command-Based Hooks, Dependency security, Enterprise hooks and distribution, Environment Variables, Hook categories (+15 more)
 
 ### Community 820 - "Community 820"
-Cohesion: 0.10
-Nodes (21): Cloud agent support, Command-Based Hooks, Configuration sources, Detailed, Enterprise hooks and distribution, Environment Variables, Examples, Execution type limits (+13 more)
+Cohesion: 0.11
+Nodes (19): Command-Based Hooks, Common schema, Detailed, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types (+11 more)
 
 ### Community 821 - "Community 821"
 Cohesion: 0.11
@@ -4411,8 +4412,8 @@ Cohesion: 0.33
 Nodes (6): Agent security and safety, Code security and best practices, Dependency security, MCP governance and visibility, Partner Integrations, Secrets management
 
 ### Community 925 - "Community 925"
-Cohesion: 0.33
-Nodes (6): Agent security and safety, Code security and best practices, Dependency security, MCP governance and visibility, Partner Integrations, Secrets management
+Cohesion: 0.40
+Nodes (5): Cloud agent support, Configuration sources, Execution type limits, Hooks not available in cloud agents, Supported hooks
 
 ### Community 926 - "Community 926"
 Cohesion: 0.40
@@ -4438,10 +4439,6 @@ Nodes (5): Configuration, Configuration file, Global Configuration Options, Matc
 Cohesion: 0.40
 Nodes (5): Configuration, Configuration file, Global Configuration Options, Matcher Configuration, Per-Script Configuration Options
 
-### Community 932 - "Community 932"
-Cohesion: 0.67
-Nodes (3): Common schema, Input (all hooks), Reference
-
 ### Community 933 - "Community 933"
 Cohesion: 0.50
 Nodes (4): Fork the current conversation, How forks differ from named subagents, Limitations, Observe and steer running forks
@@ -4458,10 +4455,14 @@ Nodes (4): Compressed, Detailed, Provenance, Summary
 Cohesion: 0.50
 Nodes (4): Cloud Distribution (Enterprise Only), MDM Distribution, Project Hooks (Version Control), Team Distribution
 
+### Community 937 - "Community 937"
+Cohesion: 0.67
+Nodes (3): Examples, Python manifest guard hook, TypeScript stop automation hook
+
 ## Knowledge Gaps
 - **6527 isolated node(s):** `husky.sh script`, `bonsai-web-fetch.sh script`, `bonsai-user-prompt-context.sh script`, `bonsai-web-fetch.sh script`, `bonsai-web-fetch.sh script` (+6522 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **63 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

@@ -20,6 +20,7 @@ Source: `.github/instructions/web-research.instructions.md`
 ## Shared Cache
 
 - Both paths use the same freshness-tiered Bonsai cache (data directory or project-local `.bonsai/research/`): it reuses fresh notes, cheaply revalidates stale ones, and re-fetches only on a miss.
+- If Bonsai is configured for project storage and `.bonsai/research/` is not ignored by git, treat those cache artifacts as intentional shared project files. It is OK to check them in, and agents must not delete them as incidental generated output without an explicit request.
 - Re-running on a recent topic is cheap — research the topic rather than skipping it to "save" a fetch.
 
 ## When Not to Use

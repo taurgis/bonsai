@@ -518,7 +518,7 @@
       "sourceType": "local",
       "repoPath": "instructions/web-research.instructions.md",
       "installPath": ".github/instructions/web-research.instructions.md",
-      "computedHash": "4afd832abf2a530f04b0af0dc6b9e28e101a4c604cede77e934f7b64584d4b6f",
+      "computedHash": "8c9fcbb83c1309e8677cd4587049d3a52cc2597eb23be7c460073e93c1a3f9bd",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -528,12 +528,12 @@
       "linkedSkills": [
         "web-research"
       ],
-      "installHash": "4afd832abf2a530f04b0af0dc6b9e28e101a4c604cede77e934f7b64584d4b6f",
-      "sourceHash": "600b88b38827512379b1cf13649503886b2beb6c9c6c85bb83d246a504eeb80b",
+      "installHash": "8c9fcbb83c1309e8677cd4587049d3a52cc2597eb23be7c460073e93c1a3f9bd",
+      "sourceHash": "1808c5b1b3009f69d61442b81ded79940815d373bac2f23358c95974066da714",
       "versionPolicy": "minor",
       "includePrerelease": false,
-      "sourceVersion": "3.1.0",
-      "installVersion": "3.1.0"
+      "sourceVersion": "3.1.1",
+      "installVersion": "3.1.1"
     }
   },
   "customAgents": {

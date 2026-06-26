@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "skills-lock.json": {
-    "mtime": 1782502689.9462173,
-    "ast_hash": "6164e0521ed12d7be3c5b7f0cdafab47",
+    "mtime": 1782505731.3457477,
+    "ast_hash": "321acf6d55f0a3cbe370aea322205bc6",
     "semantic_hash": ""
   },
   "src/base-command.ts": {
@@ -590,8 +590,8 @@
     "semantic_hash": ""
   },
   "agents/instructions/web-research.instructions.md": {
-    "mtime": 1782379224.0241308,
-    "ast_hash": "4a04feacfff5e05d03ef21901698be9d",
+    "mtime": 1782505695.990172,
+    "ast_hash": "9b933a062ba01b67a60f59c30f201a3e",
     "semantic_hash": ""
   },
   "agents/skills/web-research/SKILL.md": {
@@ -600,13 +600,13 @@
     "semantic_hash": ""
   },
   ".agents/skills/web-research/SKILL.md": {
-    "mtime": 1782379235.590116,
+    "mtime": 1782505731.3374443,
     "ast_hash": "89a124f000d4a4aec61611d300aaac36",
     "semantic_hash": ""
   },
   ".github/instructions/web-research.instructions.md": {
-    "mtime": 1782379235.5905044,
-    "ast_hash": "6d7b1c5f70aeae03aac9c80255cd5c3a",
+    "mtime": 1782505731.3380382,
+    "ast_hash": "ec72eacbf9ef25a424d79149177acfbd",
     "semantic_hash": ""
   },
   "src/lib/research/markdown.test.ts": {
@@ -2075,13 +2075,13 @@
     "semantic_hash": ""
   },
   ".agents/rules/web-research.md": {
-    "mtime": 1782379235.6168957,
-    "ast_hash": "c6748b44bed16ca26374e80937da1d2f",
+    "mtime": 1782505731.3933456,
+    "ast_hash": "9cde42d6f7b3236a02e6ab6ee7d33158",
     "semantic_hash": ""
   },
   ".claude/rules/generated/web-research.md": {
-    "mtime": 1782379235.615267,
-    "ast_hash": "0d89be4e91f98851144ce85feca999f1",
+    "mtime": 1782505731.3922956,
+    "ast_hash": "d194a81f9cba807baa7b209f3b3e5936",
     "semantic_hash": ""
   },
   "agents/agents/official-docs-researcher.agent.md": {
@@ -4205,8 +4205,8 @@
     "semantic_hash": ""
   },
   "agents/instructions/salesforce-research.instructions.md": {
-    "mtime": 1782481999.5474088,
-    "ast_hash": "9a4b1518037a1b5d0029c3a0c4ff2dfd",
+    "mtime": 1782505692.0796351,
+    "ast_hash": "5bbfe64c5a075825681497818f1b9c2d",
     "semantic_hash": ""
   },
   "agents/hooks/claude-code/hooks/bonsai-web-fetch.sh": {
