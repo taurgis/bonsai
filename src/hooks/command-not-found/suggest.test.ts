@@ -88,6 +88,51 @@ describe('command_not_found hook', () => {
     expect(msg).not.toContain('Did you mean');
   });
 
+  // `bonsai <url>` is the headline command, but bin/cli.mjs only routes args with a `://` scheme to
+  // it, so a scheme-less URL reaches this hook. It must point back at the shorthand with a scheme.
+  it('suggests the URL shorthand for a scheme-less hostname', async () => {
+    const msg = await runHook('example.com');
+    expect(msg).toContain('example.com is not a bonsai command.');
+    expect(msg).toContain('Did you mean bonsai https://example.com?');
+    expect(msg).toContain('http:// or https:// scheme');
+  });
+
+  it('suggests the URL shorthand for a scheme-less host with a path', async () => {
+    const msg = await runHook('docs.nestjs.com/guide');
+    expect(msg).toContain('Did you mean bonsai https://docs.nestjs.com/guide?');
+  });
+
+  // A port pushes the input through the URL parser's host+port branch (not host-only); the colon
+  // must not be mistaken for a topic separator, and the dotted host still marks it as a URL.
+  it('suggests the URL shorthand for a scheme-less host with a port and path', async () => {
+    const msg = await runHook('example.com:8080/path');
+    expect(msg).toContain('Did you mean bonsai https://example.com:8080/path?');
+  });
+
+  // A bare IPv4 is a valid scheme-less URL and should get the same shorthand hint.
+  it('suggests the URL shorthand for a bare IPv4 host', async () => {
+    const msg = await runHook('93.184.216.34');
+    expect(msg).toContain('Did you mean bonsai https://93.184.216.34?');
+  });
+
+  // A dotless token is an ordinary command typo, not a forgotten-scheme URL, so the URL hint must
+  // not fire and the nearest-command path must still own the suggestion.
+  it('does not offer the URL hint for a dotless command typo', async () => {
+    const msg = await runHook('statuss');
+    expect(msg).not.toContain('https://');
+    expect(msg).toContain('Did you mean status?');
+  });
+
+  // The URL parser accepts a leading-dot filename or a relative path as a "host", but neither is a
+  // real domain — suggesting `https://.env` would be nonsense, so the hint must not fire.
+  it.each(['.env', './scripts/build', '...'])(
+    'does not offer the URL hint for non-domain token %j',
+    async (token) => {
+      const msg = await runHook(token);
+      expect(msg).not.toContain('https://');
+    }
+  );
+
   it('never suggests a hidden command', async () => {
     // 'fetcj' is one edit from the hidden 'fetch'; the hook must skip it rather than surface a
     // command the help output intentionally hides. No visible command is within the threshold of

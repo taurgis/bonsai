@@ -91,3 +91,10 @@ Bonsai returns a distinct exit code for each result status, so a machine caller 
 #### Scenario B: Empty content returned
 * **Cause**: The scraper parser uses `@mozilla/readability` to extract main article text. If a page has complex nested tables or does not contain a clean `<article>` or `<main>` layout, Readability may fail to detect the content body.
 * **Resolution**: Check the metadata quality notes (`inspect <url>`). If the confidence is `low`, you can overwrite the cached scrape with a manual import of clean Markdown.
+
+#### Scenario C: "is not a bonsai command" for a URL
+* **Cause**: The `bonsai <url>` shorthand only recognizes a full URL carrying an `http://` or `https://` scheme. A bare hostname (`bonsai example.com`) is treated as a command name, not found, and exits `2`. Bonsai detects the domain shape and suggests the corrected command.
+* **Resolution**: Add the scheme:
+  ```bash
+  bonsai https://example.com
+  ```

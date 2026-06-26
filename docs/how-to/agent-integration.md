@@ -57,7 +57,7 @@ text:
 | --- | --- | --- | --- |
 | `0` | Success | Command succeeded, or a valid cache hit was returned. | Continue. |
 | `1` | General failure | DNS block, timeout, invalid host, TLS error, or HTTP ≥ 400. | Check connectivity / URL / that the host is public. |
-| `2` | Usage error | Invalid flags, missing arguments, or bad `--stdin` usage. | Re-check `--help`. |
+| `2` | Usage error | Invalid flags, missing arguments, bad `--stdin` usage, an unknown command or typo, or a URL missing its `http://`/`https://` scheme. | Re-check `--help`; supply a full URL with a scheme. |
 | `5` | Offline stale warning | Remote unreachable; stale cache served from inside the grace window. | Content is usable but unverified. Pass `--allow-stale` to exit `0` instead. |
 
 ## A cache-first workflow
