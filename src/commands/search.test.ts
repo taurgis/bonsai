@@ -1,8 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import ResearchSearch from './search.js';
 import ResearchImport from './import.js';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 describe('search command unit tests', () => {
+  useIsolatedCache();
+
   it('fails if query is empty or only whitespace', async () => {
     const runPromise = ResearchSearch.run(['   ']);
     await expect(runPromise).rejects.toThrow(/Query string cannot be empty/);

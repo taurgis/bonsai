@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Config, Errors } from '@oclif/core';
 import FetchCommand from './fetch.js';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 // Capture stdout during `fn` so the `--json` envelope can be parsed. oclif's `logJson` routes
 // through `console.log`, and `this.log()` is suppressed under `--json`, so the only stdout line
@@ -21,6 +22,8 @@ async function captureEnvelope(
 }
 
 describe('root fetch command unit tests', () => {
+  useIsolatedCache();
+
   it('runs the command class in-process and returns structured data', async () => {
     const result = await FetchCommand.run(['https://example.com']);
     expect(result).toBeDefined();

@@ -238,6 +238,11 @@ npx @taurgis/bonsai list [flags]
 `list` takes no positional argument; every filter is a flag, and with no flags
 it returns the most recent entries across all read roots.
 
+`list` reports page-level artifacts (`source` and `research_note`). The
+`section` sub-chunks a page is split into are omitted so a single fetch does not
+flood the listing — find them with `search` (which ranks sections) or `inspect`
+(which lists a page's sections).
+
 ### Command-Line Flags
 | Flag | Short | Type | Default | Description |
 | --- | --- | --- | --- | --- |

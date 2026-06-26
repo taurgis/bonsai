@@ -97,6 +97,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   private scanCacheDirForList(readRoots: string[], currentTime: Date): any[] {
     return scanCacheDirs(readRoots, (artifact, filePath) => {
       if (artifact.metadata.status !== 'active') return null;
+      // Section children are sub-chunks of a page, not artifacts a user "has" — they would flood the
+      // listing (one page yields dozens) and aren't in the documented source/research_note contract.
+      // They stay discoverable through `search` (which ranks them) and `inspect` (which lists a
+      // page's sections). `list` answers "what pages/notes do I have?", so keep it page-level.
+      if (artifact.metadata.artifact_type === 'section') return null;
       const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
       if (!this.matchesFilters(artifact.metadata, freshness)) return null;
       return {

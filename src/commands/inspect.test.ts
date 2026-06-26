@@ -3,8 +3,11 @@ import { createHash } from 'node:crypto';
 import ResearchInspect from './inspect.js';
 import ResearchImport from './import.js';
 import { writeArtifact, readArtifact } from '../lib/research/storage.js';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 describe('inspect command unit tests', () => {
+  useIsolatedCache();
+
   it('fails to inspect uncached URL', async () => {
     const runPromise = ResearchInspect.run(['https://example.com/not-cached-inspect']);
     await expect(runPromise).rejects.toThrow(/No cached research found/);
