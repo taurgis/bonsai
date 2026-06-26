@@ -10,7 +10,9 @@ import { resolveResearchTarget } from '../lib/research/resolve-target.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
 
 type CacheStatus = 'hit' | 'miss' | 'stale';
-type FreshnessStatus = 'fresh' | 'stale_grace' | 'stale_expired';
+// 'none' means no cache entry exists for the URL, so no freshness applies — distinct from
+// 'stale_expired', which describes an entry that exists but has aged past its grace window.
+type FreshnessStatus = 'fresh' | 'stale_grace' | 'stale_expired' | 'none';
 type StatusAction = 'would_fetch' | 'would_revalidate' | 'would_return_cached';
 
 interface StatusResult {
@@ -38,7 +40,7 @@ function describeCacheStatus(
   maxAge: string | undefined
 ): StatusResult {
   if (!cached) {
-    return { status: 'miss', freshness: 'stale_expired', action: 'would_fetch' };
+    return { status: 'miss', freshness: 'none', action: 'would_fetch' };
   }
 
   const freshness = resolveFreshness(cached, currentTime, ttl, maxAge);
