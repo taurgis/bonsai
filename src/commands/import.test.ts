@@ -138,6 +138,21 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('fails fast instead of hanging when --stdin is interactive with no piped input', async () => {
+    const ttySpy = vi
+      .spyOn(ResearchImport.prototype as any, 'stdinIsInteractive')
+      .mockReturnValue(true);
+    const readSpy = vi.spyOn(ResearchImport.prototype as any, 'readStdin');
+
+    const runPromise = ResearchImport.run(['https://example.com', '--stdin']);
+    await expect(runPromise).rejects.toThrow(/No data piped to --stdin/);
+    // The guard must short-circuit before the blocking read is ever attempted.
+    expect(readSpy).not.toHaveBeenCalled();
+
+    ttySpy.mockRestore();
+    readSpy.mockRestore();
+  });
+
   it('auto-generates tags and records a quality note when no --tags are supplied', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')
