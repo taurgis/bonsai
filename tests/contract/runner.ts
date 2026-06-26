@@ -35,9 +35,10 @@ export function runContract(
     env?: Record<string, string>;
     timeout?: number;
     raw?: boolean;
+    input?: string;
   } = {}
 ): RunResult {
-  const { cwd = defaultCwd(), env = {}, timeout = 30000, raw = false } = options;
+  const { cwd = defaultCwd(), env = {}, timeout = 30000, raw = false, input } = options;
   const inherited = { ...process.env };
   delete inherited.NO_COLOR;
   delete inherited.FORCE_COLOR;
@@ -49,6 +50,9 @@ export function runContract(
     cwd,
     env: mergedEnv,
     timeout,
+    // Default to an empty, closed stdin so commands that read stdin don't hang on the
+    // test runner's inherited TTY. Callers can supply real stdin content via `input`.
+    input: input ?? '',
   });
 
   const rawOut: string = result.stdout ?? '';

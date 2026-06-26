@@ -1,4 +1,4 @@
-import { Args, Flags } from '@oclif/core';
+import { Args, Errors, Flags } from '@oclif/core';
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -191,15 +191,19 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   private async readAndValidateInput(): Promise<string> {
     if (this.flags.stdin) {
+      let rawInput: string;
       try {
-        const rawInput = await this.readStdin();
-        if (!rawInput.trim()) {
-          this.error('Empty stdin content provided.', { exit: 2 });
-        }
-        return rawInput;
+        rawInput = await this.readStdin();
       } catch (err) {
+        // Genuine stream/size failure reading stdin → I/O failure (exit 1).
         this.error((err as Error).message, { exit: 1 });
       }
+      // Empty input is a usage error (exit 2), not an I/O failure — keep it out of the
+      // catch above so its exit code is not clobbered to 1.
+      if (!rawInput.trim()) {
+        this.error('Empty stdin content provided.', { exit: 2 });
+      }
+      return rawInput;
     }
 
     if (this.flags.file) {
@@ -207,6 +211,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       try {
         return this.readAndValidateFile(filePath);
       } catch (err) {
+        // readAndValidateFile raises usage errors (missing/not-a-file/empty) via this.error,
+        // which throw CLIErrors carrying their own exit code and message — preserve those.
+        // Only an unexpected read failure becomes a wrapped I/O failure (exit 1).
+        if (err instanceof Errors.CLIError) throw err;
         this.error(`Failed to read file: ${(err as Error).message}`, { exit: 1 });
       }
     }

@@ -29,7 +29,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   static hidden = true;
   static summary = 'An advanced, locally cached web research tool optimized for LLM ingestion.';
   static description =
-    'Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.';
+    'Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.\n\nUsually invoked via the shorthand `bonsai <url>` rather than `bonsai fetch <url>`.';
 
   static examples = [
     {

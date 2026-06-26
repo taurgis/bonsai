@@ -61,6 +61,19 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         { exit: 2 }
       );
     }
+    // Validate durations up front: scanCacheDir swallows per-file errors, so a malformed
+    // --older-than/--inactive would otherwise be silently ignored and report "0 entries".
+    for (const [label, value] of [
+      ['--older-than', this.flags['older-than']],
+      ['--inactive', this.flags.inactive],
+    ] as const) {
+      if (!value) continue;
+      try {
+        parseTtlToMs(value);
+      } catch (err) {
+        this.error(`Invalid ${label}: ${(err as Error).message}`, { exit: 2 });
+      }
+    }
   }
 
   private shouldPrune(meta: any, currentTime: Date): boolean {
