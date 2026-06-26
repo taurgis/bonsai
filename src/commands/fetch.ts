@@ -251,6 +251,18 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     }
   }
 
+  // Re-emit a runtime fetch failure with actionable next steps. Deep fetch/extract code throws plain
+  // Errors that otherwise reach the user as a bare "what broke" line with no "what to do"; this
+  // attaches recovery hints (e.g. import an auth-blocked page). Everything reaching here is a runtime
+  // failure — validation errors (bad flags/URL) exit before the try — so the contract's runtime code
+  // (1) applies. Suggestions render on stderr for humans only; under --json the envelope carries just
+  // the message (toErrorJson), so machine output is unchanged.
+  private emitFetchError(err: unknown, url: string): never {
+    const message = err instanceof Error ? err.message : String(err);
+    const guidance = fetchFailureGuidance(message, url);
+    this.error(message, { exit: 1, suggestions: guidance?.suggestions, ref: guidance?.ref });
+  }
+
   // Serves the cache when a fresh/revalidatable entry exists, otherwise fetches fresh. Reads fall
   // back project→global; the resolved artifact is returned with the dir it lives in / landed in.
   private async resolveArtifact(
@@ -405,12 +417,76 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
         this.log(content);
       }
       return resultData;
+    } catch (err) {
+      // Stale-serve (exit 5) signals via process.exitCode and never throws, so it bypasses this
+      // path; only genuine fetch/extract failures land here and get classified guidance. Use the
+      // normalized URL in hints so the copy-paste command is canonical (and never echoes raw,
+      // unsanitized user input back to the terminal).
+      this.emitFetchError(err, normalizedUrl);
     } finally {
       if (tmpDir) {
         rmSync(tmpDir, { recursive: true, force: true });
       }
     }
   }
+}
+
+// Maps a runtime fetch failure to recovery steps keyed off its message. Returns undefined for
+// unrecognized failures, which then surface with their original message and no extra hint. The
+// patterns match the thrown text in fetcher.ts/browser.ts; keep them in sync if those messages
+// change. Resolutions mirror the published troubleshooting guide.
+export function fetchFailureGuidance(
+  message: string,
+  url: string
+): { suggestions: string[]; ref?: string } | undefined {
+  const ref = 'https://taurgis.github.io/bonsai/troubleshooting';
+  // Name the pipe step explicitly: bare `import --stdin` blocks waiting for input, so a reader (or
+  // an agent) running the hint verbatim would hang. Show the content being piped in from a file.
+  const importHint = `Open it in a browser, save the page, then import it: cat page.md | bonsai import ${url} --stdin`;
+
+  // 401/403: an auth wall or anti-scraping WAF. Bonsai has no authenticated-fetch path in v1.
+  if (/failed with status 40[13]\b/.test(message)) {
+    return {
+      suggestions: ['The page requires authentication or blocks automated requests.', importHint],
+      ref,
+    };
+  }
+  if (/failed with status 404\b/.test(message)) {
+    return { suggestions: ['Check the URL is correct and the page still exists.'] };
+  }
+  if (/failed with status 5\d\d\b/.test(message)) {
+    return {
+      suggestions: ['The server returned an error. Retry later or verify the host is healthy.'],
+    };
+  }
+  // Server returned a non-HTML body (JSON, binary, or no Content-Type at all). Scope the opener to
+  // the real failure: --rendered does produce HTML, so "only scrapes HTML" would read as misleading.
+  if (/Rejected content type|does not look like HTML/.test(message)) {
+    return {
+      suggestions: [
+        'The server returned a non-HTML response (e.g. JSON or binary).',
+        'If the page is rendered by client-side JavaScript, retry with --rendered.',
+        importHint,
+      ],
+      ref,
+    };
+  }
+  if (/DNS resolution failed/.test(message)) {
+    return {
+      suggestions: ['Check the hostname is spelled correctly and resolves on a public network.'],
+    };
+  }
+  // A hostname that only resolves to a private/local IP at request time (literal private addresses
+  // are rejected earlier with exit 2). Blocked to prevent SSRF; only public hosts can be fetched.
+  if (/blocked local or private target/.test(message)) {
+    return {
+      suggestions: [
+        'The hostname resolves to a private or local address, which is blocked to prevent SSRF. Only public http(s) hosts can be fetched.',
+      ],
+      ref,
+    };
+  }
+  return undefined;
 }
 
 // Copies Phase 2 capability provenance from a capture outcome onto the artifact metadata.
