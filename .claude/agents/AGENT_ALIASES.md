@@ -8,6 +8,7 @@ When instructions reference a GitHub Copilot agent by display name, resolve it t
 - `Senior Code Reviewer` -> `senior-code-reviewer` (source: `.github/agents/senior-code-reviewer.agent.md`)
 - `Senior Quality Engineer` -> `senior-quality-engineer` (source: `.github/agents/senior-quality-engineer.agent.md`)
 - `Senior Release Manager` -> `senior-release-manager` (source: `.github/agents/senior-release-manager.agent.md`)
+- `Senior Technical Writer` -> `senior-technical-writer` (source: `.github/agents/senior-technical-writer.agent.md`)
 
 Regenerate after editing any `.github/agents/*.agent.md` file:
 `forward-nexus sync`

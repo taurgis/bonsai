@@ -39,6 +39,25 @@
       "sourceVersion": "1.0.0",
       "installVersion": "1.0.0"
     },
+    "beginner-technical-writing": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "computedHash": "96e7e775b00d059ff6f7181492a02ae4bebf916f994213f7403e38d32f7e20db",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "repoPath": "skills/beginner-technical-writing/SKILL.md",
+      "installPath": ".agents/skills/beginner-technical-writing",
+      "installHash": "758ca1d31dcead5ce2cb1a06521b46937a5dab1a9cef6c29fe099432424ed302",
+      "sourceHash": "96e7e775b00d059ff6f7181492a02ae4bebf916f994213f7403e38d32f7e20db",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
     "cli-design-principles": {
       "source": "Forward-Services-NV/forward-nexus-projects",
       "sourceType": "github",
@@ -434,6 +453,28 @@
       "sourceVersion": "1.0.1",
       "installVersion": "1.0.1"
     },
+    ".github/instructions/post-feature-technical-writing.instructions.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "instructions/post-feature-technical-writing.instructions.md",
+      "installPath": ".github/instructions/post-feature-technical-writing.instructions.md",
+      "computedHash": "b45e5dff7c38bf33c2d14e3b128e55decde86426d85d0e3c764eb8504e30d164",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "linkedSkills": [
+        "beginner-technical-writing"
+      ],
+      "installHash": "b45e5dff7c38bf33c2d14e3b128e55decde86426d85d0e3c764eb8504e30d164",
+      "sourceHash": "9a633d22a982b2c3690232797885a761c8aeda28d774f4e878b730ca45f676f9",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.1.0",
+      "installVersion": "1.1.0"
+    },
     ".github/instructions/release-management.instructions.md": {
       "source": "Forward-Services-NV/forward-nexus-projects",
       "sourceType": "github",
@@ -571,6 +612,28 @@
       "includePrerelease": false,
       "sourceVersion": "1.1.0",
       "installVersion": "1.1.0"
+    },
+    ".github/agents/senior-technical-writer.agent.md": {
+      "source": "Forward-Services-NV/forward-nexus-projects",
+      "sourceType": "github",
+      "repoPath": "agents/senior-technical-writer.agent.md",
+      "installPath": ".github/agents/senior-technical-writer.agent.md",
+      "computedHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
+      "agents": [
+        "github-copilot",
+        "claude-code",
+        "cursor",
+        "antigravity"
+      ],
+      "linkedSkills": [
+        "beginner-technical-writing"
+      ],
+      "installHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
+      "sourceHash": "d0c77f82894781ccaab782bb7180ed8d83c31002cf67966c2c8e19a4a55c6343",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
     }
   }
 }
