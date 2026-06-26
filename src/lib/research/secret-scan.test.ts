@@ -13,9 +13,24 @@ describe('detectSecret', () => {
     expect(detectSecret('-----BEGIN RSA PRIVATE KEY-----')).toBe('Private key block');
   });
 
+  it('flags UPPER_SNAKE env-var credential assignments where the keyword is embedded', () => {
+    // The literal AWS secret has no fixed prefix, so it is only caught via the assignment form.
+    expect(detectSecret('export AWS_SECRET_ACCESS_KEY=' + 'w'.repeat(40))).toBe(
+      'credential assignment'
+    );
+    expect(detectSecret('DB_PASSWORD=' + 's'.repeat(20))).toBe('credential assignment');
+    expect(detectSecret('MY_ACCESS_TOKEN=' + 'b'.repeat(20))).toBe('credential assignment');
+    // Intentional scope: the keyword may also be prefixed by an underscore or digit (e.g. `_SECRET`,
+    // `SESSION1_TOKEN`), which are plausible env-var names the broadened boundary deliberately catches.
+    expect(detectSecret('_SECRET=' + 'a'.repeat(20))).toBe('credential assignment');
+    expect(detectSecret('1TOKEN=' + 'c'.repeat(20))).toBe('credential assignment');
+  });
+
   it('returns null for ordinary documentation prose', () => {
     expect(detectSecret('Install the package and import the client.')).toBeNull();
     expect(detectSecret('Set your API key in the dashboard settings.')).toBeNull();
+    expect(detectSecret('The token endpoint: https://example.com/oauth/authorize')).toBeNull();
+    expect(detectSecret('| access_token | string | required |')).toBeNull();
   });
 });
 

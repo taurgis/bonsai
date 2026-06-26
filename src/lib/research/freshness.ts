@@ -36,6 +36,22 @@ export function parseTtlToMs(ttl: string): number {
 }
 
 /**
+ * Validate a duration-valued flag. Returns an actionable error message that names the
+ * offending flag when the value is malformed, or null when the flag is absent or valid.
+ * Callers map a non-null message onto `this.error(msg, { exit: 2 })`, so every command
+ * reports the same parse failure while naming the exact flag the user passed.
+ */
+export function durationFlagError(flag: string, value: string | undefined): string | null {
+  if (!value) return null;
+  try {
+    parseTtlToMs(value);
+    return null;
+  } catch (err) {
+    return `Invalid ${flag}: ${(err as Error).message}`;
+  }
+}
+
+/**
  * Derives the active freshness policy based on the tier and optional TTL override.
  */
 export function getPolicy(

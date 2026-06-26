@@ -1,12 +1,16 @@
 import { Args } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { KEY_META, BUILT_IN_DEFAULTS, readScopedConfig } from '../../lib/config/index.js';
+import {
+  KEY_META,
+  BUILT_IN_DEFAULTS,
+  readScopedConfig,
+  validKeysHint,
+} from '../../lib/config/index.js';
 
 export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
   static id = 'config get';
   static summary = 'Get the effective value of a research configuration key.';
-  static description =
-    'Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: storage.';
+  static description = `Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: ${validKeysHint()}.`;
 
   static examples = [
     {

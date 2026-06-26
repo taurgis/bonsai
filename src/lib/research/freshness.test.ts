@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { parseTtlToMs, getPolicy, evaluateFreshness, checkMaxAgeExpired } from './freshness.js';
+import {
+  parseTtlToMs,
+  getPolicy,
+  evaluateFreshness,
+  checkMaxAgeExpired,
+  durationFlagError,
+} from './freshness.js';
 import type { ResearchArtifactMetadata } from './schema.js';
 
 const HOUR = 3600 * 1000;
@@ -58,6 +64,18 @@ describe('parseTtlToMs', () => {
     expect(() => parseTtlToMs('10')).toThrow(/Invalid TTL format/);
     expect(() => parseTtlToMs('10s')).toThrow(/Invalid TTL format/);
     expect(() => parseTtlToMs('')).toThrow(/Invalid TTL format/);
+  });
+});
+
+describe('durationFlagError', () => {
+  it('returns null for an absent or valid value', () => {
+    expect(durationFlagError('--ttl', undefined)).toBeNull();
+    expect(durationFlagError('--ttl', '7d')).toBeNull();
+  });
+
+  it('names the offending flag on a malformed value', () => {
+    expect(durationFlagError('--ttl', 'banana')).toMatch(/Invalid --ttl:/);
+    expect(durationFlagError('--max-age', 'soon')).toMatch(/Invalid --max-age:/);
   });
 });
 

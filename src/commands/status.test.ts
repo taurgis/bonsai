@@ -31,17 +31,18 @@ describe('status command unit tests', () => {
     await expect(ResearchStatus.run(['not a url'])).rejects.toThrow(/Invalid URL: Could not parse/);
   });
 
-  it('rejects an invalid --max-age on a cached URL with exit 2', async () => {
-    const readSpy = vi
-      .spyOn(ResearchImport.prototype as any, 'readStdin')
-      .mockResolvedValue('# Cached for max-age');
-    await ResearchImport.run(['https://example.com/status-maxage', '--stdin']);
-
-    // max-age is only evaluated for a cached entry, so this exercises the parse-failure branch.
+  it('rejects an invalid --max-age with exit 2, naming the flag', async () => {
     await expect(
       ResearchStatus.run(['https://example.com/status-maxage', '--max-age', 'bogus'])
-    ).rejects.toThrow(/Invalid max-age/);
+    ).rejects.toThrow(/Invalid --max-age/);
+  });
 
-    readSpy.mockRestore();
+  it('rejects an invalid --ttl with exit 2, naming the ttl flag (not max-age)', async () => {
+    // This URL is intentionally uncached: validation now runs up front, so a malformed --ttl is
+    // rejected even on a cache miss (the old code only parsed --ttl for a cached hit and silently
+    // accepted the bad value on a miss).
+    await expect(
+      ResearchStatus.run(['https://example.com/status-ttl', '--ttl', 'banana'])
+    ).rejects.toThrow(/Invalid --ttl/);
   });
 });

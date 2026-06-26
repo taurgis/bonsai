@@ -7,7 +7,11 @@ import { writeArtifact, getArtifactPath, type LocatedArtifact } from '../lib/res
 import { loadStoreRoots, type StoreRoots } from '../lib/research/store-roots.js';
 import { writeArtifactSecurely } from '../lib/research/secure-write.js';
 import { loadSummaryLevel, type StorageMode, type SummaryLevel } from '../lib/config/index.js';
-import { evaluateFreshness, parseTtlToMs, checkMaxAgeExpired } from '../lib/research/freshness.js';
+import {
+  evaluateFreshness,
+  checkMaxAgeExpired,
+  durationFlagError,
+} from '../lib/research/freshness.js';
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
 import { fetchRenderedHtml } from '../lib/research/browser.js';
@@ -242,16 +246,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
   // Validates the duration flags up front, exiting with code 2 on a malformed value.
   private validateDurationFlags(ttl?: string, maxAge?: string): void {
-    for (const [label, value] of [
-      ['TTL', ttl],
-      ['max-age', maxAge],
-    ] as const) {
-      if (!value) continue;
-      try {
-        parseTtlToMs(value);
-      } catch (err) {
-        this.error(`Invalid ${label}: ${(err as Error).message}`, { exit: 2 });
-      }
+    for (const msg of [durationFlagError('--ttl', ttl), durationFlagError('--max-age', maxAge)]) {
+      if (msg) this.error(msg, { exit: 2 });
     }
   }
 

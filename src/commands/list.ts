@@ -3,6 +3,7 @@ import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
+import { pluralize } from '../lib/text.js';
 
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static id = 'list';
@@ -118,7 +119,8 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       this.log('No cached research entries found matching filters.');
       return;
     }
-    this.log(`Found ${finalResults.length} cached research entries:\n`);
+    const noun = pluralize(finalResults.length, 'entry', 'entries');
+    this.log(`Found ${finalResults.length} cached research ${noun}:\n`);
     finalResults.forEach((res, index) => {
       this.log(`${index + 1}. [${res.topic || 'No Topic'}] Key: ${res.cacheKey}`);
       this.log(`   Type: ${res.artifactType} | Freshness: ${res.freshness}`);

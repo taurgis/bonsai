@@ -4,7 +4,8 @@ import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
 import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
-import { parseTtlToMs } from '../lib/research/freshness.js';
+import { parseTtlToMs, durationFlagError } from '../lib/research/freshness.js';
+import { pluralize } from '../lib/text.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
@@ -63,16 +64,11 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     }
     // Validate durations up front: scanCacheDir swallows per-file errors, so a malformed
     // --older-than/--inactive would otherwise be silently ignored and report "0 entries".
-    for (const [label, value] of [
-      ['--older-than', this.flags['older-than']],
-      ['--inactive', this.flags.inactive],
-    ] as const) {
-      if (!value) continue;
-      try {
-        parseTtlToMs(value);
-      } catch (err) {
-        this.error(`Invalid ${label}: ${(err as Error).message}`, { exit: 2 });
-      }
+    for (const msg of [
+      durationFlagError('--older-than', this.flags['older-than']),
+      durationFlagError('--inactive', this.flags.inactive),
+    ]) {
+      if (msg) this.error(msg, { exit: 2 });
     }
   }
 
@@ -148,7 +144,8 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
     if (dryRun) {
       if (!this.jsonEnabled()) {
-        this.log(`[Dry Run] Found ${count} research cache entries that would be pruned:\n`);
+        const noun = pluralize(count, 'entry', 'entries');
+        this.log(`[Dry Run] Found ${count} research cache ${noun} that would be pruned:\n`);
         filesToPrune.forEach((f) => {
           this.log(`- [${f.topic || 'No Topic'}] Key: ${f.cacheKey} (${f.url || 'Imported note'})`);
         });
@@ -156,7 +153,8 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     } else {
       const prunedCount = this.deletePruneCandidates(filesToPrune);
       if (!this.jsonEnabled()) {
-        this.log(`Successfully pruned ${prunedCount} of ${count} research cache entries.`);
+        const noun = pluralize(count, 'entry', 'entries');
+        this.log(`Successfully pruned ${prunedCount} of ${count} research cache ${noun}.`);
       }
     }
 

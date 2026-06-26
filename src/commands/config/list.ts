@@ -1,11 +1,16 @@
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { ALL_KEYS, KEY_META, BUILT_IN_DEFAULTS, readScopedConfig } from '../../lib/config/index.js';
+import {
+  ALL_KEYS,
+  KEY_META,
+  BUILT_IN_DEFAULTS,
+  readScopedConfig,
+  validKeysHint,
+} from '../../lib/config/index.js';
 
 export default class ConfigList extends ConfigCommand<typeof ConfigList> {
   static id = 'config list';
   static summary = 'List all research configuration keys and their effective values.';
-  static description =
-    'Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage.';
+  static description = `Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: ${validKeysHint()}.`;
 
   static examples = [
     {
