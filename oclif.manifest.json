@@ -610,7 +610,7 @@
           "required": true
         }
       },
-      "description": "Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: storage.",
+      "description": "Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: storage, summary.",
       "examples": [
         {
           "description": "Get the effective storage mode",
@@ -662,7 +662,7 @@
     "config:list": {
       "aliases": [],
       "args": {},
-      "description": "Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage.",
+      "description": "Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage, summary.",
       "examples": [
         {
           "description": "Show all effective config values",
@@ -725,7 +725,7 @@
           "required": false
         }
       },
-      "description": "Persist a configuration value. Writes user-level config by default; pass --local to write the project-level config (.bonsai.json in cwd).\n\nValid keys: storage. The inline form `<key>=<value>` is also accepted.",
+      "description": "Persist a configuration value. Writes user-level config by default; pass --local to write the project-level config (.bonsai.json in cwd).\n\nValid keys: storage, summary. The inline form `<key>=<value>` is also accepted.",
       "examples": [
         {
           "description": "Store research cache inside the current project",
@@ -789,7 +789,7 @@
           "required": true
         }
       },
-      "description": "Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage.",
+      "description": "Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage, summary.",
       "examples": [
         {
           "description": "Remove the user-level storage setting",

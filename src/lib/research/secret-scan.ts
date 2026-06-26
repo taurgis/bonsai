@@ -27,9 +27,11 @@ const SECRET_PATTERNS: readonly SecretPattern[] = [
     re: /-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----/,
   },
   {
-    // Generic `api_key = "…"` / `secret: …` style assignments with a non-trivial value.
+    // Generic credential assignments with a non-trivial value: `api_key = "…"`, `secret: …`, and
+    // UPPER_SNAKE env forms like `AWS_SECRET_ACCESS_KEY=…` / `DB_PASSWORD=…`. The keyword may be a
+    // segment inside a longer identifier (so `_SECRET_` matches), which `\b…\b` boundaries missed.
     label: 'credential assignment',
-    re: /\b(?:api[_-]?key|secret|token|password|passwd|client[_-]?secret|access[_-]?token)\b\s*[:=]\s*['"]?[A-Za-z0-9._\-/+]{16,}/i,
+    re: /(?:^|[^A-Za-z])(?:api[_-]?key|secret|token|password|passwd|client[_-]?secret|access[_-]?token)[A-Za-z0-9_-]*\s*[:=]\s*['"]?[A-Za-z0-9._\-/+]{16,}/i,
   },
 ];
 

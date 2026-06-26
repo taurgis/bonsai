@@ -1,6 +1,7 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { loadSearchableArtifacts } from '../lib/research/search-index.js';
+import { pluralize } from '../lib/text.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
 import { detectSite } from '../sites/index.js';
@@ -234,7 +235,12 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
 
   private logSearchResults(finalResults: any[]): void {
     if (this.jsonEnabled()) return;
-    this.log(`Found ${finalResults.length} matching cached research entries:\n`);
+    if (finalResults.length === 0) {
+      this.log('No matching cached research entries found.');
+      return;
+    }
+    const noun = pluralize(finalResults.length, 'entry', 'entries');
+    this.log(`Found ${finalResults.length} matching cached research ${noun}:\n`);
     finalResults.forEach((res, index) => {
       this.log(`${index + 1}. [${res.topic || 'No Topic'}] Score: ${res.score}`);
       this.log(`   Cache Key: ${res.cacheKey}`);

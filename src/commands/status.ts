@@ -1,7 +1,11 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { getArtifactPath } from '../lib/research/storage.js';
-import { evaluateFreshness, checkMaxAgeExpired } from '../lib/research/freshness.js';
+import {
+  evaluateFreshness,
+  checkMaxAgeExpired,
+  durationFlagError,
+} from '../lib/research/freshness.js';
 import { resolveResearchTarget } from '../lib/research/resolve-target.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
 
@@ -77,6 +81,12 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const { url } = this.args;
     const { ttl, tier, 'max-age': maxAge } = this.flags;
 
+    // Validate the duration flags up front so a malformed value reports the exact flag that is
+    // wrong, rather than later surfacing as a misattributed parse failure.
+    for (const msg of [durationFlagError('--ttl', ttl), durationFlagError('--max-age', maxAge)]) {
+      if (msg) this.error(msg, { exit: 2 });
+    }
+
     let target: ReturnType<typeof resolveResearchTarget>;
     try {
       target = resolveResearchTarget({
@@ -93,12 +103,8 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const cached = located?.artifact ?? null;
     const currentTime = new Date();
 
-    let result: StatusResult;
-    try {
-      result = describeCacheStatus(cached, currentTime, ttl, maxAge);
-    } catch (err) {
-      this.error(`Invalid max-age: ${(err as Error).message}`, { exit: 2 });
-    }
+    // Both duration flags were validated above, so freshness resolution cannot throw on a parse error.
+    const result = describeCacheStatus(cached, currentTime, ttl, maxAge);
 
     // On a hit, report where it actually lives; on a miss, where a fetch would write it.
     const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
