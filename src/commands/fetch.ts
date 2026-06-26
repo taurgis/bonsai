@@ -79,7 +79,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     })(),
     ttl: Flags.string({
       char: 'l',
-      description: 'Predicted lifespan of the data (e.g., "2h", "7d", "3m").',
+      description: 'Predicted lifespan: number + h/d/w/m/y (m = months), e.g. "2h", "7d", "6m".',
     }),
     'max-age': Flags.string({
       description: 'Maximum age of cache to accept (e.g., "1d", "30d").',

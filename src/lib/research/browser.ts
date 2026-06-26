@@ -290,6 +290,24 @@ export interface CdpPage {
   close: () => Promise<void>;
 }
 
+/** Status line of the main-frame document response, captured from Network.responseReceived. */
+export interface MainDocumentResponse {
+  status: number;
+  statusText: string;
+}
+
+/**
+ * Rejects a rendered page whose main document returned an HTTP error, mirroring the static
+ * fetcher's `assertOk`. Without this, `--rendered` on a 404/500 would capture the server's (or
+ * the browser's) error page as if it were real content and cache it. A missing response (no
+ * Document event seen — e.g. data: or about: targets) is left to the caller's content checks.
+ */
+export function assertRenderedHttpOk(mainDoc: MainDocumentResponse | undefined): void {
+  if (mainDoc && mainDoc.status >= 400) {
+    throw new Error(`Fetch failed with status ${mainDoc.status} ${mainDoc.statusText}`.trimEnd());
+  }
+}
+
 /**
  * Spawns a headless Chrome, attaches a flat CDP session, and enables the Page, Network,
  * and Runtime domains. The caller drives navigation and must call close() when finished.
@@ -424,8 +442,46 @@ export async function fetchRenderedHtml(
   const page = await openCdpPage();
   try {
     await page.client.send('Network.setBlockedURLs', { urls: BLOCKED_ASSET_URLS }, page.sessionId);
-    await page.client.send('Page.navigate', { url: currentUrl }, page.sessionId);
+
+    // Record the status of each frame's first Document response so we can reject HTTP errors after
+    // the page settles. Keyed by frameId; the navigated top frame is matched via the navigate result.
+    const documentResponses = new Map<string, MainDocumentResponse>();
+    page.client.on(
+      `${page.sessionId}:Network.responseReceived`,
+      (params: {
+        frameId?: string;
+        type?: string;
+        response?: { status?: number; statusText?: string };
+      }) => {
+        const { frameId } = params;
+        const status = params.response?.status;
+        // Only record real numeric statuses: a Document event without a usable status would
+        // otherwise store NaN, which silently slips past the `>= 400` guard and the `?? 200`
+        // fallback alike, leaking a NaN into BrowserFetchResult.status (declared `number`).
+        if (params.type !== 'Document' || !frameId || typeof status !== 'number') return;
+        if (documentResponses.has(frameId)) return;
+        documentResponses.set(frameId, {
+          status,
+          statusText: params.response?.statusText ?? '',
+        });
+      }
+    );
+
+    const nav: { frameId?: string; errorText?: string } = await page.client.send(
+      'Page.navigate',
+      { url: currentUrl },
+      page.sessionId
+    );
+    // A network-level failure (DNS, refused/closed connection, TLS) never fires a load event, so
+    // fail fast here instead of waiting out the full navigation timeout on a dead page.
+    if (nav.errorText) {
+      throw new Error(`Navigation failed: ${nav.errorText}`);
+    }
+
     await waitForLoad(page.client, page.sessionId, timeout, options.settleMs ?? 1000);
+
+    const mainDoc = nav.frameId ? documentResponses.get(nav.frameId) : undefined;
+    assertRenderedHttpOk(mainDoc);
 
     const evalResult = await page.client.send(
       'Runtime.evaluate',
@@ -444,7 +500,7 @@ export async function fetchRenderedHtml(
     }
 
     return {
-      status: 200,
+      status: mainDoc?.status ?? 200,
       contentType: 'text/html',
       etag: null,
       lastModified: null,

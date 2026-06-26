@@ -60,10 +60,10 @@ describe('parseTtlToMs', () => {
   });
 
   it('throws on a malformed TTL string', () => {
-    expect(() => parseTtlToMs('soon')).toThrow(/Invalid TTL format/);
-    expect(() => parseTtlToMs('10')).toThrow(/Invalid TTL format/);
-    expect(() => parseTtlToMs('10s')).toThrow(/Invalid TTL format/);
-    expect(() => parseTtlToMs('')).toThrow(/Invalid TTL format/);
+    expect(() => parseTtlToMs('soon')).toThrow(/is not a valid format/);
+    expect(() => parseTtlToMs('10')).toThrow(/is not a valid format/);
+    expect(() => parseTtlToMs('10s')).toThrow(/is not a valid format/);
+    expect(() => parseTtlToMs('')).toThrow(/is not a valid format/);
   });
 });
 
