@@ -1,7 +1,58 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Config, Errors } from '@oclif/core';
-import FetchCommand from './fetch.js';
+import FetchCommand, { fetchFailureGuidance } from './fetch.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
+
+describe('fetchFailureGuidance', () => {
+  const url = 'https://docs.example.com/page';
+
+  it('points auth/WAF blocks (401/403) at manual import', () => {
+    for (const status of ['401 Unauthorized', '403 Forbidden']) {
+      const g = fetchFailureGuidance(`Fetch failed with status ${status}`, url);
+      expect(g?.suggestions.some((s) => s.includes(`bonsai import ${url} --stdin`))).toBe(true);
+      expect(g?.ref).toContain('troubleshooting');
+    }
+  });
+
+  it('suggests checking the URL on a 404', () => {
+    const g = fetchFailureGuidance('Fetch failed with status 404 Not Found', url);
+    expect(g?.suggestions.join(' ')).toMatch(/correct/i);
+  });
+
+  it('suggests retry on a 5xx server error', () => {
+    const g = fetchFailureGuidance('Fetch failed with status 503 Service Unavailable', url);
+    expect(g?.suggestions.join(' ')).toMatch(/retry/i);
+  });
+
+  it('offers --rendered and import for non-HTML responses', () => {
+    const g = fetchFailureGuidance(
+      'Rejected content type "application/json". Only HTML is supported.',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toContain('--rendered');
+    expect(g?.suggestions.some((s) => s.includes('bonsai import'))).toBe(true);
+  });
+
+  it('guides DNS failures toward the hostname', () => {
+    const g = fetchFailureGuidance(
+      'DNS resolution failed for hostname "x": getaddrinfo ENOTFOUND x',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toMatch(/hostname/i);
+  });
+
+  it('explains a runtime SSRF block (hostname resolving to a private IP)', () => {
+    const g = fetchFailureGuidance(
+      'IP address "10.0.0.5" resolved for "x" is a blocked local or private target.',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toMatch(/SSRF/);
+  });
+
+  it('returns undefined for unrecognized failures (original message surfaces unchanged)', () => {
+    expect(fetchFailureGuidance('Some novel failure mode', url)).toBeUndefined();
+  });
+});
 
 // Capture stdout during `fn` so the `--json` envelope can be parsed. oclif's `logJson` routes
 // through `console.log`, and `this.log()` is suppressed under `--json`, so the only stdout line
