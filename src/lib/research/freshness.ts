@@ -9,12 +9,19 @@ export interface FreshnessPolicy {
 }
 
 /**
- * Parses simple TTL duration strings (e.g. '24h', '7d', '30d') to milliseconds.
+ * Parses simple TTL duration strings to milliseconds. The unit `m` is months (not minutes); the
+ * smallest unit is hours, since sub-hour cache lifespans are not meaningful for research artifacts.
  */
 export function parseTtlToMs(ttl: string): number {
   const match = ttl.match(/^(\d+)([hdwmy])$/);
   if (!match) {
-    throw new Error(`Invalid TTL format "${ttl}". Use formats like '24h', '7d', '30d'.`);
+    // Deliberately does not start with "Invalid": durationFlagError wraps this as
+    // "Invalid <flag>: <message>", and a leading "Invalid" here produced a "Invalid --ttl:
+    // Invalid TTL format" stutter.
+    throw new Error(
+      `Duration "${ttl}" is not a valid format. Use a whole number plus a unit: ` +
+        `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '24h', '7d', '6m'.`
+    );
   }
   const val = parseInt(match[1] || '', 10);
   const unit = match[2] || '';

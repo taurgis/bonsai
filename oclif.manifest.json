@@ -72,7 +72,7 @@
         },
         "ttl": {
           "char": "l",
-          "description": "Predicted lifespan of the data (e.g., \"2h\", \"7d\", \"3m\").",
+          "description": "Predicted lifespan: number + h/d/w/m/y (m = months), e.g. \"2h\", \"7d\", \"6m\".",
           "name": "ttl",
           "hasDynamicHelp": false,
           "multiple": false,

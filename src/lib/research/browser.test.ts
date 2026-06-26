@@ -1,5 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fetchRenderedHtml, findChromePath, ResponseCapture, type CdpPage } from './browser.js';
+import {
+  assertRenderedHttpOk,
+  fetchRenderedHtml,
+  findChromePath,
+  ResponseCapture,
+  type CdpPage,
+} from './browser.js';
 
 describe('browser rendering unit and integration tests', () => {
   it('successfully locates Chrome executable or throws', () => {
@@ -93,6 +99,28 @@ function makeFakePage(bodies: Record<string, { body: string; base64Encoded?: boo
     (handlers.get(`S:${event}`) ?? []).forEach((h) => h(p));
   return { page, emit };
 }
+
+describe('assertRenderedHttpOk', () => {
+  it('throws on a 4xx main-document status', () => {
+    expect(() => assertRenderedHttpOk({ status: 404, statusText: 'Not Found' })).toThrow(
+      'Fetch failed with status 404 Not Found'
+    );
+  });
+
+  it('throws on a 5xx main-document status', () => {
+    expect(() => assertRenderedHttpOk({ status: 503, statusText: 'Service Unavailable' })).toThrow(
+      'Fetch failed with status 503 Service Unavailable'
+    );
+  });
+
+  it('accepts a 2xx main-document status', () => {
+    expect(() => assertRenderedHttpOk({ status: 200, statusText: 'OK' })).not.toThrow();
+  });
+
+  it('does not throw when no document response was observed', () => {
+    expect(() => assertRenderedHttpOk(undefined)).not.toThrow();
+  });
+});
 
 describe('ResponseCapture', () => {
   it('matches a request by URL predicate and returns its body after loadingFinished', async () => {
