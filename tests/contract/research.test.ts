@@ -83,3 +83,106 @@ describe('research contract tests', () => {
     });
   });
 });
+
+describe('CLI ergonomics and error contracts', () => {
+  it('root --help documents the bare-URL shorthand', () => {
+    const result = runContract(['--help']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('DESCRIPTION');
+    expect(result.stdout).toContain('$ bonsai https://');
+  });
+
+  it('multi-source stdin import succeeds (stdin is not swallowed into the url arg)', () => {
+    // Regression: oclif fills an omitted optional positional from piped stdin, which made
+    // `import --stdin --source-url ...` wrongly report a positional/--source-url conflict. The
+    // url arg sets ignoreStdin to prevent that. Writes to a project cache in the scratch cwd.
+    const result = runContract(
+      [
+        'import',
+        '--stdin',
+        '--topic',
+        'React docs',
+        '--source-url',
+        'https://react.dev/a',
+        '--source-url',
+        'https://react.dev/b',
+      ],
+      { input: '# Synthesized notes\n\nCombined research.\n', env: { BONSAI_STORAGE: 'project' } }
+    );
+    expect(result.stderr).not.toContain('Cannot specify both');
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Successfully imported');
+  });
+
+  it('a malformed URL reports an actionable error without stuttering "Invalid URL"', () => {
+    const result = runContract(['inspect', 'notaurl']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Could not parse');
+    // Regression: the native URL error ("Invalid URL") used to be appended to the command's own
+    // "Invalid URL:" prefix, producing "Invalid URL: Invalid URL ... : Invalid URL".
+    expect(result.stderr).not.toContain('Invalid URL: Invalid URL');
+  });
+
+  it('import with both an explicit url and --source-url still conflicts (exit 2)', () => {
+    // ignoreStdin must not weaken the genuine conflict: an explicit positional token is still
+    // assigned to url, so supplying both it and --source-url is a usage error even with stdin piped.
+    const result = runContract(
+      ['import', 'https://example.com/x', '--source-url', 'https://example.com/y', '--stdin'],
+      { input: '# Notes\n\nContent.\n', env: { BONSAI_STORAGE: 'project' } }
+    );
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Cannot specify both');
+  });
+
+  it('URL shorthand with an unknown flag fails cleanly (exit 2, no stack trace)', () => {
+    const result = runContract(['https://example.com', '--bogus']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Nonexistent flag: --bogus');
+    // The shim must rewrite process.argv so the help renderer resolves `fetch`, not the bare
+    // URL — otherwise oclif throws "command https://... not found" and dumps a stack trace.
+    expect(result.stderr).not.toContain('not found');
+    expect(result.stderr).not.toMatch(/\n\s+at /);
+  });
+
+  it('non-http(s) URL shorthand reports the protocol error, not "command not found"', () => {
+    const result = runContract(['ftp://example.com']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Only http: and https:');
+    expect(result.stderr).not.toContain('command ftp://example.com not found');
+  });
+
+  it('prune rejects a malformed --older-than value (exit 2) instead of silently matching nothing', () => {
+    const result = runContract(['prune', '--older-than', '5z', '--dry-run']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Invalid --older-than');
+  });
+
+  it('import with empty stdin is a usage error (exit 2)', () => {
+    const result = runContract(['import', 'https://example.com/x', '--stdin'], { input: '' });
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Empty stdin content');
+  });
+
+  it('under --json a usage error exits the process with the same code as the envelope', () => {
+    const result = runContract(['https://example.com', '--ttl', '5z', '--json'], { raw: true });
+    // Guard before parsing so a non-JSON stdout regression fails with a readable message.
+    expect(result.stdout.trim()).not.toBe('');
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.ok).toBe(false);
+    expect(envelope.exitCode).toBe(2);
+    // The process exit code must agree with the envelope — agents branch on the process code.
+    expect(result.exitCode).toBe(2);
+  });
+
+  it('import with a missing --file reports the input error once (exit 2, no double prefix)', () => {
+    const result = runContract([
+      'import',
+      'https://example.com/z',
+      '--file',
+      '/no/such/file-xyz.md',
+    ]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('File does not exist');
+    expect(result.stderr).not.toContain('Failed to read file');
+  });
+});

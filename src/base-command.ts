@@ -35,6 +35,28 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     return input;
   }
 
+  /**
+   * The exit code an error maps to. oclif `CLIError`s carry it in `err.oclif.exit`; other errors may
+   * expose `err.exitCode`. Defined once so the process exit code (`catch`) and the JSON envelope
+   * (`toErrorJson`) can never disagree — a mismatch between these two was itself the bug this fixes.
+   */
+  private static exitCodeOf(err: { oclif?: { exit?: number }; exitCode?: number }): number {
+    return err?.oclif?.exit ?? err?.exitCode ?? 1;
+  }
+
+  /**
+   * Align the process exit code with the code reported in the JSON envelope. oclif's default
+   * `catch` sets `process.exitCode = err.exitCode ?? 1`, but oclif `CLIError`s carry their code in
+   * `err.oclif.exit` (never `err.exitCode`), so a usage error (`this.error(msg, { exit: 2 })`) would
+   * exit the process with 1 under `--json` while `toErrorJson` correctly reports `exitCode: 2`. That
+   * contradiction breaks the deterministic-exit-code contract agents rely on. Pre-seed the code from
+   * the shared resolver so the framework's `??` keeps it, then defer to the default behavior.
+   */
+  public override async catch(err: Error & { oclif?: { exit?: number }; exitCode?: number }) {
+    process.exitCode = process.exitCode ?? BaseCommand.exitCodeOf(err);
+    return super.catch(err);
+  }
+
   /** Command id for the JSON envelope; falls back to the binary name when a command has no id. */
   protected envelopeCommandId(): string {
     return this.ctor.id || this.config.bin;
@@ -71,7 +93,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   /** Mirror the success envelope for failures so JSON consumers get one consistent shape. */
   protected override toErrorJson(err: unknown): Record<string, unknown> {
     const e = err as { oclif?: { exit?: number }; exitCode?: number; message?: string };
-    const exitCode = e?.oclif?.exit ?? e?.exitCode ?? 1;
+    const exitCode = BaseCommand.exitCodeOf(e);
     return this.envelope({ ok: false, exitCode, stderr: e?.message ?? String(err), data: null });
   }
 }

@@ -31,7 +31,9 @@ describe('inspect command unit tests', () => {
   });
 
   it('rejects an invalid URL with exit 2', async () => {
-    await expect(ResearchInspect.run(['not a url'])).rejects.toThrow(/Invalid URL/);
+    await expect(ResearchInspect.run(['not a url'])).rejects.toThrow(
+      /Invalid URL: Could not parse/
+    );
   });
 
   it('returns metadata in --json mode without logging it', async () => {

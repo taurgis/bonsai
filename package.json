@@ -74,6 +74,7 @@
   "oclif": {
     "bin": "bonsai",
     "dirname": "bonsai",
+    "description": "Bonsai is a standalone local research cache CLI for AI agents.\nResearch and cache a web page by passing its URL directly:\n\n  $ bonsai https://nodejs.org/api/url.html\n\nThe URL form is shorthand for fetching and caching the page. The commands listed below search, inspect, list, import, and prune the local research cache.",
     "commands": {
       "strategy": "explicit",
       "target": "./dist/commands.js",

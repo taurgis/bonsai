@@ -8,7 +8,7 @@ describe('browser rendering unit and integration tests', () => {
       expect(path).toBeDefined();
       expect(typeof path).toBe('string');
     } catch (err) {
-      expect((err as Error).message).toContain('Chrome executable not found');
+      expect((err as Error).message).toContain('No Chrome or Chromium browser found');
     }
   });
 
