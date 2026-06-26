@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ResearchList from './list.js';
 import ResearchImport from './import.js';
 import * as storage from '../lib/research/storage.js';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 // Minimal active artifact whose freshness resolves to 'fresh' (validated just now, standard tier).
 function fakeArtifact(cacheKey: string, artifactType: string): any {
@@ -25,6 +26,8 @@ function fakeArtifact(cacheKey: string, artifactType: string): any {
 }
 
 describe('list command unit tests', () => {
+  useIsolatedCache();
+
   beforeEach(() => {
     vi.restoreAllMocks();
   });

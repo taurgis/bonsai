@@ -2,8 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ResearchPrune from './prune.js';
 import ResearchImport from './import.js';
 import { existsSync } from 'node:fs';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 describe('prune command unit tests', () => {
+  useIsolatedCache();
+
   beforeEach(() => {
     vi.restoreAllMocks();
   });

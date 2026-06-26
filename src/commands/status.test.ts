@@ -1,8 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import ResearchStatus from './status.js';
 import ResearchImport from './import.js';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 describe('status command unit tests', () => {
+  useIsolatedCache();
+
   it('handles uncached miss status', async () => {
     const result = (await ResearchStatus.run(['https://example.com/not-cached-status'])) as any;
     expect(result).toBeDefined();

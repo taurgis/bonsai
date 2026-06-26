@@ -2,8 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import ResearchImport from './import.js';
+import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 describe('import command unit tests', () => {
+  useIsolatedCache();
+
   it('successfully imports single-source markdown content', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')
