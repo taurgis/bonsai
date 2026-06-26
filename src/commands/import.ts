@@ -92,6 +92,12 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   static stdoutIsPrimaryData = true;
 
+  // Isolated so tests can force the interactive branch; `isTTY` is `true` only on a real terminal and
+  // falsy (undefined) for pipes, files, and /dev/null. See https://nodejs.org/api/process.html#processstdin
+  protected stdinIsInteractive(): boolean {
+    return process.stdin.isTTY === true;
+  }
+
   private async readStdin(limitBytes: number = 1024 * 1024): Promise<string> {
     return new Promise((resolve, reject) => {
       let data = '';
@@ -195,7 +201,21 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   private async readAndValidateInput(): Promise<string> {
     if (this.flags.stdin) {
-      let rawInput: string;
+      // On an interactive terminal with nothing piped, reading stdin blocks forever waiting for EOF —
+      // a silent hang with no feedback. Fail fast with a usage error instead; piped/redirected input
+      // (the agent and CI path) has isTTY falsy and reads normally.
+      if (this.stdinIsInteractive()) {
+        this.error('No data piped to --stdin.', {
+          exit: 2,
+          suggestions: [
+            'Pipe Markdown content, e.g. cat notes.md | bonsai import <url> --stdin',
+            'Or read from a file: bonsai import <url> --file notes.md',
+          ],
+        });
+      }
+      // Initialized so the post-catch read below never depends on this.error()'s `never` return type
+      // for definite assignment; the empty-content guard rejects '' as a usage error anyway.
+      let rawInput = '';
       try {
         rawInput = await this.readStdin();
       } catch (err) {
