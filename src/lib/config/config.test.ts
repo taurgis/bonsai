@@ -7,6 +7,7 @@ import {
   resolveSummaryLevel,
   parseEnvStorage,
   parseEnvSummary,
+  invalidEnvOverrideWarnings,
   STORAGE_ENV_VAR,
   SUMMARY_ENV_VAR,
 } from './resolve.js';
@@ -109,6 +110,38 @@ describe('parseEnvSummary', () => {
     expect(parseEnvSummary({ [SUMMARY_ENV_VAR]: ' aggressive ' })).toBe('aggressive');
     expect(parseEnvSummary({ [SUMMARY_ENV_VAR]: 'bogus' })).toBeUndefined();
     expect(parseEnvSummary({})).toBeUndefined();
+  });
+});
+
+describe('invalidEnvOverrideWarnings', () => {
+  it('returns nothing when env overrides are absent or valid', () => {
+    expect(invalidEnvOverrideWarnings({})).toEqual([]);
+    expect(
+      invalidEnvOverrideWarnings({ [STORAGE_ENV_VAR]: 'project', [SUMMARY_ENV_VAR]: 'balanced' })
+    ).toEqual([]);
+  });
+
+  it('warns for a set-but-invalid value, naming the var and the valid options', () => {
+    const [warning, ...rest] = invalidEnvOverrideWarnings({ [SUMMARY_ENV_VAR]: 'agressive' });
+    expect(rest).toHaveLength(0);
+    expect(warning).toContain(SUMMARY_ENV_VAR);
+    expect(warning).toContain('agressive');
+    expect(warning).toContain('conservative, balanced, aggressive');
+  });
+
+  it('reports each offending variable independently', () => {
+    expect(
+      invalidEnvOverrideWarnings({ [STORAGE_ENV_VAR]: 'nope', [SUMMARY_ENV_VAR]: 'nope' })
+    ).toHaveLength(2);
+  });
+
+  it('treats an empty or whitespace-only value as unset (no warning), like parseEnv*', () => {
+    expect(invalidEnvOverrideWarnings({ [STORAGE_ENV_VAR]: '' })).toEqual([]);
+    expect(invalidEnvOverrideWarnings({ [SUMMARY_ENV_VAR]: '   ' })).toEqual([]);
+  });
+
+  it('warns on a wrong-case value, since matching is case-sensitive', () => {
+    expect(invalidEnvOverrideWarnings({ [SUMMARY_ENV_VAR]: 'Aggressive' })).toHaveLength(1);
   });
 });
 

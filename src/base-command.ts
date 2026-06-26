@@ -1,4 +1,5 @@
 import { Command, Errors, Interfaces } from '@oclif/core';
+import { invalidEnvOverrideWarnings } from './lib/config/index.js';
 
 /**
  * Shared base for every Bonsai command. Enables oclif's native `--json` flag,
@@ -22,6 +23,11 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     });
     this.flags = flags as Interfaces.InferredFlags<T['flags']>;
     this.args = args as Interfaces.InferredArgs<T['args']>;
+
+    // Surface a set-but-invalid BONSAI_* override once per run. Resolution silently drops such a
+    // value, so without this a typo'd env var would take no effect with no signal. Warnings go to
+    // stderr (even under --json), so machine output stays clean.
+    for (const warning of invalidEnvOverrideWarnings(process.env)) this.warn(warning);
   }
 
   /**
