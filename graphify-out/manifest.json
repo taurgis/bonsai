@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782501135.9001784,
-    "ast_hash": "6e457c872a61d90d62fb85448f6f3cc8",
+    "mtime": 1782505549.1191344,
+    "ast_hash": "06ce6b10b72698c6d5b9c6842318de47",
     "semantic_hash": ""
   },
   "scripts/check-line-counts.ts": {
@@ -570,8 +570,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1782406890.136731,
-    "ast_hash": "62afcc9490c453c34b7fa66a784c770b",
+    "mtime": 1782505549.1082141,
+    "ast_hash": "1664cc5904619723d86c29ba6bdc9f79",
     "semantic_hash": ""
   },
   "docs/troubleshooting.md": {
@@ -1290,13 +1290,13 @@
     "semantic_hash": ""
   },
   "src/lib/research/docs/sections.test.ts": {
-    "mtime": 1782312763.9595115,
-    "ast_hash": "fcd03814a4404a39ca321bc9b6e2d128",
+    "mtime": 1782505547.2532039,
+    "ast_hash": "eb508163fb040ec8bc94395a78ef6cb2",
     "semantic_hash": ""
   },
   "src/lib/research/docs/sections.ts": {
-    "mtime": 1782312654.3819356,
-    "ast_hash": "3a3a8b5c5eeaf7616c963486c962256a",
+    "mtime": 1782505547.2557728,
+    "ast_hash": "35d87a8c1472892ff7a98127498e59ad",
     "semantic_hash": ""
   },
   "src/lib/research/docs/source-map.test.ts": {
@@ -2120,13 +2120,13 @@
     "semantic_hash": ""
   },
   "src/commands/import.test.ts": {
-    "mtime": 1782501420.8773367,
-    "ast_hash": "2b42f5016ce1c5a1504c02e5c74524fb",
+    "mtime": 1782505547.2466872,
+    "ast_hash": "f8a846180a3171d82a92ab04d582c636",
     "semantic_hash": ""
   },
   "src/commands/import.ts": {
-    "mtime": 1782482792.5244358,
-    "ast_hash": "0be523b338bc35ab260daae06e9cbf1a",
+    "mtime": 1782505547.2491376,
+    "ast_hash": "898e83c67c4ff8be84c937044d6be509",
     "semantic_hash": ""
   },
   "src/commands/inspect.test.ts": {
@@ -2180,13 +2180,13 @@
     "semantic_hash": ""
   },
   "src/commands/fetch.test.ts": {
-    "mtime": 1782501420.874752,
-    "ast_hash": "8f74b24627405b59a97669f879e9e6e0",
+    "mtime": 1782505547.242017,
+    "ast_hash": "21dedd7d2fc89005fb229a31ac383c8b",
     "semantic_hash": ""
   },
   "src/commands/fetch.ts": {
-    "mtime": 1782501135.924152,
-    "ast_hash": "4a4e1f7cdf5ff88ca8316c2dfe7c4435",
+    "mtime": 1782505547.2443674,
+    "ast_hash": "f1746d2a79d8a487726bd998d043f3cd",
     "semantic_hash": ""
   },
   "src/lib/atomic-write.ts": {
@@ -3870,8 +3870,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/deploy.yml": {
-    "mtime": 1782398187.7778742,
-    "ast_hash": "284da5cce95ed2dc26a9b2e29d0e67a9",
+    "mtime": 1782505549.1044693,
+    "ast_hash": "330b4242dcefac2bc678d86307fe14cf",
     "semantic_hash": ""
   },
   "docs/examples.md": {
@@ -4852,6 +4852,11 @@
   ".github/instructions/post-feature-technical-writing.instructions.md": {
     "mtime": 1782502689.9327972,
     "ast_hash": "5cfa1c32b8ed42f3247a99fa78ab0eef",
+    "semantic_hash": ""
+  },
+  ".bonsai/research/3d5e96e79cf1443abd4bff2e01c8acd32f2f40bab62dbfc6b1ef475f407c43ea.md": {
+    "mtime": 1782505547.2393894,
+    "ast_hash": "a5e7c339b633c43549edaa9ec806e89c",
     "semantic_hash": ""
   }
 }

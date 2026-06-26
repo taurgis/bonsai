@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/taurgis/bonsai.git"
   },
-  "homepage": "https://taurgis.github.io/bonsai/",
+  "homepage": "https://bonsai.rhino-inquisitor.com/",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {

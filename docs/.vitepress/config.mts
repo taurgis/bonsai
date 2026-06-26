@@ -7,7 +7,7 @@ type PageMetadata = {
   keywords: string[];
 };
 
-const siteUrl = 'https://taurgis.github.io/bonsai/';
+const siteUrl = 'https://bonsai.rhino-inquisitor.com/';
 const siteName = 'Bonsai Docs';
 const productName = 'Bonsai';
 const defaultKeywords = [
@@ -248,8 +248,8 @@ function metadataHead(pageData: PageData, metadata: PageMetadata): HeadConfig[] 
   ];
 }
 
-// Deployed as a GitHub Pages project site at https://taurgis.github.io/bonsai/,
-// so `base` must be the repo name with leading + trailing slashes.
+// Deployed to GitHub Pages behind a custom root domain.
+// https://vitepress.dev/guide/deploy#setting-a-public-base-path
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Bonsai',
@@ -257,13 +257,13 @@ export default defineConfig({
   description:
     'A local research cache CLI for AI agents. Fetch docs once, prune them to fit a token budget, and reuse the cache instead of re-scraping.',
   lang: 'en-US',
-  base: '/bonsai/',
+  base: '/',
   cleanUrls: true,
   lastUpdated: false,
 
   head: [
-    // Favicon path includes `base` because `head` entries are not rewritten.
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/bonsai/favicon.svg' }],
+    // Head entries are not rewritten by VitePress, so keep this root-relative.
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     ['meta', { name: 'theme-color', content: '#18794e' }],
   ],
 

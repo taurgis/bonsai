@@ -4,7 +4,7 @@ Bonsai is a standalone local research cache CLI for AI agents. It turns official
 
 The package is published as `@taurgis/bonsai` and installs a `bonsai` binary.
 
-📚 **Full documentation: [taurgis.github.io/bonsai](https://taurgis.github.io/bonsai/)**
+📚 **Full documentation: [bonsai.rhino-inquisitor.com](https://bonsai.rhino-inquisitor.com/)**
 
 > Because the npm package is scoped, the correct one-shot command is `npx @taurgis/bonsai ...`. The unscoped `npx bonsai` name resolves to the separate `bonsai` package on npm unless an unscoped shim is published later.
 
@@ -259,7 +259,7 @@ When run with `--json`, commands return a stable envelope:
 ## Reference Documentation
 
 The full documentation site lives at
-**[taurgis.github.io/bonsai](https://taurgis.github.io/bonsai/)** (built with
+**[bonsai.rhino-inquisitor.com](https://bonsai.rhino-inquisitor.com/)** (built with
 VitePress from the [`docs/`](docs/) folder). Key pages:
 
 * [Getting Started](docs/guide/getting-started.md)
