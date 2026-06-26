@@ -40,6 +40,31 @@ function topicChainLength(segments: string[], config: Interfaces.Config): number
   return i + 1;
 }
 
+// Dot-separated, non-empty labels: a real domain (`docs.nestjs.com`) or IPv4 (`192.168.1.1`). The
+// URL parser also accepts a leading-dot filename (`.env`) or a relative path (`./x`) as a "host",
+// whose suggestion would be a nonsense `https://.env`; requiring well-formed labels rejects those.
+// Anchored with no overlapping quantifiers, so it is ReDoS-safe on the (already length-bounded) host.
+const DOMAIN_OR_IPV4 = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
+
+/**
+ * The input as-typed when it looks like a URL missing its scheme (`example.com`,
+ * `docs.nestjs.com/guide`), else null. `bonsai <url>` is the headline command, but bin/cli.mjs only
+ * routes args carrying a `://` scheme to the fetch shorthand — so a scheme-less URL falls through to
+ * `command_not_found`. A domain-shaped host separates a forgotten-scheme URL from an ordinary command
+ * typo: `statuss` has no dot and never matches, while `config:frobnicate` fails to parse (the second
+ * segment becomes a non-numeric port), so neither is misread as a URL.
+ */
+function bareUrlInput(id: string): string | null {
+  if (id.includes('://')) return null;
+  let hostname: string;
+  try {
+    hostname = new URL(`https://${id}`).hostname;
+  } catch {
+    return null;
+  }
+  return DOMAIN_OR_IPV4.test(hostname) ? id : null;
+}
+
 /**
  * Typo-aware "command not found" handler. oclif fires this before printing its own terse error;
  * throwing here (via `this.error`) replaces that default with a more helpful message. A correction
@@ -49,6 +74,21 @@ function topicChainLength(segments: string[], config: Interfaces.Config): number
 const hook: Hook<'command_not_found'> = async function (opts) {
   const hiddenIds = new Set(opts.config.commands.filter((c) => c.hidden).map((c) => c.id));
   const visibleIds = opts.config.commandIDs.filter((id) => !hiddenIds.has(id));
+
+  // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
+  // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which
+  // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
+  const bareUrl = bareUrlInput(opts.id);
+  if (bareUrl) {
+    this.error(
+      [
+        `${bareUrl} is not a ${opts.config.bin} command.`,
+        `Run ${opts.config.bin} help for a list of available commands.`,
+        `Did you mean ${opts.config.bin} https://${bareUrl}? URLs need an http:// or https:// scheme.`,
+      ].join('\n'),
+      { exit: 2 }
+    );
+  }
 
   const segments = opts.id.split(':');
   const { suggestion, commandSegments } = findSuggestion(segments, visibleIds);
