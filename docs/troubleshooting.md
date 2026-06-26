@@ -79,7 +79,7 @@ Bonsai returns a distinct exit code for each result status, so a machine caller 
 | --- | --- | --- | --- |
 | **`0`** | **Success** | Command completed successfully, or a valid cache hit was returned. | No action required. |
 | **`1`** | **Runtime Failure** | A network or server failure that occurs after validation passes: DNS resolution failure, connection timeout, TLS/SSL error, an HTTP status >= 400 from the server, or a hostname that only resolves to a blocked private/local address at request time. | Check internet connection, verify the target URL, or ensure the host is public. |
-| **`2`** | **Usage Error** | Invalid input rejected before any network call: invalid flags, missing positional arguments, incorrect `--stdin`/`--file` usage, or a rejected URL (malformed, a non-`http(s)` scheme, or a literal private/local/SSRF address written in the URL itself). | Check help output using `--help`, and confirm the URL is a public `http(s)` address. |
+| **`2`** | **Usage Error** | Invalid input rejected before any network call: an unknown command or typo (Bonsai prints the nearest matching command when one is close), invalid flags, missing positional arguments, incorrect `--stdin`/`--file` usage, or a rejected URL (malformed, a non-`http(s)` scheme, or a literal private/local/SSRF address written in the URL itself). | Check help output using `--help`, and confirm the command name and that the URL is a public `http(s)` address. |
 | **`5`** | **Offline Stale Warning** | Server is offline or unreachable, and the CLI served stale cache inside the grace window. | Revalidation failed but cache is within grace. Run with `--allow-stale` to suppress this warning and exit with `0`. |
 
 ### Troubleshooting Specific Scenarios

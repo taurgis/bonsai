@@ -26,6 +26,9 @@ logs/
 # Derived search index (rebuilt on demand from cached artifacts)
 **/.search-index.json
 
+# Superseded artifact backups archived when a cache entry is overwritten
+**/*.superseded.*.md
+
 # IDEs and editors
 .idea/
 .vscode/
