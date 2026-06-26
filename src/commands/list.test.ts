@@ -1,6 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ResearchList from './list.js';
 import ResearchImport from './import.js';
+import * as storage from '../lib/research/storage.js';
+
+// Minimal active artifact whose freshness resolves to 'fresh' (validated just now, standard tier).
+function fakeArtifact(cacheKey: string, artifactType: string): any {
+  return {
+    metadata: {
+      status: 'active',
+      artifact_type: artifactType,
+      cache_key: cacheKey,
+      source_urls: [`https://example.com/${cacheKey}`],
+      topic: null,
+      tags: [],
+      tier: 'standard',
+      ttl: null,
+      token_estimate: { compressed: 1, detailed: 1 },
+      quality_notes: [],
+      fetched_at: null,
+      validated_at: new Date().toISOString(),
+      capture_method: 'static_fetch',
+    },
+  };
+}
 
 describe('list command unit tests', () => {
   beforeEach(() => {
@@ -122,6 +144,18 @@ describe('list command unit tests', () => {
     ).toBe(0);
 
     readSpy.mockRestore();
+  });
+
+  it('excludes section sub-artifacts so a chunked page does not flood the listing', async () => {
+    // Drive the real list callback over a page-level source plus one of its section children.
+    const artifacts = [fakeArtifact('page', 'source'), fakeArtifact('page#sec', 'section')];
+    vi.spyOn(storage, 'scanCacheDirs').mockImplementation((_roots: string[], fn: any) =>
+      artifacts.map((a) => fn(a, `/x/${a.metadata.cache_key}.md`)).filter((x) => x !== null)
+    );
+
+    const result = (await ResearchList.run([])) as any[];
+    expect(result.some((r) => r.artifactType === 'section')).toBe(false);
+    expect(result.map((r) => r.cacheKey)).toEqual(['page']);
   });
 
   it('returns an empty list when nothing matches the filter', async () => {
