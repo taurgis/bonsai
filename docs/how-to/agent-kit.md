@@ -11,13 +11,29 @@ in the Bonsai repo, written in GitHub Copilot format. The installer converts the
 to whichever agent you target, so the same kit drops into Copilot, Claude Code,
 or Cursor.
 
+## Start here
+
+If you are new to agent config, use this order:
+
+1. Install Bonsai and make sure `bonsai --help` works.
+2. Install the agent kit with `forward-nexus`.
+3. Add a hook example only if you want to block the agent's built-in web fetch.
+4. Ask the agent to research one doc page and watch for a `bonsai search` or
+   `bonsai <url> --format detailed` command.
+
+You do not need to understand every generated file before you start. The skill
+teaches the agent what to do, the instruction tells it when to do it, and the
+subagent handles bigger research jobs without filling the main chat with fetch
+output.
+
 ## What's in the kit
 
-| Piece | File | What it does |
-| --- | --- | --- |
-| **Skill** | `web-research` | The actual workflow: search the cache, fetch with `--format detailed`, use `--rendered` for SPAs, import manual notes. The agent runs this whenever it needs docs. |
-| **Instruction** | `web-research` | The always-on rule that *requires* the agent to verify current official docs before technical changes, and says when to run the skill inline vs. delegate to the subagent. |
-| **Subagent** | `official-docs-researcher` | A focused researcher the main agent delegates to for large or multi-source research, so verbose fetching stays out of the main context. It returns source-cited findings. |
+| Piece             | File                       | What it does                                                                                                                                                               |
+| ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Skill**         | `web-research`             | The actual workflow: search the cache, fetch with `--format detailed`, use `--rendered` for SPAs, import manual notes. The agent runs this whenever it needs docs.         |
+| **Instruction**   | `web-research`             | The always-on rule that _requires_ the agent to verify current official docs before technical changes, and says when to run the skill inline vs. delegate to the subagent. |
+| **Subagent**      | `official-docs-researcher` | A focused researcher the main agent delegates to for large or multi-source research, so verbose fetching stays out of the main context. It returns source-cited findings.  |
+| **Hook examples** | `hooks/`                   | Optional native hook configs that block one-off URL fetch tools and tell the agent to run Bonsai instead.                                                                  |
 
 The skill is the engine, the instruction decides when it fires, and the subagent
 isolates the heavy research. You can install all three or just the skill.
@@ -30,10 +46,10 @@ for teams whose research targets Salesforce docs. They reuse the same
 searching Help live with `--domain help.salesforce.com`, and letting the modules
 render and extract the JavaScript-only Help and Developer pages.
 
-| Piece | File | What it does |
-| --- | --- | --- |
-| **Instruction** | `salesforce-research` | Requires verifying current Salesforce docs before Salesforce-related changes, and points at the site-module workflow. |
-| **Subagent** | `salesforce-docs-researcher` | The researcher specialized for Salesforce Help and Developer docs; returns source-cited findings. |
+| Piece           | File                         | What it does                                                                                                          |
+| --------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Instruction** | `salesforce-research`        | Requires verifying current Salesforce docs before Salesforce-related changes, and points at the site-module workflow. |
+| **Subagent**    | `salesforce-docs-researcher` | The researcher specialized for Salesforce Help and Developer docs; returns source-cited findings.                     |
 
 - [View the instruction source →](https://github.com/taurgis/bonsai/blob/main/agents/instructions/salesforce-research.instructions.md)
 - [View the subagent source →](https://github.com/taurgis/bonsai/blob/main/agents/agents/salesforce-docs-researcher.agent.md)
@@ -53,6 +69,15 @@ npx forward-nexus add https://github.com/taurgis/bonsai/tree/main/agents \
   --all --agent=github-copilot,claude-code
 ```
 
+Use one `--agent` value for one tool, or a comma-separated list for several:
+
+| You use               | Run                                                                                                                 |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Claude Code           | `npx forward-nexus add https://github.com/taurgis/bonsai/tree/main/agents --all --agent=claude-code`                |
+| GitHub Copilot        | `npx forward-nexus add https://github.com/taurgis/bonsai/tree/main/agents --all --agent=github-copilot`             |
+| Cursor                | `npx forward-nexus add https://github.com/taurgis/bonsai/tree/main/agents --all --agent=cursor`                     |
+| Claude Code + Copilot | `npx forward-nexus add https://github.com/taurgis/bonsai/tree/main/agents --all --agent=claude-code,github-copilot` |
+
 `--all` takes every artifact in the folder (skill, instruction, subagent).
 `--agent` is a comma-separated list of targets; pass one or several:
 
@@ -69,6 +94,109 @@ npx forward-nexus add https://github.com/taurgis/bonsai/tree/main/agents \
 Each target writes to that agent's own config directory (`.github/`, `.claude/`,
 `.cursor/`). Commit the result and your teammates pick up the same research
 workflow.
+
+## Add hook examples
+
+The kit also includes optional hook examples under
+[`agents/hooks/`](https://github.com/taurgis/bonsai/tree/main/agents/hooks).
+These are not installed automatically by `forward-nexus`; copy the example for
+your agent when you want the editor or agent runtime to block native URL fetches
+and return a model-visible Bonsai command instead.
+
+::: warning Hooks are intrusive
+These examples block the agent's native web-fetch tool. If Bonsai fails because
+of network access, installation, permissions, or extraction quality, the agent
+may have no native fallback for real research. Use hooks with caution, monitor
+whether they improve your workflow, and remove or narrow them if they get in the
+way.
+:::
+
+| Agent          | Native hook location                              | Bonsai example                 |
+| -------------- | ------------------------------------------------- | ------------------------------ |
+| Claude Code    | `.claude/settings.json` plus `.claude/hooks/*.sh` | `agents/hooks/claude-code/`    |
+| GitHub Copilot | `.github/hooks/*.json` plus matching scripts      | `agents/hooks/github-copilot/` |
+| Cursor         | `.cursor/hooks.json` plus `.cursor/hooks/*.sh`    | `agents/hooks/cursor/`         |
+| Codex          | `.codex/hooks.json` plus `.codex/hooks/*.sh`      | `agents/hooks/codex/`          |
+
+Copy the files into the matching locations in your project. For example, for
+Cursor:
+
+```bash
+mkdir -p .cursor/hooks
+cp agents/hooks/cursor/hooks.json .cursor/hooks.json
+cp agents/hooks/cursor/hooks/bonsai-web-fetch.sh .cursor/hooks/bonsai-web-fetch.sh
+```
+
+For Claude Code:
+
+```bash
+mkdir -p .claude/hooks
+cp agents/hooks/claude-code/settings.json .claude/settings.json
+cp agents/hooks/claude-code/hooks/bonsai-web-fetch.sh .claude/hooks/bonsai-web-fetch.sh
+```
+
+For GitHub Copilot:
+
+```bash
+mkdir -p .github/hooks
+cp agents/hooks/github-copilot/bonsai-web-fetch.json .github/hooks/bonsai-web-fetch.json
+cp agents/hooks/github-copilot/bonsai-web-fetch.sh .github/hooks/bonsai-web-fetch.sh
+```
+
+For Codex:
+
+```bash
+mkdir -p .codex/hooks
+cp agents/hooks/codex/hooks.json .codex/hooks.json
+cp agents/hooks/codex/hooks/*.sh .codex/hooks/
+```
+
+The hooks do not silently rewrite a web fetch into a shell command. The reliable
+pattern across tools is to deny the native URL-fetch tool and tell the agent to
+run:
+
+```bash
+bonsai <url> --format detailed
+```
+
+Use `node bin/cli.mjs <url> --format detailed` when testing inside the Bonsai
+repo. Codex has a narrower hook surface than the other examples: its
+`PreToolUse` hook can block shell, patch, and MCP tool calls, but not every
+built-in web or search tool. The Codex example therefore covers MCP-style fetch
+tools and adds prompt-time context for URL-heavy requests.
+
+These examples are based on the current native hook docs for
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code/hooks),
+[GitHub Copilot](https://docs.github.com/en/copilot/concepts/agents/hooks),
+[Cursor](https://cursor.com/docs/hooks), and
+[Codex](https://developers.openai.com/codex/hooks). Antigravity is omitted
+because no official project hook surface is currently documented for replacing
+`read_url_content` or similar URL-fetch tools.
+
+## What to tell your agent
+
+After installing the kit, you can give the agent a simple instruction like this:
+
+```text
+Before changing code that depends on external docs, search Bonsai first. If the
+page is not cached, fetch it with `bonsai <url> --format detailed`. Use
+`--rendered` only when a normal fetch misses client-rendered content. Cite the
+sources you used.
+```
+
+That is enough for most junior-friendly workflows. The agent should follow this
+loop:
+
+1. Search: `bonsai search "<topic>" --json`
+2. Check a known URL: `bonsai status <url> --json`
+3. Fetch only on a miss: `bonsai <url> --format detailed --json`
+4. Use `--rendered` for JavaScript-heavy docs pages.
+5. Import manual notes when Bonsai cannot fetch a page:
+   `bonsai import <url> --file notes.md --json`
+
+The agent does not need to browse first and cache later. Bonsai should be the
+first fetch path, because the result is reusable by the next agent and the next
+session.
 
 ## What lands for Claude Code
 
@@ -111,7 +239,7 @@ full model ID, or `inherit`.
 ```yaml
 ---
 name: official-docs-researcher
-description: "Researches official documentation through Bonsai and returns source-cited findings"
+description: 'Researches official documentation through Bonsai and returns source-cited findings'
 model: sonnet
 tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 ---
@@ -139,7 +267,7 @@ and `alwaysApply` frontmatter:
 
 - Rule — [`.cursor/rules/web-research.mdc`](https://github.com/taurgis/bonsai/blob/main/.cursor/rules/web-research.mdc)
 
-Cursor has no documented project-level *subagent* file. The closest native homes
+Cursor has no documented project-level _subagent_ file. The closest native homes
 for the researcher's behavior are a rule or a
 [Cursor skill](https://cursor.com/docs/skills) (`.cursor/skills/<name>/SKILL.md`).
 Bonsai still ships a [`.cursor/agents/` example](https://github.com/taurgis/bonsai/blob/main/.cursor/agents/official-docs-researcher.md),

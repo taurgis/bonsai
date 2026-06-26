@@ -19,13 +19,6 @@ export type TextFetcher = (
 
 const defaultFetcher: TextFetcher = (url) => fetchText(url);
 
-// Frameworks/engines that the research observed serving page-level `.md` routes (T-24 evidence).
-function advertisesRouteMarkdown(caps: SiteCapabilities): boolean {
-  return (
-    caps.docsEngine === 'vitepress' || caps.framework === 'rspress' || caps.framework === 'gitbook'
-  );
-}
-
 function llmsTxtCandidates(pageUrl: string, caps: SiteCapabilities): string[] {
   const advertised = caps.machineReadable
     .filter((m) => m.type === 'llms.txt' || m.type === 'llms-full.txt')
@@ -74,8 +67,8 @@ export async function probeLlmsTxt(
 }
 
 /**
- * Probes a page-level `.md` route, but only when the engine/framework is known to serve one or the
- * page advertises one. Returns validated Markdown source for the page, or null.
+ * Probes a page-level `.md` route. The derived route is only a candidate: it must be same-origin,
+ * fetch successfully, and validate as non-HTML/non-error Markdown before being trusted.
  */
 export async function probeRouteMarkdown(
   pageUrl: string,
@@ -85,7 +78,7 @@ export async function probeRouteMarkdown(
   const advertised = caps.machineReadable
     .filter((m) => m.type === 'route-markdown')
     .map((m) => m.url);
-  const derived = advertisesRouteMarkdown(caps) ? [vitepressRouteMarkdown(pageUrl)] : [];
+  const derived = [vitepressRouteMarkdown(pageUrl)];
   const candidates = [...new Set([...advertised, ...derived].filter((u): u is string => !!u))];
 
   for (const candidate of candidates) {

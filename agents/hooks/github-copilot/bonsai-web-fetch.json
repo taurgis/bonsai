@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "matcher": "web_fetch",
+        "bash": "bash .github/hooks/bonsai-web-fetch.sh",
+        "powershell": "bash .github/hooks/bonsai-web-fetch.sh",
+        "timeoutSec": 10
+      }
+    ],
+    "PreToolUse": [
+      {
+        "type": "command",
+        "matcher": "WebFetch",
+        "bash": "bash .github/hooks/bonsai-web-fetch.sh",
+        "powershell": "bash .github/hooks/bonsai-web-fetch.sh",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

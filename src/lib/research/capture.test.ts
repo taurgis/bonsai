@@ -133,6 +133,21 @@ describe('capturePage', () => {
     expect(out.extraction.detailedMarkdown).toContain('# What is VitePress?');
   });
 
+  it('prefers a Cursor route .md over rendered extraction', async () => {
+    const url = 'https://cursor.com/docs/hooks';
+    const out = await capturePage(
+      url,
+      {},
+      deps({
+        static: { [url]: load('next.html') },
+        text: { 'https://cursor.com/docs/hooks.md': '# Hooks\n\nCursor hooks documentation.' },
+      })
+    );
+    expect(out.captureMethod).toBe('route_markdown');
+    expect(out.sourceDocUrl).toBe('https://cursor.com/docs/hooks.md');
+    expect(out.extraction.detailedMarkdown).toContain('# Hooks');
+  });
+
   it('maps a Node API page to its GitHub source when no route .md exists', async () => {
     const url = 'https://nodejs.org/api/url.html';
     const raw = 'https://raw.githubusercontent.com/nodejs/node/main/doc/api/url.md';

@@ -86,11 +86,28 @@ describe('probeRouteMarkdown', () => {
     expect(result?.body).toContain('# What is VitePress?');
   });
 
-  it('does not derive a route .md for Mintlify/Fumadocs (no advertised route)', async () => {
+  it('derives a route .md for any docs page when the route validates', async () => {
     const caps = detectDocsEngine(load('mintlify.html'), 'https://mintlify.com/docs');
     const fetcher = fakeFetcher({ 'https://mintlify.com/docs.md': load('route.md') });
     const result = await probeRouteMarkdown('https://mintlify.com/docs', caps, fetcher);
+    expect(result?.artifact.type).toBe('route-markdown');
+    expect(result?.artifact.url).toBe('https://mintlify.com/docs.md');
+  });
+
+  it('ignores a derived route .md that returns HTML', async () => {
+    const caps = detectDocsEngine(load('mintlify.html'), 'https://mintlify.com/docs');
+    const fetcher = fakeFetcher({ 'https://mintlify.com/docs.md': load('error-404.html') });
+    const result = await probeRouteMarkdown('https://mintlify.com/docs', caps, fetcher);
     expect(result).toBeNull();
+  });
+
+  it('derives a route .md for Cursor docs pages', async () => {
+    const caps = detectDocsEngine(load('next.html'), 'https://cursor.com/docs/hooks');
+    const fetcher = fakeFetcher({ 'https://cursor.com/docs/hooks.md': load('route.md') });
+    const result = await probeRouteMarkdown('https://cursor.com/docs/hooks', caps, fetcher);
+    expect(result?.artifact.type).toBe('route-markdown');
+    expect(result?.artifact.url).toBe('https://cursor.com/docs/hooks.md');
+    expect(result?.body).toContain('# What is VitePress?');
   });
 
   it('uses an advertised route-markdown candidate from capabilities', async () => {

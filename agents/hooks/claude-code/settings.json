@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "WebFetch|WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/bonsai-web-fetch.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

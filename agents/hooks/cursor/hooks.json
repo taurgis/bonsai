@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "bash .cursor/hooks/bonsai-web-fetch.sh",
+        "matcher": "web_fetch|WebFetch|read_url_content|get_url_content",
+        "timeout": 10
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__.*(web|fetch|get_url_content|read_url_content).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codex/hooks/bonsai-web-fetch.sh",
+            "timeout": 10,
+            "statusMessage": "Routing URL fetch through Bonsai"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codex/hooks/bonsai-user-prompt-context.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

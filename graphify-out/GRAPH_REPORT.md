@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-26)
 
 ## Corpus Check
-- 808 files · ~884,433 words
+- 925 files · ~955,561 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 8360 nodes · 8934 edges · 814 communities (757 shown, 57 thin omitted)
+- 9367 nodes · 9827 edges · 945 communities (881 shown, 64 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f1d570d6`
+- Built from commit: `5a545efe`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -818,6 +818,137 @@
 - [[_COMMUNITY_Community 811|Community 811]]
 - [[_COMMUNITY_Community 812|Community 812]]
 - [[_COMMUNITY_Community 813|Community 813]]
+- [[_COMMUNITY_Community 814|Community 814]]
+- [[_COMMUNITY_Community 815|Community 815]]
+- [[_COMMUNITY_Community 816|Community 816]]
+- [[_COMMUNITY_Community 817|Community 817]]
+- [[_COMMUNITY_Community 818|Community 818]]
+- [[_COMMUNITY_Community 819|Community 819]]
+- [[_COMMUNITY_Community 820|Community 820]]
+- [[_COMMUNITY_Community 821|Community 821]]
+- [[_COMMUNITY_Community 822|Community 822]]
+- [[_COMMUNITY_Community 823|Community 823]]
+- [[_COMMUNITY_Community 824|Community 824]]
+- [[_COMMUNITY_Community 825|Community 825]]
+- [[_COMMUNITY_Community 826|Community 826]]
+- [[_COMMUNITY_Community 827|Community 827]]
+- [[_COMMUNITY_Community 828|Community 828]]
+- [[_COMMUNITY_Community 829|Community 829]]
+- [[_COMMUNITY_Community 830|Community 830]]
+- [[_COMMUNITY_Community 831|Community 831]]
+- [[_COMMUNITY_Community 832|Community 832]]
+- [[_COMMUNITY_Community 833|Community 833]]
+- [[_COMMUNITY_Community 834|Community 834]]
+- [[_COMMUNITY_Community 835|Community 835]]
+- [[_COMMUNITY_Community 836|Community 836]]
+- [[_COMMUNITY_Community 837|Community 837]]
+- [[_COMMUNITY_Community 838|Community 838]]
+- [[_COMMUNITY_Community 839|Community 839]]
+- [[_COMMUNITY_Community 840|Community 840]]
+- [[_COMMUNITY_Community 841|Community 841]]
+- [[_COMMUNITY_Community 842|Community 842]]
+- [[_COMMUNITY_Community 843|Community 843]]
+- [[_COMMUNITY_Community 844|Community 844]]
+- [[_COMMUNITY_Community 845|Community 845]]
+- [[_COMMUNITY_Community 846|Community 846]]
+- [[_COMMUNITY_Community 847|Community 847]]
+- [[_COMMUNITY_Community 848|Community 848]]
+- [[_COMMUNITY_Community 849|Community 849]]
+- [[_COMMUNITY_Community 850|Community 850]]
+- [[_COMMUNITY_Community 851|Community 851]]
+- [[_COMMUNITY_Community 852|Community 852]]
+- [[_COMMUNITY_Community 853|Community 853]]
+- [[_COMMUNITY_Community 854|Community 854]]
+- [[_COMMUNITY_Community 855|Community 855]]
+- [[_COMMUNITY_Community 856|Community 856]]
+- [[_COMMUNITY_Community 857|Community 857]]
+- [[_COMMUNITY_Community 858|Community 858]]
+- [[_COMMUNITY_Community 859|Community 859]]
+- [[_COMMUNITY_Community 860|Community 860]]
+- [[_COMMUNITY_Community 861|Community 861]]
+- [[_COMMUNITY_Community 862|Community 862]]
+- [[_COMMUNITY_Community 863|Community 863]]
+- [[_COMMUNITY_Community 864|Community 864]]
+- [[_COMMUNITY_Community 865|Community 865]]
+- [[_COMMUNITY_Community 866|Community 866]]
+- [[_COMMUNITY_Community 867|Community 867]]
+- [[_COMMUNITY_Community 868|Community 868]]
+- [[_COMMUNITY_Community 869|Community 869]]
+- [[_COMMUNITY_Community 870|Community 870]]
+- [[_COMMUNITY_Community 871|Community 871]]
+- [[_COMMUNITY_Community 872|Community 872]]
+- [[_COMMUNITY_Community 873|Community 873]]
+- [[_COMMUNITY_Community 874|Community 874]]
+- [[_COMMUNITY_Community 875|Community 875]]
+- [[_COMMUNITY_Community 876|Community 876]]
+- [[_COMMUNITY_Community 877|Community 877]]
+- [[_COMMUNITY_Community 878|Community 878]]
+- [[_COMMUNITY_Community 879|Community 879]]
+- [[_COMMUNITY_Community 880|Community 880]]
+- [[_COMMUNITY_Community 881|Community 881]]
+- [[_COMMUNITY_Community 882|Community 882]]
+- [[_COMMUNITY_Community 883|Community 883]]
+- [[_COMMUNITY_Community 884|Community 884]]
+- [[_COMMUNITY_Community 885|Community 885]]
+- [[_COMMUNITY_Community 886|Community 886]]
+- [[_COMMUNITY_Community 887|Community 887]]
+- [[_COMMUNITY_Community 888|Community 888]]
+- [[_COMMUNITY_Community 889|Community 889]]
+- [[_COMMUNITY_Community 890|Community 890]]
+- [[_COMMUNITY_Community 891|Community 891]]
+- [[_COMMUNITY_Community 892|Community 892]]
+- [[_COMMUNITY_Community 893|Community 893]]
+- [[_COMMUNITY_Community 894|Community 894]]
+- [[_COMMUNITY_Community 895|Community 895]]
+- [[_COMMUNITY_Community 896|Community 896]]
+- [[_COMMUNITY_Community 897|Community 897]]
+- [[_COMMUNITY_Community 898|Community 898]]
+- [[_COMMUNITY_Community 899|Community 899]]
+- [[_COMMUNITY_Community 900|Community 900]]
+- [[_COMMUNITY_Community 901|Community 901]]
+- [[_COMMUNITY_Community 902|Community 902]]
+- [[_COMMUNITY_Community 903|Community 903]]
+- [[_COMMUNITY_Community 904|Community 904]]
+- [[_COMMUNITY_Community 905|Community 905]]
+- [[_COMMUNITY_Community 906|Community 906]]
+- [[_COMMUNITY_Community 907|Community 907]]
+- [[_COMMUNITY_Community 908|Community 908]]
+- [[_COMMUNITY_Community 909|Community 909]]
+- [[_COMMUNITY_Community 910|Community 910]]
+- [[_COMMUNITY_Community 911|Community 911]]
+- [[_COMMUNITY_Community 912|Community 912]]
+- [[_COMMUNITY_Community 913|Community 913]]
+- [[_COMMUNITY_Community 914|Community 914]]
+- [[_COMMUNITY_Community 915|Community 915]]
+- [[_COMMUNITY_Community 916|Community 916]]
+- [[_COMMUNITY_Community 917|Community 917]]
+- [[_COMMUNITY_Community 918|Community 918]]
+- [[_COMMUNITY_Community 919|Community 919]]
+- [[_COMMUNITY_Community 920|Community 920]]
+- [[_COMMUNITY_Community 921|Community 921]]
+- [[_COMMUNITY_Community 922|Community 922]]
+- [[_COMMUNITY_Community 923|Community 923]]
+- [[_COMMUNITY_Community 924|Community 924]]
+- [[_COMMUNITY_Community 925|Community 925]]
+- [[_COMMUNITY_Community 926|Community 926]]
+- [[_COMMUNITY_Community 927|Community 927]]
+- [[_COMMUNITY_Community 928|Community 928]]
+- [[_COMMUNITY_Community 929|Community 929]]
+- [[_COMMUNITY_Community 930|Community 930]]
+- [[_COMMUNITY_Community 931|Community 931]]
+- [[_COMMUNITY_Community 932|Community 932]]
+- [[_COMMUNITY_Community 933|Community 933]]
+- [[_COMMUNITY_Community 934|Community 934]]
+- [[_COMMUNITY_Community 935|Community 935]]
+- [[_COMMUNITY_Community 936|Community 936]]
+- [[_COMMUNITY_Community 937|Community 937]]
+- [[_COMMUNITY_Community 938|Community 938]]
+- [[_COMMUNITY_Community 939|Community 939]]
+- [[_COMMUNITY_Community 940|Community 940]]
+- [[_COMMUNITY_Community 941|Community 941]]
+- [[_COMMUNITY_Community 942|Community 942]]
+- [[_COMMUNITY_Community 943|Community 943]]
+- [[_COMMUNITY_Community 944|Community 944]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Callback API` - 55 edges
@@ -832,21 +963,21 @@
 10. `Promises API` - 35 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
-  testing/regression/run-suite.mjs → src/lib/research/capture.ts
-- `ResolveResearchTargetOptions` --references--> `StorageMode`  [EXTRACTED]
-  src/lib/research/resolve-target.ts → src/lib/config/schema.ts
+- `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
+  testing/regression/run-suite.mjs → src/sites/index.ts
 - `SummarizeOptions` --references--> `SummaryLevel`  [EXTRACTED]
   src/lib/research/summarize.ts → src/lib/config/schema.ts
-- `defaultFetcher()` --calls--> `fetchText()`  [EXTRACTED]
-  src/lib/research/docs/machine-readable.ts → src/lib/research/fetcher.ts
-- `RevalidationResult` --references--> `ResearchArtifact`  [EXTRACTED]
-  src/lib/research/revalidate.ts → src/lib/research/schema.ts
+- `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
+  testing/regression/run-suite.mjs → src/lib/research/capture.ts
+- `MachineReadableResult` --references--> `MachineReadableArtifact`  [EXTRACTED]
+  src/lib/research/docs/machine-readable.ts → src/lib/research/docs/capabilities.ts
+- `FetchCommand` --inherits--> `BaseCommand`  [EXTRACTED]
+  src/commands/fetch.ts → src/base-command.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (814 total, 57 thin omitted)
+## Communities (945 total, 64 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -873,8 +1004,8 @@ Cohesion: 0.09
 Nodes (22): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. Search before fetching, Bonsai, Command Reference, `config` (+14 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.10
-Nodes (41): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel(), readScopedConfig() (+33 more)
+Cohesion: 0.11
+Nodes (39): ConfigCommand, configScopeFlags(), ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel(), readScopedConfig() (+31 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -933,8 +1064,8 @@ Cohesion: 0.11
 Nodes (17): `captureOutput` — Test a Command Class Directly, Common Patterns, Environment variable flags, OCLIF Testing, Prerequisites, Primary API: `runCommand`, Quick Reference, References (+9 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.09
-Nodes (16): ResearchInspect, SectionSummary, ResearchList, ResearchPrune, FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS (+8 more)
+Cohesion: 0.13
+Nodes (4): ResearchList, ResearchPrune, pluralize(), BaseCommand
 
 ### Community 22 - "Community 22"
 Cohesion: 0.12
@@ -985,12 +1116,12 @@ Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.17
-Nodes (11): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), PR Dead Code Check, Production audit, Production vs Full Audit, Step 1: Analyze changed files, Step 1: Run combined analysis (+3 more)
+Cohesion: 0.15
+Nodes (12): Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, PR Dead Code Check, Production audit (+4 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.08
-Nodes (41): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp() (+33 more)
+Cohesion: 0.12
+Nodes (25): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), initializeEmptyField(), parseArtifact(), parseArtifactShallow() (+17 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -1009,8 +1140,8 @@ Cohesion: 0.14
 Nodes (14): AGENTS.md, Architecture, Best practices, Code Style, How rules work, Importing Rules, Improvements, Nested AGENTS.md support (+6 more)
 
 ### Community 40 - "Community 40"
-Cohesion: 0.21
-Nodes (11): analyzeMarkdownQuality(), countMatches(), hasCollapsedCode(), proseLineCount(), QualitySignals, ArtifactValidation, ERROR_PAGE_PATTERNS, looksLikeErrorPage() (+3 more)
+Cohesion: 0.17
+Nodes (16): llmsTxtCandidates(), MachineReadableResult, probeLlmsTxt(), probeRouteMarkdown(), tryFetchValidText(), analyzeMarkdownQuality(), countMatches(), hasCollapsedCode() (+8 more)
 
 ### Community 41 - "Community 41"
 Cohesion: 0.29
@@ -1041,8 +1172,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, Organize rules with `.claude/rules/`, Organize rules with `.claude/rules/`, Path-specific rules, Path-specific rules, Provenance, Set up rules (+4 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.20
-Nodes (5): FetchCommand, ResolvedResearchTarget, ResolveResearchTargetOptions, LocatedArtifact, StoreRoots
+Cohesion: 0.21
+Nodes (4): applyCaptureMetadata(), FetchCommand, handleStaleRevalidationResult(), SummaryLevel
 
 ### Community 50 - "Community 50"
 Cohesion: 0.15
@@ -1485,8 +1616,8 @@ Cohesion: 0.40
 Nodes (5): Audit and edit your memory, Auto memory, Enable or disable auto memory, How it works, Storage location
 
 ### Community 174 - "Community 174"
-Cohesion: 0.13
-Nodes (24): MachineReadableArtifact, SiteCapabilities, detectDocsEngine(), getMetaGenerator(), MachineReadableResult, TextFetcher, CaptureDeps, CaptureOptions (+16 more)
+Cohesion: 0.14
+Nodes (23): MachineReadableArtifact, SiteCapabilities, TextFetcher, captureFixture(), CaptureDeps, CaptureOptions, CaptureOutcome, capturePage() (+15 more)
 
 ### Community 175 - "Community 175"
 Cohesion: 0.29
@@ -1569,8 +1700,8 @@ Cohesion: 0.04
 Nodes (49): `fs.accessSync(path[, mode])`, `fs.appendFileSync(path, data[, options])`, `fs.chmodSync(path, mode)`, `fs.chownSync(path, uid, gid)`, `fs.closeSync(fd)`, `fs.copyFileSync(src, dest[, mode])`, `fs.cpSync(src, dest[, options])`, `fs.existsSync(path)` (+41 more)
 
 ### Community 195 - "Community 195"
-Cohesion: 0.43
-Nodes (6): breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading(), splitMarkdownSections()
+Cohesion: 0.21
+Nodes (10): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), breadcrumb(), findHeadings(), HeadingLine, SectionChunk, slugifyHeading() (+2 more)
 
 ### Community 196 - "Community 196"
 Cohesion: 0.22
@@ -1729,8 +1860,8 @@ Cohesion: 0.18
 Nodes (10): Class: `fs.StatWatcher`, Class: `fs.StatWatcher`, Compressed, Detailed, Provenance, Summary, `watcher.ref()`, `watcher.ref()` (+2 more)
 
 ### Community 235 - "Community 235"
-Cohesion: 0.12
-Nodes (16): Buffer paths, Callback example, Detailed, File descriptors, File paths, File system, File system flags, File URL paths (+8 more)
+Cohesion: 0.18
+Nodes (11): Buffer paths, File descriptors, File paths, File system flags, File URL paths, Notes, Ordering of callback and promise-based operations, Per-drive working directories on Windows (+3 more)
 
 ### Community 236 - "Community 236"
 Cohesion: 0.18
@@ -1749,8 +1880,8 @@ Cohesion: 0.18
 Nodes (11): Class: `fs.FSWatcher`, Class: `fs.StatWatcher`, Common Objects, Event: `'change'`, Event: `'close'`, Event: `'error'`, `watcher.close()`, `watcher.ref()` (+3 more)
 
 ### Community 240 - "Community 240"
-Cohesion: 0.18
-Nodes (11): Buffer paths, File descriptors, File paths, File system flags, File URL paths, Notes, Ordering of callback and promise-based operations, Per-drive working directories on Windows (+3 more)
+Cohesion: 0.12
+Nodes (16): Buffer paths, Callback example, File descriptors, File paths, File system, File system flags, File URL paths, Notes (+8 more)
 
 ### Community 241 - "Community 241"
 Cohesion: 0.20
@@ -1761,8 +1892,8 @@ Cohesion: 0.20
 Nodes (10): Class: `fs.Dirent`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isDirectory()`, `dirent.isFIFO()`, `dirent.isFile()`, `dirent.isSocket()`, `dirent.isSymbolicLink()` (+2 more)
 
 ### Community 243 - "Community 243"
-Cohesion: 0.16
-Nodes (23): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), assertOk(), checkDnsSafety() (+15 more)
+Cohesion: 0.24
+Nodes (11): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), isSafeIp(), isSafeIpv4() (+3 more)
 
 ### Community 244 - "Community 244"
 Cohesion: 0.22
@@ -1786,7 +1917,7 @@ Nodes (9): Class: `fs.StatFs`, `statfs.bavail`, `statfs.bfree`, `statfs.blocks`,
 
 ### Community 249 - "Community 249"
 Cohesion: 0.25
-Nodes (7): Callback example, Compressed, File system, Promise example, Provenance, Summary, Synchronous example
+Nodes (7): Callback example, Compressed, Detailed, File system, Promise example, Summary, Synchronous example
 
 ### Community 250 - "Community 250"
 Cohesion: 0.25
@@ -2013,8 +2144,8 @@ Cohesion: 0.07
 Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
 
 ### Community 326 - "Community 326"
-Cohesion: 0.11
-Nodes (26): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SourceHint, DetectContext (+18 more)
+Cohesion: 0.10
+Nodes (29): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SourceHint, DetectContext (+21 more)
 
 ### Community 327 - "Community 327"
 Cohesion: 0.09
@@ -2061,8 +2192,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
 
 ### Community 338 - "Community 338"
-Cohesion: 0.11
-Nodes (31): applyCaptureMetadata(), CAPTURE_DEPS, handleStaleRevalidationResult(), CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness() (+23 more)
+Cohesion: 0.14
+Nodes (25): CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness(), StatusAction, StatusResult, buildCompressed() (+17 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -2223,6 +2354,10 @@ Nodes (7): Configure the Vite plugin, Create your project, Import Tailwind CSS, 
 ### Community 378 - "Community 378"
 Cohesion: 0.25
 Nodes (7): API Styles {#api-styles}, Composition API {#composition-api}, Introduction {#introduction}, Options API {#options-api}, Single-File Components {#single-file-components}, The Progressive Framework {#the-progressive-framework}, What is Vue? {#what-is-vue}
+
+### Community 379 - "Community 379"
+Cohesion: 0.18
+Nodes (7): FRESHNESS_BONUS, isFuzzyMatch(), levenshtein(), REMOTE_SEARCH_DEPS, ResearchSearch, scoreSingleTerm(), detectSite()
 
 ### Community 380 - "Community 380"
 Cohesion: 0.29
@@ -2929,8 +3064,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, JS Render Attribute, JS Render Attribute, PHP Render Attribute, PHP Render Attribute, Provenance, Rendering HTML Attributes (+4 more)
 
 ### Community 578 - "Community 578"
-Cohesion: 0.33
-Nodes (6): Compressed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Random replacement (RR), Simple queue-based policies
+Cohesion: 0.22
+Nodes (8): Compressed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Provenance, Random replacement (RR), Simple queue-based policies, Summary
 
 ### Community 579 - "Community 579"
 Cohesion: 0.29
@@ -2985,8 +3120,8 @@ Cohesion: 0.40
 Nodes (5): Migration from knip, Step 1: Preview migration, Step 2: Apply migration, Step 3: Compare results, Step 4: Remove knip config
 
 ### Community 592 - "Community 592"
-Cohesion: 0.22
-Nodes (8): Detailed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Provenance, Random replacement (RR), Simple queue-based policies, Summary
+Cohesion: 0.33
+Nodes (6): Detailed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Random replacement (RR), Simple queue-based policies
 
 ### Community 593 - "Community 593"
 Cohesion: 0.40
@@ -3022,7 +3157,7 @@ Nodes (4): Least frequent recently used (LFRU), Least frequently used (LFU), LFU
 
 ### Community 601 - "Community 601"
 Cohesion: 0.29
-Nodes (8): advertisesRouteMarkdown(), defaultFetcher(), llmsTxtCandidates(), probeLlmsTxt(), probeRouteMarkdown(), FIXTURES, tryFetchValidText(), isSameDocsOrigin()
+Nodes (14): defaultFetcher(), assertOk(), checkDnsSafety(), FetchOptions, fetchStaticHtml(), fetchText(), fetchWithRedirects(), headerMeta() (+6 more)
 
 ### Community 602 - "Community 602"
 Cohesion: 0.18
@@ -3165,7 +3300,7 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, [FCFS matching], [FCFS matching](https://prismjs.com/extending.html#fcfs-matching), Provenance, Summary
 
 ### Community 637 - "Community 637"
-Cohesion: 0.17
+Cohesion: 0.18
 Nodes (20): cacheToken(), dbg(), DEBUG, parseJson(), searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor }, RESULTS (+12 more)
 
 ### Community 638 - "Community 638"
@@ -3217,8 +3352,8 @@ Cohesion: 0.13
 Nodes (15): Connecting to an external system, Controlling a non-React widget, Custom `useChatRoom` Hook, Deep Dive, Displaying different content on the server and the client, Examples of wrapping Effects in custom Hooks, Fetching data with Effects, Reading the latest props and state from an Effect (+7 more)
 
 ### Community 650 - "Community 650"
-Cohesion: 0.26
-Nodes (8): Fixture, fixtures, captureFixture(), salesforceDeveloper, salesforce, getSiteModuleById(), SITES, SiteModule
+Cohesion: 0.27
+Nodes (7): Fixture, fixtures, salesforceDeveloper, salesforce, SITES, SiteModule, SiteSearchResult
 
 ### Community 651 - "Community 651"
 Cohesion: 0.14
@@ -3513,8 +3648,8 @@ Cohesion: 0.67
 Nodes (3): Examples of passing reactive dependencies, Passing a dependency array, Pitfall
 
 ### Community 733 - "Community 733"
-Cohesion: 0.17
-Nodes (17): waitForContentReady(), ExtractionResult, normalizeHelpDocContentUrl(), CONTENT_SELECTORS, fetchDeveloperPage(), CONTENT_SELECTORS, fetchSalesforcePage(), BASE_REMOVE_SELECTORS (+9 more)
+Cohesion: 0.18
+Nodes (15): waitForContentReady(), CONTENT_SELECTORS, fetchDeveloperPage(), CONTENT_SELECTORS, fetchSalesforcePage(), BASE_REMOVE_SELECTORS, buildCaptureScript(), confidenceFor() (+7 more)
 
 ### Community 734 - "Community 734"
 Cohesion: 0.12
@@ -3588,10 +3723,6 @@ Nodes (4): External Links, Internal Links, Links, Page Suffix
 Cohesion: 0.50
 Nodes (4): External Links, Internal Links, Links, Page Suffix
 
-### Community 753 - "Community 753"
-Cohesion: 0.23
-Nodes (3): ResearchImport, buildCompressed(), compressMarkdown()
-
 ### Community 754 - "Community 754"
 Cohesion: 0.14
 Nodes (14): Auto-compaction, Chain subagents, Choose between subagents and main conversation, Common patterns, Invoke subagents explicitly, Isolate high-volume operations, Manage subagent context, Resume subagents (+6 more)
@@ -3609,8 +3740,8 @@ Cohesion: 0.14
 Nodes (14): Built-in subagents, Code reviewer, Create custom subagents, Data scientist, Database query validator, Debugger, Example subagents, Fork the current conversation (+6 more)
 
 ### Community 758 - "Community 758"
-Cohesion: 0.15
-Nodes (12): Cursor, GitHub Copilot (the source format), Install the agent kit, Install with forward-nexus, Instruction → `.claude/rules/web-research.md`, Optional: Salesforce variant, Other agents, Skill → `.claude/skills/web-research/SKILL.md` (+4 more)
+Cohesion: 0.12
+Nodes (15): Add hook examples, Cursor, GitHub Copilot (the source format), Install the agent kit, Install with forward-nexus, Instruction → `.claude/rules/web-research.md`, Optional: Salesforce variant, Other agents (+7 more)
 
 ### Community 759 - "Community 759"
 Cohesion: 0.17
@@ -3825,29 +3956,525 @@ Cohesion: 0.25
 Nodes (7): Choose How to Research by Scope, Examples, Mandatory Pre-Step, Shared Cache, Web Research Requirement (Salesforce), When Not to Use, Working with Salesforce Sites
 
 ### Community 812 - "Community 812"
-Cohesion: 0.50
-Nodes (4): Custom Plugin Setup, Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory
+Cohesion: 0.04
+Nodes (46): afterAgentResponse, afterAgentResponse, afterAgentThought, afterAgentThought, afterFileEdit, afterFileEdit, afterMCPExecution, afterMCPExecution (+38 more)
 
 ### Community 813 - "Community 813"
 Cohesion: 0.50
 Nodes (4): Fork the current conversation, How forks differ from named subagents, Limitations, Observe and steer running forks
 
+### Community 814 - "Community 814"
+Cohesion: 0.14
+Nodes (24): CAPTURE_DEPS, ResearchInspect, SectionSummary, StorageMode, ResolvedResearchTarget, resolveResearchTarget(), ResolveResearchTargetOptions, SecureWriteResult (+16 more)
+
+### Community 815 - "Community 815"
+Cohesion: 0.07
+Nodes (26): [`agentStop` / `subagentStop` decision control], [`agentStop` / `subagentStop` decision control](https://docs.github.com/en/copilot/reference/hooks-reference#agentstop--subagentstop-decision-control), [Cloud agent execution environment], [Cloud agent execution environment](https://docs.github.com/en/copilot/reference/hooks-reference#cloud-agent-execution-environment), Compressed, Detailed, [Disable all hooks], [Disable all hooks](https://docs.github.com/en/copilot/reference/hooks-reference#disable-all-hooks) (+18 more)
+
+### Community 816 - "Community 816"
+Cohesion: 0.08
+Nodes (24): Compressed, Detailed, PermissionRequest, PermissionRequest, PostCompact, PostCompact, PostToolUse, PostToolUse (+16 more)
+
+### Community 817 - "Community 817"
+Cohesion: 0.08
+Nodes (24): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+16 more)
+
+### Community 818 - "Community 818"
+Cohesion: 0.08
+Nodes (24): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+16 more)
+
+### Community 819 - "Community 819"
+Cohesion: 0.10
+Nodes (20): Cloud Distribution (Enterprise Only), Command-Based Hooks, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types, Hooks (+12 more)
+
+### Community 820 - "Community 820"
+Cohesion: 0.11
+Nodes (18): Command-Based Hooks, Compressed, Detailed, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types (+10 more)
+
+### Community 821 - "Community 821"
+Cohesion: 0.11
+Nodes (18): Compressed, Detailed, [Example hook configuration file], [Example hook configuration file](https://docs.github.com/en/copilot/concepts/agents/hooks#example-hook-configuration-file), [Hook configuration format], [Hook configuration format](https://docs.github.com/en/copilot/concepts/agents/hooks#hook-configuration-format), [Next steps], [Next steps](https://docs.github.com/en/copilot/concepts/agents/hooks#next-steps) (+10 more)
+
+### Community 822 - "Community 822"
+Cohesion: 0.17
+Nodes (12): [`agentStop` / `Stop`], [`errorOccurred` / `ErrorOccurred`], [Hook event input payloads], [`postToolUse` / `PostToolUse`], [`postToolUseFailure` / `PostToolUseFailure`], [`preCompact` / `PreCompact`], [`preToolUse` / `PreToolUse`], [`sessionEnd` / `SessionEnd`] (+4 more)
+
+### Community 823 - "Community 823"
+Cohesion: 0.17
+Nodes (12): [`agentStop` / `Stop`](https://docs.github.com/en/copilot/reference/hooks-reference#agentstop--stop), [`errorOccurred` / `ErrorOccurred`](https://docs.github.com/en/copilot/reference/hooks-reference#erroroccurred--erroroccurred), [Hook event input payloads](https://docs.github.com/en/copilot/reference/hooks-reference#hook-event-input-payloads), [`postToolUse` / `PostToolUse`](https://docs.github.com/en/copilot/reference/hooks-reference#posttooluse--posttooluse), [`postToolUseFailure` / `PostToolUseFailure`](https://docs.github.com/en/copilot/reference/hooks-reference#posttoolusefailure--posttoolusefailure), [`preCompact` / `PreCompact`](https://docs.github.com/en/copilot/reference/hooks-reference#precompact--precompact), [`preToolUse` / `PreToolUse`](https://docs.github.com/en/copilot/reference/hooks-reference#pretooluse--pretooluse), [`sessionEnd` / `SessionEnd`](https://docs.github.com/en/copilot/reference/hooks-reference#sessionend--sessionend) (+4 more)
+
+### Community 824 - "Community 824"
+Cohesion: 0.38
+Nodes (7): applyAutoTags(), calculateFrequencies(), cleanNoise(), extractKeywords(), getHeadingTerms(), STOPWORDS, tokenize()
+
+### Community 825 - "Community 825"
+Cohesion: 0.22
+Nodes (8): Common schema, Common schema, Compressed, Detailed, Input (all hooks), Input (all hooks), Provenance, Summary
+
+### Community 826 - "Community 826"
+Cohesion: 0.22
+Nodes (8): [Command hooks], [Command hooks](https://docs.github.com/en/copilot/reference/hooks-reference#command-hooks), Compressed, Detailed, [Progress messages], [Progress messages](https://docs.github.com/en/copilot/reference/hooks-reference#progress-messages), Provenance, Summary
+
+### Community 827 - "Community 827"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, [`userPromptSubmitted` / `UserPromptSubmit`], [`userPromptSubmitted` / `UserPromptSubmit`](https://docs.github.com/en/copilot/reference/hooks-reference#userpromptsubmitted--userpromptsubmit)
+
+### Community 828 - "Community 828"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Volatile Release Notes, Volatile Release Notes
+
+### Community 829 - "Community 829"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Notes, Notes, Provenance, Summary
+
+### Community 830 - "Community 830"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Section Parent, Section Parent, Summary
+
+### Community 831 - "Community 831"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Execution type limits, Execution type limits, Provenance, Summary
+
+### Community 832 - "Community 832"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Policy hooks], [Policy hooks](https://docs.github.com/en/copilot/reference/hooks-reference#policy-hooks), Provenance, Summary
+
+### Community 833 - "Community 833"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [HTTP hooks], [HTTP hooks](https://docs.github.com/en/copilot/reference/hooks-reference#http-hooks), Provenance, Summary
+
+### Community 834 - "Community 834"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Enterprise hooks and distribution, Enterprise hooks and distribution, Provenance, Summary
+
+### Community 835 - "Community 835"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Examples, Examples, Provenance, Summary
+
+### Community 836 - "Community 836"
+Cohesion: 0.29
+Nodes (6): Compressed, Configuration file, Configuration file, Detailed, Provenance, Summary
+
+### Community 837 - "Community 837"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Hook categories, Hook categories, Provenance, Summary
+
+### Community 838 - "Community 838"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`notification` hook], [`notification` hook](https://docs.github.com/en/copilot/reference/hooks-reference#notification-hook), Provenance, Summary
+
+### Community 839 - "Community 839"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, [`subagentStart`], [`subagentStart`](https://docs.github.com/en/copilot/reference/hooks-reference#subagentstart), Summary
+
+### Community 840 - "Community 840"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Node streams, Node streams, Provenance, Summary
+
+### Community 841 - "Community 841"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, User hooks (\~/.cursor/), User hooks (\~/.cursor/)
+
+### Community 842 - "Community 842"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, MDM Distribution, MDM Distribution, Provenance, Summary
+
+### Community 843 - "Community 843"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Project Hooks (Version Control), Project Hooks (Version Control), Provenance, Summary
+
+### Community 844 - "Community 844"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, [`sessionEnd` / `SessionEnd`], [`sessionEnd` / `SessionEnd`](https://docs.github.com/en/copilot/reference/hooks-reference#sessionend--sessionend), Summary
+
+### Community 845 - "Community 845"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, [`subagentStop` / `SubagentStop`], [`subagentStop` / `SubagentStop`](https://docs.github.com/en/copilot/reference/hooks-reference#subagentstop--subagentstop), Summary
+
+### Community 846 - "Community 846"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Python manifest guard hook, Python manifest guard hook, Summary
+
+### Community 847 - "Community 847"
+Cohesion: 0.29
+Nodes (6): Compressed, Custom NestJS Config, Custom NestJS Config, Detailed, Provenance, Summary
+
+### Community 848 - "Community 848"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, TypeScript stop automation hook, TypeScript stop automation hook
+
+### Community 849 - "Community 849"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Webhooks, Webhooks
+
+### Community 850 - "Community 850"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Hook configuration format], [Hook configuration format](https://docs.github.com/en/copilot/reference/hooks-reference#hook-configuration-format), Provenance, Summary
+
+### Community 851 - "Community 851"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`postToolUse` / `PostToolUse`], [`postToolUse` / `PostToolUse`](https://docs.github.com/en/copilot/reference/hooks-reference#posttooluse--posttooluse), Provenance, Summary
+
+### Community 852 - "Community 852"
+Cohesion: 0.29
+Nodes (6): [Cloud agent execution environment], [Cloud agent execution environment](https://docs.github.com/en/copilot/reference/hooks-reference#cloud-agent-execution-environment), Compressed, Detailed, Provenance, Summary
+
+### Community 853 - "Community 853"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Vue Component Design, Vue Component Design
+
+### Community 854 - "Community 854"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Secrets management, Secrets management, Summary
+
+### Community 855 - "Community 855"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Matcher filtering], [Matcher filtering](https://docs.github.com/en/copilot/reference/hooks-reference#matcher-filtering), Provenance, Summary
+
+### Community 856 - "Community 856"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, PreToolUse, PreToolUse, Provenance, Summary
+
+### Community 857 - "Community 857"
+Cohesion: 0.29
+Nodes (6): [`agentStop` / `subagentStop` decision control], [`agentStop` / `subagentStop` decision control](https://docs.github.com/en/copilot/reference/hooks-reference#agentstop--subagentstop-decision-control), Compressed, Detailed, Provenance, Summary
+
+### Community 858 - "Community 858"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, SubagentStop, SubagentStop, Summary
+
+### Community 859 - "Community 859"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Matcher Configuration, Matcher Configuration, Provenance, Summary
+
+### Community 860 - "Community 860"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Section Parent, Section Parent, Summary
+
+### Community 861 - "Community 861"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Hook Types, Hook Types, Provenance, Summary
+
+### Community 862 - "Community 862"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Per-Script Configuration Options, Per-Script Configuration Options, Provenance, Summary
+
+### Community 863 - "Community 863"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, SessionStart, SessionStart, Summary
+
+### Community 864 - "Community 864"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Troubleshooting, Troubleshooting
+
+### Community 865 - "Community 865"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`errorOccurred` / `ErrorOccurred`], [`errorOccurred` / `ErrorOccurred`](https://docs.github.com/en/copilot/reference/hooks-reference#erroroccurred--erroroccurred), Provenance, Summary
+
+### Community 866 - "Community 866"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Web streams, Web streams
+
+### Community 867 - "Community 867"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Exit codes for command hooks], [Exit codes for command hooks](https://docs.github.com/en/copilot/reference/hooks-reference#exit-codes-for-command-hooks), Provenance, Summary
+
+### Community 868 - "Community 868"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`preToolUse` / `PreToolUse`], [`preToolUse` / `PreToolUse`](https://docs.github.com/en/copilot/reference/hooks-reference#pretooluse--pretooluse), Provenance, Summary
+
+### Community 869 - "Community 869"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, PostCompact, PostCompact, Provenance, Summary
+
+### Community 870 - "Community 870"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Header, Header, Provenance, Summary
+
+### Community 871 - "Community 871"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, UserPromptSubmit, UserPromptSubmit
+
+### Community 872 - "Community 872"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, NestJS Guide Config, NestJS Guide Config, Provenance, Summary
+
+### Community 873 - "Community 873"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Team Distribution, Team Distribution
+
+### Community 874 - "Community 874"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Inspect Payload, Inspect Payload, Provenance, Summary
+
+### Community 875 - "Community 875"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, PreCompact, PreCompact, Provenance, Summary
+
+### Community 876 - "Community 876"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Supported hooks, Supported hooks
+
+### Community 877 - "Community 877"
+Cohesion: 0.29
+Nodes (6): Agent security and safety, Agent security and safety, Compressed, Detailed, Provenance, Summary
+
+### Community 878 - "Community 878"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Hello World, Hello World, Provenance, Summary
+
+### Community 879 - "Community 879"
+Cohesion: 0.29
+Nodes (6): Compressed, Configuration, Configuration, Detailed, Provenance, Summary
+
+### Community 880 - "Community 880"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Hooks not available in cloud agents, Hooks not available in cloud agents, Provenance, Summary
+
+### Community 881 - "Community 881"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Global Configuration Options, Global Configuration Options, Provenance, Summary
+
+### Community 882 - "Community 882"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Hook event input payloads], [Hook event input payloads](https://docs.github.com/en/copilot/reference/hooks-reference#hook-event-input-payloads), Provenance, Summary
+
+### Community 883 - "Community 883"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, PostToolUse, PostToolUse, Provenance, Summary
+
+### Community 884 - "Community 884"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Introduction], [Introduction](https://docs.github.com/en/copilot/reference/hooks-reference#introduction), Provenance, Summary
+
+### Community 885 - "Community 885"
+Cohesion: 0.29
+Nodes (6): Compressed, Configuration sources, Configuration sources, Detailed, Provenance, Summary
+
+### Community 886 - "Community 886"
+Cohesion: 0.29
+Nodes (6): Cloud agent support, Cloud agent support, Compressed, Detailed, Provenance, Summary
+
+### Community 887 - "Community 887"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, React Suspense Cache Docs, React Suspense Cache Docs, Summary
+
+### Community 888 - "Community 888"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, React Suspense Cache Docs, React Suspense Cache Docs, Summary
+
+### Community 889 - "Community 889"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, React Cache Notes, React Cache Notes, Summary
+
+### Community 890 - "Community 890"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`postToolUse` output], [`postToolUse` output](https://docs.github.com/en/copilot/reference/hooks-reference#posttooluse-output), Provenance, Summary
+
+### Community 891 - "Community 891"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, JSON Inspect, JSON Inspect, Provenance, Summary
+
+### Community 892 - "Community 892"
+Cohesion: 0.29
+Nodes (6): Compressed, Dependency security, Dependency security, Detailed, Provenance, Summary
+
+### Community 893 - "Community 893"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Hook events], [Hook events](https://docs.github.com/en/copilot/reference/hooks-reference#hook-events), Provenance, Summary
+
+### Community 894 - "Community 894"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, NestJS App, NestJS App, Provenance, Summary
+
+### Community 895 - "Community 895"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Node Streams Guide, Node Streams Guide, Provenance, Summary
+
+### Community 896 - "Community 896"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Quickstart, Quickstart, Summary
+
+### Community 897 - "Community 897"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Stop, Stop, Summary
+
+### Community 898 - "Community 898"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Disable all hooks], [Disable all hooks](https://docs.github.com/en/copilot/reference/hooks-reference#disable-all-hooks), Provenance, Summary
+
+### Community 899 - "Community 899"
+Cohesion: 0.29
+Nodes (6): Command-Based Hooks, Command-Based Hooks, Compressed, Detailed, Provenance, Summary
+
+### Community 900 - "Community 900"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Further reading], [Further reading](https://docs.github.com/en/copilot/reference/hooks-reference#further-reading), Provenance, Summary
+
+### Community 901 - "Community 901"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`preCompact` / `PreCompact`], [`preCompact` / `PreCompact`](https://docs.github.com/en/copilot/reference/hooks-reference#precompact--precompact), Provenance, Summary
+
+### Community 902 - "Community 902"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Source Scraped Note, Source Scraped Note, Summary
+
+### Community 903 - "Community 903"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Sitemap, Sitemap, Summary
+
+### Community 904 - "Community 904"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, SubagentStart, SubagentStart, Summary
+
+### Community 905 - "Community 905"
+Cohesion: 0.29
+Nodes (6): [`agentStop` / `Stop`], [`agentStop` / `Stop`](https://docs.github.com/en/copilot/reference/hooks-reference#agentstop--stop), Compressed, Detailed, Provenance, Summary
+
+### Community 906 - "Community 906"
+Cohesion: 0.29
+Nodes (6): Code security and best practices, Code security and best practices, Compressed, Detailed, Provenance, Summary
+
+### Community 907 - "Community 907"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Prompt hooks], [Prompt hooks](https://docs.github.com/en/copilot/reference/hooks-reference#prompt-hooks), Provenance, Summary
+
+### Community 908 - "Community 908"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Webhooks, Webhooks
+
+### Community 909 - "Community 909"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Environment Variables, Environment Variables, Provenance, Summary
+
+### Community 910 - "Community 910"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Import Note, Import Note, Provenance, Summary
+
+### Community 911 - "Community 911"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, [`sessionStart` / `SessionStart`], [`sessionStart` / `SessionStart`](https://docs.github.com/en/copilot/reference/hooks-reference#sessionstart--sessionstart), Summary
+
+### Community 912 - "Community 912"
+Cohesion: 0.29
+Nodes (6): Cloud Distribution (Enterprise Only), Cloud Distribution (Enterprise Only), Compressed, Detailed, Provenance, Summary
+
+### Community 913 - "Community 913"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`postToolUseFailure` / `PostToolUseFailure`], [`postToolUseFailure` / `PostToolUseFailure`](https://docs.github.com/en/copilot/reference/hooks-reference#posttoolusefailure--posttoolusefailure), Provenance, Summary
+
+### Community 914 - "Community 914"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [`permissionRequest` decision control], [`permissionRequest` decision control](https://docs.github.com/en/copilot/reference/hooks-reference#permissionrequest-decision-control), Provenance, Summary
+
+### Community 915 - "Community 915"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Prompt-Based Hooks, Prompt-Based Hooks, Provenance, Summary
+
+### Community 916 - "Community 916"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Partner Integrations, Partner Integrations, Provenance, Summary
+
+### Community 917 - "Community 917"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Reference, Reference, Summary
+
+### Community 918 - "Community 918"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, PermissionRequest, PermissionRequest, Provenance, Summary
+
+### Community 919 - "Community 919"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, MCP governance and visibility, MCP governance and visibility, Provenance, Summary
+
+### Community 920 - "Community 920"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Project hooks (.cursor/), Project hooks (.cursor/), Provenance, Summary
+
+### Community 921 - "Community 921"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, [Hooks locations], [Hooks locations](https://docs.github.com/en/copilot/reference/hooks-reference#hooks-locations), Provenance, Summary
+
+### Community 922 - "Community 922"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Filter Branch Doc, Filter Branch Doc, Provenance, Summary
+
+### Community 923 - "Community 923"
+Cohesion: 0.33
+Nodes (5): Bonsai Hook Examples, Published Command, Supported Examples, Use With Caution, What The Hooks Do
+
+### Community 924 - "Community 924"
+Cohesion: 0.33
+Nodes (6): Agent security and safety, Code security and best practices, Dependency security, MCP governance and visibility, Partner Integrations, Secrets management
+
+### Community 925 - "Community 925"
+Cohesion: 0.33
+Nodes (6): Agent security and safety, Code security and best practices, Dependency security, MCP governance and visibility, Partner Integrations, Secrets management
+
+### Community 926 - "Community 926"
+Cohesion: 0.40
+Nodes (5): [Command hooks], [Hook configuration format], [HTTP hooks], [Progress messages], [Prompt hooks]
+
+### Community 927 - "Community 927"
+Cohesion: 0.40
+Nodes (5): [Command hooks](https://docs.github.com/en/copilot/reference/hooks-reference#command-hooks), [Hook configuration format](https://docs.github.com/en/copilot/reference/hooks-reference#hook-configuration-format), [HTTP hooks](https://docs.github.com/en/copilot/reference/hooks-reference#http-hooks), [Progress messages](https://docs.github.com/en/copilot/reference/hooks-reference#progress-messages), [Prompt hooks](https://docs.github.com/en/copilot/reference/hooks-reference#prompt-hooks)
+
+### Community 928 - "Community 928"
+Cohesion: 0.40
+Nodes (5): Cloud agent support, Configuration sources, Execution type limits, Hooks not available in cloud agents, Supported hooks
+
+### Community 929 - "Community 929"
+Cohesion: 0.40
+Nodes (5): Cloud agent support, Configuration sources, Execution type limits, Hooks not available in cloud agents, Supported hooks
+
+### Community 930 - "Community 930"
+Cohesion: 0.40
+Nodes (5): Configuration, Configuration file, Global Configuration Options, Matcher Configuration, Per-Script Configuration Options
+
+### Community 931 - "Community 931"
+Cohesion: 0.40
+Nodes (5): Configuration, Configuration file, Global Configuration Options, Matcher Configuration, Per-Script Configuration Options
+
+### Community 932 - "Community 932"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 933 - "Community 933"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 934 - "Community 934"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 935 - "Community 935"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 936 - "Community 936"
+Cohesion: 0.50
+Nodes (4): Cloud Distribution (Enterprise Only), MDM Distribution, Project Hooks (Version Control), Team Distribution
+
+### Community 937 - "Community 937"
+Cohesion: 0.67
+Nodes (3): Combined Dead Code + Duplication, Step 1: Run combined analysis, Step 2: Prioritize cleanup
+
 ## Knowledge Gaps
-- **5791 isolated node(s):** `husky.sh script`, `__dirname`, `rawArgv`, `Kind`, `Pt` (+5786 more)
+- **6503 isolated node(s):** `husky.sh script`, `bonsai-web-fetch.sh script`, `bonsai-user-prompt-context.sh script`, `bonsai-web-fetch.sh script`, `bonsai-web-fetch.sh script` (+6498 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **57 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `File system` connect `Community 249` to `Community 110`, `Community 207`, `Community 240`, `Community 239`, `Community 210`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `File system` connect `Community 235` to `Community 194`, `Community 238`, `Community 209`, `Community 249`, `Community 61`?**
+- **Why does `File system` connect `Community 249` to `Community 194`, `Community 235`, `Community 238`, `Community 209`, `Community 61`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `File system` connect `Community 240` to `Community 110`, `Community 207`, `Community 239`, `Community 210`, `Community 249`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `Promises API` connect `Community 210` to `Community 240`, `Community 218`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `Common Objects` connect `Community 238` to `Community 535`, `Community 235`, `Community 236`, `Community 241`, `Community 213`, `Community 247`, `Community 537`, `Community 250`, `Community 219`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **What connects `husky.sh script`, `__dirname`, `rawArgv` to the rest of the system?**
-  _5791 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `husky.sh script`, `bonsai-web-fetch.sh script`, `bonsai-user-prompt-context.sh script` to the rest of the system?**
+  _6503 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
