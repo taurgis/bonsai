@@ -142,6 +142,10 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     const dryRun = this.flags['dry-run'];
     const count = filesToPrune.length;
 
+    // Track deletions actually performed so the JSON envelope and human output agree even when an
+    // unlink fails (e.g. a permission error). Reporting candidate count as `prunedCount` would
+    // overstate success and mislead an agent branching on the result.
+    let prunedCount = 0;
     if (dryRun) {
       if (!this.jsonEnabled()) {
         const noun = pluralize(count, 'entry', 'entries');
@@ -151,7 +155,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         });
       }
     } else {
-      const prunedCount = this.deletePruneCandidates(filesToPrune);
+      prunedCount = this.deletePruneCandidates(filesToPrune);
       if (!this.jsonEnabled()) {
         const noun = pluralize(count, 'entry', 'entries');
         this.log(`Successfully pruned ${prunedCount} of ${count} research cache ${noun}.`);
@@ -160,8 +164,8 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
     return {
       dryRun,
-      prunedCount: dryRun ? 0 : filesToPrune.length,
-      candidateCount: filesToPrune.length,
+      prunedCount,
+      candidateCount: count,
       files: filesToPrune.map((f) => ({
         cacheKey: f.cacheKey,
         path: f.path,

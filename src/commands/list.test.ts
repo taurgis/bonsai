@@ -128,4 +128,41 @@ describe('list command unit tests', () => {
     const result = (await ResearchList.run(['--topic', 'no-such-topic-zzzz'])) as any[];
     expect(result).toEqual([]);
   });
+
+  it('signals truncation in the human heading when more entries match than --limit', async () => {
+    const fake = Array.from({ length: 3 }, (_, i) => ({
+      cacheKey: `k${i}`,
+      path: `/x/k${i}.md`,
+      artifactType: 'source',
+      sourceUrls: [`https://example.com/${i}`],
+      topic: 'T',
+      tags: [],
+      freshness: 'fresh',
+      captureMethod: 'agent_supplied',
+      tokenEstimate: { compressed: 1, detailed: 1 },
+      qualityNotes: [],
+      fetchedAt: null,
+      validatedAt: new Date().toISOString(),
+    }));
+    const scanSpy = vi
+      .spyOn(ResearchList.prototype as any, 'scanCacheDirForList')
+      .mockReturnValue(fake);
+    const logged: string[] = [];
+    const logSpy = vi
+      .spyOn(ResearchList.prototype as any, 'log')
+      .mockImplementation((msg: string) => logged.push(msg));
+
+    const truncated = (await ResearchList.run(['--limit', '2'])) as any[];
+    expect(truncated.length).toBe(2);
+    expect(logged[0]).toContain('Found 3');
+    expect(logged[0]).toContain('showing first 2');
+
+    logged.length = 0;
+    const full = (await ResearchList.run(['--limit', '50'])) as any[];
+    expect(full.length).toBe(3);
+    expect(logged[0]).toBe('Found 3 cached research entries:\n');
+
+    scanSpy.mockRestore();
+    logSpy.mockRestore();
+  });
 });

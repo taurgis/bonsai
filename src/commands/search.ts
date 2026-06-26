@@ -233,14 +233,18 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     return results;
   }
 
-  private logSearchResults(finalResults: any[]): void {
+  private logSearchResults(finalResults: any[], totalMatched: number): void {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No matching cached research entries found.');
       return;
     }
-    const noun = pluralize(finalResults.length, 'entry', 'entries');
-    this.log(`Found ${finalResults.length} matching cached research ${noun}:\n`);
+    const noun = pluralize(totalMatched, 'entry', 'entries');
+    const truncated = totalMatched > finalResults.length;
+    const heading = truncated
+      ? `Found ${totalMatched} matching cached research ${noun} (showing top ${finalResults.length}; raise --limit to see more):`
+      : `Found ${totalMatched} matching cached research ${noun}:`;
+    this.log(`${heading}\n`);
     finalResults.forEach((res, index) => {
       this.log(`${index + 1}. [${res.topic || 'No Topic'}] Score: ${res.score}`);
       this.log(`   Cache Key: ${res.cacheKey}`);
@@ -319,7 +323,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     results.sort((a, b) => b.score - a.score);
     const finalResults = results.slice(0, this.flags.limit);
 
-    this.logSearchResults(finalResults);
+    this.logSearchResults(finalResults, results.length);
 
     return finalResults;
   }

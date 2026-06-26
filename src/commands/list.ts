@@ -113,14 +113,18 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
   }
 
-  private logListResults(finalResults: any[]): void {
+  private logListResults(finalResults: any[], totalMatched: number): void {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No cached research entries found matching filters.');
       return;
     }
-    const noun = pluralize(finalResults.length, 'entry', 'entries');
-    this.log(`Found ${finalResults.length} cached research ${noun}:\n`);
+    const noun = pluralize(totalMatched, 'entry', 'entries');
+    const truncated = totalMatched > finalResults.length;
+    const heading = truncated
+      ? `Found ${totalMatched} cached research ${noun} (showing first ${finalResults.length}; raise --limit to see more):`
+      : `Found ${totalMatched} cached research ${noun}:`;
+    this.log(`${heading}\n`);
     finalResults.forEach((res, index) => {
       this.log(`${index + 1}. [${res.topic || 'No Topic'}] Key: ${res.cacheKey}`);
       this.log(`   Type: ${res.artifactType} | Freshness: ${res.freshness}`);
@@ -152,7 +156,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
     const finalResults = results.slice(0, this.flags.limit);
 
-    this.logListResults(finalResults);
+    this.logListResults(finalResults, results.length);
 
     return finalResults;
   }

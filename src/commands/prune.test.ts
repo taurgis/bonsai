@@ -119,4 +119,26 @@ describe('prune command unit tests', () => {
 
     readSpy.mockRestore();
   });
+
+  it('reports the actual deleted count, not the candidate count, when an unlink fails', async () => {
+    // Two candidates whose files do not exist, so every unlinkSync throws and nothing is deleted.
+    // The JSON envelope must report prunedCount=0 (actual) while candidateCount stays at 2, so an
+    // agent branching on prunedCount is never told a failed prune succeeded.
+    const candidatesSpy = vi
+      .spyOn(ResearchPrune.prototype as any, 'findPruneCandidates')
+      .mockReturnValue([
+        { cacheKey: 'missing-a', path: '/nonexistent/missing-a.md', topic: null, url: null },
+        { cacheKey: 'missing-b', path: '/nonexistent/missing-b.md', topic: null, url: null },
+      ]);
+    // Swallow the per-file failure warnings so the test output stays clean.
+    const warnSpy = vi.spyOn(ResearchPrune.prototype as any, 'warn').mockImplementation(() => '');
+
+    const result = (await ResearchPrune.run(['--older-than', '0d', '--yes'])) as any;
+
+    expect(result.candidateCount).toBe(2);
+    expect(result.prunedCount).toBe(0);
+
+    candidatesSpy.mockRestore();
+    warnSpy.mockRestore();
+  });
 });
