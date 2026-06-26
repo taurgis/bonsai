@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { splitMarkdownSections, slugifyHeading } from './sections.js';
+import { splitMarkdownSections, slugifyHeading, headingPlainText } from './sections.js';
 
 const DOC = `# URL
 
@@ -34,7 +34,47 @@ describe('slugifyHeading', () => {
   });
 });
 
+describe('headingPlainText', () => {
+  it('reduces an inline link heading to its rendered text', () => {
+    expect(
+      headingPlainText('[API documentation](https://prismjs.com/extending.html#api-documentation)')
+    ).toBe('API documentation');
+  });
+
+  it('strips images, reference links, code, and emphasis markers', () => {
+    expect(headingPlainText('![logo](a.png) Title')).toBe('logo Title');
+    expect(headingPlainText('See [the guide][guide]')).toBe('See the guide');
+    expect(headingPlainText('**Bold** and _italic_ and `code`')).toBe('Bold and italic and code');
+  });
+
+  it('tolerates parentheses inside a link target without leaving a dangling )', () => {
+    expect(headingPlainText('[docs](https://en.wikipedia.org/wiki/URL_(disambiguation))')).toBe(
+      'docs'
+    );
+  });
+
+  it('leaves plain headings untouched', () => {
+    expect(headingPlainText('Class: URL')).toBe('Class: URL');
+  });
+});
+
 describe('splitMarkdownSections (T-22)', () => {
+  it('anchors and breadcrumbs use rendered text when a heading contains a Markdown link', () => {
+    const md =
+      '## Intro\n\ntext\n\n## [API documentation](https://prismjs.com/extending.html#api-documentation)\n\nbody';
+    const section = splitMarkdownSections(md).find((s) => s.headingPath === 'API documentation');
+    expect(section).toBeDefined();
+    expect(section?.anchor).toBe('api-documentation');
+  });
+
+  it('strips inline code in a heading end-to-end (anchor, breadcrumb, and raw content)', () => {
+    const md = '## Intro\n\ntext\n\n## `fs.readFile()`\n\nbody';
+    const section = splitMarkdownSections(md).find((s) => s.anchor === 'fsreadfile');
+    expect(section?.headingPath).toBe('fs.readFile()');
+    // content keeps the original raw heading line, including backticks
+    expect(section?.content).toContain('## `fs.readFile()`');
+  });
+
   it('splits at H2/H3 boundaries with breadcrumb paths', () => {
     const sections = splitMarkdownSections(DOC);
     const anchors = sections.map((s) => s.anchor);
