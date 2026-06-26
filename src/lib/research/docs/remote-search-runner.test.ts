@@ -94,6 +94,87 @@ describe('runRemoteDocsSearch (T-20)', () => {
     expect(out.results.length).toBeGreaterThan(0);
   });
 
+  it('uses a conventional llms.txt when no framework search connector applies', async () => {
+    const out = await runRemoteDocsSearch(
+      'https://docs.example.com/',
+      'install',
+      deps({
+        fetchStatic: async () => ({
+          content: load('static-article.html'),
+          finalUrl: 'https://docs.example.com/',
+        }),
+        fetchText: async (url) => {
+          expect(url).toBe('https://docs.example.com/llms.txt');
+          return { content: load('llms.txt'), status: 200 };
+        },
+      })
+    );
+    expect(out.provider).toBe('llms.txt');
+    expect(out.results[0]!.url).toBe('https://example.com/docs/getting-started.md');
+  });
+
+  it('uses a conventional sitemap when llms.txt is unavailable', async () => {
+    const out = await runRemoteDocsSearch(
+      'https://docs.example.com/',
+      'configuration',
+      deps({
+        fetchStatic: async () => ({
+          content: load('static-article.html'),
+          finalUrl: 'https://docs.example.com/',
+        }),
+        fetchText: async (url) => {
+          if (url.endsWith('/llms.txt')) return { content: '', status: 404 };
+          expect(url).toBe('https://docs.example.com/sitemap.xml');
+          return {
+            status: 200,
+            content: `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://docs.example.com/reference/configuration.html</loc></url>
+</urlset>`,
+          };
+        },
+      })
+    );
+    expect(out.provider).toBe('sitemap');
+    expect(out.results[0]!.url).toBe('https://docs.example.com/reference/configuration.html');
+  });
+
+  it('follows same-host sitemap indexes', async () => {
+    const out = await runRemoteDocsSearch(
+      'https://docs.example.com/',
+      'agent integration',
+      deps({
+        fetchStatic: async () => ({
+          content: load('static-article.html'),
+          finalUrl: 'https://docs.example.com/',
+        }),
+        fetchText: async (url) => {
+          if (url.endsWith('/llms.txt')) return { content: '', status: 404 };
+          if (url.endsWith('/sitemap.xml')) {
+            return {
+              status: 200,
+              content: `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://docs.example.com/guides.xml</loc></sitemap>
+  <sitemap><loc>https://other.example.com/ignored.xml</loc></sitemap>
+</sitemapindex>`,
+            };
+          }
+          expect(url).toBe('https://docs.example.com/guides.xml');
+          return {
+            status: 200,
+            content: `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://docs.example.com/how-to/agent-integration.html</loc></url>
+</urlset>`,
+          };
+        },
+      })
+    );
+    expect(out.provider).toBe('sitemap');
+    expect(out.results[0]!.url).toBe('https://docs.example.com/how-to/agent-integration.html');
+  });
+
   it('throws when a static index responds 304 with no content', async () => {
     await expect(
       runRemoteDocsSearch(

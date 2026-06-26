@@ -78,7 +78,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     }),
     remote: Flags.string({
       description:
-        'Discover uncached docs via a site’s public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs index). Pass a docs page URL; falls back to local cache search if no connector applies.',
+        'Discover uncached docs via a site’s public search or index (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs, llms.txt, sitemap.xml). Pass a docs page URL; falls back to local cache search if no connector applies.',
     }),
   };
 

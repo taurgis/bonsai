@@ -77,9 +77,9 @@ npx @taurgis/bonsai search "single sign-on" --domain help.salesforce.com
 This needs a site module that implements search. Ask for a domain without one,
 and the command stops with a clear error rather than quietly scanning the cache.
 
-`--remote` discovers uncached pages through a site's public search index. Point
-it at a docs URL and Bonsai picks a connector for that site (Algolia DocSearch,
-or a MkDocs / Sphinx / Just-the-Docs index):
+`--remote` discovers uncached pages through a site's public search or docs index.
+Point it at a docs URL and Bonsai picks a connector for that site (Algolia
+DocSearch, MkDocs / Sphinx / Just-the-Docs index, llms.txt, or sitemap.xml):
 
 ```bash
 npx @taurgis/bonsai search "middleware" --remote https://docs.example.com/

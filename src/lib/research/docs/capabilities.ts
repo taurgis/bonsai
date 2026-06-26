@@ -65,6 +65,8 @@ export type SearchProvider =
   | 'mkdocs-local'
   | 'sphinx-searchindex'
   | 'jekyll-json'
+  | 'sitemap'
+  | 'llms.txt'
   | 'readme-algolia'
   | 'custom';
 

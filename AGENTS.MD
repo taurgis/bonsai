@@ -116,7 +116,7 @@ Agents working in this codebase or utilizing Bonsai must run the compiled CLI co
 * **Status Checklist**: `node bin/cli.mjs status <url> [--json]`
 * **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
 * **Search Cache**: `node bin/cli.mjs search "<query>" [--json]`
-* **Remote Docs Search (discovery)**: `node bin/cli.mjs search "<query>" --remote <docs-url> [--json]` — discovers uncached pages via a site's public search (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes); selected URLs are then captured through `<url>`. Degrades to local cache search when no connector applies.
+* **Remote Docs Search (discovery)**: `node bin/cli.mjs search "<query>" --remote <docs-url> [--json]` — discovers uncached pages via a site's public search or index (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes, llms.txt, sitemap.xml); selected URLs are then captured through `<url>`. Degrades to local cache search when no connector applies.
 * **List Database**: `node bin/cli.mjs list [filters] [--json]`
 * **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
 

@@ -1,5 +1,7 @@
 import { defineConfig } from 'vitepress';
-import type { HeadConfig, PageData } from 'vitepress';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import type { HeadConfig, PageData, SiteConfig } from 'vitepress';
 
 type PageMetadata = {
   title: string;
@@ -147,6 +149,72 @@ function canonicalUrl(relativePath: string): string {
   return new URL(route, siteUrl).href;
 }
 
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function routeSection(relativePath: string): string {
+  if (relativePath === 'index.md') return 'Start Here';
+  const firstSegment = relativePath.split('/')[0];
+  if (firstSegment === 'guide') return 'Guide';
+  if (firstSegment === 'concepts') return 'Concepts';
+  if (firstSegment === 'how-to') return 'How-to Guides';
+  if (firstSegment === 'reference') return 'Reference';
+  return 'More';
+}
+
+function sitemapXml(): string {
+  const urls = Object.keys(pageMetadata)
+    .map((relativePath) => `  <url><loc>${escapeXml(canonicalUrl(relativePath))}</loc></url>`)
+    .join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>
+`;
+}
+
+function llmsTxt(): string {
+  const sections = new Map<string, string[]>();
+  for (const [relativePath, metadata] of Object.entries(pageMetadata)) {
+    const section = routeSection(relativePath);
+    const links = sections.get(section) ?? [];
+    links.push(`- [${metadata.title}](${canonicalUrl(relativePath)}): ${metadata.description}`);
+    sections.set(section, links);
+  }
+
+  const body = Array.from(sections.entries())
+    .map(([section, links]) => `## ${section}\n\n${links.join('\n')}`)
+    .join('\n\n');
+
+  return `# ${siteName}
+
+> Documentation for Bonsai, a standalone local research cache CLI for AI agents.
+
+Bonsai captures documentation pages as reusable, source-cited Markdown artifacts with freshness metadata, deterministic JSON output, and compressed variants for context budgeting.
+
+${body}
+`;
+}
+
+async function writeMachineReadableIndexes(siteConfig: SiteConfig): Promise<void> {
+  await mkdir(siteConfig.outDir, { recursive: true });
+  await Promise.all([
+    writeFile(join(siteConfig.outDir, 'sitemap.xml'), sitemapXml(), 'utf8'),
+    writeFile(join(siteConfig.outDir, 'llms.txt'), llmsTxt(), 'utf8'),
+    writeFile(
+      join(siteConfig.outDir, 'robots.txt'),
+      `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap.xml', siteUrl).href}\n`,
+      'utf8'
+    ),
+  ]);
+}
+
 function metadataForPage(pageData: PageData): PageMetadata {
   return (
     pageMetadata[pageData.relativePath] ?? {
@@ -264,6 +332,8 @@ export default defineConfig({
   head: [
     // Head entries are not rewritten by VitePress, so keep this root-relative.
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    ['link', { rel: 'sitemap', type: 'application/xml', href: '/sitemap.xml' }],
+    ['link', { rel: 'alternate', type: 'text/plain', title: 'llms.txt', href: '/llms.txt' }],
     ['meta', { name: 'theme-color', content: '#18794e' }],
   ],
 
@@ -277,6 +347,8 @@ export default defineConfig({
       ...metadataHead(pageData, metadata),
     ];
   },
+
+  buildEnd: writeMachineReadableIndexes,
 
   themeConfig: {
     // Color the trailing "ai" of "Bonsai" to signal the tool is built for AI
