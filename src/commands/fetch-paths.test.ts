@@ -192,14 +192,16 @@ describe('fetch command branch coverage', () => {
     return (await Config.load()).dataDir;
   }
 
-  it('cache MISS: fetches fresh, writes the artifact, returns miss/stale_expired', async () => {
+  it('cache MISS: fetches fresh, writes the artifact, returns miss/none', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
 
     const result: any = await FetchCommand.run([TEST_URL]);
 
     expect(mocks.capturePage).toHaveBeenCalledTimes(1);
     expect(result.cache.status).toBe('miss');
-    expect(result.cache.freshness).toBe('stale_expired');
+    // No prior entry existed, so freshness is 'none' — not 'stale_expired' (nothing expired; the
+    // page was simply uncached and is now freshly fetched).
+    expect(result.cache.freshness).toBe('none');
     expect(result.cache.redirectedToGlobal).toBe(false);
     expect(result.format).toBe('compressed');
     expect(result.content.length).toBeGreaterThan(0);
@@ -273,6 +275,7 @@ describe('fetch command branch coverage', () => {
     const result: any = await FetchCommand.run([TEST_URL, '--dry-run']);
 
     expect(result.cache.status).toBe('miss');
+    expect(result.cache.freshness).toBe('none');
     // No artifact persisted to the real cache.
     expect(existsSync(getArtifactPath(await globalDataDir(), result.cache.key))).toBe(false);
     // No stray fnr-dry-run-* temp dirs left behind.
@@ -288,6 +291,9 @@ describe('fetch command branch coverage', () => {
 
     expect(mocks.capturePage).toHaveBeenCalledTimes(1);
     expect(result.cache.status).toBe('miss');
+    // --force disables lookup, so the existing fresh entry is ignored and the path behaves like a
+    // cold miss: no prior entry was consulted, hence freshness 'none'.
+    expect(result.cache.freshness).toBe('none');
   });
 
   it('--max-age expiry: a tier-fresh entry is forced stale and revalidated', async () => {

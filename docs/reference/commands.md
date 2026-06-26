@@ -51,7 +51,7 @@ npx @taurgis/bonsai <url> [flags]
     "cache": {
       "key": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
       "status": "hit" | "miss" | "revalidated" | "refreshed" | "stale",
-      "freshness": "fresh" | "stale_grace" | "stale_expired",
+      "freshness": "fresh" | "stale_grace" | "stale_expired" | "none",
       "path": "/path/to/research/cache/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
       "storage": "global" | "project",
       "redirectedToGlobal": false
@@ -75,6 +75,10 @@ npx @taurgis/bonsai <url> [flags]
   }
 }
 ```
+
+`cache.freshness` reports the freshness of the entry found at lookup, so it explains why the action
+was taken (a `refreshed` result still reports the pre-fetch `stale_expired`). On a `miss` it is
+`none`: no prior entry existed, so the freshly fetched content has no prior freshness to report.
 
 ---
 
@@ -143,10 +147,13 @@ npx @taurgis/bonsai status <url> [flags]
   "cacheKey": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
   "cachePath": "/path/to/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
   "status": "hit" | "miss" | "stale",
-  "freshness": "fresh" | "stale_grace" | "stale_expired",
+  "freshness": "fresh" | "stale_grace" | "stale_expired" | "none",
   "action": "would_fetch" | "would_revalidate" | "would_return_cached"
 }
 ```
+
+On a `miss`, `freshness` is `none`: no entry exists, so no freshness applies. `stale_grace` and
+`stale_expired` describe an entry that exists but has aged into the grace window or past it.
 
 ---
 

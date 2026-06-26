@@ -37,3 +37,46 @@ export function truncationNotice(
   if (total <= shown) return null;
   return `${total} entries matched; returning the ${labels.order} ${shown}. Raise --limit (max ${labels.maxLimit}) to see more.`;
 }
+
+/**
+ * Levenshtein edit distance: the minimum number of single-character insertions, deletions, or
+ * substitutions to turn `s1` into `s2`. Shared by fuzzy search ranking and command-typo suggestion.
+ */
+export function levenshtein(s1: string, s2: string): number {
+  if (s1.length < s2.length) return levenshtein(s2, s1);
+  if (s2.length === 0) return s1.length;
+  let prevRow = Array.from({ length: s2.length + 1 }, (_, i) => i);
+  for (let i = 0; i < s1.length; i++) {
+    const currRow = [i + 1];
+    for (let j = 0; j < s2.length; j++) {
+      const deletions = prevRow[j + 1]! + 1;
+      const insertions = currRow[j]! + 1;
+      const substitutions = prevRow[j]! + (s1[i] === s2[j] ? 0 : 1);
+      currRow.push(Math.min(deletions, insertions, substitutions));
+    }
+    prevRow = currRow;
+  }
+  return prevRow[s2.length]!;
+}
+
+/**
+ * The candidate nearest to `input` by edit distance, or null when even the closest is farther than
+ * `maxDistance`. The threshold keeps suggestions to plausible typos — input that resembles nothing
+ * gets no correction rather than an absurd one.
+ */
+export function closestMatch(
+  input: string,
+  candidates: readonly string[],
+  maxDistance: number
+): string | null {
+  let best: string | null = null;
+  let bestDistance = Infinity;
+  for (const candidate of candidates) {
+    const distance = levenshtein(input, candidate);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = candidate;
+    }
+  }
+  return bestDistance <= maxDistance ? best : null;
+}

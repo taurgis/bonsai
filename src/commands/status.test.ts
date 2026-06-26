@@ -7,7 +7,9 @@ describe('status command unit tests', () => {
     const result = (await ResearchStatus.run(['https://example.com/not-cached-status'])) as any;
     expect(result).toBeDefined();
     expect(result.status).toBe('miss');
-    expect(result.freshness).toBe('stale_expired');
+    // A miss reports 'none' (no entry exists), not 'stale_expired' (which would imply an entry
+    // exists but aged out).
+    expect(result.freshness).toBe('none');
     expect(result.action).toBe('would_fetch');
   });
 

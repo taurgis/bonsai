@@ -81,6 +81,9 @@
       "identifier": "commands"
     },
     "topicSeparator": " ",
+    "hooks": {
+      "command_not_found": "./dist/hooks/command-not-found/suggest.js"
+    },
     "topics": {
       "config": {
         "description": "Manage research cache storage configuration (global vs project)"

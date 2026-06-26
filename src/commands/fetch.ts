@@ -289,9 +289,12 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       cacheKey,
       artifact
     );
+    // No entry existed at lookup, so there is no prior freshness to report. 'none' (not
+    // 'stale_expired') keeps the field honest — nothing expired; the page was simply uncached and
+    // has now been fetched fresh. Mirrors the `status` command's miss reporting.
     return {
       cacheStatus: 'miss',
-      freshnessState: 'stale_expired',
+      freshnessState: 'none',
       artifact,
       storageDir: dir,
       redirectedToGlobal,
