@@ -48,19 +48,25 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     const { keyArg, valueArg } = splitInlineKeyValue(this.args.key, this.args.value);
 
     if (!keyArg) {
-      this.error('Missing required argument: key', { exit: 2 });
+      this.error('Missing required argument: key', { exit: 2, code: 'MISSING_ARGUMENT' });
     }
     this.assertKnownKey(keyArg);
     this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
 
     const meta = KEY_META[keyArg];
     if (valueArg === undefined) {
-      this.error(`Missing required argument: value for key "${keyArg}"`, { exit: 2 });
+      this.error(`Missing required argument: value for key "${keyArg}"`, {
+        exit: 2,
+        code: 'MISSING_ARGUMENT',
+      });
     }
     const parsed = meta.parseValue(valueArg);
     if (!meta.isValid(parsed)) {
       const guidance = meta.values ? `Valid values: ${meta.values.join(', ')}.` : meta.description;
-      this.error(`Invalid value "${valueArg}" for "${keyArg}". ${guidance}`, { exit: 2 });
+      this.error(`Invalid value "${valueArg}" for "${keyArg}". ${guidance}`, {
+        exit: 2,
+        code: 'INVALID_VALUE',
+      });
     }
 
     const scope = this.writeScope(this.flags.local);
@@ -81,6 +87,10 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
           'Could not determine user config directory. Use --local to write project config.',
           {
             exit: 1,
+            code: 'CONFIG_DIR_UNAVAILABLE',
+            suggestions: [
+              `Write project config instead: ${this.config.bin} config set <key> <value> --local`,
+            ],
           }
         );
       }

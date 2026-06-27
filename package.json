@@ -31,6 +31,7 @@
     "regression:suite": "tsc -b && node testing/regression/run-suite.mjs",
     "regression:promote": "tsc -b && node testing/regression/run-suite.mjs --promote",
     "regression:check": "tsc -b && node testing/regression/run-suite.mjs --strict",
+    "audit:cli": "node testing/manual-audit.mjs",
     "nexus:sync": "npx forward-nexus update && npx forward-nexus sync",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",

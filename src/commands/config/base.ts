@@ -10,7 +10,10 @@ import type { ConfigKey, ConfigScope } from '../../lib/config/index.js';
 export abstract class ConfigCommand<T extends typeof Command> extends BaseCommand<T> {
   protected assertScopeFlagsExclusive(global?: boolean, local?: boolean): void {
     if (global && local) {
-      this.error('--global and --local are mutually exclusive.', { exit: 2 });
+      this.error('--global and --local are mutually exclusive.', {
+        exit: 2,
+        code: 'CONFLICTING_FLAGS',
+      });
     }
   }
 
@@ -32,6 +35,7 @@ export abstract class ConfigCommand<T extends typeof Command> extends BaseComman
       const hint = suggestion ? ` Did you mean: ${suggestion}?` : '';
       this.error(`Unknown config key: "${keyArg}".${hint} Valid keys: ${validKeysHint()}.`, {
         exit: 2,
+        code: 'UNKNOWN_KEY',
       });
     }
   }

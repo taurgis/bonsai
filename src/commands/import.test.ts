@@ -153,6 +153,21 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('fails fast when non-interactive stdin never delivers data (open pipe)', async () => {
+    const ttySpy = vi
+      .spyOn(ResearchImport.prototype as any, 'stdinIsInteractive')
+      .mockReturnValue(false);
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockImplementation(() => new Promise(() => {}));
+
+    const runPromise = ResearchImport.run(['https://example.com', '--stdin']);
+    await expect(runPromise).rejects.toThrow(/No stdin data received/);
+
+    ttySpy.mockRestore();
+    readSpy.mockRestore();
+  }, 3000);
+
   it('auto-generates tags and records a quality note when no --tags are supplied', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

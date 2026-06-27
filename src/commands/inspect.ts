@@ -48,7 +48,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       this.error(`No cached research found for URL: ${normalizedUrl}`, {
         exit: 1,
         code: 'CACHE_MISS',
-        suggestions: [`Fetch and cache it first: bonsai ${normalizedUrl}`],
+        suggestions: [`Fetch and cache it first: ${this.config.bin} ${normalizedUrl}`],
       });
     }
 

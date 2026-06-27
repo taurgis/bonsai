@@ -155,7 +155,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     if (!hasSingle && !hasMulti) {
       this.error(
         'Must specify either positional <url> (for single-source) or --source-url (for multi-source) import.',
-        { exit: 2 }
+        { exit: 2, code: 'MISSING_URL' }
       );
     }
     if (hasMulti && !this.flags.topic) {
@@ -190,51 +190,73 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     return fs.readFileSync(filePath, 'utf8');
   }
 
+  private stdinImportSuggestions(): string[] {
+    const bin = this.config.bin;
+    return [
+      `Pipe Markdown content, e.g. cat notes.md | ${bin} import <url> --stdin`,
+      `Or read from a file: ${bin} import <url> --file notes.md`,
+    ];
+  }
+
+  /** Non-interactive stdin that never receives data (open pipe with no writer) must not hang forever. */
+  private async readStdinWithGuard(limitBytes: number = 1024 * 1024): Promise<string> {
+    if (this.stdinIsInteractive()) {
+      this.error('No data piped to --stdin.', {
+        exit: 2,
+        code: 'MISSING_STDIN',
+        suggestions: this.stdinImportSuggestions(),
+      });
+    }
+
+    const timeoutMs = 1000;
+    let rawInput = '';
+    try {
+      rawInput = await Promise.race([
+        this.readStdin(limitBytes),
+        new Promise<string>((_, reject) =>
+          setTimeout(() => reject(new Error('STDIN_TIMEOUT')), timeoutMs)
+        ),
+      ]);
+    } catch (err) {
+      if ((err as Error).message === 'STDIN_TIMEOUT') {
+        this.error('No stdin data received. Pipe content or use --file.', {
+          exit: 2,
+          code: 'MISSING_STDIN',
+          suggestions: this.stdinImportSuggestions(),
+        });
+      }
+      if ((err as Error).message.includes('stdin size limit exceeded')) {
+        this.error((err as Error).message, { exit: 1, code: 'STDIN_TOO_LARGE' });
+      }
+      // Genuine stream failure reading stdin → I/O failure (exit 1).
+      this.error((err as Error).message, { exit: 1 });
+    }
+    return rawInput;
+  }
+
   private readAndValidateFile(filePath: string): string {
     if (!this.fsExistsSync(filePath)) {
-      this.error(`File does not exist: ${filePath}`, { exit: 2 });
+      this.error(`File does not exist: ${filePath}`, { exit: 2, code: 'FILE_NOT_FOUND' });
     }
     const stat = this.fsStatSync(filePath);
     if (!stat.isFile()) {
-      this.error(`Path is not a file: ${filePath}`, { exit: 2 });
+      this.error(`Path is not a file: ${filePath}`, { exit: 2, code: 'NOT_A_FILE' });
     }
     if (stat.size > 1024 * 1024) {
-      this.error('File size limit exceeded (max 1 MiB).', { exit: 1 });
+      this.error('File size limit exceeded (max 1 MiB).', { exit: 1, code: 'FILE_TOO_LARGE' });
     }
     const content = this.fsReadFileSync(filePath);
     if (!content.trim()) {
-      this.error('Empty file content provided.', { exit: 2 });
+      this.error('Empty file content provided.', { exit: 2, code: 'EMPTY_INPUT' });
     }
     return content;
   }
 
   private async readAndValidateInput(): Promise<string> {
     if (this.flags.stdin) {
-      // On an interactive terminal with nothing piped, reading stdin blocks forever waiting for EOF —
-      // a silent hang with no feedback. Fail fast with a usage error instead; piped/redirected input
-      // (the agent and CI path) has isTTY falsy and reads normally.
-      if (this.stdinIsInteractive()) {
-        this.error('No data piped to --stdin.', {
-          exit: 2,
-          suggestions: [
-            'Pipe Markdown content, e.g. cat notes.md | bonsai import <url> --stdin',
-            'Or read from a file: bonsai import <url> --file notes.md',
-          ],
-        });
-      }
-      // Initialized so the post-catch read below never depends on this.error()'s `never` return type
-      // for definite assignment; the empty-content guard rejects '' as a usage error anyway.
-      let rawInput = '';
-      try {
-        rawInput = await this.readStdin();
-      } catch (err) {
-        // Genuine stream/size failure reading stdin → I/O failure (exit 1).
-        this.error((err as Error).message, { exit: 1 });
-      }
-      // Empty input is a usage error (exit 2), not an I/O failure — keep it out of the
-      // catch above so its exit code is not clobbered to 1.
+      const rawInput = await this.readStdinWithGuard();
       if (!rawInput.trim()) {
-        this.error('Empty stdin content provided.', { exit: 2 });
+        this.error('Empty stdin content provided.', { exit: 2, code: 'EMPTY_INPUT' });
       }
       return rawInput;
     }
@@ -252,7 +274,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       }
     }
 
-    this.error('No input source specified.', { exit: 2 });
+    this.error('No input source specified.', { exit: 2, code: 'MISSING_INPUT' });
   }
 
   private deriveImportCacheKey(

@@ -384,4 +384,59 @@ describe('CLI ergonomics and error contracts', () => {
     expect(envelope.stderr).toContain('Invalid --remote URL');
     expect(result.stderr).toBe('');
   });
+
+  it('import missing url JSON includes MISSING_URL code', () => {
+    const result = runContract(['import', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'MISSING_URL',
+      data: null,
+    });
+    expect(result.stderr).toBe('');
+  });
+
+  it('import missing file JSON includes FILE_NOT_FOUND code', () => {
+    const result = runContract(
+      ['import', 'https://example.com/z', '--file', '/no/such/file-xyz.md', '--json'],
+      { raw: true }
+    );
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'FILE_NOT_FOUND',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('File does not exist');
+    expect(result.stderr).toBe('');
+  });
+
+  it('config set unknown key JSON includes UNKNOWN_KEY code', () => {
+    const result = runContract(['config', 'set', 'bogus', 'value', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'UNKNOWN_KEY',
+      data: null,
+    });
+    expect(result.stderr).toBe('');
+  });
+
+  it('inspect CACHE_MISS suggestion uses the configured bin name', () => {
+    const result = runContract(
+      ['inspect', 'https://example.com/contract-cache-miss-suggestion', '--json'],
+      { raw: true }
+    );
+    expect(result.exitCode).toBe(1);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.suggestions?.[0]).toMatch(
+      /^Fetch and cache it first: bonsai https:\/\/example\.com\/contract-cache-miss-suggestion$/
+    );
+  });
 });
