@@ -3,8 +3,13 @@
 import { execute } from '@oclif/core';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import updateNotifier from 'update-notifier';
+import { createRequire } from 'node:module';
 
 import { normalizeArgv } from '../dist/lib/argv.js';
+
+const req = createRequire(import.meta.url);
+const pkg = req('../package.json');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -20,6 +25,12 @@ if (result.exitWithJson) {
   process.exitCode = result.exitWithJson.exitCode;
   console.log(JSON.stringify(result.exitWithJson.envelope, null, 2));
   process.exit();
+}
+
+// Only notify after the exitWithJson fast-path so the notifier never fires before
+// a JSON envelope exits. Also skip under --json so agent callers never see stderr noise.
+if (!process.argv.includes('--json')) {
+  updateNotifier({ pkg }).notify();
 }
 
 process.argv = [process.argv[0], process.argv[1], ...result.argv];

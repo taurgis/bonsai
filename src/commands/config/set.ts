@@ -17,18 +17,18 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
 
   static examples = [
     {
-      description: 'Store research cache inside the current project',
+      description: 'store research cache inside the current project',
       command: '<%= config.bin %> config set storage project --local',
     },
     {
-      description: 'Set the user-level default using the inline key=value form',
+      description: 'set the user-level default using the inline key=value form',
       command: '<%= config.bin %> config set storage=global',
     },
   ];
 
   static args = {
-    key: Args.string({ required: false, description: 'The configuration key to set.' }),
-    value: Args.string({ required: false, description: 'The value to assign.' }),
+    key: Args.string({ required: false, description: 'the configuration key to set' }),
+    value: Args.string({ required: false, description: 'the value to assign' }),
   };
 
   static flags = {
@@ -37,7 +37,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
       local: 'Write to project-level config (.bonsai.json in cwd).',
     }),
     'dry-run': Flags.boolean({
-      description: 'Show what would be written without saving.',
+      description: 'show what would be written without saving',
       default: false,
     }),
   };

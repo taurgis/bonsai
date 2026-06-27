@@ -1,4 +1,4 @@
-import { Args, Flags } from '@oclif/core';
+import { Args, Flags, ux } from '@oclif/core';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -17,7 +17,6 @@ import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
 import { fetchRenderedHtml } from '../lib/research/browser.js';
 import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
-import { resolveResearchTarget } from '../lib/research/resolve-target.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { detectSite } from '../sites/index.js';
 import type { SiteFetchResult } from '../sites/types.js';
@@ -37,13 +36,13 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
   static examples = [
     {
-      description: 'Research a URL with detailed output, tagged with topic and tags',
+      description: 'research a URL with detailed output, tagged with topic and tags',
       command:
         '<%= config.bin %> https://docs.nestjs.com/ --topic "Backend Frameworks" --tags "Node" --tags "NestJS" --format detailed --ttl 30d',
     },
     {
       description:
-        'Research a volatile page with compressed output and short TTL, returned as JSON',
+        'research a volatile page with compressed output and short TTL, returned as JSON',
       command:
         '<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json',
     },
@@ -52,57 +51,56 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   static args = {
     url: Args.string({
       required: true,
-      description: 'The full HTTP/HTTPS URL of the web page to research.',
+      description: 'the full HTTP/HTTPS URL of the web page to research',
     }),
   };
 
   static flags = {
     topic: Flags.string({
       char: 't',
-      description: 'The main category/topic of the research for metadata tagging.',
+      description: 'the main category/topic of the research for metadata tagging',
     }),
     tags: Flags.string({
       char: 'g',
-      description: 'Taxonomic tags for this research (can be repeated).',
+      description: 'taxonomic tags for this research (can be repeated)',
       multiple: true,
     }),
     format: Flags.option({
       char: 'f',
-      description: 'Desired data density.',
+      description: 'desired data density',
       options: ['compressed', 'detailed'] as const,
       default: 'compressed',
     })(),
     tier: Flags.option({
-      description: 'Freshness tier policy.',
+      description: 'freshness tier policy',
       options: ['stable', 'standard', 'volatile'] as const,
       default: 'standard',
     })(),
     ttl: Flags.string({
       char: 'l',
-      description: 'Predicted lifespan: number + h/d/w/m/y (m = months), e.g. "2h", "7d", "6m".',
+      description: 'predicted lifespan: number + h/d/w/m/y (m = months), e.g. "2h", "7d", "6m"',
     }),
     'max-age': Flags.string({
-      description: 'Maximum age of cache to accept (e.g., "1d", "30d").',
+      description: 'maximum age of cache to accept (e.g., "1d", "30d")',
     }),
     force: Flags.boolean({
-      description: 'Force a fresh fetch, ignoring any cached entries.',
+      description: 'force a fresh fetch, ignoring any cached entries',
       default: false,
     }),
     'dry-run': Flags.boolean({
-      description: 'Perform validation and fetch without saving to local cache.',
+      description: 'perform validation and fetch without saving to local cache',
       default: false,
     }),
     'allow-stale': Flags.boolean({
-      description: 'Allow serving stale cache if the remote server is unreachable.',
+      description: 'allow serving stale cache if the remote server is unreachable',
       default: false,
     }),
     rendered: Flags.boolean({
-      description: 'Force using a browser-rendered scraping path for dynamic pages.',
+      description: 'force using a browser-rendered scraping path for dynamic pages',
       default: false,
     }),
     storage: Flags.option({
-      description:
-        'Override where this result is cached (overrides configured default). Secret-bearing pages are always stored globally.',
+      description: 'override where this result is cached (secrets always stored globally)',
       options: ['global', 'project'] as const,
     })(),
   };
@@ -247,7 +245,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   // Validates the duration flags up front, exiting with code 2 on a malformed value.
   private validateDurationFlags(ttl?: string, maxAge?: string): void {
     for (const msg of [durationFlagError('--ttl', ttl), durationFlagError('--max-age', maxAge)]) {
-      if (msg) this.error(msg, { exit: 2 });
+      if (msg) this.error(msg, { exit: 2, code: 'INVALID_DURATION' });
     }
   }
 
@@ -359,19 +357,10 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
     this.validateDurationFlags(ttl, maxAge);
 
-    let target: ReturnType<typeof resolveResearchTarget>;
-    try {
-      target = resolveResearchTarget({
-        configDir: this.config.configDir,
-        cwd: process.cwd(),
-        dataDir: this.config.dataDir,
-        flagOverride: this.flags.storage as StorageMode | undefined,
-        lookup: !this.flags.force,
-        url,
-      });
-    } catch (err) {
-      this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2 });
-    }
+    const target = this.resolveResearchTargetOrFail(url, {
+      flagOverride: this.flags.storage as StorageMode | undefined,
+      lookup: !this.flags.force,
+    });
 
     const { cacheKey, located, normalizedUrl, roots } = target;
     const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());
@@ -379,6 +368,10 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     const currentTime = new Date();
 
     try {
+      if (!this.jsonEnabled()) {
+        ux.action.start('Fetching ' + normalizedUrl);
+      }
+
       const { cacheStatus, freshnessState, artifact, storageDir, redirectedToGlobal } =
         await this.resolveArtifact(
           normalizedUrl,
@@ -397,6 +390,17 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
         cacheStatus,
         summaryLevel
       );
+
+      if (!this.jsonEnabled()) {
+        const CACHE_STATUS_LABEL: Record<string, string> = {
+          hit: 'cached',
+          miss: 'done',
+          refreshed: 'refreshed',
+          revalidated: 'revalidated',
+          stale: 'served stale',
+        };
+        ux.action.stop(CACHE_STATUS_LABEL[cacheStatus] ?? cacheStatus);
+      }
 
       const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
       const resultData = this.buildResultData(
@@ -418,6 +422,9 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       }
       return resultData;
     } catch (err) {
+      if (!this.jsonEnabled()) {
+        ux.action.stop('failed');
+      }
       // Stale-serve (exit 5) signals via process.exitCode and never throws, so it bypasses this
       // path; only genuine fetch/extract failures land here and get classified guidance. Use the
       // normalized URL in hints so the copy-paste command is canonical (and never echoes raw,

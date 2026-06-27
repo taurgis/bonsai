@@ -18,7 +18,7 @@ describe('prune command unit tests', () => {
 
   it('fails if safety flags --yes and --dry-run are missing', async () => {
     const runPromise = ResearchPrune.run(['--older-than', '30d']);
-    await expect(runPromise).rejects.toThrow(/Safety check: Please specify --yes/);
+    await expect(runPromise).rejects.toThrow(/Safety check: use --yes to confirm pruning/);
   });
 
   it('performs dry-run and actual pruning successfully', async () => {

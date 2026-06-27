@@ -1,4 +1,4 @@
-import { Args, Flags } from '@oclif/core';
+import { Args, Flags, ux } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { loadSearchableArtifacts } from '../lib/research/search-index.js';
 import {
@@ -44,42 +44,55 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   static description =
     'Scans the local research cache database and ranks matching entries based on topic, tags, source URLs, summary, and content.';
 
+  static examples = [
+    {
+      description: 'search for cached notes containing specific keywords',
+      command: '<%= config.bin %> <%= command.id %> "authentication flow"',
+    },
+    {
+      description: 'search with remote docs fallback',
+      command: '<%= config.bin %> <%= command.id %> "router" --remote https://react.dev',
+    },
+    {
+      description: 'search local cache with tag filtering',
+      command: '<%= config.bin %> <%= command.id %> "setup" --tags node --tags tutorial',
+    },
+  ];
+
   static args = {
     query: Args.string({
       required: true,
-      description: 'The search query containing terms to match.',
+      description: 'the search query containing terms to match',
     }),
   };
 
   static flags = {
     topic: Flags.string({
       char: 't',
-      description: 'Filter results by exact topic (case-insensitive).',
+      description: 'filter results by exact topic (case-insensitive)',
     }),
     tags: Flags.string({
       char: 'g',
-      description: 'Filter results by tags (must match all tags specified).',
+      description: 'filter results by tags (must match all tags specified)',
       multiple: true,
     }),
     'artifact-type': Flags.option({
-      description: 'Filter results by artifact type.',
+      description: 'filter results by artifact type',
       options: ARTIFACT_TYPES,
     })(),
     limit: Flags.integer({
-      description: 'Maximum number of results to return (default 10, max 50).',
+      description: 'maximum number of results to return (default 10, max 50)',
       default: 10,
     }),
     'include-stale': Flags.boolean({
-      description: 'Include stale expired cache entries in the search results.',
+      description: 'include stale expired cache entries in the search results',
       default: false,
     }),
     domain: Flags.string({
-      description:
-        'Search a documentation site directly (e.g. help.salesforce.com) instead of the local cache. Requires a site module that implements search.',
+      description: 'search a documentation site directly (requires compatible site module)',
     }),
     remote: Flags.string({
-      description:
-        'Discover uncached docs via a site’s public search or index (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs, llms.txt, sitemap.xml). Pass a docs page URL; falls back to local cache search if no connector applies.',
+      description: 'discover uncached docs via public search or index (falls back to local cache)',
     }),
   };
 
@@ -88,14 +101,14 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   private validateSearchFlags(): void {
     const limit = this.flags.limit;
     if (limit !== undefined && (limit < 1 || limit > 50)) {
-      this.error('Limit must be between 1 and 50.', { exit: 2 });
+      this.error('Limit must be between 1 and 50.', { exit: 2, code: 'INVALID_LIMIT' });
     }
   }
 
   private getSearchQueryTerms(query: string): string[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
-      this.error('Query string cannot be empty.', { exit: 2 });
+      this.error('Query string cannot be empty.', { exit: 2, code: 'EMPTY_QUERY' });
     }
     return terms;
   }
@@ -250,6 +263,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No matching cached research entries found.');
+      this.log(`\nTip: populate the cache first: ${this.config.bin} <url>`);
       return;
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, SEARCH_LABELS)}\n`);
@@ -279,24 +293,40 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   private async executeSiteSearch(query: string, domain: string): Promise<unknown> {
     const siteModule = detectSite(`https://${domain}`);
     if (!siteModule) {
-      this.error(`No site module registered for domain: ${domain}`, { exit: 2 });
+      this.error(`No site module registered for domain: ${domain}`, {
+        exit: 2,
+        code: 'UNSUPPORTED_DOMAIN',
+      });
     }
     if (!siteModule.search) {
-      this.error(`Site module '${siteModule.id}' does not implement search.`, { exit: 2 });
+      this.error(`Site module '${siteModule.id}' does not implement search.`, {
+        exit: 2,
+        code: 'SEARCH_NOT_SUPPORTED',
+      });
     }
-    const results = await siteModule.search(query);
-    this.printResults(`Found ${results.length} results from ${siteModule.name}:\n`, results);
-    return results.map((r) => ({ ...r, site_module_id: siteModule.id }));
+    try {
+      if (!this.jsonEnabled()) ux.action.start(`Searching ${domain}`);
+      const results = await siteModule.search(query);
+      if (!this.jsonEnabled()) ux.action.stop();
+      this.printResults(`Found ${results.length} results from ${siteModule.name}:\n`, results);
+      return results.map((r) => ({ ...r, site_module_id: siteModule.id }));
+    } catch (err) {
+      if (!this.jsonEnabled()) ux.action.stop('failed');
+      throw err;
+    }
   }
 
   // Remote docs discovery. On any connector failure, degrade to local cache search with a warning
   // (T-20). Returns discovery results tagged remote: true so callers can tell them from cache hits.
   private async executeRemoteSearch(query: string, docsUrl: string): Promise<unknown> {
     try {
+      if (!this.jsonEnabled()) ux.action.start(`Searching ${docsUrl}`);
       const { provider, results } = await runRemoteDocsSearch(docsUrl, query, REMOTE_SEARCH_DEPS);
+      if (!this.jsonEnabled()) ux.action.stop();
       this.printResults(`Found ${results.length} remote results via ${provider}:\n`, results);
       return results.map((r) => ({ ...r, remote: true }));
     } catch (err) {
+      if (!this.jsonEnabled()) ux.action.stop('failed');
       this.warn(`Remote docs search unavailable, using local cache: ${(err as Error).message}`);
       return undefined;
     }

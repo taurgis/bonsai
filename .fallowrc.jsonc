@@ -6,6 +6,9 @@
   // page markup, not real imports. Excluded from all analysis (matches health/duplicates ignores).
   "ignorePatterns": ["**/__fixtures__/**"],
 
+  // oclif loads plugin packages from package.json#oclif.plugins at runtime, not via static imports.
+  "ignoreDependencies": ["@oclif/plugin-autocomplete"],
+
 
   "health": {
     "maxCyclomatic": 20,

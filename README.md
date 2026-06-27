@@ -180,6 +180,35 @@ Both keys can also be overridden per-invocation via the `BONSAI_STORAGE` and `BO
 
 ---
 
+## Shell Autocomplete
+
+Bonsai ships with shell autocomplete via `@oclif/plugin-autocomplete`. After installing globally, set it up once for your shell:
+
+```bash
+# Bash — add to ~/.bashrc
+eval "$(bonsai autocomplete bash)"
+
+# Zsh — add to ~/.zshrc
+eval "$(bonsai autocomplete zsh)"
+
+# Fish
+bonsai autocomplete fish > ~/.config/fish/completions/bonsai.fish
+```
+
+To see full setup instructions including the copy-paste snippet for your shell:
+
+```bash
+bonsai autocomplete
+```
+
+Refresh cached completions after upgrading:
+
+```bash
+bonsai autocomplete --refresh-cache
+```
+
+---
+
 ## Freshness and Cache Rules
 
 Global cache files live in Bonsai's oclif data directory, typically:
@@ -243,6 +272,30 @@ When run with `--json`, commands return a stable envelope:
   }
 }
 ```
+
+---
+
+## Environment Variables
+
+| Variable | Effect |
+| --- | --- |
+| `BONSAI_STORAGE` | Override the default storage location per-invocation (`global` or `project`). |
+| `BONSAI_SUMMARY` | Override the summary compression level per-invocation (`conservative`, `balanced`, or `aggressive`). |
+| `NO_COLOR` | Disable all ANSI color output (also respected via `TERM=dumb`). |
+| `NO_UPDATE_NOTIFIER` | Suppress the "update available" notification. |
+| `CI` | Set to `1` or `true` to suppress the update notification in CI environments (detected automatically). |
+| `DEBUG` | Enable debug output for specific Bonsai namespaces, e.g. `DEBUG=bonsai:*`. |
+
+---
+
+## Exit Codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success. |
+| `1` | Runtime failure (network error, fetch failed, file read error). |
+| `2` | Usage error (invalid flag, bad URL, missing required argument). |
+| `5` | Stale content served — the cache entry is past its grace window but `--allow-stale` is set. The returned content is still usable. |
 
 ---
 

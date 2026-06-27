@@ -16,37 +16,37 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
   static examples = [
     {
-      description: 'Perform a dry run of pruning entries older than 90 days',
+      description: 'perform a dry run of pruning entries older than 90 days',
       command: '<%= config.bin %> prune --older-than 90d --dry-run',
     },
     {
-      description: 'Actually prune entries older than 30 days that are source scrapes',
+      description: 'actually prune entries older than 30 days that are source scrapes',
       command: '<%= config.bin %> prune --older-than 30d --artifact-type source --yes',
     },
   ];
 
   static flags = {
     'older-than': Flags.string({
-      description: 'Prune entries older than duration (e.g. "30d", "90d").',
+      description: 'prune entries older than duration (e.g. "30d", "90d")',
     }),
     inactive: Flags.string({
       description:
-        'Prune entries inactive (unvalidated/unfetched) for duration (e.g. "14d", "30d").',
+        'prune entries inactive (unvalidated/unfetched) for duration (e.g. "14d", "30d")',
     }),
     'artifact-type': Flags.option({
       // Prune operates on every cached file, so it can target any artifact type — including the
       // `section`/`index` children a page generates (e.g. to clear orphans left after a source is
       // pruned with `--artifact-type source`).
-      description: 'Filter pruning to specific artifact type.',
+      description: 'filter pruning to specific artifact type',
       options: ARTIFACT_TYPES,
     })(),
     'dry-run': Flags.boolean({
-      description: 'List files that would be deleted without actually deleting them.',
+      description: 'list files that would be deleted without actually deleting them',
       default: false,
     }),
     yes: Flags.boolean({
       char: 'y',
-      description: 'Confirm deletion and prune matched entries (required unless --dry-run).',
+      description: 'confirm deletion and prune matched entries (required unless --dry-run)',
       default: false,
     }),
   };
@@ -57,13 +57,19 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     if (!this.flags['older-than'] && !this.flags.inactive && !this.flags['artifact-type']) {
       this.error(
         'Must specify at least one pruning filter: --older-than, --inactive, or --artifact-type.',
-        { exit: 2 }
+        { exit: 2, code: 'MISSING_FILTER' }
       );
     }
     if (!this.flags['dry-run'] && !this.flags.yes) {
+      const olderThanPart = this.flags['older-than']
+        ? ` --older-than ${this.flags['older-than']}`
+        : '';
       this.error(
-        'Safety check: Please specify --yes to confirm pruning, or --dry-run to list files that would be deleted.',
-        { exit: 2 }
+        'Safety check: use --yes to confirm pruning, or --dry-run to preview files that would be deleted.',
+        {
+          exit: 2,
+          suggestions: [`Preview first: ${this.config.bin} prune --dry-run${olderThanPart}`],
+        }
       );
     }
     // Validate durations up front: scanCacheDir swallows per-file errors, so a malformed
@@ -72,7 +78,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       durationFlagError('--older-than', this.flags['older-than']),
       durationFlagError('--inactive', this.flags.inactive),
     ]) {
-      if (msg) this.error(msg, { exit: 2 });
+      if (msg) this.error(msg, { exit: 2, code: 'INVALID_DURATION' });
     }
   }
 

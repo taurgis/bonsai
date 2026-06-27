@@ -21,15 +21,15 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static examples = [
     {
-      description: 'List all cached entries',
+      description: 'list all cached entries',
       command: '<%= config.bin %> list',
     },
     {
-      description: 'List cached entries for a specific topic with JSON output',
+      description: 'list cached entries for a specific topic with JSON output',
       command: '<%= config.bin %> list --topic "React Suspense" --json',
     },
     {
-      description: 'List only fresh entries filtered by tags',
+      description: 'list only fresh entries filtered by tags',
       command: '<%= config.bin %> list --freshness fresh --tags node --tags url',
     },
   ];
@@ -37,27 +37,27 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static flags = {
     topic: Flags.string({
       char: 't',
-      description: 'Filter by exact topic (case-insensitive).',
+      description: 'filter by exact topic (case-insensitive)',
     }),
     tags: Flags.string({
       char: 'g',
-      description: 'Filter by tags (must match all tags specified).',
+      description: 'filter by tags (must match all tags specified)',
       multiple: true,
     }),
     freshness: Flags.option({
-      description: 'Filter by freshness state.',
+      description: 'filter by freshness state',
       options: ['fresh', 'stale_grace', 'stale_expired'] as const,
     })(),
     'artifact-type': Flags.option({
-      description: 'Filter by artifact type.',
+      description: 'filter by artifact type',
       options: LISTABLE_ARTIFACT_TYPES,
     })(),
     'capture-method': Flags.option({
-      description: 'Filter by capture method.',
+      description: 'filter by capture method',
       options: CAPTURE_METHODS,
     })(),
     limit: Flags.integer({
-      description: 'Maximum number of results to return (default 50, max 100).',
+      description: 'maximum number of results to return (default 50, max 100)',
       default: 50,
     }),
   };
@@ -133,6 +133,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No cached research entries found matching filters.');
+      this.log(`\nTip: populate the cache first: ${this.config.bin} <url>`);
       return;
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);

@@ -14,11 +14,11 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
 
   static examples = [
     {
-      description: 'Show all effective config values',
+      description: 'show all effective config values',
       command: '<%= config.bin %> config list',
     },
     {
-      description: 'Show only project-level config',
+      description: 'show only project-level config',
       command: '<%= config.bin %> config list --local',
     },
   ];

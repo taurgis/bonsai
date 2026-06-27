@@ -1,6 +1,11 @@
 import { Command, Errors, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings } from './lib/config/index.js';
 import { buildEnvelope } from './lib/envelope.js';
+import {
+  resolveResearchTarget,
+  type ResolveResearchTargetOptions,
+  type ResolvedResearchTarget,
+} from './lib/research/resolve-target.js';
 
 /**
  * Shared base for every Bonsai command. Enables oclif's native `--json` flag,
@@ -67,6 +72,24 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   /** Command id for the JSON envelope; falls back to the binary name when a command has no id. */
   protected envelopeCommandId(): string {
     return this.ctor.id ? toConfiguredId(this.ctor.id, this.config) : this.config.bin;
+  }
+
+  /** Resolve a URL against the research cache, exiting with INVALID_URL on normalization failure. */
+  protected resolveResearchTargetOrFail(
+    url: string,
+    extra?: Pick<ResolveResearchTargetOptions, 'flagOverride' | 'lookup'>
+  ): ResolvedResearchTarget {
+    try {
+      return resolveResearchTarget({
+        configDir: this.config.configDir,
+        cwd: process.cwd(),
+        dataDir: this.config.dataDir,
+        url,
+        ...extra,
+      });
+    } catch (err) {
+      this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2, code: 'INVALID_URL' });
+    }
   }
 
   /** Single source of truth for the `--json` envelope shape, shared by success and error output. */

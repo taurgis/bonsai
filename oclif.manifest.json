@@ -4,7 +4,7 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "The full HTTP/HTTPS URL of the web page to research.",
+          "description": "the full HTTP/HTTPS URL of the web page to research",
           "name": "url",
           "required": true
         }
@@ -12,11 +12,11 @@
       "description": "Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.\n\nUsually invoked via the shorthand `bonsai <url>` rather than `bonsai fetch <url>`.",
       "examples": [
         {
-          "description": "Research a URL with detailed output, tagged with topic and tags",
+          "description": "research a URL with detailed output, tagged with topic and tags",
           "command": "<%= config.bin %> https://docs.nestjs.com/ --topic \"Backend Frameworks\" --tags \"Node\" --tags \"NestJS\" --format detailed --ttl 30d"
         },
         {
-          "description": "Research a volatile page with compressed output and short TTL, returned as JSON",
+          "description": "research a volatile page with compressed output and short TTL, returned as JSON",
           "command": "<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json"
         }
       ],
@@ -30,7 +30,7 @@
         },
         "topic": {
           "char": "t",
-          "description": "The main category/topic of the research for metadata tagging.",
+          "description": "the main category/topic of the research for metadata tagging",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -38,7 +38,7 @@
         },
         "tags": {
           "char": "g",
-          "description": "Taxonomic tags for this research (can be repeated).",
+          "description": "taxonomic tags for this research (can be repeated)",
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,
@@ -46,7 +46,7 @@
         },
         "format": {
           "char": "f",
-          "description": "Desired data density.",
+          "description": "desired data density",
           "name": "format",
           "default": "compressed",
           "hasDynamicHelp": false,
@@ -58,7 +58,7 @@
           "type": "option"
         },
         "tier": {
-          "description": "Freshness tier policy.",
+          "description": "freshness tier policy",
           "name": "tier",
           "default": "standard",
           "hasDynamicHelp": false,
@@ -72,45 +72,45 @@
         },
         "ttl": {
           "char": "l",
-          "description": "Predicted lifespan: number + h/d/w/m/y (m = months), e.g. \"2h\", \"7d\", \"6m\".",
+          "description": "predicted lifespan: number + h/d/w/m/y (m = months), e.g. \"2h\", \"7d\", \"6m\"",
           "name": "ttl",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "max-age": {
-          "description": "Maximum age of cache to accept (e.g., \"1d\", \"30d\").",
+          "description": "maximum age of cache to accept (e.g., \"1d\", \"30d\")",
           "name": "max-age",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "force": {
-          "description": "Force a fresh fetch, ignoring any cached entries.",
+          "description": "force a fresh fetch, ignoring any cached entries",
           "name": "force",
           "allowNo": false,
           "type": "boolean"
         },
         "dry-run": {
-          "description": "Perform validation and fetch without saving to local cache.",
+          "description": "perform validation and fetch without saving to local cache",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
         },
         "allow-stale": {
-          "description": "Allow serving stale cache if the remote server is unreachable.",
+          "description": "allow serving stale cache if the remote server is unreachable",
           "name": "allow-stale",
           "allowNo": false,
           "type": "boolean"
         },
         "rendered": {
-          "description": "Force using a browser-rendered scraping path for dynamic pages.",
+          "description": "force using a browser-rendered scraping path for dynamic pages",
           "name": "rendered",
           "allowNo": false,
           "type": "boolean"
         },
         "storage": {
-          "description": "Override where this result is cached (overrides configured default). Secret-bearing pages are always stored globally.",
+          "description": "override where this result is cached (secrets always stored globally)",
           "name": "storage",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -137,7 +137,7 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "The single source URL of the page (only for single-source import).",
+          "description": "the single source URL of the page (only for single-source import)",
           "name": "url",
           "required": false
         }
@@ -145,15 +145,15 @@
       "description": "Accepts a synthesized Markdown note via stdin and registers it under the single target URL or multiple source URLs.",
       "examples": [
         {
-          "description": "Import detailed research for a single URL via stdin",
+          "description": "import detailed research for a single URL via stdin",
           "command": "echo \"# My Article\" | <%= config.bin %> import https://example.com/docs --stdin"
         },
         {
-          "description": "Import research synthesized from multiple source URLs",
+          "description": "import research synthesized from multiple source URLs",
           "command": "echo \"# Synthesized\" | <%= config.bin %> import --stdin --topic \"React docs\" --source-url https://react.dev/a --source-url https://react.dev/b"
         },
         {
-          "description": "Import research from a local Markdown file",
+          "description": "import research from a local Markdown file",
           "command": "<%= config.bin %> import https://example.com/docs --file path/to/notes.md"
         }
       ],
@@ -166,20 +166,20 @@
           "type": "boolean"
         },
         "stdin": {
-          "description": "Read Markdown from stdin.",
+          "description": "read Markdown from stdin",
           "name": "stdin",
           "allowNo": false,
           "type": "boolean"
         },
         "file": {
-          "description": "Path to a Markdown file containing research notes to import.",
+          "description": "path to a Markdown file containing research notes to import",
           "name": "file",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "input-format": {
-          "description": "Format of the input provided.",
+          "description": "format of the input provided",
           "name": "input-format",
           "default": "detailed",
           "hasDynamicHelp": false,
@@ -192,7 +192,7 @@
         },
         "topic": {
           "char": "t",
-          "description": "The main topic for this research note.",
+          "description": "the main topic for this research note",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -200,14 +200,14 @@
         },
         "tags": {
           "char": "g",
-          "description": "Taxonomic tags (can be repeated).",
+          "description": "taxonomic tags (can be repeated)",
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,
           "type": "option"
         },
         "tier": {
-          "description": "Freshness tier policy.",
+          "description": "freshness tier policy",
           "name": "tier",
           "default": "standard",
           "hasDynamicHelp": false,
@@ -220,7 +220,7 @@
           "type": "option"
         },
         "source-url": {
-          "description": "Repeated source URLs for multi-source import.",
+          "description": "repeated source URLs for multi-source import",
           "name": "source-url",
           "hasDynamicHelp": false,
           "multiple": true,
@@ -228,14 +228,14 @@
         },
         "ttl": {
           "char": "l",
-          "description": "Predicted lifespan of the data (e.g. \"24h\", \"7d\").",
+          "description": "predicted lifespan of the data (e.g. \"24h\", \"7d\")",
           "name": "ttl",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "storage": {
-          "description": "Override where this note is cached (overrides configured default). Secret-bearing notes are always stored globally.",
+          "description": "override where this note is cached (secrets always stored globally)",
           "name": "storage",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -261,12 +261,22 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "The URL to inspect.",
+          "description": "the URL to inspect",
           "name": "url",
           "required": true
         }
       },
       "description": "Inspects local storage and displays full frontmatter metadata for the URL (without printing the content body).",
+      "examples": [
+        {
+          "description": "inspect cached research metadata for a specific URL",
+          "command": "<%= config.bin %> <%= command.id %> https://example.com/docs"
+        },
+        {
+          "description": "output the full metadata as JSON for use by other tools",
+          "command": "<%= config.bin %> <%= command.id %> https://example.com/docs --json"
+        }
+      ],
       "flags": {
         "json": {
           "description": "Format output as json.",
@@ -293,15 +303,15 @@
       "description": "Lists cached research artifacts, including metadata details like path, source count, freshness, token estimates, and quality metrics without printing full content.",
       "examples": [
         {
-          "description": "List all cached entries",
+          "description": "list all cached entries",
           "command": "<%= config.bin %> list"
         },
         {
-          "description": "List cached entries for a specific topic with JSON output",
+          "description": "list cached entries for a specific topic with JSON output",
           "command": "<%= config.bin %> list --topic \"React Suspense\" --json"
         },
         {
-          "description": "List only fresh entries filtered by tags",
+          "description": "list only fresh entries filtered by tags",
           "command": "<%= config.bin %> list --freshness fresh --tags node --tags url"
         }
       ],
@@ -315,7 +325,7 @@
         },
         "topic": {
           "char": "t",
-          "description": "Filter by exact topic (case-insensitive).",
+          "description": "filter by exact topic (case-insensitive)",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -323,14 +333,14 @@
         },
         "tags": {
           "char": "g",
-          "description": "Filter by tags (must match all tags specified).",
+          "description": "filter by tags (must match all tags specified)",
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,
           "type": "option"
         },
         "freshness": {
-          "description": "Filter by freshness state.",
+          "description": "filter by freshness state",
           "name": "freshness",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -342,7 +352,7 @@
           "type": "option"
         },
         "artifact-type": {
-          "description": "Filter by artifact type.",
+          "description": "filter by artifact type",
           "name": "artifact-type",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -354,7 +364,7 @@
           "type": "option"
         },
         "capture-method": {
-          "description": "Filter by capture method.",
+          "description": "filter by capture method",
           "name": "capture-method",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -368,7 +378,7 @@
           "type": "option"
         },
         "limit": {
-          "description": "Maximum number of results to return (default 50, max 100).",
+          "description": "maximum number of results to return (default 50, max 100)",
           "name": "limit",
           "default": 50,
           "hasDynamicHelp": false,
@@ -393,11 +403,11 @@
       "description": "Prunes cached research entries based on age, inactivity, or artifact type to free up disk space.",
       "examples": [
         {
-          "description": "Perform a dry run of pruning entries older than 90 days",
+          "description": "perform a dry run of pruning entries older than 90 days",
           "command": "<%= config.bin %> prune --older-than 90d --dry-run"
         },
         {
-          "description": "Actually prune entries older than 30 days that are source scrapes",
+          "description": "actually prune entries older than 30 days that are source scrapes",
           "command": "<%= config.bin %> prune --older-than 30d --artifact-type source --yes"
         }
       ],
@@ -410,21 +420,21 @@
           "type": "boolean"
         },
         "older-than": {
-          "description": "Prune entries older than duration (e.g. \"30d\", \"90d\").",
+          "description": "prune entries older than duration (e.g. \"30d\", \"90d\")",
           "name": "older-than",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "inactive": {
-          "description": "Prune entries inactive (unvalidated/unfetched) for duration (e.g. \"14d\", \"30d\").",
+          "description": "prune entries inactive (unvalidated/unfetched) for duration (e.g. \"14d\", \"30d\")",
           "name": "inactive",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "artifact-type": {
-          "description": "Filter pruning to specific artifact type.",
+          "description": "filter pruning to specific artifact type",
           "name": "artifact-type",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -437,14 +447,14 @@
           "type": "option"
         },
         "dry-run": {
-          "description": "List files that would be deleted without actually deleting them.",
+          "description": "list files that would be deleted without actually deleting them",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
         },
         "yes": {
           "char": "y",
-          "description": "Confirm deletion and prune matched entries (required unless --dry-run).",
+          "description": "confirm deletion and prune matched entries (required unless --dry-run)",
           "name": "yes",
           "allowNo": false,
           "type": "boolean"
@@ -465,12 +475,26 @@
       "aliases": [],
       "args": {
         "query": {
-          "description": "The search query containing terms to match.",
+          "description": "the search query containing terms to match",
           "name": "query",
           "required": true
         }
       },
       "description": "Scans the local research cache database and ranks matching entries based on topic, tags, source URLs, summary, and content.",
+      "examples": [
+        {
+          "description": "search for cached notes containing specific keywords",
+          "command": "<%= config.bin %> <%= command.id %> \"authentication flow\""
+        },
+        {
+          "description": "search with remote docs fallback",
+          "command": "<%= config.bin %> <%= command.id %> \"router\" --remote https://react.dev"
+        },
+        {
+          "description": "search local cache with tag filtering",
+          "command": "<%= config.bin %> <%= command.id %> \"setup\" --tags node --tags tutorial"
+        }
+      ],
       "flags": {
         "json": {
           "description": "Format output as json.",
@@ -481,7 +505,7 @@
         },
         "topic": {
           "char": "t",
-          "description": "Filter results by exact topic (case-insensitive).",
+          "description": "filter results by exact topic (case-insensitive)",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -489,14 +513,14 @@
         },
         "tags": {
           "char": "g",
-          "description": "Filter results by tags (must match all tags specified).",
+          "description": "filter results by tags (must match all tags specified)",
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,
           "type": "option"
         },
         "artifact-type": {
-          "description": "Filter results by artifact type.",
+          "description": "filter results by artifact type",
           "name": "artifact-type",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -509,7 +533,7 @@
           "type": "option"
         },
         "limit": {
-          "description": "Maximum number of results to return (default 10, max 50).",
+          "description": "maximum number of results to return (default 10, max 50)",
           "name": "limit",
           "default": 10,
           "hasDynamicHelp": false,
@@ -517,20 +541,20 @@
           "type": "option"
         },
         "include-stale": {
-          "description": "Include stale expired cache entries in the search results.",
+          "description": "include stale expired cache entries in the search results",
           "name": "include-stale",
           "allowNo": false,
           "type": "boolean"
         },
         "domain": {
-          "description": "Search a documentation site directly (e.g. help.salesforce.com) instead of the local cache. Requires a site module that implements search.",
+          "description": "search a documentation site directly (requires compatible site module)",
           "name": "domain",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "remote": {
-          "description": "Discover uncached docs via a site’s public search or index (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs, llms.txt, sitemap.xml). Pass a docs page URL; falls back to local cache search if no connector applies.",
+          "description": "discover uncached docs via public search or index (falls back to local cache)",
           "name": "remote",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -552,12 +576,22 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "The URL to check.",
+          "description": "the URL to check",
           "name": "url",
           "required": true
         }
       },
       "description": "Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the root fetch command would take.",
+      "examples": [
+        {
+          "description": "check if a URL is already in the cache",
+          "command": "<%= config.bin %> <%= command.id %> https://example.com/docs"
+        },
+        {
+          "description": "check status against a specific freshness tier and TTL",
+          "command": "<%= config.bin %> <%= command.id %> https://example.com/docs --tier volatile --ttl 2h"
+        }
+      ],
       "flags": {
         "json": {
           "description": "Format output as json.",
@@ -567,7 +601,7 @@
           "type": "boolean"
         },
         "tier": {
-          "description": "Freshness tier policy to evaluate against.",
+          "description": "freshness tier policy to evaluate against",
           "name": "tier",
           "default": "standard",
           "hasDynamicHelp": false,
@@ -581,14 +615,14 @@
         },
         "ttl": {
           "char": "l",
-          "description": "Custom TTL duration to evaluate against (e.g. \"2h\", \"7d\").",
+          "description": "custom TTL duration to evaluate against (e.g. \"2h\", \"7d\")",
           "name": "ttl",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "max-age": {
-          "description": "Maximum age of cache to accept (e.g. \"1d\", \"30d\").",
+          "description": "maximum age of cache to accept (e.g. \"1d\", \"30d\")",
           "name": "max-age",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -610,6 +644,16 @@
       "aliases": [],
       "args": {},
       "description": "Show config subcommands for reading and writing Bonsai research cache configuration.",
+      "examples": [
+        {
+          "description": "get a configuration value",
+          "command": "<%= config.bin %> <%= command.id %> get storage"
+        },
+        {
+          "description": "set a configuration value for the current project",
+          "command": "<%= config.bin %> <%= command.id %> set storage project --local"
+        }
+      ],
       "flags": {
         "json": {
           "description": "Format output as json.",
@@ -634,7 +678,7 @@
       "aliases": [],
       "args": {
         "key": {
-          "description": "The configuration key to read.",
+          "description": "the configuration key to read",
           "name": "key",
           "required": true
         }
@@ -642,11 +686,11 @@
       "description": "Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: storage, summary.",
       "examples": [
         {
-          "description": "Get the effective storage mode",
+          "description": "get the effective storage mode",
           "command": "<%= config.bin %> config get storage"
         },
         {
-          "description": "Read only the project-level value",
+          "description": "read only the project-level value",
           "command": "<%= config.bin %> config get storage --local"
         }
       ],
@@ -694,11 +738,11 @@
       "description": "Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage, summary.",
       "examples": [
         {
-          "description": "Show all effective config values",
+          "description": "show all effective config values",
           "command": "<%= config.bin %> config list"
         },
         {
-          "description": "Show only project-level config",
+          "description": "show only project-level config",
           "command": "<%= config.bin %> config list --local"
         }
       ],
@@ -744,12 +788,12 @@
       "aliases": [],
       "args": {
         "key": {
-          "description": "The configuration key to set.",
+          "description": "the configuration key to set",
           "name": "key",
           "required": false
         },
         "value": {
-          "description": "The value to assign.",
+          "description": "the value to assign",
           "name": "value",
           "required": false
         }
@@ -757,11 +801,11 @@
       "description": "Persist a configuration value. Writes user-level config by default; pass --local to write the project-level config (.bonsai.json in cwd).\n\nValid keys: storage, summary. The inline form `<key>=<value>` is also accepted.",
       "examples": [
         {
-          "description": "Store research cache inside the current project",
+          "description": "store research cache inside the current project",
           "command": "<%= config.bin %> config set storage project --local"
         },
         {
-          "description": "Set the user-level default using the inline key=value form",
+          "description": "set the user-level default using the inline key=value form",
           "command": "<%= config.bin %> config set storage=global"
         }
       ],
@@ -793,7 +837,7 @@
           "type": "boolean"
         },
         "dry-run": {
-          "description": "Show what would be written without saving.",
+          "description": "show what would be written without saving",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
@@ -813,7 +857,7 @@
       "aliases": [],
       "args": {
         "key": {
-          "description": "The configuration key to remove.",
+          "description": "the configuration key to remove",
           "name": "key",
           "required": true
         }
@@ -821,11 +865,11 @@
       "description": "Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage, summary.",
       "examples": [
         {
-          "description": "Remove the user-level storage setting",
+          "description": "remove the user-level storage setting",
           "command": "<%= config.bin %> config unset storage"
         },
         {
-          "description": "Remove the project-level storage setting",
+          "description": "remove the project-level storage setting",
           "command": "<%= config.bin %> config unset storage --local"
         }
       ],
@@ -857,7 +901,7 @@
           "type": "boolean"
         },
         "dry-run": {
-          "description": "Show what would be removed without saving.",
+          "description": "show what would be removed without saving",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"

@@ -14,17 +14,17 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
 
   static examples = [
     {
-      description: 'Get the effective storage mode',
+      description: 'get the effective storage mode',
       command: '<%= config.bin %> config get storage',
     },
     {
-      description: 'Read only the project-level value',
+      description: 'read only the project-level value',
       command: '<%= config.bin %> config get storage --local',
     },
   ];
 
   static args = {
-    key: Args.string({ required: true, description: 'The configuration key to read.' }),
+    key: Args.string({ required: true, description: 'the configuration key to read' }),
   };
 
   static flags = {

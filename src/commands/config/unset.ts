@@ -10,17 +10,17 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
   static examples = [
     {
-      description: 'Remove the user-level storage setting',
+      description: 'remove the user-level storage setting',
       command: '<%= config.bin %> config unset storage',
     },
     {
-      description: 'Remove the project-level storage setting',
+      description: 'remove the project-level storage setting',
       command: '<%= config.bin %> config unset storage --local',
     },
   ];
 
   static args = {
-    key: Args.string({ required: true, description: 'The configuration key to remove.' }),
+    key: Args.string({ required: true, description: 'the configuration key to remove' }),
   };
 
   static flags = {
@@ -29,7 +29,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
       local: 'Remove from project-level config (.bonsai.json in cwd).',
     }),
     'dry-run': Flags.boolean({
-      description: 'Show what would be removed without saving.',
+      description: 'show what would be removed without saving',
       default: false,
     }),
   };

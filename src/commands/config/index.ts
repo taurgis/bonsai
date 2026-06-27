@@ -7,6 +7,17 @@ export default class ConfigIndex extends BaseCommand<typeof ConfigIndex> {
   static description =
     'Show config subcommands for reading and writing Bonsai research cache configuration.';
 
+  static examples = [
+    {
+      description: 'get a configuration value',
+      command: '<%= config.bin %> <%= command.id %> get storage',
+    },
+    {
+      description: 'set a configuration value for the current project',
+      command: '<%= config.bin %> <%= command.id %> set storage project --local',
+    },
+  ];
+
   static stdoutIsPrimaryData = true;
 
   async run(): Promise<unknown> {

@@ -47,8 +47,10 @@
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
     "@oclif/core": "^4.11.4",
+    "@oclif/plugin-autocomplete": "^3.2.52",
     "linkedom": "^0.18.12",
-    "turndown": "^7.2.0"
+    "turndown": "^7.2.0",
+    "update-notifier": "^7.3.1"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
@@ -75,6 +77,9 @@
     "bin": "bonsai",
     "dirname": "bonsai",
     "description": "Bonsai is a standalone local research cache CLI for AI agents.\nResearch and cache a web page by passing its URL directly:\n\n  $ bonsai https://nodejs.org/api/url.html\n\nThe URL form is shorthand for fetching and caching the page. The commands listed below search, inspect, list, import, and prune the local research cache.",
+    "plugins": [
+      "@oclif/plugin-autocomplete"
+    ],
     "commands": {
       "strategy": "explicit",
       "target": "./dist/commands.js",

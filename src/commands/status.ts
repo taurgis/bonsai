@@ -6,7 +6,6 @@ import {
   checkMaxAgeExpired,
   durationFlagError,
 } from '../lib/research/freshness.js';
-import { resolveResearchTarget } from '../lib/research/resolve-target.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
 
 type CacheStatus = 'hit' | 'miss' | 'stale';
@@ -55,25 +54,37 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   static description =
     'Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the root fetch command would take.';
 
+  static examples = [
+    {
+      description: 'check if a URL is already in the cache',
+      command: '<%= config.bin %> <%= command.id %> https://example.com/docs',
+    },
+    {
+      description: 'check status against a specific freshness tier and TTL',
+      command:
+        '<%= config.bin %> <%= command.id %> https://example.com/docs --tier volatile --ttl 2h',
+    },
+  ];
+
   static args = {
     url: Args.string({
       required: true,
-      description: 'The URL to check.',
+      description: 'the URL to check',
     }),
   };
 
   static flags = {
     tier: Flags.option({
-      description: 'Freshness tier policy to evaluate against.',
+      description: 'freshness tier policy to evaluate against',
       options: ['stable', 'standard', 'volatile'] as const,
       default: 'standard',
     })(),
     ttl: Flags.string({
       char: 'l',
-      description: 'Custom TTL duration to evaluate against (e.g. "2h", "7d").',
+      description: 'custom TTL duration to evaluate against (e.g. "2h", "7d")',
     }),
     'max-age': Flags.string({
-      description: 'Maximum age of cache to accept (e.g. "1d", "30d").',
+      description: 'maximum age of cache to accept (e.g. "1d", "30d")',
     }),
   };
 
@@ -86,20 +97,10 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     // Validate the duration flags up front so a malformed value reports the exact flag that is
     // wrong, rather than later surfacing as a misattributed parse failure.
     for (const msg of [durationFlagError('--ttl', ttl), durationFlagError('--max-age', maxAge)]) {
-      if (msg) this.error(msg, { exit: 2 });
+      if (msg) this.error(msg, { exit: 2, code: 'INVALID_DURATION' });
     }
 
-    let target: ReturnType<typeof resolveResearchTarget>;
-    try {
-      target = resolveResearchTarget({
-        configDir: this.config.configDir,
-        cwd: process.cwd(),
-        dataDir: this.config.dataDir,
-        url,
-      });
-    } catch (err) {
-      this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2 });
-    }
+    const target = this.resolveResearchTargetOrFail(url);
 
     const { cacheKey, located, normalizedUrl, roots } = target;
     const cached = located?.artifact ?? null;
@@ -112,12 +113,12 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
 
     if (!this.jsonEnabled()) {
-      this.log(`URL: ${normalizedUrl}`);
-      this.log(`Cache Key: ${cacheKey}`);
-      this.log(`Cache Path: ${artifactPath}`);
-      this.log(`Status: ${result.status}`);
-      this.log(`Freshness: ${result.freshness}`);
-      this.log(`Action: ${result.action}`);
+      this.log(`${'URL:'.padEnd(25)} ${normalizedUrl}`);
+      this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
+      this.log(`${'Cache Path:'.padEnd(25)} ${artifactPath}`);
+      this.log(`${'Status:'.padEnd(25)} ${result.status}`);
+      this.log(`${'Freshness:'.padEnd(25)} ${result.freshness}`);
+      this.log(`${'Action:'.padEnd(25)} ${result.action}`);
     }
 
     return {

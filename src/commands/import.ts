@@ -23,16 +23,16 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   static examples = [
     {
-      description: 'Import detailed research for a single URL via stdin',
+      description: 'import detailed research for a single URL via stdin',
       command: 'echo "# My Article" | <%= config.bin %> import https://example.com/docs --stdin',
     },
     {
-      description: 'Import research synthesized from multiple source URLs',
+      description: 'import research synthesized from multiple source URLs',
       command:
         'echo "# Synthesized" | <%= config.bin %> import --stdin --topic "React docs" --source-url https://react.dev/a --source-url https://react.dev/b',
     },
     {
-      description: 'Import research from a local Markdown file',
+      description: 'import research from a local Markdown file',
       command: '<%= config.bin %> import https://example.com/docs --file path/to/notes.md',
     },
   ];
@@ -44,48 +44,47 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       // this, the Markdown piped for `--stdin` is swallowed into `url`, making multi-source import
       // (`import --stdin --source-url ...`) wrongly look like it also got a positional URL.
       ignoreStdin: true,
-      description: 'The single source URL of the page (only for single-source import).',
+      description: 'the single source URL of the page (only for single-source import)',
     }),
   };
 
   static flags = {
     stdin: Flags.boolean({
-      description: 'Read Markdown from stdin.',
+      description: 'read Markdown from stdin',
       default: false,
     }),
     file: Flags.string({
-      description: 'Path to a Markdown file containing research notes to import.',
+      description: 'path to a Markdown file containing research notes to import',
     }),
     'input-format': Flags.option({
-      description: 'Format of the input provided.',
+      description: 'format of the input provided',
       options: ['compressed', 'detailed'] as const,
       default: 'detailed',
     })(),
     topic: Flags.string({
       char: 't',
-      description: 'The main topic for this research note.',
+      description: 'the main topic for this research note',
     }),
     tags: Flags.string({
       char: 'g',
-      description: 'Taxonomic tags (can be repeated).',
+      description: 'taxonomic tags (can be repeated)',
       multiple: true,
     }),
     tier: Flags.option({
-      description: 'Freshness tier policy.',
+      description: 'freshness tier policy',
       options: ['stable', 'standard', 'volatile'] as const,
       default: 'standard',
     })(),
     'source-url': Flags.string({
-      description: 'Repeated source URLs for multi-source import.',
+      description: 'repeated source URLs for multi-source import',
       multiple: true,
     }),
     ttl: Flags.string({
       char: 'l',
-      description: 'Predicted lifespan of the data (e.g. "24h", "7d").',
+      description: 'predicted lifespan of the data (e.g. "24h", "7d")',
     }),
     storage: Flags.option({
-      description:
-        'Override where this note is cached (overrides configured default). Secret-bearing notes are always stored globally.',
+      description: 'override where this note is cached (secrets always stored globally)',
       options: ['global', 'project'] as const,
     })(),
   };
@@ -140,7 +139,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       try {
         return normalizeUrl(u);
       } catch (err) {
-        this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2 });
+        this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2, code: 'INVALID_URL' });
       }
     }) as string[];
     return hasMulti ? normalized.sort() : normalized;
@@ -148,7 +147,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   private validateSourceMode(hasSingle: boolean, hasMulti: boolean, multiUrls: string[]): void {
     if (hasSingle && hasMulti) {
-      this.error('Cannot specify both positional <url> and --source-url flags.', { exit: 2 });
+      this.error('Cannot specify both positional <url> and --source-url flags.', {
+        exit: 2,
+        code: 'CONFLICTING_FLAGS',
+      });
     }
     if (!hasSingle && !hasMulti) {
       this.error(
@@ -157,15 +159,22 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       );
     }
     if (hasMulti && !this.flags.topic) {
-      this.error('Multi-source import requires the --topic flag.', { exit: 2 });
+      this.error('Multi-source import requires the --topic flag.', {
+        exit: 2,
+        code: 'MISSING_TOPIC',
+      });
     }
     if (!this.flags.stdin && !this.flags.file) {
       this.error('Either --stdin or --file <path> must be specified to import content.', {
         exit: 2,
+        code: 'MISSING_INPUT',
       });
     }
     if (this.flags.stdin && this.flags.file) {
-      this.error('Cannot specify both --stdin and --file <path>. Choose one.', { exit: 2 });
+      this.error('Cannot specify both --stdin and --file <path>. Choose one.', {
+        exit: 2,
+        code: 'CONFLICTING_FLAGS',
+      });
     }
   }
 
@@ -369,8 +378,8 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
     if (!this.jsonEnabled()) {
       this.log(`Successfully imported research artifact.`);
-      this.log(`Cache Key: ${cacheKey}`);
-      this.log(`Storage Path: ${storagePath}`);
+      this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
+      this.log(`${'Storage Path:'.padEnd(25)} ${storagePath}`);
     }
 
     const inputFormat = this.flags['input-format'];
