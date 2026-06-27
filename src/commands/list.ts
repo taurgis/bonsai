@@ -4,7 +4,12 @@ import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES, CAPTURE_METHODS } from '../lib/research/schema.js';
-import { resultListHeading, truncationNotice, type ResultListLabels } from '../lib/text.js';
+import {
+  NO_TOPIC_LABEL,
+  resultListHeading,
+  truncationNotice,
+  type ResultListLabels,
+} from '../lib/text.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
 const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
@@ -67,7 +72,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   private validateListFlags(): void {
     const limit = this.flags.limit;
     if (limit !== undefined && (limit < 1 || limit > 100)) {
-      this.error('Limit must be between 1 and 100.', { exit: 2 });
+      this.error('Limit must be between 1 and 100.', { exit: 2, code: 'INVALID_LIMIT' });
     }
   }
 
@@ -138,7 +143,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);
     finalResults.forEach((res, index) => {
-      this.log(`${index + 1}. [${res.topic || 'No Topic'}] Key: ${res.cacheKey}`);
+      this.log(`${index + 1}. [${res.topic || NO_TOPIC_LABEL}] Key: ${res.cacheKey}`);
       this.log(`   Type: ${res.artifactType} | Freshness: ${res.freshness}`);
       this.log(
         `   Tokens: compressed=${res.tokenEstimate?.compressed || 0}, detailed=${res.tokenEstimate?.detailed || 0}`

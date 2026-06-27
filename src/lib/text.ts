@@ -1,3 +1,6 @@
+/** Display label when an artifact has no topic — not a filterable topic value. */
+export const NO_TOPIC_LABEL = '(no topic)';
+
 /**
  * Pick the singular or plural noun for a count so human-readable output stays grammatical
  * ("1 entry" / "2 entries"). English has irregular plurals, so the plural is passed explicitly

@@ -90,7 +90,7 @@
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782568518.1683035,
+    "mtime": 1782569503.1839788,
     "ast_hash": "ffe2e341638125681e8d2f4c3893ae27",
     "semantic_hash": ""
   },
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "src/base-command.ts": {
-    "mtime": 1782567818.8714964,
-    "ast_hash": "feb9f6d52a5e799779360998b83e2be6",
+    "mtime": 1782569361.2501771,
+    "ast_hash": "ace1878903bec1475f4c62853124d26b",
     "semantic_hash": ""
   },
   "src/lib/research/artifact.test.ts": {
@@ -220,13 +220,13 @@
     "semantic_hash": ""
   },
   "tests/contract/research.test.ts": {
-    "mtime": 1782569016.1523979,
-    "ast_hash": "c6c05704bbb772bf09f612693f556a7f",
+    "mtime": 1782569491.896211,
+    "ast_hash": "c485f85a69510bf4f55b9ae99e5ccd69",
     "semantic_hash": ""
   },
   "tests/contract/runner.ts": {
-    "mtime": 1782482792.5661585,
-    "ast_hash": "c032dfa94094cd9b09ca4a8a6783f464",
+    "mtime": 1782569490.6103985,
+    "ast_hash": "fd30ae94aaa0d307b8c3868de854af00",
     "semantic_hash": ""
   },
   "tests/setup/disable-ci-color.ts": {
@@ -2145,8 +2145,8 @@
     "semantic_hash": ""
   },
   "src/commands/list.ts": {
-    "mtime": 1782566796.6501374,
-    "ast_hash": "978191a005f69bd43bb055e43ebd68c0",
+    "mtime": 1782569361.2506037,
+    "ast_hash": "d86645e8ee5e1265b140196f2f7e7f63",
     "semantic_hash": ""
   },
   "src/commands/prune.test.ts": {
@@ -2155,8 +2155,8 @@
     "semantic_hash": ""
   },
   "src/commands/prune.ts": {
-    "mtime": 1782568484.9152465,
-    "ast_hash": "ef195d6178cd27c5b7b538f3378020c9",
+    "mtime": 1782569490.286793,
+    "ast_hash": "22cfd009d069db737a83aaea3e7ff3f2",
     "semantic_hash": ""
   },
   "src/commands/search.test.ts": {
@@ -2165,8 +2165,8 @@
     "semantic_hash": ""
   },
   "src/commands/search.ts": {
-    "mtime": 1782569016.1931,
-    "ast_hash": "828f4bcdba72435a09c2d3d0a6c8c240",
+    "mtime": 1782569361.2510698,
+    "ast_hash": "feff101a9eee6c1040b6990d40ee782d",
     "semantic_hash": ""
   },
   "src/commands/status.test.ts": {
@@ -2180,8 +2180,8 @@
     "semantic_hash": ""
   },
   "src/commands/fetch.test.ts": {
-    "mtime": 1782505547.242017,
-    "ast_hash": "21dedd7d2fc89005fb229a31ac383c8b",
+    "mtime": 1782569361.2503989,
+    "ast_hash": "59963a9147b633091cd97f98115d6c7e",
     "semantic_hash": ""
   },
   "src/commands/fetch.ts": {
@@ -4185,8 +4185,8 @@
     "semantic_hash": ""
   },
   "src/lib/text.ts": {
-    "mtime": 1782501135.95119,
-    "ast_hash": "232b7a603401b9eca54246bd6e19fa8c",
+    "mtime": 1782569361.251424,
+    "ast_hash": "2a9e69d93f5e3f32bafa2e31a141d0d6",
     "semantic_hash": ""
   },
   ".bonsai/research/133653c47800dc413d354b163f55bbee0189ef226b62cb935f44c6ee28c8a91f.md": {
@@ -4810,8 +4810,8 @@
     "semantic_hash": ""
   },
   "tests/helpers/isolated-cache.ts": {
-    "mtime": 1782501420.9117777,
-    "ast_hash": "91f433cb51a4cb4854ba44eac9c01747",
+    "mtime": 1782569361.2517633,
+    "ast_hash": "7ad7c706fc19b1bc9349559750f85fb4",
     "semantic_hash": ""
   },
   ".agents/rules/post-feature-technical-writing.md": {
@@ -5000,8 +5000,8 @@
     "semantic_hash": ""
   },
   "src/lib/envelope.ts": {
-    "mtime": 1782559204.4192295,
-    "ast_hash": "47b785c5f22d5361b05a9817d65d29eb",
+    "mtime": 1782569361.2512486,
+    "ast_hash": "62c95016f0cd5becb2e3af4bacfb4f9a",
     "semantic_hash": ""
   },
   ".bonsai/research/0328a8e69584bd3cb9b09d09c07c45c94af502240863056b0e0e2c58ed1763a2.md": {
@@ -5182,6 +5182,11 @@
   "src/sites/nextjs/index.ts": {
     "mtime": 1782564748.8570886,
     "ast_hash": "4e64550208a39f4a248d775d04899e5f",
+    "semantic_hash": ""
+  },
+  "src/lib/envelope.test.ts": {
+    "mtime": 1782569151.7787452,
+    "ast_hash": "893ee45fcb854d693a84a022ffe77037",
     "semantic_hash": ""
   }
 }

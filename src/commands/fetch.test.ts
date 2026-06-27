@@ -193,6 +193,25 @@ describe('JSON envelope shaping', () => {
     expect(env).toMatchObject({ ok: false, exitCode: 2, stderr: 'boom', data: null });
   });
 
+  it('includes code and suggestions in the JSON error envelope', async () => {
+    const cmd = await instance();
+    const env = cmd.toErrorJson({
+      oclif: { exit: 1 },
+      message: 'No cached research found for URL: https://example.com/missing',
+      code: 'CACHE_MISS',
+      suggestions: ['Fetch and cache it first: bonsai https://example.com/missing'],
+    });
+    expect(env).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'CACHE_MISS',
+      suggestions: ['Fetch and cache it first: bonsai https://example.com/missing'],
+      data: null,
+    });
+    expect(env.stderr).toContain('Code: CACHE_MISS');
+    expect(env.stderr).toContain('Try this: Fetch and cache it first');
+  });
+
   it('falls back to exit 1 and stringifies a non-Error throw', async () => {
     const cmd = await instance();
     const env = cmd.toErrorJson('plain string failure');

@@ -1,6 +1,6 @@
 import { Command, Errors, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings } from './lib/config/index.js';
-import { buildEnvelope } from './lib/envelope.js';
+import { buildEnvelope, formatErrorForJson } from './lib/envelope.js';
 import {
   resolveResearchTarget,
   type ResolveResearchTargetOptions,
@@ -120,8 +120,28 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
 
   /** Mirror the success envelope for failures so JSON consumers get one consistent shape. */
   protected override toErrorJson(err: unknown): Record<string, unknown> {
-    const e = err as { oclif?: { exit?: number }; exitCode?: number; message?: string };
+    const e = err as {
+      oclif?: { exit?: number };
+      exitCode?: number;
+      message?: string;
+      code?: string;
+      suggestions?: string[];
+      ref?: string;
+    };
     const exitCode = BaseCommand.exitCodeOf(e);
-    return this.envelope({ ok: false, exitCode, stderr: e?.message ?? String(err), data: null });
+    const stderr =
+      typeof e?.message === 'string' || e?.code || e?.suggestions?.length || e?.ref
+        ? formatErrorForJson(e)
+        : String(err);
+    return buildEnvelope({
+      command: this.envelopeCommandId(),
+      ok: false,
+      exitCode,
+      stderr,
+      data: null,
+      code: e.code,
+      suggestions: e.suggestions?.length ? e.suggestions : undefined,
+      ref: e.ref,
+    });
   }
 }

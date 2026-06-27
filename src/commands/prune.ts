@@ -6,7 +6,7 @@ import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { parseTtlToMs, durationFlagError } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES } from '../lib/research/schema.js';
-import { pluralize } from '../lib/text.js';
+import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
@@ -74,6 +74,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         'Safety check: use --yes to confirm pruning, or --dry-run to preview files that would be deleted.',
         {
           exit: 2,
+          code: 'SAFETY_CHECK_REQUIRED',
           suggestions: [`Preview first: ${this.config.bin} prune --dry-run${olderThanPart}`],
         }
       );
@@ -167,7 +168,9 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         const noun = pluralize(count, 'entry', 'entries');
         this.log(`[Dry Run] Found ${count} research cache ${noun} that would be pruned:\n`);
         filesToPrune.forEach((f) => {
-          this.log(`- [${f.topic || 'No Topic'}] Key: ${f.cacheKey} (${f.url || 'Imported note'})`);
+          this.log(
+            `- [${f.topic || NO_TOPIC_LABEL}] Key: ${f.cacheKey} (${f.url || 'Imported note'})`
+          );
         });
       }
     } else {

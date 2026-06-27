@@ -313,4 +313,58 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stderr).toContain('File does not exist');
     expect(result.stderr).not.toContain('Failed to read file');
   });
+
+  it('inspect cache miss JSON includes actionable code and suggestions', () => {
+    const result = runContract(['inspect', 'https://example.com/contract-cache-miss', '--json'], {
+      raw: true,
+    });
+    expect(result.exitCode).toBe(1);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'CACHE_MISS',
+      suggestions: ['Fetch and cache it first: bonsai https://example.com/contract-cache-miss'],
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Code: CACHE_MISS');
+    expect(envelope.stderr).toContain('Try this: Fetch and cache it first');
+    expect(result.stderr).toBe('');
+  });
+
+  it('prune JSON usage error includes suggestions in the envelope', () => {
+    const result = runContract(['prune', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.code).toBe('MISSING_FILTER');
+    expect(envelope.suggestions?.[0]).toContain('prune --older-than 90d --dry-run');
+    expect(envelope.stderr).toContain('Try this:');
+  });
+
+  it('prune JSON safety check includes SAFETY_CHECK_REQUIRED code', () => {
+    const result = runContract(['prune', '--older-than', '90d', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.code).toBe('SAFETY_CHECK_REQUIRED');
+    expect(envelope.suggestions?.[0]).toContain('--dry-run');
+  });
+
+  it('list JSON invalid limit includes INVALID_LIMIT in the envelope', () => {
+    const result = runContract(['list', '--limit', '0', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.code).toBe('INVALID_LIMIT');
+    expect(envelope.stderr).toContain('Code: INVALID_LIMIT');
+  });
+
+  it('fetch JSON duration errors include INVALID_DURATION in the envelope', () => {
+    const result = runContract(['https://example.com', '--ttl', '5z', '--json'], { raw: true });
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'INVALID_DURATION',
+    });
+    expect(envelope.stderr).toContain('Code: INVALID_DURATION');
+  });
 });

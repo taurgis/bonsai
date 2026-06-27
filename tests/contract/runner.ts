@@ -43,6 +43,8 @@ export function runContract(
   delete inherited.NO_COLOR;
   delete inherited.FORCE_COLOR;
   delete inherited.CI;
+  delete inherited.BONSAI_STORAGE;
+  delete inherited.BONSAI_SUMMARY;
 
   const mergedEnv = { ...inherited, ...env };
   const result = spawnSync('node', [CLI_ENTRY, ...args], {

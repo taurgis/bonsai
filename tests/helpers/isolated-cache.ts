@@ -34,6 +34,7 @@ export function useIsolatedCache(): IsolatedCache {
   let prevCwd: string;
   let prevDataHome: string | undefined;
   let prevConfigHome: string | undefined;
+  let prevBonsaiStorage: string | undefined;
   let prevExitCode: number | string | undefined;
 
   beforeEach(() => {
@@ -42,8 +43,10 @@ export function useIsolatedCache(): IsolatedCache {
     paths.cwd = mkdtempSync(join(tmpdir(), 'bonsai-cwd-'));
     prevDataHome = process.env.XDG_DATA_HOME;
     prevConfigHome = process.env.XDG_CONFIG_HOME;
+    prevBonsaiStorage = process.env.BONSAI_STORAGE;
     process.env.XDG_DATA_HOME = paths.dataHome;
     process.env.XDG_CONFIG_HOME = paths.configHome;
+    delete process.env.BONSAI_STORAGE;
     prevCwd = process.cwd();
     process.chdir(paths.cwd);
     prevExitCode = process.exitCode;
@@ -54,6 +57,7 @@ export function useIsolatedCache(): IsolatedCache {
     process.exitCode = prevExitCode;
     restoreEnv('XDG_DATA_HOME', prevDataHome);
     restoreEnv('XDG_CONFIG_HOME', prevConfigHome);
+    restoreEnv('BONSAI_STORAGE', prevBonsaiStorage);
     rmSync(paths.dataHome, { recursive: true, force: true });
     rmSync(paths.configHome, { recursive: true, force: true });
     rmSync(paths.cwd, { recursive: true, force: true });

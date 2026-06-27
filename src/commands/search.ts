@@ -3,6 +3,7 @@ import { BaseCommand } from '../base-command.js';
 import { loadSearchableArtifacts } from '../lib/research/search-index.js';
 import {
   levenshtein,
+  NO_TOPIC_LABEL,
   resultListHeading,
   truncationNotice,
   type ResultListLabels,
@@ -268,7 +269,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, SEARCH_LABELS)}\n`);
     finalResults.forEach((res, index) => {
-      this.log(`${index + 1}. [${res.topic || 'No Topic'}] Score: ${res.score}`);
+      this.log(`${index + 1}. [${res.topic || NO_TOPIC_LABEL}] Score: ${res.score}`);
       this.log(`   Cache Key: ${res.cacheKey}`);
       this.log(`   Snippet: ${res.snippet}`);
       this.log(`   Source URLs: ${res.sourceUrls.join(', ')}\n`);
