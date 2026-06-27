@@ -90,7 +90,7 @@
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782569503.1839788,
+    "mtime": 1782570102.9698942,
     "ast_hash": "ffe2e341638125681e8d2f4c3893ae27",
     "semantic_hash": ""
   },
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "tests/contract/research.test.ts": {
-    "mtime": 1782569491.896211,
-    "ast_hash": "c485f85a69510bf4f55b9ae99e5ccd69",
+    "mtime": 1782569847.1784785,
+    "ast_hash": "a0b31637b81aeb6075cf378b656c6e62",
     "semantic_hash": ""
   },
   "tests/contract/runner.ts": {
@@ -2160,23 +2160,23 @@
     "semantic_hash": ""
   },
   "src/commands/search.test.ts": {
-    "mtime": 1782568831.9188254,
-    "ast_hash": "f595e094fd4d97053a915adffb97b247",
+    "mtime": 1782569848.6717215,
+    "ast_hash": "eb5c66499bf08c7065cd8ac983acb2ec",
     "semantic_hash": ""
   },
   "src/commands/search.ts": {
-    "mtime": 1782569361.2510698,
-    "ast_hash": "feff101a9eee6c1040b6990d40ee782d",
+    "mtime": 1782570098.4633996,
+    "ast_hash": "98a44dd8bf2273d39e977fa4f2807439",
     "semantic_hash": ""
   },
   "src/commands/status.test.ts": {
-    "mtime": 1782568507.5780146,
-    "ast_hash": "dfc0c5fd0c5d4dfeb7cc45ad6844394c",
+    "mtime": 1782570100.6403184,
+    "ast_hash": "4f616fa0db2edb4f1e1dd6caa18e0361",
     "semantic_hash": ""
   },
   "src/commands/status.ts": {
-    "mtime": 1782568831.297068,
-    "ast_hash": "16c0928bb0cf19491ccb3b8822623a2b",
+    "mtime": 1782569840.2027984,
+    "ast_hash": "0d6f727327a199f7bceab0c3c30eada0",
     "semantic_hash": ""
   },
   "src/commands/fetch.test.ts": {

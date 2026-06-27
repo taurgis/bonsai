@@ -1,5 +1,6 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
+import { formatErrorForJson } from '../lib/envelope.js';
 import { getArtifactPath } from '../lib/research/storage.js';
 import {
   evaluateFreshness,
@@ -90,6 +91,22 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
 
   static stdoutIsPrimaryData = true;
 
+  /** Enrich cache-miss envelopes with the same CACHE_MISS code and suggestions as inspect. */
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    const envelope = super.toSuccessJson(data);
+    const d = data as { status?: string; normalizedUrl?: string } | null;
+    if (d?.status !== 'miss') return envelope;
+
+    const normalizedUrl = d.normalizedUrl ?? '';
+    const suggestions = [`Fetch and cache it first: ${this.config.bin} ${normalizedUrl}`];
+    const stderr = formatErrorForJson({
+      message: `Cache miss for ${normalizedUrl}`,
+      code: 'CACHE_MISS',
+      suggestions,
+    });
+    return { ...envelope, ok: false, exitCode: 1, stderr, code: 'CACHE_MISS', suggestions };
+  }
+
   async run(): Promise<unknown> {
     const { url } = this.args;
     const { ttl, tier, 'max-age': maxAge } = this.flags;
@@ -125,13 +142,18 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     // lets scripts branch on $? while JSON still returns the structured status payload. Unlike
     // inspect, we do not throw here — status must always return structured data even on a miss.
     if (result.status === 'miss') {
-      this.warn(`Cache miss. Fetch and cache it first: ${this.config.bin} ${normalizedUrl}`);
+      // Human mode: actionable hint on stderr. JSON mode: same info lives in the envelope (see
+      // toSuccessJson) so agents get code/suggestions without parsing warn() line wraps.
+      if (!this.jsonEnabled()) {
+        this.warn(`Cache miss — run: ${this.config.bin} ${normalizedUrl}`);
+      }
       process.exitCode = 1;
     }
 
     return {
       cacheKey,
       cachePath: artifactPath,
+      normalizedUrl,
       status: result.status,
       freshness: result.freshness,
       action: result.action,

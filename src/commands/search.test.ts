@@ -27,6 +27,11 @@ describe('search command unit tests', () => {
     await expect(runPromise).rejects.toThrow(/Query string cannot be empty/);
   });
 
+  it('rejects an invalid --remote URL with exit 2', async () => {
+    const runPromise = ResearchSearch.run(['router', '--remote', 'notaurl']);
+    await expect(runPromise).rejects.toThrow(/Invalid --remote URL/);
+  });
+
   it('returns empty results if no match is found', async () => {
     const result = (await ResearchSearch.run(['nonexistentQueryTerm'])) as any[];
     expect(result).toBeDefined();

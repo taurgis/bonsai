@@ -1,4 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { Config } from '@oclif/core';
 import ResearchStatus from './status.js';
 import ResearchImport from './import.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
@@ -56,5 +57,69 @@ describe('status command unit tests', () => {
     await expect(
       ResearchStatus.run(['https://example.com/status-ttl', '--ttl', 'banana'])
     ).rejects.toThrow(/Invalid --ttl/);
+  });
+
+  it('returns normalizedUrl and sets exit code 1 on cache miss via run', async () => {
+    const prevExit = process.exitCode;
+    process.exitCode = 0;
+    try {
+      const data = (await ResearchStatus.run([
+        'https://example.com/not-cached-status-json',
+        '--json',
+      ])) as any;
+      expect(data.status).toBe('miss');
+      expect(data.normalizedUrl).toBe('https://example.com/not-cached-status-json');
+      expect(process.exitCode).toBe(1);
+    } finally {
+      process.exitCode = prevExit;
+    }
+  });
+});
+
+describe('status JSON envelope shaping', () => {
+  async function instance() {
+    const config = await Config.load(process.cwd());
+    return new ResearchStatus([], config) as any;
+  }
+
+  beforeEach(() => {
+    process.exitCode = undefined;
+  });
+
+  it('adds CACHE_MISS code and suggestions when status is miss', async () => {
+    const cmd = await instance();
+    const prev = process.exitCode;
+    process.exitCode = 1;
+    try {
+      const envelope = cmd.toSuccessJson({
+        status: 'miss',
+        normalizedUrl: 'https://example.com/missing',
+        cacheKey: 'abc',
+        cachePath: '/tmp/x.md',
+        freshness: 'none',
+        action: 'would_fetch',
+      });
+      expect(envelope).toMatchObject({
+        ok: false,
+        exitCode: 1,
+        code: 'CACHE_MISS',
+      });
+      expect(envelope.stderr).toContain('Code: CACHE_MISS');
+      expect(envelope.suggestions?.[0]).toContain('Fetch and cache it first');
+    } finally {
+      process.exitCode = prev;
+    }
+  });
+
+  it('passes through hit envelopes unchanged', async () => {
+    const cmd = await instance();
+    const envelope = cmd.toSuccessJson({
+      status: 'hit',
+      normalizedUrl: 'https://example.com/cached',
+      freshness: 'fresh',
+      action: 'would_return_cached',
+    });
+    expect(envelope).toMatchObject({ ok: true, exitCode: 0, stderr: '' });
+    expect(envelope.code).toBeUndefined();
   });
 });

@@ -266,9 +266,12 @@ describe('CLI ergonomics and error contracts', () => {
     expect(envelope).toMatchObject({
       ok: false,
       exitCode: 1,
+      code: 'CACHE_MISS',
       data: { status: 'miss', action: 'would_fetch' },
     });
-    expect(result.stderr).toContain('Cache miss');
+    expect(envelope.suggestions?.[0]).toContain('Fetch and cache it first');
+    expect(envelope.stderr).toContain('Code: CACHE_MISS');
+    expect(result.stderr).toBe('');
   });
 
   it('prune rejects a malformed --older-than value (exit 2) instead of silently matching nothing', () => {
@@ -366,5 +369,19 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'INVALID_DURATION',
     });
     expect(envelope.stderr).toContain('Code: INVALID_DURATION');
+  });
+
+  it('search --remote with invalid URL fails with INVALID_URL instead of silent fallback', () => {
+    const result = runContract(['search', 'foo', '--remote', 'notaurl', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'INVALID_URL',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Invalid --remote URL');
+    expect(result.stderr).toBe('');
   });
 });

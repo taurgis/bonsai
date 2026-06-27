@@ -13,6 +13,7 @@ import { evaluateFreshness } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES } from '../lib/research/schema.js';
 import { detectSite } from '../sites/index.js';
 import { fetchStaticHtml, fetchText, postJson } from '../lib/research/fetcher.js';
+import { normalizeUrl } from '../lib/research/url.js';
 import {
   runRemoteDocsSearch,
   type RemoteSearchDeps,
@@ -359,9 +360,18 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     }
 
     if (remote) {
-      const remoteResults = await this.executeRemoteSearch(query, remote);
+      let normalizedRemote: string;
+      try {
+        normalizedRemote = normalizeUrl(remote);
+      } catch (err) {
+        this.error(`Invalid --remote URL: ${(err as Error).message}`, {
+          exit: 2,
+          code: 'INVALID_URL',
+        });
+      }
+      const remoteResults = await this.executeRemoteSearch(query, normalizedRemote);
       if (remoteResults !== undefined) return remoteResults;
-      // else: fall through to local cache search
+      // else: fall through to local cache search (connector/network failure only)
     }
 
     this.validateSearchFlags();
