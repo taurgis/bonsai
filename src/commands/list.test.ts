@@ -166,6 +166,26 @@ describe('list command unit tests', () => {
     expect(result).toEqual([]);
   });
 
+  it('exposes every schema capture method / artifact type as a filter (no enum drift)', async () => {
+    // The flag option lists derive from CAPTURE_METHODS / ARTIFACT_TYPES, so a route_markdown page
+    // (the common case for doc sites) and index hubs are filterable — they previously parse-errored.
+    const idx = fakeArtifact('hub', 'index');
+    idx.metadata.capture_method = 'route_markdown';
+    vi.spyOn(storage, 'scanCacheDirs').mockImplementation((_roots: string[], fn: any) =>
+      [idx].map((a) => fn(a, `/x/${a.metadata.cache_key}.md`)).filter((x) => x !== null)
+    );
+
+    expect(((await ResearchList.run(['--capture-method', 'route_markdown'])) as any[]).length).toBe(
+      1
+    );
+    expect(((await ResearchList.run(['--capture-method', 'github_source'])) as any[]).length).toBe(
+      0
+    );
+    expect(((await ResearchList.run(['--artifact-type', 'index'])) as any[]).length).toBe(1);
+    // `section` stays intentionally absent from list (sections are never listed).
+    await expect(ResearchList.run(['--artifact-type', 'section'])).rejects.toThrow(/one of/);
+  });
+
   it('signals truncation in the human heading when more entries match than --limit', async () => {
     const fake = Array.from({ length: 3 }, (_, i) => ({
       cacheKey: `k${i}`,

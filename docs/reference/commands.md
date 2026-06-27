@@ -59,7 +59,7 @@ npx @taurgis/bonsai <url> [flags]
     "source": {
       "url": "https://example.com",
       "normalizedUrl": "https://example.com/",
-      "captureMethod": "static_fetch" | "browser_fallback" | "agent_supplied",
+      "captureMethod": "static_fetch" | "browser_fallback" | "agent_supplied" | "route_markdown" | "github_source",
       "extractionStatus": "extracted" | "agent_supplied" | "failed",
       "extractionConfidence": "high" | "medium" | "low",
       "qualityNotes": [
@@ -249,8 +249,8 @@ flood the listing — find them with `search` (which ranks sections) or `inspect
 | `--topic` | `-t` | string | — | Keep only entries with this exact topic (case-insensitive). |
 | `--tags` | `-g` | string | — | Keep entries carrying **all** the given tags (repeatable). |
 | `--freshness` | — | choice | — | Filter by freshness: `fresh`, `stale_grace`, or `stale_expired`. |
-| `--artifact-type` | — | choice | — | Filter by type: `source` or `research_note`. |
-| `--capture-method` | — | choice | — | Filter by capture method: `static_fetch`, `browser_fallback`, or `agent_supplied`. |
+| `--artifact-type` | — | choice | — | Filter by type: `source`, `research_note`, or `index`. (Section children are never listed, so `section` is not offered here.) |
+| `--capture-method` | — | choice | — | Filter by capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`. |
 | `--limit` | — | integer | `50` | Cap the result count (1–100). |
 | `--json` | — | boolean | `false` | Return the machine-readable envelope. |
 
@@ -268,7 +268,7 @@ first, then truncated to `--limit`.
     "topic": "example",
     "tags": ["test"],
     "freshness": "fresh" | "stale_grace" | "stale_expired",
-    "captureMethod": "static_fetch" | "browser_fallback" | "agent_supplied",
+    "captureMethod": "static_fetch" | "browser_fallback" | "agent_supplied" | "route_markdown" | "github_source",
     "tokenEstimate": { "compressed": 29, "detailed": 65 },
     "qualityNotes": ["readability extracted main article"],
     "fetchedAt": "2026-06-24T07:33:20.519Z",
@@ -303,7 +303,7 @@ Two guardrails make accidental deletion hard:
 | --- | --- | --- | --- | --- |
 | `--older-than` | — | duration | — | Prune entries older than this age, e.g. `30d`, `90d`. |
 | `--inactive` | — | duration | — | Prune entries not validated or fetched within this window, e.g. `14d`. |
-| `--artifact-type` | — | choice | — | Limit pruning to `source` or `research_note`. |
+| `--artifact-type` | — | choice | — | Limit pruning to `source`, `research_note`, `index`, or `section`. |
 | `--dry-run` | — | boolean | `false` | List what would be deleted, delete nothing. |
 | `--yes` | `-y` | boolean | `false` | Confirm deletion. Required for a real prune. |
 | `--json` | — | boolean | `false` | Return the machine-readable envelope. |

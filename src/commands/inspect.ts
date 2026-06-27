@@ -43,7 +43,12 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     const { cacheKey, located, normalizedUrl, roots } = target;
 
     if (!located) {
-      this.error(`No cached research found for URL: ${normalizedUrl}`, { exit: 1 });
+      // inspect makes no network call, so the bare message reads like the network-failure case the
+      // exit-1 contract describes. Point at the fix instead: fetch the page so it lands in the cache.
+      this.error(`No cached research found for URL: ${normalizedUrl}`, {
+        exit: 1,
+        suggestions: [`Fetch and cache it first: bonsai ${normalizedUrl}`],
+      });
     }
 
     const cached = located.artifact;

@@ -348,7 +348,8 @@
           "multiple": false,
           "options": [
             "source",
-            "research_note"
+            "research_note",
+            "index"
           ],
           "type": "option"
         },
@@ -360,7 +361,9 @@
           "options": [
             "static_fetch",
             "browser_fallback",
-            "agent_supplied"
+            "agent_supplied",
+            "route_markdown",
+            "github_source"
           ],
           "type": "option"
         },
@@ -427,7 +430,9 @@
           "multiple": false,
           "options": [
             "source",
-            "research_note"
+            "research_note",
+            "index",
+            "section"
           ],
           "type": "option"
         },
@@ -439,7 +444,7 @@
         },
         "yes": {
           "char": "y",
-          "description": "Skip confirmation prompt and prune files.",
+          "description": "Confirm deletion and prune matched entries (required unless --dry-run).",
           "name": "yes",
           "allowNo": false,
           "type": "boolean"

@@ -5,6 +5,7 @@ import { BaseCommand } from '../base-command.js';
 import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { parseTtlToMs, durationFlagError } from '../lib/research/freshness.js';
+import { ARTIFACT_TYPES } from '../lib/research/schema.js';
 import { pluralize } from '../lib/text.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
@@ -33,8 +34,11 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         'Prune entries inactive (unvalidated/unfetched) for duration (e.g. "14d", "30d").',
     }),
     'artifact-type': Flags.option({
+      // Prune operates on every cached file, so it can target any artifact type — including the
+      // `section`/`index` children a page generates (e.g. to clear orphans left after a source is
+      // pruned with `--artifact-type source`).
       description: 'Filter pruning to specific artifact type.',
-      options: ['source', 'research_note'] as const,
+      options: ARTIFACT_TYPES,
     })(),
     'dry-run': Flags.boolean({
       description: 'List files that would be deleted without actually deleting them.',
@@ -42,7 +46,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     }),
     yes: Flags.boolean({
       char: 'y',
-      description: 'Skip confirmation prompt and prune files.',
+      description: 'Confirm deletion and prune matched entries (required unless --dry-run).',
       default: false,
     }),
   };
