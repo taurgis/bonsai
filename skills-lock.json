@@ -9,7 +9,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/agent-authoring/SKILL.md",
       "installPath": ".agents/skills/agent-authoring",
@@ -28,7 +29,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/anti-ai-writing/SKILL.md",
       "installPath": ".agents/skills/anti-ai-writing",
@@ -47,7 +49,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/beginner-technical-writing/SKILL.md",
       "installPath": ".agents/skills/beginner-technical-writing",
@@ -105,7 +108,8 @@
       "agents": [
         "github-copilot",
         "claude-code",
-        "cursor"
+        "cursor",
+        "codex"
       ],
       "repoPath": "fallow/skills/fallow/SKILL.md",
       "installPath": ".agents/skills/fallow",
@@ -124,7 +128,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/graphify/SKILL.md",
       "installPath": ".agents/skills/graphify",
@@ -143,7 +148,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/human-prose-editing/SKILL.md",
       "installPath": ".agents/skills/human-prose-editing",
@@ -261,7 +267,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/ponytail/SKILL.md",
       "installPath": ".agents/skills/ponytail",
@@ -280,7 +287,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/ponytail-audit/SKILL.md",
       "installPath": ".agents/skills/ponytail-audit",
@@ -299,7 +307,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/ponytail-debt/SKILL.md",
       "installPath": ".agents/skills/ponytail-debt",
@@ -318,7 +327,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/ponytail-review/SKILL.md",
       "installPath": ".agents/skills/ponytail-review",
@@ -356,7 +366,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/thermo-nuclear-code-quality-review/SKILL.md",
       "installPath": ".agents/skills/thermo-nuclear-code-quality-review",
@@ -375,7 +386,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "repoPath": "skills/web-research/SKILL.md",
       "installPath": ".agents/skills/web-research",
@@ -398,7 +410,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "linkedSkills": [
         "graphify",
@@ -463,7 +476,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "linkedSkills": [
         "beginner-technical-writing"
@@ -523,7 +537,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "linkedSkills": [
         "web-research"
@@ -547,7 +562,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "installHash": "0ac3a1e5694f7351bade263c2ace2714e491fa69a7064a0209b93980d698c82d",
       "sourceHash": "5e6620a7f695f2ce72e9fc3002af0dcf2eb4a7d52d7e1977df67158f77a76544",
@@ -623,7 +639,8 @@
         "github-copilot",
         "claude-code",
         "cursor",
-        "antigravity"
+        "antigravity",
+        "codex"
       ],
       "linkedSkills": [
         "beginner-technical-writing"

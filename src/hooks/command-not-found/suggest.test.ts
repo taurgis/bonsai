@@ -20,7 +20,7 @@ const fakeConfig = {
 
 // Invoke the hook the way oclif does: `this` is the context (here only `error` is exercised), and
 // the options object carries id/argv plus the config. `error` throws so we capture the message.
-async function runHook(id: string): Promise<string> {
+async function runHook(id: string, argv: string[] = []): Promise<string> {
   const ctx = {
     error: vi.fn((message: string) => {
       throw new Error(message);
@@ -28,12 +28,35 @@ async function runHook(id: string): Promise<string> {
   };
   let captured = '';
   try {
-    await (hook as any).call(ctx, { id, argv: [], config: fakeConfig, context: ctx });
+    await (hook as any).call(ctx, { id, argv, config: fakeConfig, context: ctx });
   } catch (err) {
     captured = (err as Error).message;
   }
   expect(ctx.error).toHaveBeenCalledOnce();
   return captured;
+}
+
+async function runJsonHook(id: string, argv: string[] = ['--json']): Promise<any> {
+  const writes: string[] = [];
+  const spy = vi.spyOn(console, 'log').mockImplementation((value: string) => {
+    writes.push(value);
+  });
+  const ctx = {
+    error: vi.fn((message: string) => {
+      throw new Error(message);
+    }),
+  };
+  const previousExitCode = process.exitCode;
+  try {
+    const result = await (hook as any).call(ctx, { id, argv, config: fakeConfig, context: ctx });
+    expect(ctx.error).not.toHaveBeenCalled();
+    expect(process.exitCode).toBe(2);
+    expect(result).toEqual(JSON.parse(writes.join('\n')));
+    return result;
+  } finally {
+    process.exitCode = previousExitCode;
+    spy.mockRestore();
+  }
 }
 
 describe('command_not_found hook', () => {
@@ -42,6 +65,19 @@ describe('command_not_found hook', () => {
     expect(msg).toContain('statuss is not a bonsai command.');
     expect(msg).toContain('Did you mean status?');
     expect(msg).toContain('Run bonsai help');
+  });
+
+  it('emits the standard JSON error envelope when --json is present', async () => {
+    const envelope = await runJsonHook('serch:hello');
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'serch',
+      ok: false,
+      exitCode: 2,
+      stdout: '',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Did you mean search?');
   });
 
   it('renders topic ids with the configured separator', async () => {
@@ -88,6 +124,18 @@ describe('command_not_found hook', () => {
     expect(msg).not.toContain('Did you mean');
   });
 
+  it('does not suggest unrelated commands for very short input', async () => {
+    const msg = await runHook('wat');
+    expect(msg).toContain('wat is not a bonsai command.');
+    expect(msg).not.toContain('Did you mean');
+  });
+
+  it('does not suggest unrelated commands for very short input in JSON mode', async () => {
+    const envelope = await runJsonHook('wat');
+    expect(envelope).toMatchObject({ command: 'wat', ok: false, exitCode: 2 });
+    expect(envelope.stderr).not.toContain('Did you mean');
+  });
+
   // `bonsai <url>` is the headline command, but bin/cli.mjs only routes args with a `://` scheme to
   // it, so a scheme-less URL reaches this hook. It must point back at the shorthand with a scheme.
   it('suggests the URL shorthand for a scheme-less hostname', async () => {
@@ -95,6 +143,18 @@ describe('command_not_found hook', () => {
     expect(msg).toContain('example.com is not a bonsai command.');
     expect(msg).toContain('Did you mean bonsai https://example.com?');
     expect(msg).toContain('http:// or https:// scheme');
+  });
+
+  it('emits a JSON error envelope for a scheme-less URL when --json is present', async () => {
+    const envelope = await runJsonHook('example.com');
+    expect(envelope).toMatchObject({
+      command: 'example.com',
+      ok: false,
+      exitCode: 2,
+      stdout: '',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Did you mean bonsai https://example.com?');
   });
 
   it('suggests the URL shorthand for a scheme-less host with a path', async () => {

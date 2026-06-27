@@ -606,6 +606,30 @@
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
+    "config": {
+      "aliases": [],
+      "args": {},
+      "description": "Show config subcommands for reading and writing Bonsai research cache configuration.",
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "config",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Manage research cache storage configuration (global vs project).",
+      "enableJsonFlag": true,
+      "stdoutIsPrimaryData": true
+    },
     "config:get": {
       "aliases": [],
       "args": {

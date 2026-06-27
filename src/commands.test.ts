@@ -8,6 +8,7 @@ import PruneCommand from './commands/prune.js';
 import SearchCommand from './commands/search.js';
 import StatusCommand from './commands/status.js';
 import ConfigGet from './commands/config/get.js';
+import ConfigIndex from './commands/config/index.js';
 import ConfigList from './commands/config/list.js';
 import ConfigSet from './commands/config/set.js';
 import ConfigUnset from './commands/config/unset.js';
@@ -22,6 +23,7 @@ describe('command registry', () => {
       prune: PruneCommand,
       search: SearchCommand,
       status: StatusCommand,
+      config: ConfigIndex,
       'config:get': ConfigGet,
       'config:list': ConfigList,
       'config:set': ConfigSet,
@@ -33,6 +35,7 @@ describe('command registry', () => {
     expect(Object.keys(commands).sort()).toEqual(
       [
         'config:get',
+        'config',
         'config:list',
         'config:set',
         'config:unset',

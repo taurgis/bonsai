@@ -24,6 +24,105 @@ describe('research contract tests', () => {
     expect(result.stdout).toContain('COMMANDS');
   });
 
+  it('bonsai --json without URL or command returns a JSON usage error', () => {
+    const result = runContract(['--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'bonsai',
+      ok: false,
+      exitCode: 2,
+      stdout: '',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Missing URL or command');
+    expect(result.stderr).toBe('');
+  });
+
+  it('bonsai config --json returns structured subcommand metadata', () => {
+    const result = runContract(['config', '--json'], { raw: true });
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'config',
+      ok: true,
+      exitCode: 0,
+      stdout: '',
+      stderr: '',
+      data: {
+        topic: 'config',
+        commands: expect.arrayContaining([
+          expect.objectContaining({ id: 'config get' }),
+          expect.objectContaining({ id: 'config set' }),
+        ]),
+      },
+    });
+    expect(result.stderr).toBe('');
+  });
+
+  it('accepts --json before a normal command', () => {
+    const result = runContract(['--json', 'list'], { raw: true });
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'list',
+      ok: true,
+      exitCode: 0,
+      stdout: '',
+      stderr: '',
+    });
+    expect(result.stderr).toBe('');
+  });
+
+  it('accepts --json before the URL shorthand and returns JSON error for unsupported scheme', () => {
+    const result = runContract(['--json', 'ftp://example.com'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'bonsai',
+      ok: false,
+      exitCode: 2,
+      stdout: '',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Only http: and https:');
+  });
+
+  it('accepts --json before an unknown command and returns the JSON error envelope', () => {
+    const result = runContract(['--json', 'serch', 'alpha'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'serch',
+      ok: false,
+      exitCode: 2,
+      stdout: '',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Did you mean search?');
+    expect(result.stderr).toBe('');
+  });
+
+  it('does not invent a suggestion for unrelated short unknown commands', () => {
+    const result = runContract(['--json', 'wat'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'wat',
+      ok: false,
+      exitCode: 2,
+      stdout: '',
+      data: null,
+    });
+    expect(envelope.stderr).not.toContain('Did you mean');
+  });
+
   it('bonsai with invalid flag value fails with exit code 2 (usage error)', () => {
     const result = runContract(['https://example.com', '--format', 'invalid-format']);
     expect(result.exitCode).toBe(2);

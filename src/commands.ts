@@ -1,4 +1,5 @@
 import ConfigGet from './commands/config/get.js';
+import ConfigIndex from './commands/config/index.js';
 import ConfigList from './commands/config/list.js';
 import ConfigSet from './commands/config/set.js';
 import ConfigUnset from './commands/config/unset.js';
@@ -18,6 +19,7 @@ export const commands = {
   prune: PruneCommand,
   search: SearchCommand,
   status: StatusCommand,
+  config: ConfigIndex,
   'config:get': ConfigGet,
   'config:list': ConfigList,
   'config:set': ConfigSet,

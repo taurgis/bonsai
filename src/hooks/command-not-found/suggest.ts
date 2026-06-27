@@ -1,10 +1,14 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch } from '../../lib/text.js';
+import { buildEnvelope } from '../../lib/envelope.js';
 
-// Nearest command must be within this edit distance to be offered as a correction. Bonsai's command
-// ids are short, so 3 catches realistic typos ("statuss", "improt") without suggesting an unrelated
-// command for input that resembles nothing.
-const MAX_SUGGESTION_DISTANCE = 3;
+// Nearest command must be close enough to be useful. A fixed threshold of 3 is too generous for
+// very short inputs (`wat` should not suggest `list`), while still reasonable for longer topic ids.
+function maxSuggestionDistance(input: string): number {
+  if (input.length <= 3) return 1;
+  if (input.length <= 5) return 2;
+  return 3;
+}
 
 /**
  * The nearest visible command to a typo, plus how many leading segments of the attempted id name
@@ -19,11 +23,8 @@ function findSuggestion(
   visibleIds: string[]
 ): { suggestion: string | null; commandSegments: number } {
   for (let n = segments.length; n >= 1; n--) {
-    const suggestion = closestMatch(
-      segments.slice(0, n).join(':'),
-      visibleIds,
-      MAX_SUGGESTION_DISTANCE
-    );
+    const attempted = segments.slice(0, n).join(':');
+    const suggestion = closestMatch(attempted, visibleIds, maxSuggestionDistance(attempted));
     if (suggestion) return { suggestion, commandSegments: n };
   }
   return { suggestion: null, commandSegments: 0 };
@@ -65,6 +66,23 @@ function bareUrlInput(id: string): string | null {
   return DOMAIN_OR_IPV4.test(hostname) ? id : null;
 }
 
+function isJsonMode(argv: string[] | undefined): boolean {
+  return argv?.includes('--json') ?? false;
+}
+
+function emitJsonError(command: string, message: string): Record<string, unknown> {
+  const envelope = buildEnvelope({
+    command,
+    ok: false,
+    exitCode: 2,
+    stderr: message,
+    data: null,
+  });
+  process.exitCode = 2;
+  console.log(JSON.stringify(envelope, null, 2));
+  return envelope;
+}
+
 /**
  * Typo-aware "command not found" handler. oclif fires this before printing its own terse error;
  * throwing here (via `this.error`) replaces that default with a more helpful message. A correction
@@ -80,14 +98,13 @@ const hook: Hook<'command_not_found'> = async function (opts) {
   // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
   const bareUrl = bareUrlInput(opts.id);
   if (bareUrl) {
-    this.error(
-      [
-        `${bareUrl} is not a ${opts.config.bin} command.`,
-        `Run ${opts.config.bin} help for a list of available commands.`,
-        `Did you mean ${opts.config.bin} https://${bareUrl}? URLs need an http:// or https:// scheme.`,
-      ].join('\n'),
-      { exit: 2 }
-    );
+    const message = [
+      `${bareUrl} is not a ${opts.config.bin} command.`,
+      `Run ${opts.config.bin} help for a list of available commands.`,
+      `Did you mean ${opts.config.bin} https://${bareUrl}? URLs need an http:// or https:// scheme.`,
+    ].join('\n');
+    if (isJsonMode(opts.argv)) return emitJsonError(bareUrl, message);
+    this.error(message, { exit: 2 });
   }
 
   const segments = opts.id.split(':');
@@ -103,7 +120,9 @@ const hook: Hook<'command_not_found'> = async function (opts) {
   lines.push(`Run ${opts.config.bin} help for a list of available commands.`);
   if (suggestion) lines.push(`Did you mean ${toConfiguredId(suggestion, opts.config)}?`);
 
-  this.error(lines.join('\n'), { exit: 2 });
+  const message = lines.join('\n');
+  if (isJsonMode(opts.argv)) return emitJsonError(attempted, message);
+  this.error(message, { exit: 2 });
 };
 
 export default hook;

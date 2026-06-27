@@ -67,8 +67,7 @@ describe('config set', () => {
       ConfigSet.run(['storage', 'project', '--local', '--json'])
     );
     const envelope = JSON.parse(lines.join('\n').trim());
-    expect(envelope).toMatchObject({ schemaVersion: 1, ok: true });
-    expect(String(envelope.command)).toContain('set');
+    expect(envelope).toMatchObject({ schemaVersion: 1, command: 'config set', ok: true });
     expect(envelope.data).toMatchObject({ key: 'storage', value: 'project' });
   });
 
@@ -121,7 +120,7 @@ describe('config get', () => {
   it('emits the envelope under --json', async () => {
     const lines = await captureLog(() => ConfigGet.run(['storage', '--json']));
     const envelope = JSON.parse(lines.join('\n').trim());
-    expect(envelope).toMatchObject({ schemaVersion: 1, ok: true });
+    expect(envelope).toMatchObject({ schemaVersion: 1, command: 'config get', ok: true });
     expect(envelope.data).toMatchObject({ key: 'storage', value: 'global' });
   });
 });
@@ -152,7 +151,12 @@ describe('config list', () => {
   it('emits the envelope under --json', async () => {
     const lines = await captureLog(() => ConfigList.run(['--json']));
     const envelope = JSON.parse(lines.join('\n').trim());
-    expect(envelope).toMatchObject({ schemaVersion: 1, ok: true, data: { storage: 'global' } });
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'config list',
+      ok: true,
+      data: { storage: 'global' },
+    });
   });
 
   it('rejects --global and --local together', async () => {
@@ -198,7 +202,7 @@ describe('config unset', () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const lines = await captureLog(() => ConfigUnset.run(['storage', '--local', '--json']));
     const envelope = JSON.parse(lines.join('\n').trim());
-    expect(envelope).toMatchObject({ schemaVersion: 1, ok: true });
+    expect(envelope).toMatchObject({ schemaVersion: 1, command: 'config unset', ok: true });
     expect(envelope.data).toMatchObject({ key: 'storage', scope: 'project' });
   });
 });

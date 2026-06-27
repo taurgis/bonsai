@@ -4,6 +4,8 @@ import { execute } from '@oclif/core';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { normalizeArgv } from '../dist/lib/argv.js';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Normalize argv so the whole oclif pipeline sees one consistent command. oclif's
@@ -12,19 +14,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // trying to resolve the bare URL as a command — which crashes with a stack trace. Rewrite
 // process.argv itself so both the run path and the help/error path agree.
 const rawArgv = process.argv.slice(2);
-const [firstArg, ...restArgv] = rawArgv;
-// Treat any first arg that looks like a URL (carries a scheme) as the `fetch` shorthand.
-// Routing wrong-scheme URLs (ftp://, file://) here too means fetch can answer with a clear
-// "only http/https" error instead of oclif's cryptic "command not found".
-const looksLikeUrl = firstArg?.includes('://') ?? false;
-const normalizedArgv =
-  firstArg === 'help'
-    ? [...restArgv, '--help']
-    : looksLikeUrl
-      ? ['fetch', ...rawArgv]
-      : rawArgv;
+const result = normalizeArgv(rawArgv);
 
-process.argv = [process.argv[0], process.argv[1], ...normalizedArgv];
+if (result.exitWithJson) {
+  process.exitCode = result.exitWithJson.exitCode;
+  console.log(JSON.stringify(result.exitWithJson.envelope, null, 2));
+  process.exit();
+}
+
+process.argv = [process.argv[0], process.argv[1], ...result.argv];
 
 await execute({
   development: false,

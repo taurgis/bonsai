@@ -1,5 +1,6 @@
-import { Command, Errors, Interfaces } from '@oclif/core';
+import { Command, Errors, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings } from './lib/config/index.js';
+import { buildEnvelope } from './lib/envelope.js';
 
 /**
  * Shared base for every Bonsai command. Enables oclif's native `--json` flag,
@@ -65,7 +66,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
 
   /** Command id for the JSON envelope; falls back to the binary name when a command has no id. */
   protected envelopeCommandId(): string {
-    return this.ctor.id || this.config.bin;
+    return this.ctor.id ? toConfiguredId(this.ctor.id, this.config) : this.config.bin;
   }
 
   /** Single source of truth for the `--json` envelope shape, shared by success and error output. */
@@ -75,15 +76,13 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     stderr: string;
     data: unknown;
   }): Record<string, unknown> {
-    return {
-      schemaVersion: 1,
+    return buildEnvelope({
       command: this.envelopeCommandId(),
       ok: parts.ok,
       exitCode: parts.exitCode,
-      stdout: '',
       stderr: parts.stderr,
       data: parts.data,
-    };
+    });
   }
 
   /** Wrap a command's return value in the machine-readable envelope emitted under `--json`. */
