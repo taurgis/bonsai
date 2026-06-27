@@ -1,6 +1,11 @@
 import { Command, Errors, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings } from './lib/config/index.js';
-import { buildEnvelope, formatErrorForJson } from './lib/envelope.js';
+import {
+  buildEnvelope,
+  formatErrorForJson,
+  normalizeCliErrorMessage,
+  stableErrorCodeFrom,
+} from './lib/envelope.js';
 import {
   resolveResearchTarget,
   type ResolveResearchTargetOptions,
@@ -65,6 +70,9 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    * the shared resolver so the framework's `??` keeps it, then defer to the default behavior.
    */
   public override async catch(err: Error & { oclif?: { exit?: number }; exitCode?: number }) {
+    // Parse failures throw before `this.parse()` sets `parsed`, which makes oclif emit a spurious
+    // [UnparsedCommand] warning to stderr even under `--json`. CLIParseError subclasses carry `parse`.
+    if (err && typeof err === 'object' && 'parse' in err) this.parsed = true;
     process.exitCode = process.exitCode ?? BaseCommand.exitCodeOf(err);
     return super.catch(err);
   }
@@ -129,9 +137,12 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       ref?: string;
     };
     const exitCode = BaseCommand.exitCodeOf(e);
+    const code = stableErrorCodeFrom(e);
+    const message =
+      typeof e?.message === 'string' ? normalizeCliErrorMessage(e.message) : undefined;
     const stderr =
-      typeof e?.message === 'string' || e?.code || e?.suggestions?.length || e?.ref
-        ? formatErrorForJson(e)
+      message || code || e?.suggestions?.length || e?.ref
+        ? formatErrorForJson({ ...e, message, code })
         : String(err);
     return buildEnvelope({
       command: this.envelopeCommandId(),
@@ -139,7 +150,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       exitCode,
       stderr,
       data: null,
-      code: e.code,
+      code,
       suggestions: e.suggestions?.length ? e.suggestions : undefined,
       ref: e.ref,
     });

@@ -6,6 +6,31 @@ export interface CliErrorShape {
   ref?: string;
 }
 
+/** Map oclif parse-time errors to stable Bonsai codes when the throw site did not set one. */
+export function stableErrorCodeFrom(err: unknown): string | undefined {
+  const e = err as { code?: string; constructor?: { name?: string } };
+  if (typeof e?.code === 'string' && e.code) return e.code;
+  switch (e?.constructor?.name) {
+    case 'RequiredArgsError':
+      return 'MISSING_ARGUMENT';
+    case 'FlagInvalidOptionError':
+    case 'ArgInvalidOptionError':
+      return 'INVALID_FLAG_VALUE';
+    case 'NonExistentFlagsError':
+      return 'UNKNOWN_FLAG';
+    case 'UnexpectedArgsError':
+      return 'UNEXPECTED_ARGUMENT';
+    default:
+      return undefined;
+  }
+}
+
+/** Strip oclif's generic help suffix from JSON stderr — agents already have structured codes. */
+export function normalizeCliErrorMessage(message: string): string {
+  const suffix = '\nSee more help with --help';
+  return message.endsWith(suffix) ? message.slice(0, -suffix.length) : message;
+}
+
 export interface EnvelopeParts {
   command: string;
   ok: boolean;

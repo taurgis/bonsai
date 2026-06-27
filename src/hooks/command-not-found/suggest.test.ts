@@ -74,10 +74,12 @@ describe('command_not_found hook', () => {
       command: 'serch',
       ok: false,
       exitCode: 2,
+      code: 'COMMAND_NOT_FOUND',
       stdout: '',
       data: null,
     });
     expect(envelope.stderr).toContain('Did you mean search?');
+    expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
   });
 
   it('renders topic ids with the configured separator', async () => {
@@ -132,8 +134,14 @@ describe('command_not_found hook', () => {
 
   it('does not suggest unrelated commands for very short input in JSON mode', async () => {
     const envelope = await runJsonHook('wat');
-    expect(envelope).toMatchObject({ command: 'wat', ok: false, exitCode: 2 });
+    expect(envelope).toMatchObject({
+      command: 'wat',
+      ok: false,
+      exitCode: 2,
+      code: 'COMMAND_NOT_FOUND',
+    });
     expect(envelope.stderr).not.toContain('Did you mean');
+    expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
   });
 
   // `bonsai <url>` is the headline command, but bin/cli.mjs only routes args with a `://` scheme to
@@ -151,10 +159,12 @@ describe('command_not_found hook', () => {
       command: 'example.com',
       ok: false,
       exitCode: 2,
+      code: 'MISSING_URL_SCHEME',
       stdout: '',
       data: null,
     });
     expect(envelope.stderr).toContain('Did you mean bonsai https://example.com?');
+    expect(envelope.stderr).toContain('Code: MISSING_URL_SCHEME');
   });
 
   it('suggests the URL shorthand for a scheme-less host with a path', async () => {

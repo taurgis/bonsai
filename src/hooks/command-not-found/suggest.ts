@@ -1,6 +1,6 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch } from '../../lib/text.js';
-import { buildEnvelope } from '../../lib/envelope.js';
+import { buildEnvelope, formatErrorForJson } from '../../lib/envelope.js';
 
 // Nearest command must be close enough to be useful. A fixed threshold of 3 is too generous for
 // very short inputs (`wat` should not suggest `list`), while still reasonable for longer topic ids.
@@ -70,13 +70,18 @@ function isJsonMode(argv: string[] | undefined): boolean {
   return argv?.includes('--json') ?? false;
 }
 
-function emitJsonError(command: string, message: string): Record<string, unknown> {
+function emitJsonError(
+  command: string,
+  message: string,
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME'
+): Record<string, unknown> {
   const envelope = buildEnvelope({
     command,
     ok: false,
     exitCode: 2,
-    stderr: message,
+    stderr: formatErrorForJson({ message, code }),
     data: null,
+    code,
   });
   process.exitCode = 2;
   console.log(JSON.stringify(envelope, null, 2));
@@ -103,7 +108,7 @@ const hook: Hook<'command_not_found'> = async function (opts) {
       `Run ${opts.config.bin} help for a list of available commands.`,
       `Did you mean ${opts.config.bin} https://${bareUrl}? URLs need an http:// or https:// scheme.`,
     ].join('\n');
-    if (isJsonMode(opts.argv)) return emitJsonError(bareUrl, message);
+    if (isJsonMode(opts.argv)) return emitJsonError(bareUrl, message, 'MISSING_URL_SCHEME');
     this.error(message, { exit: 2 });
   }
 
@@ -121,7 +126,7 @@ const hook: Hook<'command_not_found'> = async function (opts) {
   if (suggestion) lines.push(`Did you mean ${toConfiguredId(suggestion, opts.config)}?`);
 
   const message = lines.join('\n');
-  if (isJsonMode(opts.argv)) return emitJsonError(attempted, message);
+  if (isJsonMode(opts.argv)) return emitJsonError(attempted, message, 'COMMAND_NOT_FOUND');
   this.error(message, { exit: 2 });
 };
 

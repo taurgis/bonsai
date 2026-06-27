@@ -39,6 +39,22 @@ export abstract class ConfigCommand<T extends typeof Command> extends BaseComman
       });
     }
   }
+
+  protected requireConfigKey(key: string | undefined): asserts key is ConfigKey {
+    if (!key) {
+      this.error('Missing required argument: key', { exit: 2, code: 'MISSING_ARGUMENT' });
+    }
+    this.assertKnownKey(key);
+  }
+
+  protected validateConfigKeyAndScope(
+    key: string | undefined,
+    global?: boolean,
+    local?: boolean
+  ): asserts key is ConfigKey {
+    this.requireConfigKey(key);
+    this.assertScopeFlagsExclusive(global, local);
+  }
 }
 
 /** Build the `--global`/`--local` scope-flag pair with per-command descriptions. */

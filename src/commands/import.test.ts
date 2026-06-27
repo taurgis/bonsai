@@ -58,6 +58,17 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('fails if invalid --ttl is provided', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Notes\n');
+
+    const runPromise = ResearchImport.run(['https://example.com', '--stdin', '--ttl', '5z']);
+    await expect(runPromise).rejects.toThrow(/Invalid --ttl:/);
+
+    readSpy.mockRestore();
+  });
+
   it('fails if both single and multi-source are specified', async () => {
     const runPromise = ResearchImport.run([
       'https://example.com',

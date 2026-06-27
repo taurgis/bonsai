@@ -1,5 +1,40 @@
 import { describe, it, expect } from 'vitest';
-import { buildEnvelope, formatErrorForJson } from './envelope.js';
+import {
+  buildEnvelope,
+  formatErrorForJson,
+  normalizeCliErrorMessage,
+  stableErrorCodeFrom,
+} from './envelope.js';
+
+describe('stableErrorCodeFrom', () => {
+  it('prefers an explicit code on the error', () => {
+    expect(stableErrorCodeFrom({ code: 'CACHE_MISS' })).toBe('CACHE_MISS');
+  });
+
+  it('maps oclif parse error class names', () => {
+    expect(stableErrorCodeFrom({ constructor: { name: 'RequiredArgsError' } })).toBe(
+      'MISSING_ARGUMENT'
+    );
+    expect(stableErrorCodeFrom({ constructor: { name: 'FlagInvalidOptionError' } })).toBe(
+      'INVALID_FLAG_VALUE'
+    );
+    expect(stableErrorCodeFrom({ constructor: { name: 'NonExistentFlagsError' } })).toBe(
+      'UNKNOWN_FLAG'
+    );
+    expect(stableErrorCodeFrom({ constructor: { name: 'ArgInvalidOptionError' } })).toBe(
+      'INVALID_FLAG_VALUE'
+    );
+    expect(stableErrorCodeFrom({ constructor: { name: 'UnexpectedArgsError' } })).toBe(
+      'UNEXPECTED_ARGUMENT'
+    );
+  });
+});
+
+describe('normalizeCliErrorMessage', () => {
+  it('strips the generic oclif help suffix', () => {
+    expect(normalizeCliErrorMessage('bad flag\nSee more help with --help')).toBe('bad flag');
+  });
+});
 
 describe('formatErrorForJson', () => {
   it('includes message, code, and a single suggestion', () => {

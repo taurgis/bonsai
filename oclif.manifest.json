@@ -680,7 +680,7 @@
         "key": {
           "description": "the configuration key to read",
           "name": "key",
-          "required": true
+          "required": false
         }
       },
       "description": "Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: storage, summary.",
@@ -859,7 +859,7 @@
         "key": {
           "description": "the configuration key to remove",
           "name": "key",
-          "required": true
+          "required": false
         }
       },
       "description": "Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage, summary.",

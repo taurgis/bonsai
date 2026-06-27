@@ -109,6 +109,10 @@ describe('config get', () => {
     expect(result.value).toBe('global');
   });
 
+  it('rejects a missing key', async () => {
+    await expect(ConfigGet.run([])).rejects.toThrow(/Missing required argument: key/);
+  });
+
   it('rejects an unknown key with a suggestion', async () => {
     await expect(ConfigGet.run(['storag'])).rejects.toThrow(/Did you mean: storage/);
   });
@@ -177,6 +181,10 @@ describe('config unset', () => {
     const result = (await ConfigUnset.run(['storage', '--local', '--dry-run'])) as any;
     expect(result.dryRun).toBe(true);
     expect(JSON.parse(readFileSync(projectConfig(), 'utf-8')).storage).toBe('project');
+  });
+
+  it('rejects a missing key', async () => {
+    await expect(ConfigUnset.run([])).rejects.toThrow(/Missing required argument: key/);
   });
 
   it('rejects an unknown key', async () => {

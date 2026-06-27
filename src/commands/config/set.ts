@@ -47,11 +47,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
   async run(): Promise<unknown> {
     const { keyArg, valueArg } = splitInlineKeyValue(this.args.key, this.args.value);
 
-    if (!keyArg) {
-      this.error('Missing required argument: key', { exit: 2, code: 'MISSING_ARGUMENT' });
-    }
-    this.assertKnownKey(keyArg);
-    this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
+    this.validateConfigKeyAndScope(keyArg, this.flags.global, this.flags.local);
 
     const meta = KEY_META[keyArg];
     if (valueArg === undefined) {

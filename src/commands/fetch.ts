@@ -258,7 +258,12 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   private emitFetchError(err: unknown, url: string): never {
     const message = err instanceof Error ? err.message : String(err);
     const guidance = fetchFailureGuidance(message, url);
-    this.error(message, { exit: 1, suggestions: guidance?.suggestions, ref: guidance?.ref });
+    this.error(message, {
+      exit: 1,
+      code: 'FETCH_FAILED',
+      suggestions: guidance?.suggestions,
+      ref: guidance?.ref,
+    });
   }
 
   // Serves the cache when a fresh/revalidatable entry exists, otherwise fetches fresh. Reads fall

@@ -135,3 +135,26 @@ Use `--rendered` when the target page is a Single Page Application (SPA) or reli
 ### Advanced Full-Text Search
 
 `search` now supports fuzzy matching (Levenshtein distance <= 2 for terms >= 4 chars), term frequency ranking, substring matching in topics and tags, and exact phrase match bonuses for multi-word queries.
+
+### Manual CLI audit (`pnpm audit:cli`) — keep it up to date
+
+`testing/manual-audit.mjs` is the entry point for a living, end-to-end inventory of the CLI's
+happy and unhappy flows. It runs the **built** `bin/cli.mjs` (building once if `dist/` is missing)
+in an isolated cwd + XDG sandbox per invocation and asserts exit codes, stdout/stderr routing,
+JSON envelopes, and on-disk cache side effects. Run it with `pnpm audit:cli`. Opt into extra
+network-heavy scenarios (remote docs search, `--rendered` fetch) with
+`AUDIT_NETWORK=1 pnpm audit:cli`.
+
+It is split for manageability and must stay that way as the CLI grows:
+
+- `testing/audit/harness.mjs` — build guard, sandbox, and `run`/`check`/`expect`/`parseJson`/`report`.
+- `testing/audit/fixtures.mjs` — shared URLs, workspaces (`createWorkspace`), and note files for import.
+- `testing/audit/scenarios/*.mjs` — one file per command area, each exporting a
+  `register(harness, fixtures)` function. Register new modules in `testing/manual-audit.mjs`.
+
+**Requirement:** keep this audit current. Whenever you change CLI behavior — a command, alias,
+flag, stdout/stderr routing, exit code, or cache side effect — update the matching scenario
+module in the same change. **When you uncover an end-to-end flow (happy or unhappy) that the audit
+does not yet cover, add it** to the relevant scenario module (or add a new module and register it).
+Run `pnpm audit:cli` and confirm it is green before finishing. Under `--json`, warnings and human
+messages go to **stderr**; machine output stays on stdout — assert accordingly.

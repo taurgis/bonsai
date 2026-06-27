@@ -24,7 +24,7 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
   ];
 
   static args = {
-    key: Args.string({ required: true, description: 'the configuration key to read' }),
+    key: Args.string({ required: false, description: 'the configuration key to read' }),
   };
 
   static flags = {
@@ -38,8 +38,7 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
 
   async run(): Promise<unknown> {
     const key = this.args.key;
-    this.assertKnownKey(key);
-    this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
+    this.validateConfigKeyAndScope(key, this.flags.global, this.flags.local);
 
     const scope = this.readScope(this.flags.global, this.flags.local);
     const value = readScopedConfig(scope, this.config.configDir, process.cwd())[key];

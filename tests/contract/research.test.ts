@@ -101,10 +101,12 @@ describe('research contract tests', () => {
       command: 'serch',
       ok: false,
       exitCode: 2,
+      code: 'COMMAND_NOT_FOUND',
       stdout: '',
       data: null,
     });
     expect(envelope.stderr).toContain('Did you mean search?');
+    expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
     expect(result.stderr).toBe('');
   });
 
@@ -117,10 +119,12 @@ describe('research contract tests', () => {
       command: 'wat',
       ok: false,
       exitCode: 2,
+      code: 'COMMAND_NOT_FOUND',
       stdout: '',
       data: null,
     });
     expect(envelope.stderr).not.toContain('Did you mean');
+    expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
   });
 
   it('bonsai with invalid flag value fails with exit code 2 (usage error)', () => {
@@ -438,5 +442,71 @@ describe('CLI ergonomics and error contracts', () => {
     expect(envelope.suggestions?.[0]).toMatch(
       /^Fetch and cache it first: bonsai https:\/\/example\.com\/contract-cache-miss-suggestion$/
     );
+  });
+
+  it('fetch runtime failure JSON includes FETCH_FAILED code and suggestions', () => {
+    const result = runContract(
+      ['https://this-domain-definitely-does-not-exist-xyz123.invalid', '--json'],
+      { raw: true }
+    );
+    expect(result.exitCode).toBe(1);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'FETCH_FAILED',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Code: FETCH_FAILED');
+    expect(envelope.suggestions?.length).toBeGreaterThan(0);
+    expect(result.stderr).toBe('');
+  });
+
+  it('scheme-less hostname JSON includes MISSING_URL_SCHEME code', () => {
+    const result = runContract(['--json', 'example.com'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'MISSING_URL_SCHEME',
+      command: 'example.com',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('https://example.com');
+    expect(envelope.stderr).toContain('Code: MISSING_URL_SCHEME');
+    expect(result.stderr).toBe('');
+  });
+
+  it('invalid flag option JSON includes INVALID_FLAG_VALUE code', () => {
+    const result = runContract(['status', 'https://example.com', '--tier', 'bogus', '--json'], {
+      raw: true,
+    });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'INVALID_FLAG_VALUE',
+      data: null,
+    });
+    expect(envelope.stderr).not.toContain('See more help with --help');
+    expect(result.stderr).toBe('');
+  });
+
+  it('import invalid ttl JSON includes INVALID_DURATION code', () => {
+    const result = runContract(
+      ['import', 'https://example.com/z', '--stdin', '--ttl', '5z', '--json'],
+      { raw: true, input: '# note\n' }
+    );
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      code: 'INVALID_DURATION',
+      data: null,
+    });
+    expect(result.stderr).toBe('');
   });
 });

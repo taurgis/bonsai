@@ -9,7 +9,7 @@ import { getArtifactPath } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { writeArtifactSecurely } from '../lib/research/secure-write.js';
 import { loadSummaryLevel, type StorageMode } from '../lib/config/index.js';
-import { getPolicy } from '../lib/research/freshness.js';
+import { durationFlagError, getPolicy } from '../lib/research/freshness.js';
 import { buildCompressed } from '../lib/research/compress.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { estimateTokens } from '../lib/research/token-estimate.js';
@@ -229,7 +229,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         this.error((err as Error).message, { exit: 1, code: 'STDIN_TOO_LARGE' });
       }
       // Genuine stream failure reading stdin → I/O failure (exit 1).
-      this.error((err as Error).message, { exit: 1 });
+      this.error((err as Error).message, { exit: 1, code: 'IO_ERROR' });
     }
     return rawInput;
   }
@@ -270,7 +270,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         // which throw CLIErrors carrying their own exit code and message — preserve those.
         // Only an unexpected read failure becomes a wrapped I/O failure (exit 1).
         if (err instanceof Errors.CLIError) throw err;
-        this.error(`Failed to read file: ${(err as Error).message}`, { exit: 1 });
+        this.error(`Failed to read file: ${(err as Error).message}`, { exit: 1, code: 'IO_ERROR' });
       }
     }
 
@@ -367,6 +367,9 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     const hasSingle = Boolean(this.args.url);
     const multiUrls = this.flags['source-url'] || [];
     const hasMulti = multiUrls.length > 0;
+
+    const ttlErr = durationFlagError('--ttl', this.flags.ttl);
+    if (ttlErr) this.error(ttlErr, { exit: 2, code: 'INVALID_DURATION' });
 
     this.validateSourceMode(hasSingle, hasMulti, multiUrls);
     const rawInput = await this.readAndValidateInput();

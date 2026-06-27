@@ -20,7 +20,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
   ];
 
   static args = {
-    key: Args.string({ required: true, description: 'the configuration key to remove' }),
+    key: Args.string({ required: false, description: 'the configuration key to remove' }),
   };
 
   static flags = {
@@ -38,8 +38,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
   async run(): Promise<unknown> {
     const key = this.args.key;
-    this.assertKnownKey(key);
-    this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
+    this.validateConfigKeyAndScope(key, this.flags.global, this.flags.local);
 
     const scope = this.writeScope(this.flags.local);
 
@@ -58,6 +57,10 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
           'Could not determine user config directory. Use --local to remove project config.',
           {
             exit: 1,
+            code: 'CONFIG_DIR_UNAVAILABLE',
+            suggestions: [
+              `Remove project config instead: ${this.config.bin} config unset ${key} --local`,
+            ],
           }
         );
       }
