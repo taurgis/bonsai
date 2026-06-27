@@ -57,7 +57,13 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     if (!this.flags['older-than'] && !this.flags.inactive && !this.flags['artifact-type']) {
       this.error(
         'Must specify at least one pruning filter: --older-than, --inactive, or --artifact-type.',
-        { exit: 2, code: 'MISSING_FILTER' }
+        {
+          exit: 2,
+          code: 'MISSING_FILTER',
+          suggestions: [
+            `Preview age-based pruning: ${this.config.bin} prune --older-than 90d --dry-run`,
+          ],
+        }
       );
     }
     if (!this.flags['dry-run'] && !this.flags.yes) {

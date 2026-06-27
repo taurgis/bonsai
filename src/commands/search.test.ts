@@ -11,6 +11,22 @@ describe('search command unit tests', () => {
     await expect(runPromise).rejects.toThrow(/Query string cannot be empty/);
   });
 
+  it('rejects mutually exclusive --domain and --remote flags', async () => {
+    const runPromise = ResearchSearch.run([
+      'router',
+      '--domain',
+      'react.dev',
+      '--remote',
+      'https://vuejs.org',
+    ]);
+    await expect(runPromise).rejects.toThrow(/mutually exclusive/);
+  });
+
+  it('rejects a whitespace-only query on the --domain path', async () => {
+    const runPromise = ResearchSearch.run(['   ', '--domain', 'react.dev']);
+    await expect(runPromise).rejects.toThrow(/Query string cannot be empty/);
+  });
+
   it('returns empty results if no match is found', async () => {
     const result = (await ResearchSearch.run(['nonexistentQueryTerm'])) as any[];
     expect(result).toBeDefined();

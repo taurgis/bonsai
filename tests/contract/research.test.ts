@@ -250,10 +250,39 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stderr).not.toContain('command ftp://example.com not found');
   });
 
+  it('scheme-only URLs like javascript: report a protocol error, not "command not found"', () => {
+    const result = runContract(['javascript:alert(1)']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Unsupported protocol');
+    expect(result.stderr).not.toContain('is not a bonsai command');
+  });
+
+  it('status cache miss exits 1 while still returning structured JSON', () => {
+    const result = runContract(['status', 'https://example.com/contract-cache-miss', '--json'], {
+      raw: true,
+    });
+    expect(result.exitCode).toBe(1);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      data: { status: 'miss', action: 'would_fetch' },
+    });
+    expect(result.stderr).toContain('Cache miss');
+  });
+
   it('prune rejects a malformed --older-than value (exit 2) instead of silently matching nothing', () => {
     const result = runContract(['prune', '--older-than', '5z', '--dry-run']);
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain('Invalid --older-than');
+  });
+
+  it('prune without filters suggests an example dry-run command', () => {
+    const result = runContract(['prune', '--dry-run']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Must specify at least one pruning filter');
+    expect(result.stderr).toContain('older-than 90d');
+    expect(result.stderr).toContain('--dry-run');
   });
 
   it('import with empty stdin is a usage error (exit 2)', () => {

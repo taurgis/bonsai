@@ -336,6 +336,23 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     const { query } = this.args;
     const { domain, remote } = this.flags;
 
+    // Reject whitespace-only queries on every path (local, --domain, --remote).
+    this.getSearchQueryTerms(query);
+
+    if (domain && remote) {
+      this.error(
+        '--domain and --remote are mutually exclusive. Use one discovery mode at a time.',
+        {
+          exit: 2,
+          code: 'CONFLICTING_FLAGS',
+          suggestions: [
+            `Local site API: ${this.config.bin} search "${query}" --domain ${domain}`,
+            `Remote index: ${this.config.bin} search "${query}" --remote ${remote}`,
+          ],
+        }
+      );
+    }
+
     if (domain) {
       return this.executeSiteSearch(query, domain);
     }

@@ -7,13 +7,20 @@ describe('status command unit tests', () => {
   useIsolatedCache();
 
   it('handles uncached miss status', async () => {
-    const result = (await ResearchStatus.run(['https://example.com/not-cached-status'])) as any;
-    expect(result).toBeDefined();
-    expect(result.status).toBe('miss');
-    // A miss reports 'none' (no entry exists), not 'stale_expired' (which would imply an entry
-    // exists but aged out).
-    expect(result.freshness).toBe('none');
-    expect(result.action).toBe('would_fetch');
+    const prevExit = process.exitCode;
+    process.exitCode = 0;
+    try {
+      const result = (await ResearchStatus.run(['https://example.com/not-cached-status'])) as any;
+      expect(result).toBeDefined();
+      expect(result.status).toBe('miss');
+      // A miss reports 'none' (no entry exists), not 'stale_expired' (which would imply an entry
+      // exists but aged out).
+      expect(result.freshness).toBe('none');
+      expect(result.action).toBe('would_fetch');
+      expect(process.exitCode).toBe(1);
+    } finally {
+      process.exitCode = prevExit;
+    }
   });
 
   it('handles cached hit status', async () => {

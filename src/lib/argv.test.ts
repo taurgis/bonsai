@@ -51,6 +51,20 @@ describe('normalizeArgv', () => {
       },
     },
     {
+      name: 'scheme-only URLs like javascript: should route to fetch for protocol validation',
+      input: ['javascript:alert(1)'],
+      expected: {
+        argv: ['fetch', 'javascript:alert(1)'],
+      },
+    },
+    {
+      name: 'data: URLs should route to fetch for protocol validation',
+      input: ['data:text/html,hello'],
+      expected: {
+        argv: ['fetch', 'data:text/html,hello'],
+      },
+    },
+    {
       name: 'help shorthand should move help to the end as --help',
       input: ['help', 'list'],
       expected: {

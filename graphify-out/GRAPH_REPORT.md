@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-27)
 
 ## Corpus Check
-- 994 files · ~1,046,003 words
+- 994 files · ~1,046,352 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 10160 nodes · 10724 edges · 1014 communities (952 shown, 62 thin omitted)
+- 10160 nodes · 10724 edges · 1013 communities (952 shown, 61 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `86da149f`
+- Built from commit: `a712e6e1`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1017,7 +1017,6 @@
 - [[_COMMUNITY_Community 1008|Community 1008]]
 - [[_COMMUNITY_Community 1009|Community 1009]]
 - [[_COMMUNITY_Community 1010|Community 1010]]
-- [[_COMMUNITY_Community 1011|Community 1011]]
 - [[_COMMUNITY_Community 1012|Community 1012]]
 - [[_COMMUNITY_Community 1013|Community 1013]]
 
@@ -1048,7 +1047,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (1014 total, 62 thin omitted)
+## Communities (1013 total, 61 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -1187,8 +1186,8 @@ Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.15
-Nodes (12): Combined Dead Code + Duplication, Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, Production audit (+4 more)
+Cohesion: 0.14
+Nodes (13): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Migration from knip, Production audit, Production vs Full Audit, Step 1: Preview migration, Step 1: Run combined analysis (+5 more)
 
 ### Community 35 - "Community 35"
 Cohesion: 0.08
@@ -3155,8 +3154,8 @@ Cohesion: 0.15
 Nodes (12): Compressed, Detailed, JS Render Attribute, JS Render Attribute, PHP Render Attribute, PHP Render Attribute, Provenance, Rendering HTML Attributes (+4 more)
 
 ### Community 578 - "Community 578"
-Cohesion: 0.22
-Nodes (8): Compressed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Provenance, Random replacement (RR), Simple queue-based policies, Summary
+Cohesion: 0.33
+Nodes (6): Compressed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Random replacement (RR), Simple queue-based policies
 
 ### Community 579 - "Community 579"
 Cohesion: 0.29
@@ -3211,8 +3210,8 @@ Cohesion: 0.29
 Nodes (6): Guardrails, Mandatory Follow-Up, Minimum Expectations, Post-Feature Technical Writing, Reporting Format, When This Is Not Required
 
 ### Community 592 - "Community 592"
-Cohesion: 0.33
-Nodes (6): Detailed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Random replacement (RR), Simple queue-based policies
+Cohesion: 0.22
+Nodes (8): Detailed, First in first out (FIFO), Last in first out (LIFO) or First in last out (FILO), Policies approximating Bélády's algorithm, Provenance, Random replacement (RR), Simple queue-based policies, Summary
 
 ### Community 593 - "Community 593"
 Cohesion: 0.40
@@ -4059,8 +4058,8 @@ Cohesion: 0.13
 Nodes (21): nextjs, Fixture, fixtures, salesforceDeveloper, salesforce, cypress, jest, react (+13 more)
 
 ### Community 814 - "Community 814"
-Cohesion: 0.40
-Nodes (5): Migration from knip, Step 1: Preview migration, Step 2: Apply migration, Step 3: Compare results, Step 4: Remove knip config
+Cohesion: 0.29
+Nodes (7): Config Intellisense, Config Resolution, Directory-Level Overrides, Overview, Page-Level Overrides, Typed Theme Config, Vite, Vue & Markdown Config
 
 ### Community 815 - "Community 815"
 Cohesion: 0.07
@@ -4075,16 +4074,16 @@ Cohesion: 0.10
 Nodes (21): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+13 more)
 
 ### Community 818 - "Community 818"
-Cohesion: 0.10
-Nodes (21): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+13 more)
+Cohesion: 0.08
+Nodes (24): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+16 more)
 
 ### Community 819 - "Community 819"
-Cohesion: 0.09
-Nodes (22): Agent security and safety, Code security and best practices, Command-Based Hooks, Dependency security, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories (+14 more)
+Cohesion: 0.10
+Nodes (20): Cloud Distribution (Enterprise Only), Command-Based Hooks, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types, Hooks (+12 more)
 
 ### Community 820 - "Community 820"
 Cohesion: 0.11
-Nodes (19): Command-Based Hooks, Common schema, Detailed, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types (+11 more)
+Nodes (18): Command-Based Hooks, Compressed, Detailed, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types (+10 more)
 
 ### Community 821 - "Community 821"
 Cohesion: 0.11
@@ -4535,8 +4534,8 @@ Cohesion: 0.20
 Nodes (10): Chaos, Consistency across programs, Conversation as the norm, Ease of discovery, Empathy, Human-first design, Philosophy, Robustness (+2 more)
 
 ### Community 933 - "Community 933"
-Cohesion: 0.50
-Nodes (4): Cloud Distribution (Enterprise Only), MDM Distribution, Project Hooks (Version Control), Team Distribution
+Cohesion: 0.33
+Nodes (6): Agent security and safety, Code security and best practices, Dependency security, MCP governance and visibility, Partner Integrations, Secrets management
 
 ### Community 934 - "Community 934"
 Cohesion: 0.20
@@ -4559,8 +4558,8 @@ Cohesion: 0.13
 Nodes (14): appearance, cleanUrls, Compressed, Customization, Detailed, lastUpdated, markdown, rewrites (+6 more)
 
 ### Community 947 - "Community 947"
-Cohesion: 0.13
-Nodes (15): appearance, cleanUrls, Config Intellisense, Config Resolution, Directory-Level Overrides, lastUpdated, Overview, Page-Level Overrides (+7 more)
+Cohesion: 0.17
+Nodes (12): appearance, cleanUrls, Customization, lastUpdated, markdown, Provenance, rewrites, Routing (+4 more)
 
 ### Community 948 - "Community 948"
 Cohesion: 0.18
@@ -4794,6 +4793,10 @@ Nodes (6): Chaos, Chaos, Compressed, Detailed, Provenance, Summary
 Cohesion: 0.29
 Nodes (6): Compressed, Detailed, Ease of discovery, Ease of discovery, Provenance, Summary
 
+### Community 1006 - "Community 1006"
+Cohesion: 0.50
+Nodes (4): Custom Plugin Setup, Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory
+
 ### Community 1007 - "Community 1007"
 Cohesion: 0.26
 Nodes (14): staticIndexSearch(), collectDocIndices(), parseSphinxObject(), queryTerms(), resolve(), scoreSphinxDocs(), scoreText(), searchJekyllIndex() (+6 more)
@@ -4810,10 +4813,6 @@ Nodes (8): detectLanguage(), flattenCodeStructure(), normalizeCodeBlocks(), reco
 Cohesion: 0.50
 Nodes (6): GithubSource, mapMdnSource(), mapNodeApiSource(), mapUrlToSource(), parseGithubSourceLink(), vitepressRouteMarkdown()
 
-### Community 1011 - "Community 1011"
-Cohesion: 0.50
-Nodes (4): Customization, markdown, vite, vue
-
 ### Community 1012 - "Community 1012"
 Cohesion: 0.50
 Nodes (4): Fork the current conversation, How forks differ from named subagents, Limitations, Observe and steer running forks
@@ -4825,7 +4824,7 @@ Nodes (3): PR Dead Code Check, Step 1: Analyze changed files, Step 2: If issues 
 ## Knowledge Gaps
 - **7022 isolated node(s):** `husky.sh script`, `bonsai-web-fetch.sh script`, `bonsai-user-prompt-context.sh script`, `bonsai-web-fetch.sh script`, `bonsai-web-fetch.sh script` (+7017 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **62 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **61 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

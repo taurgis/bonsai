@@ -90,7 +90,7 @@
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782567827.8990915,
+    "mtime": 1782568518.1683035,
     "ast_hash": "ffe2e341638125681e8d2f4c3893ae27",
     "semantic_hash": ""
   },
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "tests/contract/research.test.ts": {
-    "mtime": 1782559246.1574235,
-    "ast_hash": "ab28aa7a84e69ce97bf3fc87e71989d9",
+    "mtime": 1782569016.1523979,
+    "ast_hash": "c6c05704bbb772bf09f612693f556a7f",
     "semantic_hash": ""
   },
   "tests/contract/runner.ts": {
@@ -2150,33 +2150,33 @@
     "semantic_hash": ""
   },
   "src/commands/prune.test.ts": {
-    "mtime": 1782566527.062346,
+    "mtime": 1782568601.2561288,
     "ast_hash": "1abd0ea7ebe92921d33269e69e641f24",
     "semantic_hash": ""
   },
   "src/commands/prune.ts": {
-    "mtime": 1782567763.1893725,
-    "ast_hash": "094dbd4c7b7569571f1eaaac5c367e96",
+    "mtime": 1782568484.9152465,
+    "ast_hash": "ef195d6178cd27c5b7b538f3378020c9",
     "semantic_hash": ""
   },
   "src/commands/search.test.ts": {
-    "mtime": 1782501420.8926146,
-    "ast_hash": "ef2a26720885a4f7a1b725aa85fc8bb3",
+    "mtime": 1782568831.9188254,
+    "ast_hash": "f595e094fd4d97053a915adffb97b247",
     "semantic_hash": ""
   },
   "src/commands/search.ts": {
-    "mtime": 1782567763.204684,
-    "ast_hash": "efa3b250f77d5f69f355452fccfe4019",
+    "mtime": 1782569016.1931,
+    "ast_hash": "828f4bcdba72435a09c2d3d0a6c8c240",
     "semantic_hash": ""
   },
   "src/commands/status.test.ts": {
-    "mtime": 1782501420.90085,
-    "ast_hash": "3dca08c1bd3ec746479248d5b3a310e0",
+    "mtime": 1782568507.5780146,
+    "ast_hash": "dfc0c5fd0c5d4dfeb7cc45ad6844394c",
     "semantic_hash": ""
   },
   "src/commands/status.ts": {
-    "mtime": 1782567820.207921,
-    "ast_hash": "567a91a3d5f0a4a5f386f4f70a3f19f9",
+    "mtime": 1782568831.297068,
+    "ast_hash": "16c0928bb0cf19491ccb3b8822623a2b",
     "semantic_hash": ""
   },
   "src/commands/fetch.test.ts": {
@@ -4990,13 +4990,13 @@
     "semantic_hash": ""
   },
   "src/lib/argv.test.ts": {
-    "mtime": 1782559207.4574754,
-    "ast_hash": "27d18657e99f62f32f78a21fffb89bfd",
+    "mtime": 1782568488.4602263,
+    "ast_hash": "77079a73ef3cde72b263789a8c657a43",
     "semantic_hash": ""
   },
   "src/lib/argv.ts": {
-    "mtime": 1782559652.4028478,
-    "ast_hash": "acab9cbbae373b92c78f5b62323a0f72",
+    "mtime": 1782568478.8120575,
+    "ast_hash": "26c8021d0a35b62bab6afdeefa195bed",
     "semantic_hash": ""
   },
   "src/lib/envelope.ts": {

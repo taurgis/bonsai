@@ -40,9 +40,10 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
 
   const [firstArg, ...restArgv] = argvForRouting;
   // Treat any first arg that looks like a URL (carries a scheme) as the `fetch` shorthand.
-  // Routing wrong-scheme URLs (ftp://, file://) here too means fetch can answer with a clear
-  // "only http/https" error instead of oclif's cryptic "command not found".
-  const looksLikeUrl = firstArg?.includes('://') ?? false;
+  // Match both `https://…` and scheme-only forms like `javascript:` or `data:` so fetch can
+  // reject unsupported protocols instead of oclif reporting a misleading "command not found".
+  const looksLikeUrl =
+    firstArg != null && (firstArg.includes('://') || /^[a-z][a-z0-9+.-]*:/i.test(firstArg));
   const normalizedArgv =
     firstArg === 'help'
       ? [...restArgv, '--help']

@@ -121,6 +121,14 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
       this.log(`${'Action:'.padEnd(25)} ${result.action}`);
     }
 
+    // Align with inspect's CACHE_MISS contract: a miss is actionable, not a usage error. Exit 1
+    // lets scripts branch on $? while JSON still returns the structured status payload. Unlike
+    // inspect, we do not throw here — status must always return structured data even on a miss.
+    if (result.status === 'miss') {
+      this.warn(`Cache miss. Fetch and cache it first: ${this.config.bin} ${normalizedUrl}`);
+      process.exitCode = 1;
+    }
+
     return {
       cacheKey,
       cachePath: artifactPath,
