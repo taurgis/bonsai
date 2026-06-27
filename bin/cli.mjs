@@ -7,6 +7,7 @@ import updateNotifier from 'update-notifier';
 import { createRequire } from 'node:module';
 
 import { normalizeArgv } from '../dist/lib/argv.js';
+import { tryJsonMetaOutput } from '../dist/lib/json-meta.js';
 
 const req = createRequire(import.meta.url);
 const pkg = req('../package.json');
@@ -24,6 +25,13 @@ const result = normalizeArgv(rawArgv);
 if (result.exitWithJson) {
   process.exitCode = result.exitWithJson.exitCode;
   console.log(JSON.stringify(result.exitWithJson.envelope, null, 2));
+  process.exit();
+}
+
+const jsonMeta = await tryJsonMetaOutput(result.argv, __dirname + '/../');
+if (jsonMeta) {
+  process.exitCode = jsonMeta.exitCode;
+  console.log(JSON.stringify(jsonMeta.envelope, null, 2));
   process.exit();
 }
 

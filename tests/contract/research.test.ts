@@ -98,6 +98,68 @@ describe('research contract tests', () => {
     expect(result.stdout).toContain('USAGE');
   });
 
+  it('bonsai --json --help returns a JSON help envelope', () => {
+    const result = runContract(['--json', '--help'], { raw: true });
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'bonsai',
+      ok: true,
+      exitCode: 0,
+      stdout: '',
+      stderr: '',
+    });
+    expect(typeof envelope.data?.help).toBe('string');
+    expect(envelope.data.help).toContain('COMMANDS');
+    expect(result.stderr).toBe('');
+  });
+
+  it('bonsai --json -h returns a JSON help envelope', () => {
+    const result = runContract(['--json', '-h'], { raw: true });
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'bonsai',
+      ok: true,
+      exitCode: 0,
+    });
+    expect(typeof envelope.data?.help).toBe('string');
+    expect(result.stderr).toBe('');
+  });
+
+  it('bonsai list --json --help returns command-scoped JSON help', () => {
+    const result = runContract(['list', '--json', '--help'], { raw: true });
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'list',
+      ok: true,
+      exitCode: 0,
+    });
+    expect(envelope.data?.help).toContain('USAGE');
+    expect(result.stderr).toBe('');
+  });
+
+  it('bonsai --version --json returns a JSON version envelope', () => {
+    const result = runContract(['--version', '--json'], { raw: true });
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      schemaVersion: 1,
+      command: 'bonsai',
+      ok: true,
+      exitCode: 0,
+      stdout: '',
+      stderr: '',
+    });
+    expect(typeof envelope.data?.version).toBe('string');
+    expect(typeof envelope.data?.userAgent).toBe('string');
+    expect(result.stderr).toBe('');
+  });
+
   it('accepts --json before the URL shorthand and returns JSON error for unsupported scheme', () => {
     const result = runContract(['--json', 'ftp://example.com'], { raw: true });
     expect(result.exitCode).toBe(2);

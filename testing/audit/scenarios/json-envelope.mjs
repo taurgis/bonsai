@@ -31,6 +31,45 @@ export default function register(harness) {
     expect(env?.stderr?.includes('Missing URL or command'), env?.stderr);
   });
 
+  check('--json --help returns JSON help envelope', () => {
+    const r = run(['--json', '--help']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.ok === true, 'ok');
+    expect(env?.command === 'bonsai', `command ${env?.command}`);
+    expect(typeof env?.data?.help === 'string', 'help text');
+    expect(env?.data?.help?.includes('COMMANDS'), 'missing COMMANDS');
+    expect(r.stderr === '', `stderr noise: ${r.stderr.slice(0, 80)}`);
+  });
+
+  check('--json -h returns JSON help envelope', () => {
+    const r = run(['--json', '-h']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.ok === true, 'ok');
+    expect(typeof env?.data?.help === 'string', 'help text');
+  });
+
+  check('list --json --help returns JSON help envelope', () => {
+    const r = run(['list', '--json', '--help']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.command === 'list', `command ${env?.command}`);
+    expect(env?.data?.help?.includes('USAGE'), 'missing USAGE');
+    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 80)}`);
+  });
+
+  check('--version --json returns JSON version envelope', () => {
+    const r = run(['--version', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.ok === true, 'ok');
+    expect(env?.command === 'bonsai', `command ${env?.command}`);
+    expect(typeof env?.data?.version === 'string', 'version');
+    expect(typeof env?.data?.userAgent === 'string', 'userAgent');
+    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 80)}`);
+  });
+
   check('list --json empty has array data', () => {
     const r = run(['list', '--topic', '__empty__', '--json']);
     const env = parseJson(r.stdout);

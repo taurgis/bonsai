@@ -85,12 +85,12 @@
     "semantic_hash": ""
   },
   "bin/cli.mjs": {
-    "mtime": 1782566784.953225,
-    "ast_hash": "5846a717b3557d347b9e4e1bb3440e28",
+    "mtime": 1782574658.372333,
+    "ast_hash": "fbac485d50eeeb950eb684a7895e7139",
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782574408.9071548,
+    "mtime": 1782575149.389636,
     "ast_hash": "7640ae5859da4c4188a89cae2a05c7d9",
     "semantic_hash": ""
   },
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "tests/contract/research.test.ts": {
-    "mtime": 1782573994.2098413,
-    "ast_hash": "0688614f5f2ec1c8bbc5375af385c659",
+    "mtime": 1782575142.2406003,
+    "ast_hash": "44aa0a43564a30533ddc16d502f8b386",
     "semantic_hash": ""
   },
   "tests/contract/runner.ts": {
@@ -5240,8 +5240,8 @@
     "semantic_hash": ""
   },
   "testing/audit/scenarios/json-envelope.mjs": {
-    "mtime": 1782573983.637933,
-    "ast_hash": "f8826bf750fe8aea0805dff5d26773a8",
+    "mtime": 1782574662.2851622,
+    "ast_hash": "66cedcf0fcdb6efcff20b183c0c2b8a5",
     "semantic_hash": ""
   },
   "testing/audit/scenarios/list.mjs": {
@@ -5257,6 +5257,16 @@
   "testing/audit/scenarios/search.mjs": {
     "mtime": 1782573758.1502292,
     "ast_hash": "61379cef30ac9b869e7552120bdfd4d0",
+    "semantic_hash": ""
+  },
+  "src/lib/json-meta.test.ts": {
+    "mtime": 1782574660.478887,
+    "ast_hash": "3d055959f08668d757a955c59e4976a4",
+    "semantic_hash": ""
+  },
+  "src/lib/json-meta.ts": {
+    "mtime": 1782575141.6696286,
+    "ast_hash": "09fb02ad41acc51525191aa76f0fff4b",
     "semantic_hash": ""
   }
 }
