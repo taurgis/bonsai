@@ -1,17 +1,1130 @@
 {
   "summary": {
-    "startedAt": "2026-06-24T17:11:55.669Z",
-    "finishedAt": "2026-06-24T17:11:58.985Z",
-    "fixtureCount": 3,
+    "startedAt": "2026-06-27T11:55:14.436Z",
+    "finishedAt": "2026-06-27T12:04:12.062Z",
+    "fixtureCount": 64,
     "failed": 0,
-    "unchanged": 0,
-    "changed": 0,
+    "unchanged": 63,
+    "changed": 1,
     "infoLoss": 0,
     "leaking": 0,
-    "new": 3,
+    "new": 0,
     "promoted": true
   },
   "results": [
+    {
+      "id": "help-active-data-migration",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?language=en_US&id=000394720&type=1",
+      "title": "Migration of Active Data in B2C Commerce | Salesforce Help",
+      "focus": [
+        "article-body",
+        "links",
+        "basic-sections"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 1116,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "baseline": {
+        "chars": 1116,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-agentforce-enable",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_shopping_agent_enable_agentforce.htm&type=5&release=2.0.1&language=en_us",
+      "title": "Enable Agentforce for Guided Shopping | Salesforce Help",
+      "focus": [
+        "step-guide",
+        "images",
+        "inline-formatting"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 1378,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 3,
+        "orderedSteps": 6,
+        "bullets": 0,
+        "headings": 1
+      },
+      "baseline": {
+        "chars": 1378,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 3,
+        "orderedSteps": 6,
+        "bullets": 0,
+        "headings": 1
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-agentforce-b2b-create",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=commerce.comm_agent_guided_shopping_create_agent.htm&type=5&release=260.0.0&language=en_us",
+      "title": "Create a Guided Shopping Agent for a B2B Store | Salesforce Help",
+      "focus": [
+        "long-step-guide",
+        "images",
+        "tables"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 8592,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 11,
+        "orderedSteps": 23,
+        "bullets": 5,
+        "headings": 3
+      },
+      "baseline": {
+        "chars": 8592,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 11,
+        "orderedSteps": 23,
+        "bullets": 5,
+        "headings": 3
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-agentforce-b2b-considerations",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=commerce.comm_agent_guided_shopping_considerations.htm&type=5&release=260.0.0&language=en_us",
+      "title": "Considerations for Agentforce Guided Shopping for B2B Commerce | Salesforce Help",
+      "focus": [
+        "tables",
+        "notes",
+        "section-headings"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 12171,
+        "codeBlocks": 0,
+        "tables": 5,
+        "images": 1,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 10
+      },
+      "baseline": {
+        "chars": 12171,
+        "codeBlocks": 0,
+        "tables": 5,
+        "images": 1,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 10
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-roles-create",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_creating_roles.htm&type=5&release=2.0.1&language=en_us",
+      "title": "Create a Role in B2C Commerce | Salesforce Help",
+      "focus": [
+        "dense-steps",
+        "tables",
+        "code-snippet"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 8979,
+        "codeBlocks": 1,
+        "tables": 6,
+        "images": 7,
+        "orderedSteps": 36,
+        "bullets": 0,
+        "headings": 12
+      },
+      "baseline": {
+        "chars": 8935,
+        "codeBlocks": 1,
+        "tables": 6,
+        "images": 7,
+        "orderedSteps": 36,
+        "bullets": 0,
+        "headings": 12
+      },
+      "exactMatch": false,
+      "charDeltaPct": 0.49,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-roles-admin",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_administrator_role.htm&type=5&release=2.0.1&language=en_us",
+      "title": "Administrator Role in B2C Commerce | Salesforce Help",
+      "focus": [
+        "tables",
+        "role-matrix",
+        "ordered-lists"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 16616,
+        "codeBlocks": 1,
+        "tables": 5,
+        "images": 3,
+        "orderedSteps": 13,
+        "bullets": 10,
+        "headings": 14
+      },
+      "baseline": {
+        "chars": 16616,
+        "codeBlocks": 1,
+        "tables": 5,
+        "images": 3,
+        "orderedSteps": 13,
+        "bullets": 10,
+        "headings": 14
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-systemjobs",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/systemjobs.html",
+      "title": "OCAPI System Jobs",
+      "focus": [
+        "dx-code-block",
+        "request-response-example"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 2547,
+        "codeBlocks": 2,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "baseline": {
+        "chars": 2547,
+        "codeBlocks": 2,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-exceptions",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/exceptions.html",
+      "title": "OCAPI Global Exceptions",
+      "focus": [
+        "large-table",
+        "long-rows"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 9555,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "baseline": {
+        "chars": 9555,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-ocapi-settings",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/ocapisettings.html",
+      "title": "OCAPI Settings",
+      "focus": [
+        "mixed-content",
+        "tables",
+        "code"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 11603,
+        "codeBlocks": 3,
+        "tables": 4,
+        "images": 0,
+        "orderedSteps": 5,
+        "bullets": 11,
+        "headings": 11
+      },
+      "baseline": {
+        "chars": 11603,
+        "codeBlocks": 3,
+        "tables": 4,
+        "images": 0,
+        "orderedSteps": 5,
+        "bullets": 11,
+        "headings": 11
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-customization",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/customization.html",
+      "title": "OCAPI Customization",
+      "focus": [
+        "code",
+        "images",
+        "examples"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 14102,
+        "codeBlocks": 6,
+        "tables": 1,
+        "images": 1,
+        "orderedSteps": 4,
+        "bullets": 40,
+        "headings": 8
+      },
+      "baseline": {
+        "chars": 14102,
+        "codeBlocks": 6,
+        "tables": 1,
+        "images": 1,
+        "orderedSteps": 4,
+        "bullets": 40,
+        "headings": 8
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-exportglobaldata",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/exportglobaldataconfiguration.html",
+      "title": "ExportGlobalDataConfiguration document",
+      "focus": [
+        "schema-table",
+        "property-list"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 2625,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "baseline": {
+        "chars": 2625,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 1
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-batchrequests",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/batchrequests.html",
+      "title": "OCAPI Batch Requests",
+      "focus": [
+        "multiple-code-samples",
+        "batch-format",
+        "request-examples"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 11152,
+        "codeBlocks": 6,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 4,
+        "bullets": 0,
+        "headings": 8
+      },
+      "baseline": {
+        "chars": 11152,
+        "codeBlocks": 6,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 4,
+        "bullets": 0,
+        "headings": 8
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-httpmethods",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/httpmethods.html",
+      "title": "OCAPI HTTP Methods",
+      "focus": [
+        "dense-code-reference",
+        "method-examples",
+        "long-markdown"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 9781,
+        "codeBlocks": 9,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 3,
+        "headings": 14
+      },
+      "baseline": {
+        "chars": 9781,
+        "codeBlocks": 9,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 3,
+        "headings": 14
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-site-import-export",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_site_import_export.htm&type=5&release=2.0.1&language=en_us",
+      "title": "Site Import/Export in B2C Commerce | Salesforce Help",
+      "focus": [
+        "tables",
+        "steps",
+        "images",
+        "admin-workflow"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 15645,
+        "codeBlocks": 0,
+        "tables": 9,
+        "images": 8,
+        "orderedSteps": 12,
+        "bullets": 16,
+        "headings": 21
+      },
+      "baseline": {
+        "chars": 15645,
+        "codeBlocks": 0,
+        "tables": 9,
+        "images": 8,
+        "orderedSteps": 12,
+        "bullets": 16,
+        "headings": 21
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-site-import-export-copy-instances",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_using_site_import_export_to_copy_instances.htm&type=5&release=2.0.1&language=en_us",
+      "title": "Using Site Import/Export to Copy Instances and Development Testing in B2C Commerce | Salesforce Help",
+      "focus": [
+        "procedural-steps",
+        "tables",
+        "image-guidance"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 6545,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 7,
+        "orderedSteps": 12,
+        "bullets": 0,
+        "headings": 5
+      },
+      "baseline": {
+        "chars": 6545,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 7,
+        "orderedSteps": 12,
+        "bullets": 0,
+        "headings": 5
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-coupons-import-export",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_coupons_and_coupon_code_object_import_export.htm&type=5&release=2.0.1&language=en_us",
+      "title": "Coupons and Coupon Code Object Import/Export in B2C Commerce | Salesforce Help",
+      "focus": [
+        "complex-tables",
+        "many-code-snippets",
+        "data-import-export"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 6752,
+        "codeBlocks": 15,
+        "tables": 0,
+        "images": 2,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 7
+      },
+      "baseline": {
+        "chars": 6752,
+        "codeBlocks": 15,
+        "tables": 0,
+        "images": 2,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 7
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-oauth",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/oauth.html",
+      "title": "OCAPI OAuth 2.0",
+      "focus": [
+        "auth-flows",
+        "code-samples",
+        "procedural-steps"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 13247,
+        "codeBlocks": 12,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 11,
+        "bullets": 5,
+        "headings": 8
+      },
+      "baseline": {
+        "chars": 13247,
+        "codeBlocks": 12,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 11,
+        "bullets": 5,
+        "headings": 8
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-jwt",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/jwt.html",
+      "title": "OCAPI JWT",
+      "focus": [
+        "token-examples",
+        "code",
+        "request-sequences"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 11115,
+        "codeBlocks": 4,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 15,
+        "bullets": 7,
+        "headings": 7
+      },
+      "baseline": {
+        "chars": 11115,
+        "codeBlocks": 4,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 15,
+        "bullets": 7,
+        "headings": 7
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-propertyselection",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/propertyselection.html",
+      "title": "OCAPI Property Selection",
+      "focus": [
+        "selector-syntax",
+        "tables",
+        "code-samples"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 5516,
+        "codeBlocks": 4,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 2
+      },
+      "baseline": {
+        "chars": 5516,
+        "codeBlocks": 4,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 2
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-customproperties",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/customproperties.html",
+      "title": "OCAPI Custom Properties",
+      "focus": [
+        "schema-details",
+        "tables",
+        "examples"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 6143,
+        "codeBlocks": 1,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 14,
+        "headings": 6
+      },
+      "baseline": {
+        "chars": 6143,
+        "codeBlocks": 1,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 14,
+        "headings": 6
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-getcampaign",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-data-campaigns?meta=Get%2BCampaign",
+      "title": "Get campaign | Data Campaigns (deprecated) | B2C Commerce | Salesforce Developers",
+      "focus": [
+        "response-example",
+        "response-body-table",
+        "status-tabs"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 2135,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 1,
+        "headings": 2
+      },
+      "baseline": {
+        "chars": 2135,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 1,
+        "headings": 2
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-updatecampaign",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-data-campaigns?meta=Update%2BCampaign",
+      "title": "Update campaign | Data Campaigns (deprecated) | B2C Commerce | Salesforce Developers",
+      "focus": [
+        "request-body-table",
+        "request-example",
+        "response-body-table"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 3833,
+        "codeBlocks": 0,
+        "tables": 3,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 2
+      },
+      "baseline": {
+        "chars": 3833,
+        "codeBlocks": 0,
+        "tables": 3,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 2
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-createcustomer",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-data-customer-lists?meta=Create%2Bcustomer",
+      "title": "Create customer | Data Customer Lists (deprecated) | B2C Commerce | Salesforce Developers",
+      "focus": [
+        "nested-request-body",
+        "request-example",
+        "response-body-table"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 6873,
+        "codeBlocks": 0,
+        "tables": 3,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 7,
+        "headings": 2
+      },
+      "baseline": {
+        "chars": 6873,
+        "codeBlocks": 0,
+        "tables": 3,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 7,
+        "headings": 2
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-removebasket",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-shop-baskets?meta=Remove%2Ba%2Bbasket",
+      "title": "Remove a basket | Shop Baskets (deprecated) | B2C Commerce | Salesforce Developers",
+      "focus": [
+        "204-no-content",
+        "fault-responses",
+        "status-tabs"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 1732,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 4
+      },
+      "baseline": {
+        "chars": 1732,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 4
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-createbasket",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-shop-baskets?meta=Create%2Bbasket",
+      "title": "Create basket | Shop Baskets (deprecated) | B2C Commerce | Salesforce Developers",
+      "focus": [
+        "nested-request-body",
+        "request-json-xml-examples",
+        "deep-response-body"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 13454,
+        "codeBlocks": 0,
+        "tables": 3,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 24,
+        "headings": 4
+      },
+      "baseline": {
+        "chars": 13454,
+        "codeBlocks": 0,
+        "tables": 3,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 24,
+        "headings": 4
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-getorder",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-shop-orders?meta=Get%2Border",
+      "title": "Get order | Shop Orders (deprecated) | B2C Commerce | Salesforce Developers",
+      "focus": [
+        "deep-response-body",
+        "response-example",
+        "status-tabs"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 2282,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 1,
+        "headings": 4
+      },
+      "baseline": {
+        "chars": 2282,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 1,
+        "headings": 4
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "dev-ocapi-registercustomer",
+      "site": "salesforce-developer",
+      "url": "https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-shop-customers?meta=Register%2Bcustomer",
+      "title": "Register customer | Shop Customers (deprecated) | B2C Commerce | Salesforce Developers",
+      "focus": [
+        "request-json-xml-examples",
+        "request-constraints",
+        "response-body-table"
+      ],
+      "captureMethod": "site:salesforce-developer",
+      "current": {
+        "chars": 5225,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 8,
+        "headings": 4
+      },
+      "baseline": {
+        "chars": 5225,
+        "codeBlocks": 0,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 8,
+        "headings": 4
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "help-site-import-export-development-testing",
+      "site": "salesforce",
+      "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_using_site_import_export_for_development_testing.htm&type=5&release=2.0.1&language=en_us",
+      "title": "Using Site Import/Export for Development Testing in B2C Commerce | Salesforce Help",
+      "focus": [
+        "development-workflow",
+        "ordered-steps",
+        "images"
+      ],
+      "captureMethod": "site:salesforce",
+      "current": {
+        "chars": 3196,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 3,
+        "orderedSteps": 8,
+        "bullets": 0,
+        "headings": 2
+      },
+      "baseline": {
+        "chars": 3196,
+        "codeBlocks": 0,
+        "tables": 1,
+        "images": 3,
+        "orderedSteps": 8,
+        "bullets": 0,
+        "headings": 2
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "vue-introduction",
+      "site": null,
+      "url": "https://vuejs.org/guide/introduction.html",
+      "title": "Introduction {#introduction}",
+      "focus": [
+        "route-markdown",
+        "code-blocks",
+        "no-nav-chrome"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 8403,
+        "codeBlocks": 6,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 10
+      },
+      "baseline": {
+        "chars": 8403,
+        "codeBlocks": 6,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 10
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "vite-guide",
+      "site": null,
+      "url": "https://vite.dev/guide/",
+      "title": "Getting Started",
+      "focus": [
+        "route-markdown",
+        "links"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 11003,
+        "codeBlocks": 28,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 13
+      },
+      "baseline": {
+        "chars": 11003,
+        "codeBlocks": 28,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 13
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "mdn-array-map",
+      "site": null,
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map",
+      "title": "Array.prototype.map()",
+      "focus": [
+        "source-markdown",
+        "code-blocks",
+        "tables"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 9225,
+        "codeBlocks": 18,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 10,
+        "headings": 14
+      },
+      "baseline": {
+        "chars": 9225,
+        "codeBlocks": 18,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 10,
+        "headings": 14
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
     {
       "id": "mdn-html-input",
       "site": null,
@@ -32,12 +1145,20 @@
         "bullets": 86,
         "headings": 28
       },
-      "baseline": null,
-      "exactMatch": null,
-      "charDeltaPct": null,
+      "baseline": {
+        "chars": 69448,
+        "codeBlocks": 16,
+        "tables": 5,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 86,
+        "headings": 28
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
       "infoLoss": [],
       "leaks": [],
-      "baselineExists": false,
+      "baselineExists": true,
       "error": null
     },
     {
@@ -60,12 +1181,20 @@
         "bullets": 50,
         "headings": 32
       },
-      "baseline": null,
-      "exactMatch": null,
-      "charDeltaPct": null,
+      "baseline": {
+        "chars": 39150,
+        "codeBlocks": 10,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 50,
+        "headings": 32
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
       "infoLoss": [],
       "leaks": [],
-      "baselineExists": false,
+      "baselineExists": true,
       "error": null
     },
     {
@@ -88,12 +1217,1092 @@
         "bullets": 10,
         "headings": 6
       },
-      "baseline": null,
-      "exactMatch": null,
-      "charDeltaPct": null,
+      "baseline": {
+        "chars": 5415,
+        "codeBlocks": 5,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 10,
+        "headings": 6
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
       "infoLoss": [],
       "leaks": [],
-      "baselineExists": false,
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "node-path",
+      "site": null,
+      "url": "https://nodejs.org/api/path.html",
+      "title": "Path",
+      "focus": [
+        "source-markdown",
+        "long-reference",
+        "sections"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 16504,
+        "codeBlocks": 30,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 42,
+        "headings": 18
+      },
+      "baseline": {
+        "chars": 16504,
+        "codeBlocks": 30,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 42,
+        "headings": 18
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "react-usestate",
+      "site": null,
+      "url": "https://react.dev/reference/react/useState",
+      "title": "useState",
+      "focus": [
+        "html-extraction",
+        "code-blocks",
+        "no-nav-chrome"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 37441,
+        "codeBlocks": 49,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 7,
+        "bullets": 13,
+        "headings": 36
+      },
+      "baseline": {
+        "chars": 37441,
+        "codeBlocks": 49,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 7,
+        "bullets": 13,
+        "headings": 36
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "tailwind-vite-install",
+      "site": null,
+      "url": "https://tailwindcss.com/docs/installation/using-vite",
+      "title": "Installing with Vite - Installation",
+      "focus": [
+        "code-blocks",
+        "command-line-fidelity"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 2432,
+        "codeBlocks": 4,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 5,
+        "headings": 7
+      },
+      "baseline": {
+        "chars": 2432,
+        "codeBlocks": 4,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 5,
+        "headings": 7
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "redux-getting-started",
+      "site": null,
+      "url": "https://redux-toolkit.js.org/introduction/getting-started",
+      "title": "Getting Started | Redux Toolkit",
+      "focus": [
+        "code-blocks",
+        "multi-command"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 11296,
+        "codeBlocks": 3,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 19,
+        "headings": 17
+      },
+      "baseline": {
+        "chars": 11296,
+        "codeBlocks": 3,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 19,
+        "headings": 17
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "astro-getting-started",
+      "site": null,
+      "url": "https://docs.astro.build/en/getting-started/",
+      "title": "Getting started",
+      "focus": [
+        "landing-cleanup",
+        "no-avatar-grid"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 3418,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 39,
+        "orderedSteps": 0,
+        "bullets": 8,
+        "headings": 3
+      },
+      "baseline": {
+        "chars": 3418,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 39,
+        "orderedSteps": 0,
+        "bullets": 8,
+        "headings": 3
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "mkdocs-material-getting-started",
+      "site": null,
+      "url": "https://squidfunk.github.io/mkdocs-material/getting-started/",
+      "title": "Getting started",
+      "focus": [
+        "html-extraction",
+        "tabs"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 5680,
+        "codeBlocks": 10,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 5
+      },
+      "baseline": {
+        "chars": 5680,
+        "codeBlocks": 10,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 2,
+        "headings": 5
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "nestjs-first-steps",
+      "site": null,
+      "url": "https://docs.nestjs.com/first-steps",
+      "title": "Documentation | NestJS - A progressive Node.js framework",
+      "focus": [
+        "rendered-fallback",
+        "code-blocks"
+      ],
+      "captureMethod": "browser_fallback",
+      "current": {
+        "chars": 7444,
+        "codeBlocks": 7,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 9
+      },
+      "baseline": {
+        "chars": 7444,
+        "codeBlocks": 7,
+        "tables": 2,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 9
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "typescript-everyday-types",
+      "site": null,
+      "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html",
+      "title": "Documentation - Everyday Types",
+      "focus": [
+        "chrome-cleanup",
+        "base64-logo",
+        "code-blocks"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 27587,
+        "codeBlocks": 38,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 2,
+        "bullets": 8,
+        "headings": 29
+      },
+      "baseline": {
+        "chars": 27587,
+        "codeBlocks": 38,
+        "tables": 1,
+        "images": 0,
+        "orderedSteps": 2,
+        "bullets": 8,
+        "headings": 29
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "prisma-quickstart",
+      "site": null,
+      "url": "https://www.prisma.io/docs/getting-started/quickstart-sqlite",
+      "title": "SQLite",
+      "focus": [
+        "next-docs",
+        "code-blocks"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 9000,
+        "codeBlocks": 19,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 24,
+        "headings": 12
+      },
+      "baseline": {
+        "chars": 9000,
+        "codeBlocks": 19,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 24,
+        "headings": 12
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "tanstack-query-overview",
+      "site": null,
+      "url": "https://tanstack.com/query/latest/docs/framework/react/overview",
+      "title": "Overview",
+      "focus": [
+        "source-markdown",
+        "code-blocks"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 4740,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 19,
+        "headings": 4
+      },
+      "baseline": {
+        "chars": 4740,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 19,
+        "headings": 4
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "svelte-overview",
+      "site": null,
+      "url": "https://svelte.dev/docs/svelte/overview",
+      "title": "Overview",
+      "focus": [
+        "spa",
+        "code-blocks"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 778,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 0
+      },
+      "baseline": {
+        "chars": 778,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 0
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "python-tutorial-intro",
+      "site": null,
+      "url": "https://docs.python.org/3/tutorial/introduction.html",
+      "title": "3. An Informal Introduction to Python",
+      "focus": [
+        "html-extraction",
+        "long-reference"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 18767,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 4,
+        "headings": 5
+      },
+      "baseline": {
+        "chars": 18767,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 4,
+        "headings": 5
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "gitbook-docs",
+      "site": null,
+      "url": "https://docs.gitbook.com/",
+      "title": "Page Not Found",
+      "focus": [
+        "managed-platform",
+        "image-noise",
+        "llms-txt"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 1970,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 5,
+        "headings": 7
+      },
+      "baseline": {
+        "chars": 1970,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 5,
+        "headings": 7
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "mintlify-quickstart",
+      "site": null,
+      "url": "https://mintlify.com/docs/quickstart",
+      "title": "Quickstart",
+      "focus": [
+        "managed-platform",
+        "landing-cleanup"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 8123,
+        "codeBlocks": 6,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 3,
+        "headings": 7
+      },
+      "baseline": {
+        "chars": 8123,
+        "codeBlocks": 6,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 3,
+        "headings": 7
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "just-the-docs-configuration",
+      "site": null,
+      "url": "https://just-the-docs.com/docs/configuration/",
+      "title": "Configuration",
+      "focus": [
+        "jekyll",
+        "chrome-cleanup"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 11191,
+        "codeBlocks": 16,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 13,
+        "bullets": 10,
+        "headings": 36
+      },
+      "baseline": {
+        "chars": 11191,
+        "codeBlocks": 16,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 13,
+        "bullets": 10,
+        "headings": 36
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "docsify-configuration",
+      "site": null,
+      "url": "https://docsify.js.org/#/configuration",
+      "title": "Configuration",
+      "focus": [
+        "hash-route",
+        "rendered-or-source"
+      ],
+      "captureMethod": "browser_fallback",
+      "current": {
+        "chars": 20512,
+        "codeBlocks": 59,
+        "tables": 0,
+        "images": 7,
+        "orderedSteps": 3,
+        "bullets": 70,
+        "headings": 37
+      },
+      "baseline": {
+        "chars": 20512,
+        "codeBlocks": 59,
+        "tables": 0,
+        "images": 7,
+        "orderedSteps": 3,
+        "bullets": 70,
+        "headings": 37
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "node-fs-reference",
+      "site": null,
+      "url": "https://nodejs.org/api/fs.html",
+      "title": "File system",
+      "focus": [
+        "source-markdown",
+        "huge-reference",
+        "sections",
+        "tables",
+        "many-code-blocks"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 295798,
+        "codeBlocks": 127,
+        "tables": 5,
+        "images": 0,
+        "orderedSteps": 5,
+        "bullets": 640,
+        "headings": 313
+      },
+      "baseline": {
+        "chars": 295798,
+        "codeBlocks": 127,
+        "tables": 5,
+        "images": 0,
+        "orderedSteps": 5,
+        "bullets": 640,
+        "headings": 313
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "react-useeffect",
+      "site": null,
+      "url": "https://react.dev/reference/react/useEffect",
+      "title": "useEffect",
+      "focus": [
+        "html-extraction",
+        "long-reference",
+        "many-code-examples",
+        "no-nav-chrome"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 64357,
+        "codeBlocks": 73,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 5,
+        "bullets": 25,
+        "headings": 35
+      },
+      "baseline": {
+        "chars": 64357,
+        "codeBlocks": 73,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 5,
+        "bullets": 25,
+        "headings": 35
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "tanstack-usequery-reference",
+      "site": null,
+      "url": "https://tanstack.com/query/latest/docs/framework/react/reference/useQuery",
+      "title": "useQuery",
+      "focus": [
+        "source-markdown",
+        "options-list",
+        "api-reference"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 14625,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 51,
+        "headings": 1
+      },
+      "baseline": {
+        "chars": 14625,
+        "codeBlocks": 1,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 51,
+        "headings": 1
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "tanstack-usequeries-reference",
+      "site": null,
+      "url": "https://tanstack.com/query/v5/docs/framework/react/reference/useQueries",
+      "title": "useQueries",
+      "focus": [
+        "source-markdown",
+        "code-blocks",
+        "api-reference"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 2567,
+        "codeBlocks": 2,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 4,
+        "headings": 3
+      },
+      "baseline": {
+        "chars": 2567,
+        "codeBlocks": 2,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 4,
+        "headings": 3
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "docusaurus-jest-getting-started",
+      "site": null,
+      "url": "https://jestjs.io/docs/getting-started",
+      "title": "Getting Started",
+      "focus": [
+        "docusaurus",
+        "code-blocks",
+        "headings"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 8411,
+        "codeBlocks": 19,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 13
+      },
+      "baseline": {
+        "chars": 8411,
+        "codeBlocks": 19,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 13
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "nextjs-layouts-and-pages",
+      "site": null,
+      "url": "https://nextjs.org/docs/app/getting-started/layouts-and-pages",
+      "title": "Layouts and Pages",
+      "focus": [
+        "next",
+        "code-blocks",
+        "rsc"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 12771,
+        "codeBlocks": 18,
+        "tables": 0,
+        "images": 5,
+        "orderedSteps": 0,
+        "bullets": 15,
+        "headings": 10
+      },
+      "baseline": {
+        "chars": 12771,
+        "codeBlocks": 18,
+        "tables": 0,
+        "images": 5,
+        "orderedSteps": 0,
+        "bullets": 15,
+        "headings": 10
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "mdbook-rust-ownership",
+      "site": null,
+      "url": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html",
+      "title": "What is Ownership? - The Rust Programming Language",
+      "focus": [
+        "mdbook",
+        "code-blocks",
+        "long-prose"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 29249,
+        "codeBlocks": 15,
+        "tables": 0,
+        "images": 5,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 14
+      },
+      "baseline": {
+        "chars": 29249,
+        "codeBlocks": 15,
+        "tables": 0,
+        "images": 5,
+        "orderedSteps": 0,
+        "bullets": 12,
+        "headings": 14
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "docsy-kubernetes-pods",
+      "site": null,
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+      "title": "Pods",
+      "focus": [
+        "docsy",
+        "yaml-code",
+        "feature-state-table"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 25779,
+        "codeBlocks": 3,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 40,
+        "headings": 22
+      },
+      "baseline": {
+        "chars": 25779,
+        "codeBlocks": 3,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 40,
+        "headings": 22
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "sphinx-pandas-groupby",
+      "site": null,
+      "url": "https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html",
+      "title": "pandas.DataFrame.groupby — pandas 3.0.3 documentation",
+      "focus": [
+        "sphinx",
+        "parameter-table",
+        "code-blocks"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 7177,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 0
+      },
+      "baseline": {
+        "chars": 7177,
+        "codeBlocks": 0,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 0
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "vite-server-options",
+      "site": null,
+      "url": "https://vite.dev/config/server-options",
+      "title": "Server Options",
+      "focus": [
+        "route-markdown",
+        "long-options-reference",
+        "code-blocks"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 19964,
+        "codeBlocks": 12,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 49,
+        "headings": 21
+      },
+      "baseline": {
+        "chars": 19964,
+        "codeBlocks": 12,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 49,
+        "headings": 21
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "vue-reactivity-core-api",
+      "site": null,
+      "url": "https://vuejs.org/api/reactivity-core.html",
+      "title": "Reactivity API: Core {#reactivity-api-core}",
+      "focus": [
+        "route-markdown",
+        "api-reference",
+        "typescript-signatures"
+      ],
+      "captureMethod": "route_markdown",
+      "current": {
+        "chars": 16439,
+        "codeBlocks": 33,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 26,
+        "headings": 10
+      },
+      "baseline": {
+        "chars": 16439,
+        "codeBlocks": 33,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 26,
+        "headings": 10
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "mdn-promise",
+      "site": null,
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+      "title": "Promise",
+      "focus": [
+        "source-markdown",
+        "complex-reference",
+        "methods",
+        "tables"
+      ],
+      "captureMethod": "github_source",
+      "current": {
+        "chars": 26500,
+        "codeBlocks": 16,
+        "tables": 0,
+        "images": 1,
+        "orderedSteps": 0,
+        "bullets": 33,
+        "headings": 18
+      },
+      "baseline": {
+        "chars": 26500,
+        "codeBlocks": 16,
+        "tables": 0,
+        "images": 1,
+        "orderedSteps": 0,
+        "bullets": 33,
+        "headings": 18
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "tailwind-grid-template-columns",
+      "site": null,
+      "url": "https://tailwindcss.com/docs/grid-template-columns",
+      "title": "grid-template-columns - Flexbox & Grid",
+      "focus": [
+        "html-extraction",
+        "utility-tables",
+        "code-blocks"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 1932,
+        "codeBlocks": 5,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 5
+      },
+      "baseline": {
+        "chars": 1932,
+        "codeBlocks": 5,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 0,
+        "headings": 5
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
+      "error": null
+    },
+    {
+      "id": "typescript-generics",
+      "site": null,
+      "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html",
+      "title": "Documentation - Generics",
+      "focus": [
+        "long-reference",
+        "many-code-blocks",
+        "chrome-cleanup"
+      ],
+      "captureMethod": "static_fetch",
+      "current": {
+        "chars": 21668,
+        "codeBlocks": 31,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 7,
+        "headings": 9
+      },
+      "baseline": {
+        "chars": 21668,
+        "codeBlocks": 31,
+        "tables": 0,
+        "images": 0,
+        "orderedSteps": 0,
+        "bullets": 7,
+        "headings": 9
+      },
+      "exactMatch": true,
+      "charDeltaPct": 0,
+      "infoLoss": [],
+      "leaks": [],
+      "baselineExists": true,
       "error": null
     }
   ]

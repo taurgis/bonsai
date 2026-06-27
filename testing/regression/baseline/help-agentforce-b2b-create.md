@@ -15,12 +15,12 @@ The Commerce Cart Management subagent supports only simple products.
 
 Qualification rules and localization on Lightning web components aren't supported by the agent.
 
-1.  In your Salesforce org, click [](https://help.salesforce.com/s?language=en_US)![Setup](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_setup_icon_no_border.png) at the top of the page, and then select **Setup**.
+1.  In your Salesforce org, click ![Setup](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_setup_icon_no_border.png) at the top of the page, and then select **Setup**.
 2.  In the Quick Find box, enter Agentforce Agents, and select **Agentforce Agents**.
 3.  To create an agent, click **New Agent**.
 4.  Select the Agentforce for **Guided Shopping - B2B template**, and then click **Next**.
 
-    [](https://help.salesforce.com/s?language=en_US)![Select an agent window with Agentforce for Guided Shopping - B2B template selected.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_template.jpg)
+    ![Select an agent window with Agentforce for Guided Shopping - B2B template selected.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_template.jpg)
 
 5.  On the Review Topics page, review the subagents included in the template. Salesforce suggests keeping all default subagents.
 
@@ -43,7 +43,7 @@ Qualification rules and localization on Lightning web components aren't supporte
 9.  Click **Next**.
 10.  Click **Create**.
 
-     [](https://help.salesforce.com/s?language=en_US)![Customize your agent window with information for Guided Shopping Agent entered](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_customize_agent.jpg)
+     ![Customize your agent window with information for Guided Shopping Agent entered](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_customize_agent.jpg)
 
 11.  (Optional). To add Guided Shopping subagents to a pre-existing agent, select the agent and then click **Open in Builder**. If the agent is active, click **Deactivate**. Click **New** | **Add From Asset Library**. Select the subagents to add, and then click **Finish**.
 
@@ -68,22 +68,22 @@ Qualification rules and localization on Lightning web components aren't supporte
 
      This ID is a 15-character record ID beginning with OZE. Always use the hard coded value '0ZExxxxxxxxxxxx' for the input webStoreId parameter in any action that requires this identifier.
 
-     [](https://help.salesforce.com/s?language=en_US)![Commerce Global Instructions subagent instruction with replaced webstore ID value](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_global_instructions_replace_value.jpg)
+     ![Commerce Global Instructions subagent instruction with replaced webstore ID value](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_global_instructions_replace_value.jpg)
 
      ![Note](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/images/icon_note.png)
 
-     [](https://help.salesforce.com/s?language=en_US)Note Locate the webStoreUrl on the store's setup page in the URL. [](https://help.salesforce.com/s?language=en_US)![Location within store setup to find the store's webstore ID.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_webstore_id_location.jpg)
+     Note Locate the webStoreUrl on the store's setup page in the URL. ![Location within store setup to find the store's webstore ID.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_webstore_id_location.jpg)
 
 17.  Save your work.
 18.  In Agent Builder, select the **Commerce Order** subagent.
 19.  Click **New Version**.
 20.  Locate the instruction that begins with For the cart URL. Replace {loginPageUrl}?startURL={cartPageUrl}/cart with webStoreUrl/cart, where webStoreUrl is your store's URL. For example, https://mydomain.com/store/cart.
 
-     [](https://help.salesforce.com/s?language=en_US)![Commerce Order cart URL subagent instruction replaced text with example webstore ID](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_cart_url_replace.jpg)
+     ![Commerce Order cart URL subagent instruction replaced text with example webstore ID](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_cart_url_replace.jpg)
 
 21.  Locate the instruction that begins with For the Order Url. Replace {loginPageUrl}?startURL={orderSummaryPageUrl}/orderId with webStoreUrl/orderSummary/{orderId}, where webStoreUrl is your store's URL. For example, https://mydomain.com/store/orderSummary/{orderId}.
 
-     [](https://help.salesforce.com/s?language=en_US)![Commerce Order order URL subagent instruction replaced fields with webstore ID.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_replace_commerce_order_instruction_order_url.jpg)
+     ![Commerce Order order URL subagent instruction replaced fields with webstore ID.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_agent_replace_commerce_order_instruction_order_url.jpg)
 
 22.  Save your work.
 23.  Add your domain URL as a trusted site.
@@ -94,7 +94,7 @@ Qualification rules and localization on Lightning web components aren't supporte
 
 Example A Guided Shopping agent with all the B2B Commerce subagents added.
 
-[](https://help.salesforce.com/s?language=en_US)![A B2B store with all Commerce subagents added.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_b2bagent_subagents.png)
+![A B2B store with all Commerce subagents added.](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/comm/images/comm_b2bagent_subagents.png)
 
 #### See Also
 

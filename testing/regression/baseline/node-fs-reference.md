@@ -380,8 +380,7 @@ added: v10.0.0
 #### `filehandle.pull([...transforms][, options])`
 
 <!-- YAML
-added:
- - v25.9.0
+added: v25.9.0
 -->
 
 > Stability: 1 - Experimental
@@ -458,8 +457,7 @@ run().catch(console.error);
 #### `filehandle.pullSync([...transforms][, options])`
 
 <!-- YAML
-added:
- - v25.9.0
+added: v25.9.0
 -->
 
 > Stability: 1 - Experimental
@@ -697,7 +695,7 @@ close the `FileHandle` automatically. User code must still call the
 <!-- YAML
 added: v10.0.0
 changes:
-  - version: REPLACEME
+  - version: v26.4.0
     pr-url: https://github.com/nodejs/node/pull/63634
     description: Added support for the `buffer` option.
 -->
@@ -824,9 +822,7 @@ Read from a file and write to an array of {ArrayBufferView}s
 <!-- YAML
 added: v10.0.0
 changes:
-  - version:
-     - v26.1.0
-     - v24.16.0
+  - version: v26.1.0
     pr-url: https://github.com/nodejs/node/pull/57775
     description: Now accepts an additional `signal` property to allow aborting the operation.
   - version: v10.5.0
@@ -1060,8 +1056,7 @@ the end of the file.
 #### `filehandle.writer([options])`
 
 <!-- YAML
-added:
- - v25.9.0
+added: v25.9.0
 -->
 
 > Stability: 1 - Experimental
@@ -1400,9 +1395,7 @@ behavior is similar to `cp dir1/ dir2/`.
 <!-- YAML
 added: v22.0.0
 changes:
-  - version:
-     - v26.1.0
-     - v24.16.0
+  - version: v26.1.0
     pr-url: https://github.com/nodejs/node/pull/62695
     description: Add support for the `followSymlinks` option.
   - version:
@@ -1809,7 +1802,7 @@ try {
 <!-- YAML
 added: v10.0.0
 changes:
-  - version: REPLACEME
+  - version: v26.4.0
     pr-url: https://github.com/nodejs/node/pull/63634
     description: Added support for the `buffer` option.
   - version:
@@ -3556,9 +3549,7 @@ descriptor. See [`fs.utimes()`][].
 <!-- YAML
 added: v22.0.0
 changes:
-  - version:
-     - v26.1.0
-     - v24.16.0
+  - version: v26.1.0
     pr-url: https://github.com/nodejs/node/pull/62695
     description: Add support for the `followSymlinks` option.
   - version:
@@ -4302,7 +4293,7 @@ If `options.withFileTypes` is set to `true`, the `files` array will contain
 <!-- YAML
 added: v0.1.29
 changes:
-  - version: REPLACEME
+  - version: v26.4.0
     pr-url: https://github.com/nodejs/node/pull/63634
     description: Added support for the `buffer` option.
   - version: v18.0.0
@@ -5206,9 +5197,7 @@ The `atime` and `mtime` arguments follow these rules:
 <!-- YAML
 added: v0.5.10
 changes:
-  - version:
-     - v26.1.0
-     - v24.16.0
+  - version: v26.1.0
     pr-url: https://github.com/nodejs/node/pull/61870
     description: Added `throwIfNoEntry` option.
   - version: v19.1.0
@@ -6187,9 +6176,7 @@ Synchronous version of [`fs.futimes()`][]. Returns `undefined`.
 <!-- YAML
 added: v22.0.0
 changes:
-  - version:
-     - v26.1.0
-     - v24.16.0
+  - version: v26.1.0
     pr-url: https://github.com/nodejs/node/pull/62695
     description: Add support for the `followSymlinks` option.
   - version:
@@ -6542,7 +6529,7 @@ If `options.withFileTypes` is set to `true`, the result will contain
 <!-- YAML
 added: v0.1.8
 changes:
-  - version: REPLACEME
+  - version: v26.4.0
     pr-url: https://github.com/nodejs/node/pull/63634
     description: Added support for the `buffer` option.
   - version: v7.6.0
@@ -8224,9 +8211,7 @@ Optimal transfer block size in bytes.
 #### `statfs.frsize`
 
 <!-- YAML
-added:
- - v26.1.0
- - v24.16.0
+added: v26.1.0
 -->
 
 * Type: {number|bigint}
@@ -8737,7 +8722,7 @@ rename('/tmp/hello', '/tmp/world', (err) => {
 ```
 
 ```cjs
-const { rename, stat } = require('node:fs');
+const { rename, stat } = require('node:fs/promises');
 
 rename('/tmp/hello', '/tmp/world', (err) => {
   if (err) throw err;

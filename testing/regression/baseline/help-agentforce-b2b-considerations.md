@@ -69,7 +69,7 @@ Agentforce Guided Shopping Agent is a consumption-based product that uses Einste
 
 ![Tip](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-commerce-comm-262-0-0-production-enus/__asset_version__/images/icon_tip.png)
 
-[](https://help.salesforce.com/s?language=en_US)Tip This feature has access to Digital Wallet, a free account management tool that offers near real-time consumption data for enabled products across your active contracts. Access Digital Wallet and start tracking your org's usage. To learn more, see [About Digital Wallet](https://help.salesforce.com/s/articleView?id=xcloud.wallet_about.htm&language=en_US&type=5).
+Tip This feature has access to Digital Wallet, a free account management tool that offers near real-time consumption data for enabled products across your active contracts. Access Digital Wallet and start tracking your org's usage. To learn more, see [About Digital Wallet](https://help.salesforce.com/s/articleView?id=xcloud.wallet_about.htm&language=en_US&type=5).
 
 | Card | Type | Description | Notes |
 | --- | --- | --- | --- |
@@ -86,7 +86,7 @@ Agentforce Guided Shopping Agent is a consumption-based product that uses Einste
 
 *   Your Salesforce org can have no more than 100 active agents at a time. See [Activate or Deactivate your Agent](https://help.salesforce.com/s/articleView?id=ai.copilot_setup_activate_deactivate.htm&language=en_US&type=5).
 *   Agentforce Guided Shopping Agent supports multiple stores.
-*   When an incoming customer message exceeds the character limits of the messaging channel, the message isn’t delivered, and no response is generated. Different messaging channels have different character limits.[](https://help.salesforce.com/s?language=en_US)
+*   When an incoming customer message exceeds the character limits of the messaging channel, the message isn’t delivered, and no response is generated. Different messaging channels have different character limits.
     *   Facebook allows up to 2,000 characters.
     *   LINE allows up to 5,000 characters.
     *   SMS allows up to 912 characters, but if the message includes special characters, this limit decreases to 396 characters.
@@ -96,7 +96,7 @@ Agentforce Guided Shopping Agent is a consumption-based product that uses Einste
 ## Other Considerations
 
 *   You can create multiple versions of an agent. See [Manage Agent Versions](https://help.salesforce.com/s/articleView?id=ai.agent_versions.htm&language=en_US&type=5).
-*   Currently, Agentforce Guided Shopping doesn't support these standard topics:[](https://help.salesforce.com/s?language=en_US)
+*   Currently, Agentforce Guided Shopping doesn't support these standard topics:
     *   General CRM
     *   Single Record Summary
 *   Curently, Agentforce Guided Shopping doesn't support these standard actions;

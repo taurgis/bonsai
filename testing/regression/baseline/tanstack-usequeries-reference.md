@@ -1,3 +1,5 @@
+# useQueries
+
 The `useQueries` hook can be used to fetch a variable number of queries:
 
 ```tsx
