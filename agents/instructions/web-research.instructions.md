@@ -4,7 +4,7 @@ applyTo: '**'
 skills:
   - web-research
 metadata:
-  version: '3.1.1'
+  version: '3.1.2'
 ---
 
 # Web Research Requirement
@@ -24,9 +24,11 @@ metadata:
 
 ## Shared Cache
 
-- Both paths use the same freshness-tiered Bonsai cache (data directory or project-local `.bonsai/research/`): it reuses fresh notes, cheaply revalidates stale ones, and re-fetches only on a miss.
+- **Local Cache Search (Default)**: Always search the local cache first using `bonsai search "<query>"`. This checks everything you've researched across all domains, even ones that don't support online search APIs.
+- **Online URL Discovery (Fallback)**: If the local cache comes up empty, use `--domain <domain>` or `--remote <docs-url>` to quickly hit a site's search API and find the official URLs you need to fetch. This is specifically for online URL discovery when local cache fails.
 - If Bonsai is configured for project storage and `.bonsai/research/` is not ignored by git, treat those cache artifacts as intentional shared project files. It is OK to check them in, and agents must not delete them as incidental generated output without an explicit request.
 - Re-running on a recent topic is cheap — research the topic rather than skipping it to "save" a fetch.
+- Supported remote API domains: `help.salesforce.com`, `react.dev`, `vuejs.org`, `tailwindcss.com`, `nextjs.org`, `jestjs.io`, `cypress.io`, `vitest.dev`, `vitepress.dev`, `angular.dev`, `redux.js.org`, `vitejs.dev`, `fastify.dev`, `rollupjs.org`, `vueuse.org`.
 
 ## When Not to Use
 

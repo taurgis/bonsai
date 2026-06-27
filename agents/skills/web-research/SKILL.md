@@ -4,7 +4,7 @@ description: 'Bonsai-backed official documentation and web research workflow. Us
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '2.1.0'
+  version: '2.1.1'
 ---
 
 # Web Research Skill
@@ -15,10 +15,15 @@ Use Bonsai as the cache-first research path for official documentation and web c
 
 Before creating, updating, refactoring, scaffolding, or deleting technical content, verify relevant current official documentation in the same task.
 
-Search the cache first:
-
 ```bash
+# 1. Default search: Checks the local cache across EVERYTHING you've researched, 
+# including domains that do not support online search APIs.
 bonsai search "<topic or keywords>"
+
+# 2. Remote API search: Use this to quickly find URLs for documentation pages online
+# ONLY if you don't find any information in the local cache.
+bonsai search "<topic or keywords>" --domain <domain>
+# Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org, jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org, vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
 ```
 
 If the cache misses or does not cover the question, fetch the source through Bonsai:

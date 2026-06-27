@@ -115,8 +115,9 @@ Agents working in this codebase or utilizing Bonsai must run the compiled CLI co
 * **Import Synthesized Notes**: `node bin/cli.mjs import <url> --file <path> [--json]`
 * **Status Checklist**: `node bin/cli.mjs status <url> [--json]`
 * **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
-* **Search Cache**: `node bin/cli.mjs search "<query>" [--json]`
-* **Remote Docs Search (discovery)**: `node bin/cli.mjs search "<query>" --remote <docs-url> [--json]` — discovers uncached pages via a site's public search or index (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes, llms.txt, sitemap.xml); selected URLs are then captured through `<url>`. Degrades to local cache search when no connector applies.
+* **Search Cache (Local)**: `node bin/cli.mjs search "<query>" [--json]` — Default search checks the **local cache** across everything you've researched, even for domains that don't support online search.
+* **Remote Docs Search (API)**: `node bin/cli.mjs search "<query>" --domain <domain> [--json]` — Quickly hits a supported documentation site's native search API to find official URLs if you couldn't find the information in the local cache. Supported domains include `help.salesforce.com`, `react.dev`, `vuejs.org`, `nextjs.org`, `tailwindcss.com`, `jestjs.io`, `cypress.io`, `vitest.dev`, `vitepress.dev`, `angular.dev`, `redux.js.org`, `vitejs.dev`, `fastify.dev`, `rollupjs.org`, `vueuse.org`.
+* **Remote Docs Search (Discovery/Fallback)**: `node bin/cli.mjs search "<query>" --remote <docs-url> [--json]` — Discovers uncached pages via a site's public search or index (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes, llms.txt, sitemap.xml); selected URLs are then captured through `<url>`. Degrades to local cache search when no connector applies.
 * **List Database**: `node bin/cli.mjs list [filters] [--json]`
 * **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
 

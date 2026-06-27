@@ -210,14 +210,14 @@ site_module_id: string | null;
 
 | `id` | Domains | Custom behavior |
 | --- | --- | --- |
-| `react` | `react.dev`, `legacy.reactjs.org` | None. Generic pipeline; listed mainly to claim both domains. |
+| Algolia Sites | `react.dev`, `legacy.reactjs.org`, `vuejs.org`, `tailwindcss.com`, `jestjs.io`, `cypress.io`, `vitest.dev`, `vitepress.dev` | `search`. Standard Algolia search implementations. |
+| Auto-discovery Sites | `angular.dev`, `redux.js.org`, `vitejs.dev`, `fastify.dev`, `rollupjs.org`, `vueuse.org` | `search`. Automatically proxy the remote search connectors for these standard domains. |
+| `nextjs` | `nextjs.org` | `search`. Uses a custom JSON POST fetcher to hit Next.js's native app router search API. |
 | `salesforce` | `help.salesforce.com` | `fetchPage` + `search`, `rendered: true`. |
 | `salesforce-developer` | `developer.salesforce.com` | `fetchPage`, `rendered: true`. No search. |
 | `tanstack` | `tanstack.com` | None. Relies on the generic source-resolution path that prefers a page's GitHub Markdown source (keeping fenced code intact), so it deliberately does **not** force `rendered`. |
 
-Only the two Salesforce modules carry site-specific code. `react` and
-`tanstack` are listed so their domains are recognized, but they ride the
-generic pipeline.
+Only the Salesforce and Next.js modules carry heavy site-specific code. The Algolia and Auto-discovery sites leverage shared search factories, and `tanstack` is listed so its domain is recognized but it rides the generic pipeline.
 
 ## The Salesforce modules in detail
 

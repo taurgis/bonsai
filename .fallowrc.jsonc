@@ -12,7 +12,7 @@
     "maxCognitive": 15,
     "maxCrap": 30,
     "coverage": "coverage/coverage-final.json",
-    "ignore": ["scripts/**", "tests/**", "**/*.test.ts", "**/__fixtures__/**"]
+    "ignore": ["scripts/**", "tests/**", "**/*.test.ts", "**/__fixtures__/**", "docs/**"]
   },
 
   "audit": {

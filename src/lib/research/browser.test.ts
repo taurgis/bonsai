@@ -4,6 +4,7 @@ import {
   fetchRenderedHtml,
   findChromePath,
   ResponseCapture,
+  waitForContentReady,
   type CdpPage,
 } from './browser.js';
 
@@ -195,5 +196,68 @@ describe('ResponseCapture', () => {
     emit('Network.loadingFinished', { requestId: 'r1' });
 
     expect(await capture.waitFor('k', 1000)).toBe('héllo');
+  });
+});
+
+describe('waitForContentReady unit tests', () => {
+  it('resolves immediately if page has settled content', async () => {
+    let callCount = 0;
+    const client = {
+      on: vi.fn(),
+      send: vi.fn(async (method) => {
+        if (method === 'Runtime.evaluate') {
+          callCount++;
+          // First poll: has: true, len: 100
+          // Second poll: has: true, len: 100 (stable/not grew, so returns)
+          return { result: { value: { has: true, len: 100 } } };
+        }
+        return {};
+      }),
+    };
+    const page = { client, sessionId: 'S', close: vi.fn() } as unknown as CdpPage;
+
+    await waitForContentReady(page, ['.content'], 10, 5000);
+    expect(callCount).toBeGreaterThanOrEqual(2);
+  });
+
+  it('polls and waits for rendering to settle if content grows', async () => {
+    let callCount = 0;
+    const client = {
+      on: vi.fn(),
+      send: vi.fn(async (method) => {
+        if (method === 'Runtime.evaluate') {
+          callCount++;
+          if (callCount === 1) {
+            // First poll: has: true, len: 10
+            return { result: { value: { has: true, len: 10 } } };
+          }
+          if (callCount === 2) {
+            // Second poll: has: true, len: 100 (grew)
+            return { result: { value: { has: true, len: 100 } } };
+          }
+          // Third and fourth poll: has: true, len: 100 (settles)
+          return { result: { value: { has: true, len: 100 } } };
+        }
+        return {};
+      }),
+    };
+    const page = { client, sessionId: 'S', close: vi.fn() } as unknown as CdpPage;
+
+    await waitForContentReady(page, ['.content'], 10, 5000);
+    expect(callCount).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('findChromePath unit tests', () => {
+  it('prefers process.env.CHROME_PATH if set and points to an existing file', () => {
+    const originalEnv = process.env.CHROME_PATH;
+    try {
+      // Point CHROME_PATH to this test file itself, which is guaranteed to exist.
+      process.env.CHROME_PATH = import.meta.filename;
+      const path = findChromePath();
+      expect(path).toBe(import.meta.filename);
+    } finally {
+      process.env.CHROME_PATH = originalEnv;
+    }
   });
 });

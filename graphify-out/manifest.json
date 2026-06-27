@@ -90,7 +90,7 @@
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782559520.37278,
+    "mtime": 1782563996.7069998,
     "ast_hash": "7eb1600c8f31493d45207907596946cd",
     "semantic_hash": ""
   },
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   ".github/agents/official-docs-researcher.agent.md": {
-    "mtime": 1782378125.9211893,
-    "ast_hash": "c4bb9966cd854a01d438a534ad3c46ad",
+    "mtime": 1782564719.9053013,
+    "ast_hash": "ee8823bad9c295903a7bbdeeb20fb16f",
     "semantic_hash": ""
   },
   ".github/agents/senior-code-reviewer.agent.md": {
@@ -565,8 +565,8 @@
     "semantic_hash": ""
   },
   "AGENTS.MD": {
-    "mtime": 1782506219.074847,
-    "ast_hash": "5b0b56820746d7ed49a714b91f02609c",
+    "mtime": 1782564657.7558005,
+    "ast_hash": "fda54668095ece6971f9c2a469c2197d",
     "semantic_hash": ""
   },
   "README.md": {
@@ -580,8 +580,8 @@
     "semantic_hash": ""
   },
   "src/lib/research/browser.test.ts": {
-    "mtime": 1782482792.541699,
-    "ast_hash": "5954f43ba51e4fb37a0d7466af05e8b5",
+    "mtime": 1782564748.8155303,
+    "ast_hash": "7925533f920c6995d5ed7724ad037a52",
     "semantic_hash": ""
   },
   "src/lib/research/browser.ts": {
@@ -590,18 +590,18 @@
     "semantic_hash": ""
   },
   "agents/instructions/web-research.instructions.md": {
-    "mtime": 1782505695.990172,
-    "ast_hash": "9b933a062ba01b67a60f59c30f201a3e",
+    "mtime": 1782564737.1190948,
+    "ast_hash": "a4476e7a22d20a2a199555e5fffc40c1",
     "semantic_hash": ""
   },
   "agents/skills/web-research/SKILL.md": {
-    "mtime": 1782328543.958617,
-    "ast_hash": "89a124f000d4a4aec61611d300aaac36",
+    "mtime": 1782564741.6744537,
+    "ast_hash": "ea22e3159c6b63a181e31440d10e0636",
     "semantic_hash": ""
   },
   ".agents/skills/web-research/SKILL.md": {
-    "mtime": 1782505731.3374443,
-    "ast_hash": "89a124f000d4a4aec61611d300aaac36",
+    "mtime": 1782564719.9018533,
+    "ast_hash": "f99ec95b001fa53651312c50dd3d428d",
     "semantic_hash": ""
   },
   ".github/instructions/web-research.instructions.md": {
@@ -630,8 +630,8 @@
     "semantic_hash": ""
   },
   "src/sites/index.ts": {
-    "mtime": 1782319413.280146,
-    "ast_hash": "45d6e8ec731797d61250b5aca14fb54b",
+    "mtime": 1782563989.6237226,
+    "ast_hash": "39633bf41ee9f34787042ab09bb58d67",
     "semantic_hash": ""
   },
   "src/sites/salesforce-developer/fetch-page.ts": {
@@ -2075,8 +2075,8 @@
     "semantic_hash": ""
   },
   ".agents/rules/web-research.md": {
-    "mtime": 1782505731.3933456,
-    "ast_hash": "9cde42d6f7b3236a02e6ab6ee7d33158",
+    "mtime": 1782564719.900163,
+    "ast_hash": "b7b75485a9146e7fd89689fce2ae7446",
     "semantic_hash": ""
   },
   ".claude/rules/generated/web-research.md": {
@@ -2085,8 +2085,8 @@
     "semantic_hash": ""
   },
   "agents/agents/official-docs-researcher.agent.md": {
-    "mtime": 1782328543.9594672,
-    "ast_hash": "c4bb9966cd854a01d438a534ad3c46ad",
+    "mtime": 1782564668.3764672,
+    "ast_hash": "de269e2a645afeb943976d6afcabb195",
     "semantic_hash": ""
   },
   "src/commands.ts": {
@@ -3970,7 +3970,7 @@
     "semantic_hash": ""
   },
   ".bonsai.json": {
-    "mtime": 1782559496.8959286,
+    "mtime": 1782562781.9260616,
     "ast_hash": "49c1c93ff8a05b6d5b73318d32807bde",
     "semantic_hash": ""
   },
@@ -4025,8 +4025,8 @@
     "semantic_hash": ""
   },
   "docs/reference/site-modules.md": {
-    "mtime": 1782406948.0249004,
-    "ast_hash": "ede8dce551bf195d80d0384998010bd2",
+    "mtime": 1782564241.0277154,
+    "ast_hash": "9299580c8bebecb9046ff11e6f0bf30d",
     "semantic_hash": ""
   },
   ".bonsai/research/00c152845cc11815f6cf8a44d56c2b878017ff6ca5644b8e0b11b0507658eac4.md": {
@@ -4200,13 +4200,13 @@
     "semantic_hash": ""
   },
   "agents/agents/salesforce-docs-researcher.agent.md": {
-    "mtime": 1782481999.5442016,
-    "ast_hash": "94ffe5a7b55341dd5dd146a9fdf74690",
+    "mtime": 1782564730.2192717,
+    "ast_hash": "7ce2306fec690760d2b88b36dfae4882",
     "semantic_hash": ""
   },
   "agents/instructions/salesforce-research.instructions.md": {
-    "mtime": 1782505692.0796351,
-    "ast_hash": "5bbfe64c5a075825681497818f1b9c2d",
+    "mtime": 1782564733.7177846,
+    "ast_hash": "ac07f4c475abe7c896030601ffda6daf",
     "semantic_hash": ""
   },
   "agents/hooks/claude-code/hooks/bonsai-web-fetch.sh": {
@@ -4870,7 +4870,7 @@
     "semantic_hash": ""
   },
   ".bonsai/research/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md": {
-    "mtime": 1782506217.3558064,
+    "mtime": 1782562781.9262857,
     "ast_hash": "97e7cd7976b9804b6a53b88f2a42526f",
     "semantic_hash": ""
   },
@@ -5167,6 +5167,21 @@
   ".bonsai/research/faaed167e3e3f3646cb4c6ddc650f8213990949e89643b1d364bf62f2402074e.md": {
     "mtime": 1782557872.1040995,
     "ast_hash": "24bafa6931712f39aa97ef01d74cdb99",
+    "semantic_hash": ""
+  },
+  "src/sites/algolia.ts": {
+    "mtime": 1782564748.828178,
+    "ast_hash": "a68b10d60d95b60a38be6e70d48dee7e",
+    "semantic_hash": ""
+  },
+  "src/sites/auto.ts": {
+    "mtime": 1782564748.837877,
+    "ast_hash": "3ca6ed817a9f07b0b3fca59dd5054c86",
+    "semantic_hash": ""
+  },
+  "src/sites/nextjs/index.ts": {
+    "mtime": 1782564748.8570886,
+    "ast_hash": "4e64550208a39f4a248d775d04899e5f",
     "semantic_hash": ""
   }
 }
