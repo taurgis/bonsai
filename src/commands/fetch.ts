@@ -509,9 +509,13 @@ function applyCaptureMetadata(
 function handleStaleRevalidationResult(command: any, revalResult: any): void {
   if (revalResult.status !== 'stale') return;
   if (revalResult.allowed) {
-    command.warn(`Serving stale content: revalidation failed: ${revalResult.error}`);
+    command.warn(
+      `Serving stale content within grace period: revalidation failed (${revalResult.error}).`
+    );
   } else {
-    command.warn(`Serving stale content (exit 5): revalidation failed: ${revalResult.error}`);
+    command.warn(
+      `Serving stale content within grace period (exit 5): revalidation failed (${revalResult.error}).`
+    );
     process.exitCode = 5;
   }
 }

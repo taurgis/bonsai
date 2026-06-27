@@ -312,7 +312,9 @@ export async function revalidateCache(
         status: 'stale',
         artifact: existing,
         allowed: options.allowStale,
-        error: `Revalidation failed: ${(err as Error).message}. Serving stale content within grace period.`,
+        // Carry only the underlying cause; the command layer owns the user-facing framing
+        // (so the warning reads cleanly instead of stuttering "stale … stale", "failed … failed").
+        error: (err as Error).message,
       };
     }
 
