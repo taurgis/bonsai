@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "skills-lock.json": {
-    "mtime": 1782558712.3841608,
-    "ast_hash": "d587fa812f270d0bf304a99dbd898564",
+    "mtime": 1782564824.57727,
+    "ast_hash": "446ec0f49d8eef63f25ea28b3f23197a",
     "semantic_hash": ""
   },
   "src/base-command.ts": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   ".claude/agents/official-docs-researcher.md": {
-    "mtime": 1782378082.0071585,
-    "ast_hash": "4f836053f2db96883e69c59ba0702cf4",
+    "mtime": 1782564824.5887766,
+    "ast_hash": "be13a877d8cf24f5a6899f2c56b17b16",
     "semantic_hash": ""
   },
   ".claude/agents/senior-code-reviewer.md": {
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   ".github/agents/official-docs-researcher.agent.md": {
-    "mtime": 1782564719.9053013,
-    "ast_hash": "ee8823bad9c295903a7bbdeeb20fb16f",
+    "mtime": 1782564824.5717618,
+    "ast_hash": "de269e2a645afeb943976d6afcabb195",
     "semantic_hash": ""
   },
   ".github/agents/senior-code-reviewer.agent.md": {
@@ -600,13 +600,13 @@
     "semantic_hash": ""
   },
   ".agents/skills/web-research/SKILL.md": {
-    "mtime": 1782564719.9018533,
-    "ast_hash": "f99ec95b001fa53651312c50dd3d428d",
+    "mtime": 1782564802.823809,
+    "ast_hash": "ea22e3159c6b63a181e31440d10e0636",
     "semantic_hash": ""
   },
   ".github/instructions/web-research.instructions.md": {
-    "mtime": 1782505731.3380382,
-    "ast_hash": "ec72eacbf9ef25a424d79149177acfbd",
+    "mtime": 1782564802.8243911,
+    "ast_hash": "adee4db5f4cb66d65ec7991699a3c7d5",
     "semantic_hash": ""
   },
   "src/lib/research/markdown.test.ts": {
@@ -2075,13 +2075,13 @@
     "semantic_hash": ""
   },
   ".agents/rules/web-research.md": {
-    "mtime": 1782564719.900163,
-    "ast_hash": "b7b75485a9146e7fd89689fce2ae7446",
+    "mtime": 1782564802.8817418,
+    "ast_hash": "6e3e295d834ac99571b3bd895227383c",
     "semantic_hash": ""
   },
   ".claude/rules/generated/web-research.md": {
-    "mtime": 1782505731.3922956,
-    "ast_hash": "d194a81f9cba807baa7b209f3b3e5936",
+    "mtime": 1782564802.8804252,
+    "ast_hash": "d8ae2758fae64002136ff58dc5f3f119",
     "semantic_hash": ""
   },
   "agents/agents/official-docs-researcher.agent.md": {

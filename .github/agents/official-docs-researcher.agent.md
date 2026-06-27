@@ -5,7 +5,7 @@ model: 'Auto'
 tools: ['vscode/askQuestions', 'execute', 'read', 'search', 'web', 'vscode/memory']
 argument-hint: 'What topic should I research in official docs?'
 metadata:
-  version: '3.0.0'
+  version: '3.0.1'
 ---
 
 # Official Docs Researcher Agent
@@ -31,7 +31,7 @@ Do not research from memory alone. Training-data knowledge does not satisfy this
    # 2. Remote API search: Use this to quickly find URLs for documentation pages online
    # ONLY if you don't find any information in the local cache.
    bonsai search "<topic or keywords>" --domain <domain>
-   # Supported domains: react.dev, vuejs.org, tailwindcss.com, nextjs.org,
+   # Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org,
    # jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org,
    # vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
    ```

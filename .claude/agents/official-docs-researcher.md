@@ -26,7 +26,16 @@ Do not research from memory alone. Training-data knowledge does not satisfy this
 2. Search the Bonsai cache first:
 
    ```bash
+   # 1. Default search: Checks the local cache across EVERYTHING you've researched, 
+   # including domains that do not support online search APIs.
    bonsai search "<topic or keywords>"
+   
+   # 2. Remote API search: Use this to quickly find URLs for documentation pages online
+   # ONLY if you don't find any information in the local cache.
+   bonsai search "<topic or keywords>" --domain <domain>
+   # Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org,
+   # jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org,
+   # vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
    ```
 
 3. If the cache misses or does not cover the question, locate official source URLs. Prefer vendor docs, standards bodies, API references, and official release notes.
