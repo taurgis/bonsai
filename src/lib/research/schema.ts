@@ -3,17 +3,25 @@ export interface TokenEstimate {
   detailed: number | null;
 }
 
-export type CaptureMethod =
-  | 'static_fetch'
-  | 'browser_fallback'
-  | 'agent_supplied'
-  | 'route_markdown'
-  | 'github_source';
+// Single source of truth for the capture-method enum. Command flag `options` lists derive from this
+// so a new method can never drift out of sync with the filters that are supposed to expose it.
+export const CAPTURE_METHODS = [
+  'static_fetch',
+  'browser_fallback',
+  'agent_supplied',
+  'route_markdown',
+  'github_source',
+] as const;
+export type CaptureMethod = (typeof CAPTURE_METHODS)[number];
+
+// Single source of truth for the artifact-type enum. `index` = navigation/hub or llms.txt site
+// index; `section` = a heading-level child of a page. Command flag `options` derive from this.
+export const ARTIFACT_TYPES = ['source', 'research_note', 'index', 'section'] as const;
+export type ArtifactType = (typeof ARTIFACT_TYPES)[number];
 
 export interface ResearchArtifactMetadata {
   schema_version: number;
-  // `index` = navigation/hub or llms.txt site index; `section` = a heading-level child of a page.
-  artifact_type: 'source' | 'research_note' | 'index' | 'section';
+  artifact_type: ArtifactType;
   source_url: string;
   source_urls: string[];
   normalized_url: string;

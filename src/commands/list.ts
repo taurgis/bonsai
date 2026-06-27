@@ -3,10 +3,15 @@ import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
+import { ARTIFACT_TYPES, CAPTURE_METHODS } from '../lib/research/schema.js';
 import { resultListHeading, truncationNotice, type ResultListLabels } from '../lib/text.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
 const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
+
+// `list` answers "what pages/notes do I have?" and deliberately omits section children (see
+// scanCacheDirForList), so `section` is not an offered filter — every other artifact type can appear.
+const LISTABLE_ARTIFACT_TYPES = ARTIFACT_TYPES.filter((type) => type !== 'section');
 
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static id = 'list';
@@ -45,11 +50,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     })(),
     'artifact-type': Flags.option({
       description: 'Filter by artifact type.',
-      options: ['source', 'research_note'] as const,
+      options: LISTABLE_ARTIFACT_TYPES,
     })(),
     'capture-method': Flags.option({
       description: 'Filter by capture method.',
-      options: ['static_fetch', 'browser_fallback', 'agent_supplied'] as const,
+      options: CAPTURE_METHODS,
     })(),
     limit: Flags.integer({
       description: 'Maximum number of results to return (default 50, max 100).',
@@ -100,7 +105,10 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       // Section children are sub-chunks of a page, not artifacts a user "has" — they would flood the
       // listing (one page yields dozens) and aren't in the documented source/research_note contract.
       // They stay discoverable through `search` (which ranks them) and `inspect` (which lists a
-      // page's sections). `list` answers "what pages/notes do I have?", so keep it page-level.
+      // page's sections). `list` answers "what pages/notes do I have?", so keep it page-level. This
+      // unconditional guard owns the exclusion (the default no-filter case relies on it);
+      // LISTABLE_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
+      // type list can never return. Keep both in sync if section handling ever changes.
       if (artifact.metadata.artifact_type === 'section') return null;
       const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
       if (!this.matchesFilters(artifact.metadata, freshness)) return null;

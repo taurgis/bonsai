@@ -9,6 +9,7 @@ import {
 } from '../lib/text.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
+import { ARTIFACT_TYPES } from '../lib/research/schema.js';
 import { detectSite } from '../sites/index.js';
 import { fetchStaticHtml, fetchText, postJson } from '../lib/research/fetcher.js';
 import {
@@ -62,7 +63,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     }),
     'artifact-type': Flags.option({
       description: 'Filter results by artifact type.',
-      options: ['source', 'research_note', 'index', 'section'] as const,
+      options: ARTIFACT_TYPES,
     })(),
     limit: Flags.integer({
       description: 'Maximum number of results to return (default 10, max 50).',

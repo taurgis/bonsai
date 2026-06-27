@@ -12,8 +12,9 @@ fetch or import produces exactly one artifact.
 
 What an artifact represents. A **`source`** artifact is a single page (fetched or
 imported for one URL). A **`research_note`** is a synthesis keyed by a topic and
-a set of source URLs rather than a single page. See
-[Import synthesized research](/how-to/importing-synthesis).
+a set of source URLs rather than a single page. An **`index`** is a navigation
+hub or llms.txt site index. A **`section`** is a heading-level child extracted
+from a page. See [Import synthesized research](/how-to/importing-synthesis).
 
 ### Cache key
 
@@ -25,8 +26,10 @@ filename and the reason two slightly different URLs reuse the same entry.
 
 How the content was obtained: `static_fetch` (plain HTTP GET, the default),
 `browser_fallback` (rendered in a headless browser, used for `--rendered` and
-some [site modules](/reference/site-modules)), or `agent_supplied` (handed in via
-[`import`](/how-to/importing-synthesis)).
+some [site modules](/reference/site-modules)), `agent_supplied` (handed in via
+[`import`](/how-to/importing-synthesis)), `route_markdown` (the page's
+machine-readable `.md` route, when one is published), or `github_source` (raw
+source fetched from the page's GitHub edit link).
 
 ### Compressed vs. detailed
 
