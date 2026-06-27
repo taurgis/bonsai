@@ -14,44 +14,58 @@ export interface NormalizationResult {
  * Normalizes process.argv (excluding Node executable and script path) so the
  * oclif pipeline sees one consistent command structure.
  */
+function missingUsageJsonExit(): NormalizationResult['exitWithJson'] {
+  return {
+    exitCode: 2,
+    envelope: buildEnvelope({
+      command: 'bonsai',
+      ok: false,
+      exitCode: 2,
+      stderr: 'Missing URL or command. Run bonsai --help for usage.',
+      data: null,
+    }),
+  };
+}
+
 export function normalizeArgv(rawArgv: string[]): NormalizationResult {
-  if (rawArgv.length === 1 && rawArgv[0] === '--json') {
+  const onlyJsonFlags = rawArgv.length > 0 && rawArgv.every((arg) => arg === '--json');
+  if (onlyJsonFlags) {
     return {
-      argv: rawArgv,
-      exitWithJson: {
-        exitCode: 2,
-        envelope: buildEnvelope({
-          command: 'bonsai',
-          ok: false,
-          exitCode: 2,
-          stderr: 'Missing URL or command. Run bonsai --help for usage.',
-          data: null,
-        }),
-      },
+      // bin/cli.mjs exits before applying argv when exitWithJson is set.
+      argv: ['--json'],
+      exitWithJson: missingUsageJsonExit(),
     };
   }
 
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but
   // `bonsai --json list` is otherwise parsed as an unknown command named
-  // "--json". Treat a leading --json as a global convenience and move it after
-  // the command/URL before the rest of the shim routes shorthand URLs.
-  const argvForRouting =
-    rawArgv.length > 1 && rawArgv[0] === '--json' ? [...rawArgv.slice(1), '--json'] : rawArgv;
+  // "--json". Collect every --json, append one copy after the command/URL, and
+  // dedupe repeats like `bonsai --json --json list`.
+  const jsonMode = rawArgv.includes('--json');
+  let tokens = rawArgv.filter((arg) => arg !== '--json');
 
-  const [firstArg, ...restArgv] = argvForRouting;
+  // clig.dev: -h and --help must always work at any level.
+  tokens = tokens.map((arg) => (arg === '-h' ? '--help' : arg));
+
+  if (tokens[0] === 'help') {
+    tokens = [...tokens.slice(1), '--help'];
+  }
+
+  const helpRequested = tokens.includes('--help');
+  let core = tokens.filter((arg) => arg !== '--help');
+
+  const firstArg = core[0];
   // Treat any first arg that looks like a URL (carries a scheme) as the `fetch` shorthand.
   // Match both `https://…` and scheme-only forms like `javascript:` or `data:` so fetch can
   // reject unsupported protocols instead of oclif reporting a misleading "command not found".
   const looksLikeUrl =
     firstArg != null && (firstArg.includes('://') || /^[a-z][a-z0-9+.-]*:/i.test(firstArg));
-  const normalizedArgv =
-    firstArg === 'help'
-      ? [...restArgv, '--help']
-      : looksLikeUrl
-        ? ['fetch', ...argvForRouting]
-        : argvForRouting;
+  if (looksLikeUrl) {
+    core = ['fetch', ...core];
+  }
 
-  return {
-    argv: normalizedArgv,
-  };
+  if (helpRequested) core.push('--help');
+  if (jsonMode) core.push('--json');
+
+  return { argv: core };
 }

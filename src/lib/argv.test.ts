@@ -72,6 +72,74 @@ describe('normalizeArgv', () => {
       },
     },
     {
+      name: '-h should normalize to --help',
+      input: ['-h'],
+      expected: {
+        argv: ['--help'],
+      },
+    },
+    {
+      name: 'command -h should normalize to command --help',
+      input: ['list', '-h'],
+      expected: {
+        argv: ['list', '--help'],
+      },
+    },
+    {
+      name: '-h before subcommand should normalize to subcommand --help',
+      input: ['-h', 'list'],
+      expected: {
+        argv: ['list', '--help'],
+      },
+    },
+    {
+      name: 'leading --json with -h should normalize help and dedupe json',
+      input: ['--json', '-h'],
+      expected: {
+        argv: ['--help', '--json'],
+      },
+    },
+    {
+      name: '-h with trailing --json should normalize help and dedupe json',
+      input: ['-h', '--json'],
+      expected: {
+        argv: ['--help', '--json'],
+      },
+    },
+    {
+      name: 'duplicate leading --json should dedupe and route the command',
+      input: ['--json', '--json', 'list'],
+      expected: {
+        argv: ['list', '--json'],
+      },
+    },
+    {
+      name: 'duplicate trailing --json should dedupe',
+      input: ['list', '--json', '--json'],
+      expected: {
+        argv: ['list', '--json'],
+      },
+    },
+    {
+      name: 'only duplicate --json flags should trigger early JSON usage exit',
+      input: ['--json', '--json'],
+      expected: {
+        argv: ['--json'],
+        exitWithJson: {
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr: 'Missing URL or command. Run bonsai --help for usage.',
+            data: null,
+          },
+        },
+      },
+    },
+    {
       name: 'plain command should pass through unchanged',
       input: ['list'],
       expected: {

@@ -77,6 +77,27 @@ describe('research contract tests', () => {
     expect(result.stderr).toBe('');
   });
 
+  it('accepts duplicate --json before a normal command', () => {
+    const result = runContract(['--json', '--json', 'list'], { raw: true });
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.command).toBe('list');
+    expect(envelope.ok).toBe(true);
+    expect(result.stderr).toBe('');
+  });
+
+  it('bonsai -h exits 0 and lists top-level commands', () => {
+    const result = runContract(['-h']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('COMMANDS');
+  });
+
+  it('bonsai list -h exits 0 and shows command usage', () => {
+    const result = runContract(['list', '-h']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('USAGE');
+  });
+
   it('accepts --json before the URL shorthand and returns JSON error for unsupported scheme', () => {
     const result = runContract(['--json', 'ftp://example.com'], { raw: true });
     expect(result.exitCode).toBe(2);

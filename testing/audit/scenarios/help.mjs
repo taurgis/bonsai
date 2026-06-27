@@ -9,6 +9,18 @@ export default function register(harness) {
     expect(r.stdout.includes('$ bonsai https://'), 'missing URL shorthand docs');
   });
 
+  check('root -h exits 0 with COMMANDS', () => {
+    const r = run(['-h']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('COMMANDS'), 'missing COMMANDS');
+  });
+
+  check('list -h exits 0 with USAGE', () => {
+    const r = run(['list', '-h']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('USAGE'), 'missing USAGE');
+  });
+
   for (const cmd of ['search', 'inspect', 'status', 'list', 'import', 'prune', 'config']) {
     check(`${cmd} --help exits 0`, () => {
       const r = run([cmd, '--help']);

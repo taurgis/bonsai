@@ -17,6 +17,12 @@ export default function register(harness) {
     expect(parseJson(r.stdout)?.command === 'list', 'command id');
   });
 
+  check('duplicate --json before command dedupes', () => {
+    const r = run(['--json', '--json', 'list']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.command === 'list', 'command id');
+  });
+
   check('--json alone returns usage envelope exit 2', () => {
     const r = run(['--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
