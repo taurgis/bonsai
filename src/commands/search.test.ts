@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import ResearchSearch from './search.js';
 import ResearchImport from './import.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
+import type { LocalSearchResult } from '../lib/research/local-search.js';
 
 describe('search command unit tests', () => {
   useIsolatedCache();
@@ -33,7 +34,7 @@ describe('search command unit tests', () => {
   });
 
   it('returns empty results if no match is found', async () => {
-    const result = (await ResearchSearch.run(['nonexistentQueryTerm'])) as any[];
+    const result = (await ResearchSearch.run(['nonexistentQueryTerm'])) as LocalSearchResult[];
     expect(result).toBeDefined();
     expect(result).toHaveLength(0);
   });
@@ -65,12 +66,18 @@ describe('search command unit tests', () => {
     ]);
 
     // Search for "react suspense"
-    const results = (await ResearchSearch.run(['react suspense'])) as any[];
+    const results = (await ResearchSearch.run(['react suspense'])) as LocalSearchResult[];
     expect(results.length).toBeGreaterThanOrEqual(1);
     const reactMatch = results.find((r) => r.topic === 'React Search Topic');
     expect(reactMatch).toBeDefined();
-    expect(reactMatch.score).toBeGreaterThan(0);
-    expect(reactMatch.snippet).toContain('React Suspense');
+    expect(reactMatch!.score).toBeGreaterThan(0);
+    expect(reactMatch!.snippet.toLowerCase()).toContain('react');
+    expect(reactMatch!.matchedTerms).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ term: 'react' }),
+        expect.objectContaining({ term: 'suspense' }),
+      ])
+    );
 
     readSpy.mockRestore();
   });
@@ -99,7 +106,11 @@ describe('search command unit tests', () => {
     ]);
 
     // Match both but filter by tag "node"
-    const results = (await ResearchSearch.run(['streams', '--tags', 'node'])) as any[];
+    const results = (await ResearchSearch.run([
+      'streams',
+      '--tags',
+      'node',
+    ])) as LocalSearchResult[];
     expect(results.length).toBeGreaterThanOrEqual(1);
     const backendMatch = results.find((r) => r.topic === 'Backend Search Streams');
     expect(backendMatch).toBeDefined();
@@ -109,7 +120,7 @@ describe('search command unit tests', () => {
       'streams',
       '--topic',
       'Frontend Search Streams',
-    ])) as any[];
+    ])) as LocalSearchResult[];
     expect(resultsTopic.length).toBeGreaterThanOrEqual(1);
     const frontendMatch = resultsTopic.find((r) => r.topic === 'Frontend Search Streams');
     expect(frontendMatch).toBeDefined();
@@ -132,11 +143,11 @@ describe('search command unit tests', () => {
     ]);
 
     // Search fuzzy term "nestj" (edit distance 1 to "nestjs" / "nestjs framework")
-    const results = (await ResearchSearch.run(['nestj'])) as any[];
+    const results = (await ResearchSearch.run(['nestj'])) as LocalSearchResult[];
     expect(results.length).toBeGreaterThanOrEqual(1);
     const nestjsMatch = results.find((r) => r.topic === 'NestJS Framework');
     expect(nestjsMatch).toBeDefined();
-    expect(nestjsMatch.score).toBeGreaterThan(0);
+    expect(nestjsMatch!.score).toBeGreaterThan(0);
 
     readSpy.mockRestore();
   });
@@ -162,7 +173,7 @@ describe('search command unit tests', () => {
 
     // Search for "nestjs config" - "Custom NestJS Config" matches the exact phrase "nestjs config"
     // "NestJS Guide Config" has "nestjs" and "config" but not as a phrase.
-    const results = (await ResearchSearch.run(['nestjs config'])) as any[];
+    const results = (await ResearchSearch.run(['nestjs config'])) as LocalSearchResult[];
     expect(results.length).toBeGreaterThanOrEqual(2);
     expect(results[0].topic).toBe('Custom NestJS Config');
 
@@ -170,7 +181,7 @@ describe('search command unit tests', () => {
   });
 
   it('signals truncation in the human heading when more entries match than --limit', async () => {
-    const fake = Array.from({ length: 3 }, (_, i) => ({
+    const fake: LocalSearchResult[] = Array.from({ length: 3 }, (_, i) => ({
       cacheKey: `k${i}`,
       path: `/x/k${i}.md`,
       artifactType: 'source',
@@ -181,6 +192,7 @@ describe('search command unit tests', () => {
       captureMethod: 'agent_supplied',
       tokenEstimate: { compressed: 1, detailed: 1 },
       snippet: 's',
+      matchedTerms: [{ term: 'anything', field: 'summary', kind: 'exact' }],
       siteModuleId: null,
       score: 100 - i,
     }));
@@ -192,13 +204,17 @@ describe('search command unit tests', () => {
       .spyOn(ResearchSearch.prototype as any, 'log')
       .mockImplementation((msg: string) => logged.push(msg));
 
-    const truncated = (await ResearchSearch.run(['anything', '--limit', '2'])) as any[];
+    const truncated = (await ResearchSearch.run([
+      'anything',
+      '--limit',
+      '2',
+    ])) as LocalSearchResult[];
     expect(truncated.length).toBe(2);
     expect(logged[0]).toContain('Found 3');
     expect(logged[0]).toContain('showing top 2');
 
     logged.length = 0;
-    const full = (await ResearchSearch.run(['anything', '--limit', '10'])) as any[];
+    const full = (await ResearchSearch.run(['anything', '--limit', '10'])) as LocalSearchResult[];
     expect(full.length).toBe(3);
     expect(logged[0]).toBe('Found 3 matching cached research entries:\n');
 
@@ -207,7 +223,7 @@ describe('search command unit tests', () => {
   });
 
   it('warns on stderr (not stdout) when --json results are truncated', async () => {
-    const fake = Array.from({ length: 3 }, (_, i) => ({
+    const fake: LocalSearchResult[] = Array.from({ length: 3 }, (_, i) => ({
       cacheKey: `k${i}`,
       path: `/x/k${i}.md`,
       artifactType: 'source',
@@ -218,6 +234,7 @@ describe('search command unit tests', () => {
       captureMethod: 'agent_supplied',
       tokenEstimate: { compressed: 1, detailed: 1 },
       snippet: 's',
+      matchedTerms: [{ term: 'anything', field: 'summary', kind: 'exact' }],
       siteModuleId: null,
       score: 100 - i,
     }));

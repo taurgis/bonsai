@@ -195,7 +195,9 @@ npx @taurgis/bonsai inspect <url>
 
 ## 5. `search`
 
-Rank local cache contents based on keyword scores.
+Rank local cache contents by keyword relevance. Every non-stopword term must
+match (AND). Quoted phrases must appear contiguously. See
+[Search](/how-to/search) for ranking details.
 
 ### Usage
 ```bash
@@ -216,6 +218,10 @@ npx @taurgis/bonsai search "<query>" [flags]
     "captureMethod": "static_fetch",
     "tokenEstimate": { "compressed": 29, "detailed": 65 },
     "snippet": "...example domain is for use in documentation...",
+    "matchedTerms": [
+      { "term": "example", "field": "topic", "kind": "exact" }
+    ],
+    "siteModuleId": null,
     "score": 145
   }
 ]

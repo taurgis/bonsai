@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   closestMatch,
   levenshtein,
+  maxFuzzyDistance,
   pluralize,
   resultListHeading,
   truncationNotice,
@@ -48,6 +49,14 @@ describe('truncationNotice', () => {
     expect(truncationNotice(5, 2, SEARCH)).toBe(
       '5 entries matched; returning the top 2. Raise --limit (max 50) to see more.'
     );
+  });
+});
+
+describe('maxFuzzyDistance', () => {
+  it('uses tighter thresholds for short inputs', () => {
+    expect(maxFuzzyDistance('ab')).toBe(1);
+    expect(maxFuzzyDistance('abcd')).toBe(2);
+    expect(maxFuzzyDistance('abcdef')).toBe(3);
   });
 });
 

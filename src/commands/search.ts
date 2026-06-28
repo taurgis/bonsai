@@ -2,7 +2,17 @@ import { Args, Flags, ux } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { loadSearchableArtifacts } from '../lib/research/search-index.js';
 import {
-  levenshtein,
+  buildSearchCorpusStats,
+  isEmptySearchQuery,
+  parseSearchQuery,
+  prepareSearchArtifact,
+  scoreLocalSearch,
+  toLocalSearchResult,
+  type LocalSearchResult,
+  type ParsedSearchQuery,
+} from '../lib/research/local-search.js';
+import type { ResearchArtifactMetadata } from '../lib/research/schema.js';
+import {
   NO_TOPIC_LABEL,
   resultListHeading,
   truncationNotice,
@@ -39,8 +49,6 @@ const REMOTE_SEARCH_DEPS: RemoteSearchDeps = {
   },
   postJson: (url, body, headers) => postJson(url, body, headers),
 };
-
-const FRESHNESS_BONUS: Record<string, number> = { fresh: 30, stale_grace: 10 };
 
 export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   static id = 'search';
@@ -99,16 +107,16 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
 
   static stdoutIsPrimaryData = true;
 
-  private getSearchQueryTerms(query: string): string[] {
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    if (terms.length === 0) {
+  private parseQuery(raw: string): ParsedSearchQuery {
+    const parsed = parseSearchQuery(raw);
+    if (isEmptySearchQuery(parsed)) {
       this.error('Query string cannot be empty.', { exit: 2, code: 'EMPTY_QUERY' });
     }
-    return terms;
+    return parsed;
   }
 
   private matchesFilters(
-    meta: any,
+    meta: ResearchArtifactMetadata,
     freshness: string,
     topicFlag: string | undefined,
     tagsFlag: string[] | undefined,
@@ -137,78 +145,17 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     return true;
   }
 
-  private phraseMatchBonus(
-    topic: string,
-    tags: string[],
-    summ: string,
-    comp: string,
-    queryTerms: string[]
-  ): number {
-    if (queryTerms.length <= 1) return 0;
-    const fullQuery = queryTerms.join(' ');
-    let bonus = 0;
-    if (topic === fullQuery) bonus += 200;
-    if (topic.includes(fullQuery)) bonus += 100;
-    if (tags.includes(fullQuery)) bonus += 150;
-    if (summ.includes(fullQuery)) bonus += 50 + Math.min(summ.split(fullQuery).length - 1, 5) * 10;
-    if (comp.includes(fullQuery)) bonus += 20 + Math.min(comp.split(fullQuery).length - 1, 10) * 5;
-    return bonus;
-  }
-
-  private calculateScore(
-    meta: any,
-    summary: string,
-    compressed: string,
-    queryTerms: string[],
-    freshness: string
-  ): number {
-    const topic = (meta.topic || '').toLowerCase();
-    const tags = (meta.tags || []).map((t: string) => t.toLowerCase());
-    const sourceUrl = (meta.source_url || '').toLowerCase();
-    const sourceUrls = (meta.source_urls || []).map((u: string) => u.toLowerCase());
-    const summ = summary.toLowerCase();
-    const comp = compressed.toLowerCase();
-
-    let score = 0;
-    let matchedAny = false;
-    for (const term of queryTerms) {
-      const termScore = scoreSingleTerm(term, topic, tags, sourceUrl, sourceUrls, summ, comp);
-      if (termScore > 0) {
-        score += termScore;
-        matchedAny = true;
-      }
-    }
-    if (!matchedAny) return 0;
-
-    score += this.phraseMatchBonus(topic, tags, summ, comp, queryTerms);
-    score += FRESHNESS_BONUS[freshness] ?? 0;
-    return score;
-  }
-
-  private makeSnippet(text: string, queryTerms: string[]): string {
-    const lower = text.toLowerCase();
-    let bestIdx = 0;
-    for (const term of queryTerms) {
-      const idx = lower.indexOf(term);
-      if (idx !== -1) {
-        bestIdx = idx;
-        break;
-      }
-    }
-    const start = Math.max(0, bestIdx - 40);
-    const end = Math.min(text.length, bestIdx + 110);
-    let snippet = text.slice(start, end).replace(/\s+/g, ' ').trim();
-    if (start > 0) snippet = '...' + snippet;
-    if (end < text.length) snippet = snippet + '...';
-    return snippet;
-  }
-
   private scanCacheDirForResults(
     readRoots: string[],
-    queryTerms: string[],
+    parsedQuery: ParsedSearchQuery,
     currentTime: Date
-  ): any[] {
-    const results: any[] = [];
+  ): LocalSearchResult[] {
+    const candidates: {
+      prepared: ReturnType<typeof prepareSearchArtifact>;
+      filePath: string;
+      freshness: string;
+    }[] = [];
+
     for (const { artifact, filePath } of loadSearchableArtifacts(readRoots)) {
       if (artifact.metadata.status !== 'active') continue;
       const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
@@ -221,39 +168,29 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
           this.flags['artifact-type'],
           Boolean(this.flags['include-stale'])
         )
-      )
+      ) {
         continue;
-      let score = this.calculateScore(
-        artifact.metadata,
-        artifact.summary,
-        artifact.compressed,
-        queryTerms,
-        freshness
-      );
-      if (score <= 0) continue;
-      // Section children are more precise than the whole page, so rank a section hit slightly
-      // above its parent for the same query (T-22).
-      if (artifact.metadata.artifact_type === 'section') score += 15;
-      const snippetText = [artifact.summary, artifact.compressed].filter(Boolean).join('\n');
-      results.push({
-        cacheKey: artifact.metadata.cache_key,
-        path: filePath,
-        artifactType: artifact.metadata.artifact_type,
-        sourceUrls: artifact.metadata.source_urls,
-        topic: artifact.metadata.topic,
-        tags: artifact.metadata.tags,
-        freshness,
-        captureMethod: artifact.metadata.capture_method,
-        tokenEstimate: artifact.metadata.token_estimate,
-        snippet: this.makeSnippet(snippetText, queryTerms),
-        siteModuleId: artifact.metadata.site_module_id,
-        score,
-      });
+      }
+      candidates.push({ prepared: prepareSearchArtifact(artifact), filePath, freshness });
     }
+
+    const corpus = buildSearchCorpusStats(candidates.map((c) => c.prepared));
+    const results: LocalSearchResult[] = [];
+
+    for (const { prepared, filePath, freshness } of candidates) {
+      const scored = scoreLocalSearch(prepared, parsedQuery, corpus, freshness);
+      if (!scored) continue;
+      results.push(toLocalSearchResult(filePath, prepared, freshness, scored));
+    }
+
     return results;
   }
 
-  private logSearchResults(finalResults: any[], totalMatched: number): void {
+  private logSearchResults(
+    finalResults: LocalSearchResult[],
+    totalMatched: number,
+    highlightTerms: string[]
+  ): void {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No matching cached research entries found.');
@@ -261,12 +198,11 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       return;
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, SEARCH_LABELS)}\n`);
-    const queryTerms = this.args.query ? this.getSearchQueryTerms(this.args.query) : [];
     finalResults.forEach((res, index) => {
       const topicStr = res.topic ? colors.cyan(res.topic) : colors.gray(NO_TOPIC_LABEL);
       this.log(`${index + 1}. [${topicStr}] Score: ${colors.magenta(String(res.score))}`);
       this.log(`   Cache Key: ${colors.bold(res.cacheKey)}`);
-      this.log(`   Snippet: ${highlightQuery(res.snippet, queryTerms)}`);
+      this.log(`   Snippet: ${highlightQuery(res.snippet, highlightTerms)}`);
       this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
     });
   }
@@ -275,20 +211,24 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   // search so the two paths can't drift in formatting.
   private printResults(
     heading: string,
-    results: ReadonlyArray<{ title: string; url: string; snippet?: string }>
+    results: ReadonlyArray<{ title: string; url: string; snippet?: string }>,
+    highlightTerms: string[]
   ): void {
     if (this.jsonEnabled()) return;
     this.log(colors.cyan(heading));
-    const query = this.args.query ? this.getSearchQueryTerms(this.args.query) : [];
     results.forEach((r, i) => {
       this.log(`${i + 1}. ${colors.bold(r.title)}`);
       this.log(`   URL: ${colors.gray(r.url)}`);
-      if (r.snippet) this.log(`   ${highlightQuery(r.snippet, query)}`);
+      if (r.snippet) this.log(`   ${highlightQuery(r.snippet, highlightTerms)}`);
     });
   }
 
   // fallow-ignore-next-line complexity
-  private async executeSiteSearch(query: string, domain: string): Promise<unknown> {
+  private async executeSiteSearch(
+    query: string,
+    domain: string,
+    highlightTerms: string[]
+  ): Promise<unknown> {
     const siteModule = detectSite(`https://${domain}`);
     if (!siteModule) {
       this.error(`No site module registered for domain: ${domain}`, {
@@ -306,7 +246,11 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       if (!this.jsonEnabled()) ux.action.start(`Searching ${domain}`);
       const results = await siteModule.search(query);
       if (!this.jsonEnabled()) ux.action.stop();
-      this.printResults(`Found ${results.length} results from ${siteModule.name}:\n`, results);
+      this.printResults(
+        `Found ${results.length} results from ${siteModule.name}:\n`,
+        results,
+        highlightTerms
+      );
       return results.map((r) => ({ ...r, site_module_id: siteModule.id }));
     } catch (err) {
       if (!this.jsonEnabled()) ux.action.stop('failed');
@@ -317,12 +261,20 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   // Remote docs discovery. On any connector failure, degrade to local cache search with a warning
   // (T-20). Returns discovery results tagged remote: true so callers can tell them from cache hits.
   // fallow-ignore-next-line complexity
-  private async executeRemoteSearch(query: string, docsUrl: string): Promise<unknown> {
+  private async executeRemoteSearch(
+    query: string,
+    docsUrl: string,
+    highlightTerms: string[]
+  ): Promise<unknown> {
     try {
       if (!this.jsonEnabled()) ux.action.start(`Searching ${docsUrl}`);
       const { provider, results } = await runRemoteDocsSearch(docsUrl, query, REMOTE_SEARCH_DEPS);
       if (!this.jsonEnabled()) ux.action.stop();
-      this.printResults(`Found ${results.length} remote results via ${provider}:\n`, results);
+      this.printResults(
+        `Found ${results.length} remote results via ${provider}:\n`,
+        results,
+        highlightTerms
+      );
       return results.map((r) => ({ ...r, remote: true }));
     } catch (err) {
       if (!this.jsonEnabled()) ux.action.stop('failed');
@@ -335,8 +287,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     const { query } = this.args;
     const { domain, remote } = this.flags;
 
-    // Reject whitespace-only queries on every path (local, --domain, --remote).
-    this.getSearchQueryTerms(query);
+    const parsedQuery = this.parseQuery(query);
 
     if (domain && remote) {
       this.error(
@@ -353,7 +304,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     }
 
     if (domain) {
-      return this.executeSiteSearch(query, domain);
+      return this.executeSiteSearch(query, domain, parsedQuery.highlightTerms);
     }
 
     if (remote) {
@@ -366,12 +317,14 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
           code: 'INVALID_URL',
         });
       }
-      const remoteResults = await this.executeRemoteSearch(query, normalizedRemote);
+      const remoteResults = await this.executeRemoteSearch(
+        query,
+        normalizedRemote,
+        parsedQuery.highlightTerms
+      );
       if (remoteResults !== undefined) return remoteResults;
       // else: fall through to local cache search (connector/network failure only)
     }
-
-    const queryTerms = this.getSearchQueryTerms(query);
 
     const roots = loadStoreRoots({
       configDir: this.config.configDir,
@@ -380,7 +333,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     });
     const currentTime = new Date();
 
-    const results = this.scanCacheDirForResults(roots.readRoots, queryTerms, currentTime);
+    const results = this.scanCacheDirForResults(roots.readRoots, parsedQuery, currentTime);
 
     results.sort((a, b) => b.score - a.score);
     const finalResults = results.slice(0, this.flags.limit);
@@ -391,72 +344,8 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     const notice = truncationNotice(results.length, finalResults.length, SEARCH_LABELS);
     if (notice && this.jsonEnabled()) this.warn(notice);
 
-    this.logSearchResults(finalResults, results.length);
+    this.logSearchResults(finalResults, results.length, parsedQuery.highlightTerms);
 
     return finalResults;
   }
-}
-
-function scoreSingleTerm(
-  term: string,
-  topic: string,
-  tags: string[],
-  sourceUrl: string,
-  sourceUrls: string[],
-  summ: string,
-  comp: string
-): number {
-  let termScore = 0;
-  let termMatched = false;
-
-  // 1. Topic Match
-  if (topic === term) {
-    termScore += 100;
-    termMatched = true;
-  } else if (topic.includes(term)) {
-    termScore += 60;
-    termMatched = true;
-  } else if (isFuzzyMatch(term, topic)) {
-    termScore += 40;
-    termMatched = true;
-  }
-
-  // 2. Tags Match
-  if (tags.includes(term)) {
-    termScore += 80;
-    termMatched = true;
-  } else if (tags.some((t) => isFuzzyMatch(term, t) || t.includes(term))) {
-    termScore += 30;
-    termMatched = true;
-  }
-
-  // 3. Source URL Match
-  if (sourceUrl.includes(term) || sourceUrls.some((u) => u.includes(term))) {
-    termScore += 50;
-    termMatched = true;
-  }
-
-  // 4. Summary Term Frequency Match
-  const summMatches = summ.split(term).length - 1;
-  if (summMatches > 0) {
-    termScore += 20 + Math.min(summMatches, 5) * 5;
-    termMatched = true;
-  }
-
-  // 5. Compressed Content Term Frequency Match
-  const compMatches = comp.split(term).length - 1;
-  if (compMatches > 0) {
-    termScore += 5 + Math.min(compMatches, 10) * 2;
-    termMatched = true;
-  }
-
-  if (termMatched) {
-    termScore += 10;
-  }
-  return termScore;
-}
-
-function isFuzzyMatch(term: string, target: string): boolean {
-  if (term.length < 4 || target.length < 4) return false;
-  return levenshtein(term, target) <= 2;
 }

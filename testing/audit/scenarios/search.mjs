@@ -69,9 +69,42 @@ export default function register(harness, fixtures) {
     expectSingleCachedHit(harness, ['search', 'alpha-bravo-cache', '--json'], ws, url);
   });
 
-  check('search missing query exit 2', () => {
-    const r = run(['search', '--json']);
-    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+  check('search AND semantics exclude partial multi-term hits', () => {
+    const ws = createWorkspace();
+    const reactUrl = 'https://example.com/audit-search-react-only';
+    const vueUrl = 'https://example.com/audit-search-vue-only';
+    const reactImport = run(['import', reactUrl, '--stdin', '--topic', 'React Only', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# React\n\nReact hooks overview.\n',
+    });
+    const vueImport = run(['import', vueUrl, '--stdin', '--topic', 'Vue Only', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Vue\n\nVue component lifecycle.\n',
+    });
+    expect(reactImport.exitCode === 0 && vueImport.exitCode === 0, 'imports');
+
+    const r = run(['search', 'react vue', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const data = parseJson(r.stdout)?.data;
+    expect(Array.isArray(data) && data.length === 0, 'no partial AND matches');
+  });
+
+  check('search quoted phrase returns matchedTerms phrase kind', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-search-phrase';
+    const imported = run(['import', url, '--stdin', '--topic', 'Phrase Hit', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Phrase\n\nThe delta-tango phrase appears once here.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['search', '"delta-tango phrase"', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const row = parseJson(r.stdout)?.data?.[0];
+    expect(row?.matchedTerms?.some((m) => m.kind === 'phrase'), 'phrase match metadata');
   });
 
   check('search missing query --json MISSING_ARGUMENT', () => {

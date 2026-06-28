@@ -26,24 +26,31 @@ npx @taurgis/bonsai search "react useEffect cleanup" --json --limit 5
 
 ## How ranking works
 
-A query term earns points wherever it lands, and the strongest signals sit
-closest to what the entry is *about*:
+Bonsai parses your query before scoring:
 
-- **Topic** is worth the most. An exact topic match scores 100, a partial match
-  60, and a close-but-not-exact (fuzzy) match 40.
-- **Tags** come next: 80 for an exact tag, 30 for a partial or fuzzy one.
-- **Source URLs, the summary, and the compressed body** all contribute, so a
-  term buried in the content still surfaces the page, just lower down.
+- **Quoted phrases** (`"use effect"`) must appear contiguously in the entry.
+- **Unquoted terms** have common English stopwords removed (`how`, `the`, `to`, …).
+- **Every remaining term must match** (AND semantics). An entry that only hits
+  one word of a multi-word query is excluded.
 
-Multi-word queries get a phrase bonus when the whole phrase appears in the topic,
-tags, summary, or body, which rewards entries that match your full intent rather
-than one stray word. Fresh entries get a small boost (30 points, or 10 inside the
-grace window), so current research outranks a stale copy of the same page. A
-section extracted from a larger page edges out its parent for the same query,
-because the section is the more precise hit.
+Matching is **token-aware**, not substring-based: `art` does not match `start`,
+and `api` does not match `rapid`. Terms can match exactly, as a **prefix**
+(`authent` → `authentication`), or **fuzzily** (typo tolerance scales with term
+length).
 
-One rule decides what disappears: an entry that matches no query term at all
-scores zero and never appears in the results.
+Scores combine metadata boosts with **BM25-lite** ranking on the summary and
+compressed body (rare terms rank higher than words that appear in every note):
+
+- **Topic** is worth the most: exact, prefix, then fuzzy matches.
+- **Tags** and **source URLs** come next.
+- **Summary and compressed content** contribute via BM25, with summary weighted
+  more heavily.
+
+Multi-word queries get an extra bonus when terms appear adjacent in the text.
+Quoted phrases earn a field-specific boost depending on where they matched. Fresh
+entries get a small boost (30 points, or 10 inside the grace window). A section
+extracted from a larger page edges out its parent for the same query, because
+the section is the more precise hit.
 
 ## Narrow the results
 
@@ -93,5 +100,7 @@ back to a normal local cache search, with a warning so you know which path ran.
 Local results return as an array. The fields you will use most are `cacheKey`
 and `path` (where the artifact lives), `sourceUrls`, `topic`, `tags`,
 `freshness`, `tokenEstimate` (separate `compressed` and `detailed` counts),
-`snippet`, and `score`. The full envelope is documented in the
+`snippet`, `score`, and `matchedTerms` (each hit records the query term, which
+field matched, and whether the match was `exact`, `prefix`, `fuzzy`, or
+`phrase`). The full envelope is documented in the
 [Command Reference](/reference/commands).

@@ -134,7 +134,7 @@ Use `--rendered` when the target page is a Single Page Application (SPA) or reli
 
 ### Advanced Full-Text Search
 
-`search` now supports fuzzy matching (Levenshtein distance <= 2 for terms >= 4 chars), term frequency ranking, substring matching in topics and tags, and exact phrase match bonuses for multi-word queries.
+`search` uses AND semantics (every term must match), quoted-phrase support, token-aware matching (exact/prefix/fuzzy), BM25-lite body ranking with metadata field boosts, and returns `matchedTerms` in JSON results for agent transparency.
 
 ### Manual CLI audit (`pnpm audit:cli`) — keep it up to date
 

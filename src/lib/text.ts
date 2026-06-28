@@ -41,6 +41,13 @@ export function truncationNotice(
   return `${total} entries matched; returning the ${labels.order} ${shown}. Raise --limit (max ${labels.maxLimit}) to see more.`;
 }
 
+/** Max edit distance for a plausible typo; scales with input length. */
+export function maxFuzzyDistance(input: string): number {
+  if (input.length <= 3) return 1;
+  if (input.length <= 5) return 2;
+  return 3;
+}
+
 /**
  * Levenshtein edit distance: the minimum number of single-character insertions, deletions, or
  * substitutions to turn `s1` into `s2`. Shared by fuzzy search ranking and command-typo suggestion.

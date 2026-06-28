@@ -1,14 +1,6 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
-import { closestMatch } from '../../lib/text.js';
+import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
 import { buildEnvelope, formatErrorForJson } from '../../lib/envelope.js';
-
-// Nearest command must be close enough to be useful. A fixed threshold of 3 is too generous for
-// very short inputs (`wat` should not suggest `list`), while still reasonable for longer topic ids.
-function maxSuggestionDistance(input: string): number {
-  if (input.length <= 3) return 1;
-  if (input.length <= 5) return 2;
-  return 3;
-}
 
 /**
  * The nearest visible command to a typo, plus how many leading segments of the attempted id name
@@ -24,7 +16,7 @@ function findSuggestion(
 ): { suggestion: string | null; commandSegments: number } {
   for (let n = segments.length; n >= 1; n--) {
     const attempted = segments.slice(0, n).join(':');
-    const suggestion = closestMatch(attempted, visibleIds, maxSuggestionDistance(attempted));
+    const suggestion = closestMatch(attempted, visibleIds, maxFuzzyDistance(attempted));
     if (
       suggestion === attempted &&
       n < segments.length &&
