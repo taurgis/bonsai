@@ -1,6 +1,7 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
 import { buildEnvelope, formatErrorForJson } from '../../lib/envelope.js';
+import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
 /**
  * The nearest visible command to a typo, plus how many leading segments of the attempted id name
@@ -63,29 +64,17 @@ function exactZeroArgCommandPrefix(
   return null;
 }
 
-// Dot-separated, non-empty labels: a real domain (`docs.nestjs.com`) or IPv4 (`192.168.1.1`). The
-// URL parser also accepts a leading-dot filename (`.env`) or a relative path (`./x`) as a "host",
-// whose suggestion would be a nonsense `https://.env`; requiring well-formed labels rejects those.
-// Anchored with no overlapping quantifiers, so it is ReDoS-safe on the (already length-bounded) host.
-const DOMAIN_OR_IPV4 = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
-
 /**
  * The input as-typed when it looks like a URL missing its scheme (`example.com`,
  * `docs.nestjs.com/guide`), else null. `bonsai <url>` is the headline command, but bin/cli.mjs only
  * routes args carrying a `://` scheme to the fetch shorthand — so a scheme-less URL falls through to
  * `command_not_found`. A domain-shaped host separates a forgotten-scheme URL from an ordinary command
  * typo: `statuss` has no dot and never matches, while `config:frobnicate` fails to parse (the second
- * segment becomes a non-numeric port), so neither is misread as a URL.
+ * segment becomes a non-numeric port), so neither is misread as a URL. The same domain-shape test
+ * powers normalizeUrl's "missing scheme" hint, so the two entry paths stay in lockstep.
  */
 function bareUrlInput(id: string): string | null {
-  if (id.includes('://')) return null;
-  let hostname: string;
-  try {
-    hostname = new URL(`https://${id}`).hostname;
-  } catch {
-    return null;
-  }
-  return DOMAIN_OR_IPV4.test(hostname) ? id : null;
+  return looksLikeSchemelessUrl(id) ? id : null;
 }
 
 function isJsonMode(argv: string[] | undefined): boolean {

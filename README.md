@@ -281,7 +281,9 @@ When run with `--json`, commands return a stable envelope:
 | --- | --- |
 | `BONSAI_STORAGE` | Override the default storage location per-invocation (`global` or `project`). |
 | `BONSAI_SUMMARY` | Override the summary compression level per-invocation (`conservative`, `balanced`, or `aggressive`). |
-| `NO_COLOR` | Disable all ANSI color output (also respected via `TERM=dumb`). |
+| `NO_COLOR` | Set to any non-empty value to disable all ANSI color output. An empty `NO_COLOR` is treated as unset. |
+| `FORCE_COLOR` | Set to any value other than an empty string, `0`, or `false` to force ANSI color on, even in non-TTY environments. |
+| `TERM=dumb` | Disables ANSI color output when the terminal cannot render escape sequences. |
 | `NO_UPDATE_NOTIFIER` | Suppress the "update available" notification. |
 | `CI` | Set to `1` or `true` to suppress the update notification in CI environments (detected automatically). |
 | `DEBUG` | Enable debug output for specific Bonsai namespaces, e.g. `DEBUG=bonsai:*`. |

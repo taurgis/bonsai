@@ -143,7 +143,9 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       try {
         return normalizeUrl(u);
       } catch (err) {
-        this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2, code: 'INVALID_URL' });
+        // Shared exit point: a forgotten scheme reports MISSING_URL_SCHEME like every other command,
+        // while genuinely malformed input stays INVALID_URL.
+        this.failInvalidUrl(u, (err as Error).message);
       }
     }) as string[];
     return hasMulti ? normalized.sort() : normalized;
