@@ -1,17 +1,24 @@
+/**
+ * Whether ANSI color should be emitted, per the clig.dev / no-color.org rules:
+ * - `FORCE_COLOR` (set to any value other than an explicit off) forces color on, ignoring detection.
+ * - `NO_COLOR` set to a non-empty value disables color, regardless of that value. An empty
+ *   `NO_COLOR` is treated as unset (the spec keys off "present and not empty").
+ * - `TERM=dumb` cannot render ANSI, so color is disabled.
+ * - Otherwise color follows whether stdout is an interactive terminal.
+ * See https://clig.dev/#output and https://no-color.org/.
+ */
 export function isColorEnabled(): boolean {
-  const hasNoColor =
-    typeof process !== 'undefined' &&
-    process.env &&
-    (process.env.NO_COLOR === '1' ||
-      process.env.NO_COLOR === 'true' ||
-      process.env.NO_COLOR === '');
-  const hasForceColor =
-    typeof process !== 'undefined' &&
-    process.env &&
-    (process.env.FORCE_COLOR === '1' || process.env.FORCE_COLOR === 'true');
-  const isTTY = typeof process !== 'undefined' && process.stdout && process.stdout.isTTY;
+  if (typeof process === 'undefined' || !process.env) return false;
+  const env = process.env;
 
-  return !!hasForceColor || (!!isTTY && !hasNoColor);
+  const force = env.FORCE_COLOR;
+  if (force !== undefined && force !== '' && force !== '0' && force !== 'false') return true;
+
+  if (env.NO_COLOR !== undefined && env.NO_COLOR !== '') return false;
+
+  if (env.TERM === 'dumb') return false;
+
+  return Boolean(process.stdout && process.stdout.isTTY);
 }
 
 export function color(text: string, colorCode: string): string {

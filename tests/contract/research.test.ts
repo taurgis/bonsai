@@ -329,6 +329,20 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stderr).not.toContain('Invalid URL: Invalid URL');
   });
 
+  it('a scheme-less URL on a subcommand reports MISSING_URL_SCHEME like the root shorthand', () => {
+    const result = runContract(['inspect', 'docs.nestjs.com', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.code).toBe('MISSING_URL_SCHEME');
+    expect(envelope.stderr).toContain('https://docs.nestjs.com');
+  });
+
+  it('truly malformed input stays INVALID_URL, distinct from a forgotten scheme', () => {
+    const result = runContract(['inspect', 'notaurl', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    expect(JSON.parse(result.stdout).code).toBe('INVALID_URL');
+  });
+
   it('import with both an explicit url and --source-url still conflicts (exit 2)', () => {
     // ignoreStdin must not weaken the genuine conflict: an explicit positional token is still
     // assigned to url, so supplying both it and --source-url is a usage error even with stdin piped.

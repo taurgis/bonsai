@@ -36,6 +36,14 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'EMPTY_INPUT', 'code');
   });
 
+  check('import scheme-less URL hints the https form --json MISSING_URL_SCHEME', () => {
+    const r = run(['import', 'example.com/page', '--stdin', '--json'], { input: '# x\n' });
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'MISSING_URL_SCHEME', env?.code);
+    expect(env?.stderr?.includes('https://example.com/page'), env?.stderr);
+  });
+
   check('import file not found --json FILE_NOT_FOUND', () => {
     const r = run(['import', 'https://example.com/x', '--file', '/no/such/file.md', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

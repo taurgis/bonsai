@@ -82,6 +82,30 @@ export function validateHostname(hostname: string): void {
   }
 }
 
+// Dot-separated, non-empty labels: a real domain (`docs.nestjs.com`) or IPv4 (`192.168.1.1`). The
+// URL parser also accepts a leading-dot filename (`.env`) or relative path (`./x`) as a "host", whose
+// suggestion would be a nonsense `https://.env`; requiring well-formed labels rejects those. Anchored
+// with no overlapping quantifiers, so it is ReDoS-safe on the (already length-bounded) host. This is
+// the single owner of the domain-shape test; the command_not_found hook consumes it too.
+const DOMAIN_OR_IPV4 = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
+
+/**
+ * Whether the input looks like a URL that simply forgot its `http(s)://` scheme
+ * (`example.com`, `docs.nestjs.com/guide`, `192.168.1.1`) rather than unparseable junk.
+ * Lets every command turn a scheme-less URL into the same actionable "did you mean https://…" hint
+ * that the root `bonsai <url>` shorthand already gives via the command_not_found hook.
+ */
+export function looksLikeSchemelessUrl(input: string): boolean {
+  if (input.includes('://')) return false;
+  let hostname: string;
+  try {
+    hostname = new URL(`https://${input}`).hostname;
+  } catch {
+    return false;
+  }
+  return DOMAIN_OR_IPV4.test(hostname);
+}
+
 /**
  * Parses and normalizes a URL. Strips fragments, credentials, default ports,
  * and sorts query parameters lexicographically.
@@ -93,7 +117,14 @@ export function normalizeUrl(input: string): string {
   } catch {
     // new URL() only ever throws the constant "Invalid URL" (no structured cause worth keeping),
     // and every caller prefixes its own "Invalid URL:" — forwarding the native text would stutter.
-    // Drop the binding and emit an actionable, self-contained reason instead.
+    // A scheme-less but domain-shaped input is the common "forgot https://" mistake, so steer the
+    // user to the corrected URL (clig.dev: show the fix, never auto-run it); otherwise emit a
+    // self-contained "couldn't parse" reason.
+    if (looksLikeSchemelessUrl(input)) {
+      throw new Error(
+        `"${input}" is missing a URL scheme. Did you mean https://${input}? Only http:// and https:// URLs are supported.`
+      );
+    }
     throw new Error(
       `Could not parse "${input}" as a URL; provide a full http(s) URL like https://example.com/page.`
     );
