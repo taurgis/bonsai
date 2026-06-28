@@ -46,6 +46,15 @@ export default function register(harness, fixtures) {
     expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
   });
 
+  check('fetch shorthand accepts flags before URL', () => {
+    const r = run(['--format', 'detailed', 'https://example.com', '--json']);
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+    expect(env?.command === 'bonsai', `command ${env?.command}`);
+    expect(env?.data?.format === 'detailed', `format ${env?.data?.format}`);
+    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
+  });
+
   check('bogus flag no stack trace', () => {
     const r = run(['https://example.com', '--bogus']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

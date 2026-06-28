@@ -55,17 +55,24 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   let core = tokens.filter((arg) => arg !== '--help');
 
   const firstArg = core[0];
-  // Treat any first arg that looks like a URL (carries a scheme) as the `fetch` shorthand.
-  // Match both `https://…` and scheme-only forms like `javascript:` or `data:` so fetch can
-  // reject unsupported protocols instead of oclif reporting a misleading "command not found".
-  const looksLikeUrl =
-    firstArg != null && (firstArg.includes('://') || /^[a-z][a-z0-9+.-]*:/i.test(firstArg));
-  if (looksLikeUrl) {
-    core = ['fetch', ...core];
+  // Treat URL-shaped tokens as the `fetch` shorthand. Match both `https://...` and scheme-only
+  // forms like `javascript:` or `data:` so fetch can reject unsupported protocols instead of oclif
+  // reporting a misleading "command not found". If the invocation begins with a flag, allow common
+  // flag-before-argument usage such as `bonsai --format detailed https://example.com`.
+  const urlTokenIndex = core.findIndex(looksLikeUrl);
+  const rootFetchShape =
+    urlTokenIndex === 0 || (urlTokenIndex > 0 && firstArg?.startsWith('-') === true);
+  if (rootFetchShape) {
+    const url = core[urlTokenIndex]!;
+    core = ['fetch', url, ...core.slice(0, urlTokenIndex), ...core.slice(urlTokenIndex + 1)];
   }
 
   if (helpRequested) core.push('--help');
   if (jsonMode) core.push('--json');
 
   return { argv: core };
+}
+
+function looksLikeUrl(arg: string): boolean {
+  return arg.includes('://') || /^[a-z][a-z0-9+.-]*:/i.test(arg);
 }

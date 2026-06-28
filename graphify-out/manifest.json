@@ -90,7 +90,7 @@
     "semantic_hash": ""
   },
   "oclif.manifest.json": {
-    "mtime": 1782662113.304937,
+    "mtime": 1782662641.1565163,
     "ast_hash": "b8e49cdbdeb8bebc5b6610161d8eaa09",
     "semantic_hash": ""
   },
@@ -4990,13 +4990,13 @@
     "semantic_hash": ""
   },
   "src/lib/argv.test.ts": {
-    "mtime": 1782574400.9862657,
-    "ast_hash": "b468fe319199d2231f6ac804d910ba67",
+    "mtime": 1782662617.9274383,
+    "ast_hash": "dd3bc7177857cf1898207a5f35c3c27d",
     "semantic_hash": ""
   },
   "src/lib/argv.ts": {
-    "mtime": 1782574400.209872,
-    "ast_hash": "c7ee391dfe193c973c6b02ca416150ba",
+    "mtime": 1782662608.763591,
+    "ast_hash": "5642107538190f92dd80e897af297316",
     "semantic_hash": ""
   },
   "src/lib/envelope.ts": {
@@ -5210,8 +5210,8 @@
     "semantic_hash": ""
   },
   "testing/audit/scenarios/config.mjs": {
-    "mtime": 1782573753.646365,
-    "ast_hash": "e648c4d3b580f1d7a189ab52d0a29018",
+    "mtime": 1782662528.577475,
+    "ast_hash": "9a89d9aea8396e65ae7e9783bde48262",
     "semantic_hash": ""
   },
   "testing/audit/scenarios/env.mjs": {
@@ -5220,8 +5220,8 @@
     "semantic_hash": ""
   },
   "testing/audit/scenarios/fetch.mjs": {
-    "mtime": 1782573756.414528,
-    "ast_hash": "18f3d456e326ebefe4fd9fd04241fd04",
+    "mtime": 1782662517.4245899,
+    "ast_hash": "2824db302f2ce0d3793e0f15e15ddfed",
     "semantic_hash": ""
   },
   "testing/audit/scenarios/help.mjs": {

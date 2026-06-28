@@ -1,6 +1,7 @@
 /** config topic subcommands. */
-export default function register(harness) {
+export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
+  const { createWorkspace } = fixtures;
 
   check('config --json lists subcommands', () => {
     const r = run(['config', '--json']);
@@ -55,5 +56,23 @@ export default function register(harness) {
     const r = run(['config', 'get', 'storage', '--global', '--local', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(parseJson(r.stdout)?.code === 'CONFLICTING_FLAGS', 'code');
+  });
+
+  check('config set --local persists for get and list', () => {
+    const ws = createWorkspace();
+    const set = run(['config', 'set', 'storage', 'project', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(set.exitCode === 0, `set exit ${set.exitCode}`);
+    expect(parseJson(set.stdout)?.data?.scope === 'project', 'project scope');
+
+    const get = run(['config', 'get', 'storage', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(get.exitCode === 0, `get exit ${get.exitCode}`);
+    expect(parseJson(get.stdout)?.data?.value === 'project', 'project value');
+
+    const list = run(['config', 'list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(list.exitCode === 0, `list exit ${list.exitCode}`);
+    expect(parseJson(list.stdout)?.data?.storage === 'project', 'project listed');
   });
 }

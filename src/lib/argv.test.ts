@@ -37,10 +37,31 @@ describe('normalizeArgv', () => {
       },
     },
     {
+      name: 'URL shorthand should allow flags before the URL',
+      input: ['--format', 'detailed', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '--format', 'detailed'],
+      },
+    },
+    {
+      name: 'URL shorthand should allow repeated flags before the URL',
+      input: ['--topic', 'Docs', '--tags', 'node', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '--topic', 'Docs', '--tags', 'node'],
+      },
+    },
+    {
       name: 'leading --json with URL shorthand should prepend fetch and move --json to the end',
       input: ['--json', 'https://example.com'],
       expected: {
         argv: ['fetch', 'https://example.com', '--json'],
+      },
+    },
+    {
+      name: 'leading --json with flags before URL shorthand should route fetch once',
+      input: ['--json', '--format', 'detailed', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '--format', 'detailed', '--json'],
       },
     },
     {
@@ -144,6 +165,13 @@ describe('normalizeArgv', () => {
       input: ['list'],
       expected: {
         argv: ['list'],
+      },
+    },
+    {
+      name: 'URL argument after a command should not become fetch shorthand',
+      input: ['search', 'https://example.com'],
+      expected: {
+        argv: ['search', 'https://example.com'],
       },
     },
   ];
