@@ -244,4 +244,11 @@ describe('search command unit tests', () => {
     scanSpy.mockRestore();
     warnSpy.mockRestore();
   });
+
+  it('fails if limit is out of bounds', async () => {
+    const runPromise1 = ResearchSearch.run(['anything', '--limit', '200']);
+    await expect(runPromise1).rejects.toThrow(/Limit must be between 1 and 50/);
+    const runPromise2 = ResearchSearch.run(['anything', '--limit', '0']);
+    await expect(runPromise2).rejects.toThrow(/Limit must be between 1 and 50/);
+  });
 });

@@ -1,12 +1,25 @@
 /** URL shorthand fetch command (root bonsai <url>). */
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
-  const { networkEnabled } = fixtures;
+  const { createWorkspace, networkEnabled } = fixtures;
 
-  check('fetch example.com human mode', () => {
-    const r = run(['https://example.com']);
+  function seedFetchCache() {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-fetch-cache-hit';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Audit Fetch\n\nDeterministic fetch command fixture.\n',
+    });
+    expect(imported.exitCode === 0, `seed import exit ${imported.exitCode}`);
+    return { ws, url };
+  }
+
+  check('fetch cached URL human mode', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url], { cwd: ws.cwd, xdg: ws.xdg });
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
-    expect(r.stdout.includes('documentation examples'), 'content');
+    expect(r.stdout.includes('Deterministic fetch command fixture'), 'content');
   });
 
   check('fetch ftp:// protocol error not command-not-found', () => {
@@ -40,18 +53,30 @@ export default function register(harness, fixtures) {
     expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 80)}`);
   });
 
-  check('fetch example.com --json clean stderr', () => {
-    const r = run(['https://example.com', '--json']);
+  check('fetch cached URL --json clean stderr', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
   });
 
   check('fetch shorthand accepts flags before URL', () => {
-    const r = run(['--format', 'detailed', 'https://example.com', '--json']);
+    const { ws, url } = seedFetchCache();
+    const r = run(['--format', 'detailed', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     const env = parseJson(r.stdout);
     expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
     expect(env?.command === 'bonsai', `command ${env?.command}`);
     expect(env?.data?.format === 'detailed', `format ${env?.data?.format}`);
+    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
+  });
+
+  check('fetch shorthand accepts --json before URL', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run(['--json', url], { cwd: ws.cwd, xdg: ws.xdg });
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+    expect(env?.command === 'bonsai', `command ${env?.command}`);
+    expect(env?.ok === true, 'ok');
     expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
   });
 

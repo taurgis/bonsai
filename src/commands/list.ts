@@ -10,6 +10,7 @@ import {
   truncationNotice,
   type ResultListLabels,
 } from '../lib/text.js';
+import { limitFlag } from '../lib/limit-flag.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
 const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
@@ -61,20 +62,10 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       description: 'filter by capture method',
       options: CAPTURE_METHODS,
     })(),
-    limit: Flags.integer({
-      description: 'maximum number of results to return (default 50, max 100)',
-      default: 50,
-    }),
+    limit: limitFlag(100, 50, 'maximum number of results to return (default 50, max 100)'),
   };
 
   static stdoutIsPrimaryData = true;
-
-  private validateListFlags(): void {
-    const limit = this.flags.limit;
-    if (limit !== undefined && (limit < 1 || limit > 100)) {
-      this.error('Limit must be between 1 and 100.', { exit: 2, code: 'INVALID_LIMIT' });
-    }
-  }
 
   private matchesFilters(meta: any, freshness: string): boolean {
     if (
@@ -153,8 +144,6 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   }
 
   async run(): Promise<unknown> {
-    this.validateListFlags();
-
     const roots = loadStoreRoots({
       configDir: this.config.configDir,
       cwd: process.cwd(),

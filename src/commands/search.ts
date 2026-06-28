@@ -18,6 +18,7 @@ import {
   runRemoteDocsSearch,
   type RemoteSearchDeps,
 } from '../lib/research/docs/remote-search-runner.js';
+import { limitFlag } from '../lib/limit-flag.js';
 
 // Results are ranked, so the truncation word is "top"; --limit caps at 50.
 const SEARCH_LABELS: ResultListLabels = {
@@ -82,10 +83,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       description: 'filter results by artifact type',
       options: ARTIFACT_TYPES,
     })(),
-    limit: Flags.integer({
-      description: 'maximum number of results to return (default 10, max 50)',
-      default: 10,
-    }),
+    limit: limitFlag(50, 10, 'maximum number of results to return (default 10, max 50)'),
     'include-stale': Flags.boolean({
       description: 'include stale expired cache entries in the search results',
       default: false,
@@ -99,13 +97,6 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   };
 
   static stdoutIsPrimaryData = true;
-
-  private validateSearchFlags(): void {
-    const limit = this.flags.limit;
-    if (limit !== undefined && (limit < 1 || limit > 50)) {
-      this.error('Limit must be between 1 and 50.', { exit: 2, code: 'INVALID_LIMIT' });
-    }
-  }
 
   private getSearchQueryTerms(query: string): string[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -374,7 +365,6 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       // else: fall through to local cache search (connector/network failure only)
     }
 
-    this.validateSearchFlags();
     const queryTerms = this.getSearchQueryTerms(query);
 
     const roots = loadStoreRoots({

@@ -174,6 +174,27 @@ describe('normalizeArgv', () => {
         argv: ['search', 'https://example.com'],
       },
     },
+    {
+      name: 'command with flags and URL argument should not become fetch shorthand',
+      input: ['--topic', 'Docs', 'search', 'https://example.com'],
+      expected: {
+        argv: ['--topic', 'Docs', 'search', 'https://example.com'],
+      },
+    },
+    {
+      name: 'command with boolean flags and URL argument should not become fetch shorthand',
+      input: ['--local', 'config', 'set', 'storage', 'https://example.com'],
+      expected: {
+        argv: ['--local', 'config', 'set', 'storage', 'https://example.com'],
+      },
+    },
+    {
+      name: 'input containing only flags should not trigger fetch shorthand',
+      input: ['--topic', 'Docs'],
+      expected: {
+        argv: ['--topic', 'Docs'],
+      },
+    },
   ];
 
   for (const tc of cases) {

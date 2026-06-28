@@ -27,6 +27,30 @@ function missingUsageJsonExit(): NormalizationResult['exitWithJson'] {
   };
 }
 
+const FLAGS_WITH_VALUES = new Set([
+  '--topic',
+  '-t',
+  '--tags',
+  '-g',
+  '--format',
+  '--tier',
+  '--ttl',
+  '--max-age',
+  '--storage',
+  '--file',
+  '-f',
+  '--input-format',
+  '--source-url',
+  '--freshness',
+  '--artifact-type',
+  '--capture-method',
+  '--older-than',
+  '--inactive',
+  '--domain',
+  '--remote',
+  '--limit',
+]);
+
 export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   const onlyJsonFlags = rawArgv.length > 0 && rawArgv.every((arg) => arg === '--json');
   if (onlyJsonFlags) {
@@ -54,17 +78,32 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   const helpRequested = tokens.includes('--help');
   let core = tokens.filter((arg) => arg !== '--help');
 
-  const firstArg = core[0];
   // Treat URL-shaped tokens as the `fetch` shorthand. Match both `https://...` and scheme-only
   // forms like `javascript:` or `data:` so fetch can reject unsupported protocols instead of oclif
   // reporting a misleading "command not found". If the invocation begins with a flag, allow common
   // flag-before-argument usage such as `bonsai --format detailed https://example.com`.
-  const urlTokenIndex = core.findIndex(looksLikeUrl);
-  const rootFetchShape =
-    urlTokenIndex === 0 || (urlTokenIndex > 0 && firstArg?.startsWith('-') === true);
+  let firstNonFlagArgIndex = -1;
+  for (let i = 0; i < core.length; i++) {
+    const token = core[i]!;
+    if (token.startsWith('-')) {
+      if (FLAGS_WITH_VALUES.has(token)) {
+        i++; // skip the value
+      }
+      continue;
+    }
+    firstNonFlagArgIndex = i;
+    break;
+  }
+
+  const rootFetchShape = firstNonFlagArgIndex !== -1 && looksLikeUrl(core[firstNonFlagArgIndex]!);
   if (rootFetchShape) {
-    const url = core[urlTokenIndex]!;
-    core = ['fetch', url, ...core.slice(0, urlTokenIndex), ...core.slice(urlTokenIndex + 1)];
+    const url = core[firstNonFlagArgIndex]!;
+    core = [
+      'fetch',
+      url,
+      ...core.slice(0, firstNonFlagArgIndex),
+      ...core.slice(firstNonFlagArgIndex + 1),
+    ];
   }
 
   if (helpRequested) core.push('--help');

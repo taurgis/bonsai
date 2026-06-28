@@ -523,6 +523,22 @@ describe('CLI ergonomics and error contracts', () => {
     expect(envelope.stderr).toContain('Code: INVALID_LIMIT');
   });
 
+  it('list JSON non-integer limit includes INVALID_LIMIT in the envelope', () => {
+    const result = runContract(['list', '--limit', 'abc', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.code).toBe('INVALID_LIMIT');
+    expect(envelope.stderr).toContain('Code: INVALID_LIMIT');
+  });
+
+  it('search JSON non-integer limit includes INVALID_LIMIT in the envelope', () => {
+    const result = runContract(['search', 'docs', '--limit', 'abc', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.code).toBe('INVALID_LIMIT');
+    expect(envelope.stderr).toContain('Code: INVALID_LIMIT');
+  });
+
   it('fetch JSON duration errors include INVALID_DURATION in the envelope', () => {
     const result = runContract(['https://example.com', '--ttl', '5z', '--json'], { raw: true });
     const envelope = JSON.parse(result.stdout);

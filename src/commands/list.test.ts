@@ -99,8 +99,10 @@ describe('list command unit tests', () => {
   });
 
   it('fails if limit is out of bounds', async () => {
-    const runPromise = ResearchList.run(['--limit', '200']);
-    await expect(runPromise).rejects.toThrow(/Limit must be between 1 and 100/);
+    const runPromise1 = ResearchList.run(['--limit', '200']);
+    await expect(runPromise1).rejects.toThrow(/Limit must be between 1 and 100/);
+    const runPromise2 = ResearchList.run(['--limit', '0']);
+    await expect(runPromise2).rejects.toThrow(/Limit must be between 1 and 100/);
   });
 
   it('excludes entries on non-matching artifact-type/capture-method/freshness filters', async () => {

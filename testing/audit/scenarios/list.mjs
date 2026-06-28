@@ -1,11 +1,20 @@
 /** list command filters and empty states. */
-export default function register(harness) {
+export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
+  const { createWorkspace } = fixtures;
 
   check('list invalid limit INVALID_LIMIT', () => {
     const r = run(['list', '--limit', '0', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(parseJson(r.stdout)?.code === 'INVALID_LIMIT', 'code');
+  });
+
+  check('list non-integer limit INVALID_LIMIT', () => {
+    const r = run(['list', '--limit', 'abc', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_LIMIT', env?.code);
+    expect(env?.stderr?.includes('Code: INVALID_LIMIT'), env?.stderr);
   });
 
   check('list extra arg --json UNEXPECTED_ARGUMENT not command-not-found', () => {
@@ -22,5 +31,28 @@ export default function register(harness) {
     const r = run(['list', '--topic', '__bonsai_audit_empty_topic__']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(r.stdout.includes('No cached'), r.stdout.slice(0, 200));
+  });
+
+  check('import then list filters by topic and tag', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-list-hit';
+    const imported = run(
+      ['import', url, '--stdin', '--topic', 'Audit List', '--tags', 'audit-tag', '--json'],
+      {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        input: '# Audit List\n\nList command fixture.\n',
+      }
+    );
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['list', '--topic', 'Audit List', '--tags', 'audit-tag', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(env?.data?.length === 1, `results ${env?.data?.length}`);
+    expect(env?.data?.[0]?.sourceUrls?.includes(url), JSON.stringify(env?.data?.[0]));
   });
 }

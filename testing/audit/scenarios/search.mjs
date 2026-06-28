@@ -1,7 +1,7 @@
 /** search command happy and unhappy paths. */
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
-  const { networkEnabled } = fixtures;
+  const { createWorkspace, networkEnabled } = fixtures;
 
   check('search empty query exit 2 EMPTY_QUERY', () => {
     const r = run(['search', '   ', '--json']);
@@ -13,6 +13,14 @@ export default function register(harness, fixtures) {
     const r = run(['search', 'test', '--limit', '0', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(parseJson(r.stdout)?.code === 'INVALID_LIMIT', 'code');
+  });
+
+  check('search non-integer limit exit 2 INVALID_LIMIT', () => {
+    const r = run(['search', 'test', '--limit', 'abc', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_LIMIT', env?.code);
+    expect(env?.stderr?.includes('Code: INVALID_LIMIT'), env?.stderr);
   });
 
   check('search --domain and --remote conflict CONFLICTING_FLAGS', () => {
@@ -48,6 +56,23 @@ export default function register(harness, fixtures) {
     const r = run(['search', 'foo', '--domain', 'not-a-real-domain.example', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(parseJson(r.stdout)?.code === 'UNSUPPORTED_DOMAIN', 'code');
+  });
+
+  check('import then search finds cached content', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-search-hit';
+    const imported = run(['import', url, '--stdin', '--topic', 'Audit Search', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Audit Search\n\nUnique searchable phrase: alpha-bravo-cache.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['search', 'alpha-bravo-cache', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(env?.data?.length === 1, `results ${env?.data?.length}`);
+    expect(env?.data?.[0]?.sourceUrls?.includes(url), JSON.stringify(env?.data?.[0]));
   });
 
   check('search missing query exit 2', () => {
