@@ -350,12 +350,45 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stderr).not.toMatch(/\n\s+at /);
   });
 
+  it('extra tokens after a zero-arg command report unexpected argument, not command not found', () => {
+    const result = runContract(['list', 'extra', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      command: 'list',
+      code: 'UNEXPECTED_ARGUMENT',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Unexpected argument: extra');
+    expect(envelope.stderr).toContain('Code: UNEXPECTED_ARGUMENT');
+    expect(envelope.stderr).not.toContain('is not a bonsai command');
+    expect(result.stderr).toBe('');
+  });
+
   it('unknown topic subcommand with --help uses command-not-found suggestions', () => {
     const result = runContract(['config', 'gett', '--help']);
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain('config gett is not a bonsai command.');
     expect(result.stderr).toContain('Did you mean config get?');
     expect(result.stderr).toContain('Code: COMMAND_NOT_FOUND');
+  });
+
+  it('unknown topic subcommand without a close match does not suggest the topic root', () => {
+    const result = runContract(['config', 'frobnicate', '--json'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      command: 'config frobnicate',
+      code: 'COMMAND_NOT_FOUND',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('config frobnicate is not a bonsai command.');
+    expect(envelope.stderr).not.toContain('Did you mean config?');
+    expect(result.stderr).toBe('');
   });
 
   it('unknown topic subcommand with --json --help returns command-not-found envelope', () => {

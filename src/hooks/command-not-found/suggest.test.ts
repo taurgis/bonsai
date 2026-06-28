@@ -6,10 +6,27 @@ import hook from './suggest.js';
 const fakeConfig = {
   bin: 'bonsai',
   topicSeparator: ' ',
-  commandIDs: ['import', 'inspect', 'list', 'prune', 'search', 'status', 'fetch', 'config:set'],
+  commandIDs: [
+    'import',
+    'inspect',
+    'list',
+    'prune',
+    'search',
+    'status',
+    'fetch',
+    'config',
+    'config:get',
+    'config:set',
+  ],
   commands: [
+    { id: 'import', hidden: false, args: { url: {} } },
+    { id: 'inspect', hidden: false, args: { url: {} } },
+    { id: 'list', hidden: false, args: {} },
+    { id: 'prune', hidden: false, args: {} },
     { id: 'status', hidden: false },
     { id: 'search', hidden: false },
+    { id: 'config', hidden: false, args: {} },
+    { id: 'config:get', hidden: false },
     { id: 'config:set', hidden: false },
     { id: 'fetch', hidden: true },
   ],
@@ -142,6 +159,32 @@ describe('command_not_found hook', () => {
     });
     expect(envelope.stderr).not.toContain('Did you mean');
     expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
+  });
+
+  it('reports folded extra tokens after a zero-arg command as unexpected arguments', async () => {
+    const msg = await runHook('list:extra');
+    expect(msg).toContain('Unexpected argument: extra');
+    expect(msg).toContain('Run bonsai list --help for usage.');
+    expect(msg).not.toContain('is not a bonsai command');
+  });
+
+  it('emits a JSON envelope for folded extra tokens after a zero-arg command', async () => {
+    const envelope = await runJsonHook('list:extra');
+    expect(envelope).toMatchObject({
+      command: 'list',
+      ok: false,
+      exitCode: 2,
+      code: 'UNEXPECTED_ARGUMENT',
+    });
+    expect(envelope.stderr).toContain('Unexpected argument: extra');
+    expect(envelope.stderr).toContain('Code: UNEXPECTED_ARGUMENT');
+  });
+
+  it('keeps topic subcommand typos on the command-not-found path', async () => {
+    const msg = await runHook('config:gett');
+    expect(msg).toContain('config gett is not a bonsai command.');
+    expect(msg).toContain('Did you mean config get?');
+    expect(msg).not.toContain('Unexpected argument');
   });
 
   // `bonsai <url>` is the headline command, but bin/cli.mjs only routes args with a `://` scheme to

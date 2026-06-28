@@ -25,6 +25,13 @@ function findSuggestion(
   for (let n = segments.length; n >= 1; n--) {
     const attempted = segments.slice(0, n).join(':');
     const suggestion = closestMatch(attempted, visibleIds, maxSuggestionDistance(attempted));
+    if (
+      suggestion === attempted &&
+      n < segments.length &&
+      visibleIds.some((id) => id.startsWith(`${attempted}:`))
+    ) {
+      continue;
+    }
     if (suggestion) return { suggestion, commandSegments: n };
   }
   return { suggestion: null, commandSegments: 0 };
@@ -39,6 +46,29 @@ function topicChainLength(segments: string[], config: Interfaces.Config): number
   let i = 0;
   while (i < segments.length - 1 && config.findTopic(segments.slice(0, i + 1).join(':'))) i++;
   return i + 1;
+}
+
+function exactZeroArgCommandPrefix(
+  segments: string[],
+  visibleIds: string[],
+  config: Interfaces.Config
+): { commandId: string; extra: string } | null {
+  for (let n = segments.length - 1; n >= 1; n--) {
+    const candidate = segments.slice(0, n).join(':');
+    if (!visibleIds.includes(candidate)) continue;
+    if (visibleIds.some((id) => id.startsWith(`${candidate}:`))) continue;
+
+    const command = config.commands.find((entry) => entry.id === candidate);
+    const args = Object.keys(
+      (command as { args?: Record<string, unknown> } | undefined)?.args ?? {}
+    );
+    if (args.length > 0) continue;
+
+    const extra = segments[n];
+    if (extra === undefined) continue;
+    return { commandId: candidate, extra };
+  }
+  return null;
 }
 
 // Dot-separated, non-empty labels: a real domain (`docs.nestjs.com`) or IPv4 (`192.168.1.1`). The
@@ -73,7 +103,7 @@ function isJsonMode(argv: string[] | undefined): boolean {
 function emitJsonError(
   command: string,
   message: string,
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME'
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT'
 ): Record<string, unknown> {
   const envelope = buildEnvelope({
     command,
@@ -93,7 +123,7 @@ export function buildCommandNotFoundDetails(
   argv: string[] | undefined,
   config: Interfaces.Config
 ): {
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME';
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT';
   command: string;
   jsonMode: boolean;
   message: string;
@@ -119,6 +149,20 @@ export function buildCommandNotFoundDetails(
   }
 
   const segments = id.split(':');
+  const unexpected = exactZeroArgCommandPrefix(segments, visibleIds, config);
+  if (unexpected) {
+    const command = toConfiguredId(unexpected.commandId, config);
+    return {
+      code: 'UNEXPECTED_ARGUMENT',
+      command,
+      jsonMode: isJsonMode(argv),
+      message: [
+        `Unexpected argument: ${unexpected.extra}`,
+        `Run ${config.bin} ${command} --help for usage.`,
+      ].join('\n'),
+    };
+  }
+
   const { suggestion, commandSegments } = findSuggestion(segments, visibleIds);
   // Show only the segments that name the command, never the positional args oclif folded into the id
   // (which would otherwise glue the arg on and turn `://` into ` //`).
