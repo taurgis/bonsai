@@ -128,7 +128,7 @@
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
-      "strict": true,
+      "strict": false,
       "summary": "An advanced, locally cached web research tool optimized for LLM ingestion.",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
@@ -296,7 +296,7 @@
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
-      "strict": true,
+      "strict": false,
       "summary": "Inspect cached research metadata for a URL.",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
@@ -317,6 +317,10 @@
         {
           "description": "list only fresh entries filtered by tags",
           "command": "<%= config.bin %> list --freshness fresh --tags node --tags url"
+        },
+        {
+          "description": "list entries matching a specific URL glob",
+          "command": "<%= config.bin %> list --url \"https://react.dev/*\""
         }
       ],
       "flags": {
@@ -341,6 +345,13 @@
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,
+          "type": "option"
+        },
+        "url": {
+          "description": "filter by source URL glob pattern (case-insensitive, supports * wildcard)",
+          "name": "url",
+          "hasDynamicHelp": false,
+          "multiple": false,
           "type": "option"
         },
         "freshness": {
@@ -413,6 +424,10 @@
         {
           "description": "actually prune entries older than 30 days that are source scrapes",
           "command": "<%= config.bin %> prune --older-than 30d --artifact-type source --yes"
+        },
+        {
+          "description": "prune entries matching a URL glob pattern",
+          "command": "<%= config.bin %> prune --url \"https://react.dev/*\" --yes"
         }
       ],
       "flags": {
@@ -433,6 +448,13 @@
         "inactive": {
           "description": "prune entries inactive (unvalidated/unfetched) for duration (e.g. \"14d\", \"30d\")",
           "name": "inactive",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "url": {
+          "description": "filter pruning to source URL glob pattern (case-insensitive, supports * wildcard)",
+          "name": "url",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -639,7 +661,7 @@
       "pluginAlias": "@taurgis/bonsai",
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
-      "strict": true,
+      "strict": false,
       "summary": "Check the cache status of a URL without fetching or writing.",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true

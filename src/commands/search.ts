@@ -19,6 +19,7 @@ import {
   type RemoteSearchDeps,
 } from '../lib/research/docs/remote-search-runner.js';
 import { limitFlag } from '../lib/limit-flag.js';
+import { colors, highlightQuery } from '../lib/color.js';
 
 // Results are ranked, so the truncation word is "top"; --limit caps at 50.
 const SEARCH_LABELS: ResultListLabels = {
@@ -256,15 +257,17 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No matching cached research entries found.');
-      this.log(`\nTip: populate the cache first: ${this.config.bin} <url>`);
+      this.log(`\nTip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`);
       return;
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, SEARCH_LABELS)}\n`);
+    const queryTerms = this.args.query ? this.getSearchQueryTerms(this.args.query) : [];
     finalResults.forEach((res, index) => {
-      this.log(`${index + 1}. [${res.topic || NO_TOPIC_LABEL}] Score: ${res.score}`);
-      this.log(`   Cache Key: ${res.cacheKey}`);
-      this.log(`   Snippet: ${res.snippet}`);
-      this.log(`   Source URLs: ${res.sourceUrls.join(', ')}\n`);
+      const topicStr = res.topic ? colors.cyan(res.topic) : colors.gray(NO_TOPIC_LABEL);
+      this.log(`${index + 1}. [${topicStr}] Score: ${colors.magenta(String(res.score))}`);
+      this.log(`   Cache Key: ${colors.bold(res.cacheKey)}`);
+      this.log(`   Snippet: ${highlightQuery(res.snippet, queryTerms)}`);
+      this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
     });
   }
 
@@ -275,14 +278,16 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     results: ReadonlyArray<{ title: string; url: string; snippet?: string }>
   ): void {
     if (this.jsonEnabled()) return;
-    this.log(heading);
+    this.log(colors.cyan(heading));
+    const query = this.args.query ? this.getSearchQueryTerms(this.args.query) : [];
     results.forEach((r, i) => {
-      this.log(`${i + 1}. ${r.title}`);
-      this.log(`   URL: ${r.url}`);
-      if (r.snippet) this.log(`   ${r.snippet}`);
+      this.log(`${i + 1}. ${colors.bold(r.title)}`);
+      this.log(`   URL: ${colors.gray(r.url)}`);
+      if (r.snippet) this.log(`   ${highlightQuery(r.snippet, query)}`);
     });
   }
 
+  // fallow-ignore-next-line complexity
   private async executeSiteSearch(query: string, domain: string): Promise<unknown> {
     const siteModule = detectSite(`https://${domain}`);
     if (!siteModule) {
@@ -311,6 +316,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
 
   // Remote docs discovery. On any connector failure, degrade to local cache search with a warning
   // (T-20). Returns discovery results tagged remote: true so callers can tell them from cache hits.
+  // fallow-ignore-next-line complexity
   private async executeRemoteSearch(query: string, docsUrl: string): Promise<unknown> {
     try {
       if (!this.jsonEnabled()) ux.action.start(`Searching ${docsUrl}`);

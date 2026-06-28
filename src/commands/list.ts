@@ -11,6 +11,8 @@ import {
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
+import { artifactMatchesUrlFilter } from '../lib/research/url.js';
+import { colors } from '../lib/color.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
 const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
@@ -38,6 +40,10 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       description: 'list only fresh entries filtered by tags',
       command: '<%= config.bin %> list --freshness fresh --tags node --tags url',
     },
+    {
+      description: 'list entries matching a specific URL glob',
+      command: '<%= config.bin %> list --url "https://react.dev/*"',
+    },
   ];
 
   static flags = {
@@ -49,6 +55,9 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       char: 'g',
       description: 'filter by tags (must match all tags specified)',
       multiple: true,
+    }),
+    url: Flags.string({
+      description: 'filter by source URL glob pattern (case-insensitive, supports * wildcard)',
     }),
     freshness: Flags.option({
       description: 'filter by freshness state',
@@ -67,21 +76,26 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static stdoutIsPrimaryData = true;
 
+  private matchesTopic(meta: any, topic: string | undefined): boolean {
+    if (!topic) return true;
+    return !!meta.topic && meta.topic.trim().toLowerCase() === topic.trim().toLowerCase();
+  }
+
+  private matchesTags(meta: any, tags: string[] | undefined): boolean {
+    if (!tags || tags.length === 0) return true;
+    const metaTagsLower = (meta.tags || []).map((t: string) => t.toLowerCase());
+    return tags.every((t: string) => metaTagsLower.includes(t.toLowerCase()));
+  }
+
   private matchesFilters(meta: any, freshness: string): boolean {
-    if (
-      this.flags.topic &&
-      (!meta.topic || meta.topic.trim().toLowerCase() !== this.flags.topic.trim().toLowerCase())
-    ) {
+    if (!this.matchesTopic(meta, this.flags.topic)) {
       return false;
     }
-    if (this.flags.tags && this.flags.tags.length > 0) {
-      const metaTagsLower = (meta.tags || []).map((t: string) => t.toLowerCase());
-      const hasAllTags = this.flags.tags.every((t: string) =>
-        metaTagsLower.includes(t.toLowerCase())
-      );
-      if (!hasAllTags) {
-        return false;
-      }
+    if (!this.matchesTags(meta, this.flags.tags)) {
+      return false;
+    }
+    if (this.flags.url && !artifactMatchesUrlFilter(meta, this.flags.url)) {
+      return false;
     }
     if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
       return false;
@@ -129,17 +143,28 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No cached research entries found matching filters.');
-      this.log(`\nTip: populate the cache first: ${this.config.bin} <url>`);
+      this.log(`\nTip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`);
       return;
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);
     finalResults.forEach((res, index) => {
-      this.log(`${index + 1}. [${res.topic || NO_TOPIC_LABEL}] Key: ${res.cacheKey}`);
-      this.log(`   Type: ${res.artifactType} | Freshness: ${res.freshness}`);
+      const topicStr = res.topic ? colors.cyan(res.topic) : colors.gray(NO_TOPIC_LABEL);
+      const keyStr = colors.bold(res.cacheKey);
+      this.log(`${index + 1}. [${topicStr}] Key: ${keyStr}`);
+
+      const freshnessColorMap: Record<string, (t: string) => string> = {
+        fresh: colors.green,
+        stale_grace: colors.yellow,
+        stale_expired: colors.red,
+      };
+      const freshnessColor = freshnessColorMap[res.freshness] || ((t: string) => t);
+      const freshnessStr = freshnessColor(res.freshness);
+
+      this.log(`   Type: ${colors.bold(res.artifactType)} | Freshness: ${freshnessStr}`);
       this.log(
-        `   Tokens: compressed=${res.tokenEstimate?.compressed || 0}, detailed=${res.tokenEstimate?.detailed || 0}`
+        `   Tokens: compressed=${colors.bold(String(res.tokenEstimate?.compressed || 0))}, detailed=${colors.bold(String(res.tokenEstimate?.detailed || 0))}`
       );
-      this.log(`   Source URLs: ${res.sourceUrls.join(', ')}\n`);
+      this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
     });
   }
 

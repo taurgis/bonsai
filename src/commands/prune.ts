@@ -7,6 +7,8 @@ import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { parseTtlToMs, durationFlagError } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES } from '../lib/research/schema.js';
 import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
+import { artifactMatchesUrlFilter } from '../lib/research/url.js';
+import { colors } from '../lib/color.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
@@ -23,6 +25,10 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       description: 'actually prune entries older than 30 days that are source scrapes',
       command: '<%= config.bin %> prune --older-than 30d --artifact-type source --yes',
     },
+    {
+      description: 'prune entries matching a URL glob pattern',
+      command: '<%= config.bin %> prune --url "https://react.dev/*" --yes',
+    },
   ];
 
   static flags = {
@@ -32,6 +38,10 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     inactive: Flags.string({
       description:
         'prune entries inactive (unvalidated/unfetched) for duration (e.g. "14d", "30d")',
+    }),
+    url: Flags.string({
+      description:
+        'filter pruning to source URL glob pattern (case-insensitive, supports * wildcard)',
     }),
     'artifact-type': Flags.option({
       // Prune operates on every cached file, so it can target any artifact type — including the
@@ -54,9 +64,14 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static stdoutIsPrimaryData = true;
 
   private validatePruneFlags(): void {
-    if (!this.flags['older-than'] && !this.flags.inactive && !this.flags['artifact-type']) {
+    if (
+      !this.flags['older-than'] &&
+      !this.flags.inactive &&
+      !this.flags['artifact-type'] &&
+      !this.flags.url
+    ) {
       this.error(
-        'Must specify at least one pruning filter: --older-than, --inactive, or --artifact-type.',
+        'Must specify at least one pruning filter: --older-than, --inactive, --artifact-type, or --url.',
         {
           exit: 2,
           code: 'MISSING_FILTER',
@@ -70,12 +85,15 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       const olderThanPart = this.flags['older-than']
         ? ` --older-than ${this.flags['older-than']}`
         : '';
+      const urlPart = this.flags.url ? ` --url "${this.flags.url}"` : '';
       this.error(
         'Safety check: use --yes to confirm pruning, or --dry-run to preview files that would be deleted.',
         {
           exit: 2,
           code: 'SAFETY_CHECK_REQUIRED',
-          suggestions: [`Preview first: ${this.config.bin} prune --dry-run${olderThanPart}`],
+          suggestions: [
+            `Preview first: ${this.config.bin} prune --dry-run${olderThanPart}${urlPart}`,
+          ],
         }
       );
     }
@@ -96,6 +114,10 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     const ageMs = currentTime.getTime() - baseTime;
 
     if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
+      return false;
+    }
+
+    if (this.flags.url && !artifactMatchesUrlFilter(meta, this.flags.url)) {
       return false;
     }
 
@@ -166,10 +188,12 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     if (dryRun) {
       if (!this.jsonEnabled()) {
         const noun = pluralize(count, 'entry', 'entries');
-        this.log(`[Dry Run] Found ${count} research cache ${noun} that would be pruned:\n`);
+        this.log(
+          colors.yellow(`[Dry Run] Found ${count} research cache ${noun} that would be pruned:\n`)
+        );
         filesToPrune.forEach((f) => {
           this.log(
-            `- [${f.topic || NO_TOPIC_LABEL}] Key: ${f.cacheKey} (${f.url || 'Imported note'})`
+            `- [${f.topic ? colors.cyan(f.topic) : colors.gray(NO_TOPIC_LABEL)}] Key: ${colors.bold(f.cacheKey)} (${colors.gray(f.url || 'Imported note')})`
           );
         });
       }
@@ -177,7 +201,9 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       prunedCount = this.deletePruneCandidates(filesToPrune);
       if (!this.jsonEnabled()) {
         const noun = pluralize(count, 'entry', 'entries');
-        this.log(`Successfully pruned ${prunedCount} of ${count} research cache ${noun}.`);
+        this.log(
+          colors.green(`Successfully pruned ${prunedCount} of ${count} research cache ${noun}.`)
+        );
       }
     }
 

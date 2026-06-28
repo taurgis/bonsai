@@ -8,6 +8,7 @@ import {
   durationFlagError,
 } from '../lib/research/freshness.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
+import { colors } from '../lib/color.js';
 
 type CacheStatus = 'hit' | 'miss' | 'stale';
 // 'none' means no cache entry exists for the URL, so no freshness applies — distinct from
@@ -67,6 +68,8 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     },
   ];
 
+  static strict = false;
+
   static args = {
     url: Args.string({
       required: true,
@@ -94,13 +97,19 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   /** Enrich cache-miss envelopes with the same CACHE_MISS code and suggestions as inspect. */
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
     const envelope = super.toSuccessJson(data);
-    const d = data as { status?: string; normalizedUrl?: string } | null;
-    if (d?.status !== 'miss') return envelope;
+    const list = Array.isArray(data) ? data : [data];
+    const misses = list.filter((d) => d && d.status === 'miss');
+    if (misses.length === 0) return envelope;
 
-    const normalizedUrl = d.normalizedUrl ?? '';
-    const suggestions = [`Fetch and cache it first: ${this.config.bin} ${normalizedUrl}`];
+    const firstMiss = misses[0];
+    const normalizedUrl = firstMiss.normalizedUrl ?? '';
+    const suggestions = misses.map(
+      (m) => `Fetch and cache it first: ${this.config.bin} ${m.normalizedUrl}`
+    );
     const stderr = formatErrorForJson({
-      message: `Cache miss for ${normalizedUrl}`,
+      message:
+        `Cache miss for ${normalizedUrl}` +
+        (misses.length > 1 ? ` and ${misses.length - 1} other URLs` : ''),
       code: 'CACHE_MISS',
       suggestions,
     });
@@ -108,7 +117,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   }
 
   async run(): Promise<unknown> {
-    const { url } = this.args;
+    const urls = this.parsedArgv;
     const { ttl, tier, 'max-age': maxAge } = this.flags;
 
     // Validate the duration flags up front so a malformed value reports the exact flag that is
@@ -117,37 +126,81 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
       if (msg) this.error(msg, { exit: 2, code: 'INVALID_DURATION' });
     }
 
-    const target = this.resolveResearchTargetOrFail(url);
-
-    const { cacheKey, located, normalizedUrl, roots } = target;
-    const cached = located?.artifact ?? null;
+    const results: any[] = [];
+    let hasMiss = false;
     const currentTime = new Date();
 
-    // Both duration flags were validated above, so freshness resolution cannot throw on a parse error.
-    const result = describeCacheStatus(cached, currentTime, ttl, maxAge);
+    for (const url of urls) {
+      const res = this.checkSingleStatus(url, currentTime, ttl, maxAge, urls.length > 1);
+      if (res.status === 'miss') {
+        hasMiss = true;
+      }
+      results.push(res);
+    }
 
-    // On a hit, report where it actually lives; on a miss, where a fetch would write it.
+    if (hasMiss) {
+      process.exitCode = 1;
+    }
+
+    return urls.length === 1 ? results[0] : results;
+  }
+
+  private checkSingleStatus(
+    url: string,
+    currentTime: Date,
+    ttl: string | undefined,
+    maxAge: string | undefined,
+    showSeparator: boolean
+  ): {
+    cacheKey: string;
+    cachePath: string;
+    normalizedUrl: string;
+    status: string;
+    freshness: string;
+    action: string;
+  } {
+    const target = this.resolveResearchTargetOrFail(url);
+    const { cacheKey, located, normalizedUrl, roots } = target;
+    const cached = located?.artifact ?? null;
+
+    const result = describeCacheStatus(cached, currentTime, ttl, maxAge);
     const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
 
     if (!this.jsonEnabled()) {
-      this.log(`${'URL:'.padEnd(25)} ${normalizedUrl}`);
-      this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
-      this.log(`${'Cache Path:'.padEnd(25)} ${artifactPath}`);
-      this.log(`${'Status:'.padEnd(25)} ${result.status}`);
-      this.log(`${'Freshness:'.padEnd(25)} ${result.freshness}`);
-      this.log(`${'Action:'.padEnd(25)} ${result.action}`);
+      const statusColorMap: Record<string, (t: string) => string> = {
+        hit: colors.green,
+        stale: colors.yellow,
+        miss: colors.red,
+      };
+      const freshnessColorMap: Record<string, (t: string) => string> = {
+        fresh: colors.green,
+        stale_grace: colors.yellow,
+        stale_expired: colors.red,
+        none: colors.gray,
+      };
+      const actionColorMap: Record<string, (t: string) => string> = {
+        would_return_cached: colors.green,
+        would_revalidate: colors.yellow,
+        would_fetch: colors.red,
+      };
+
+      const statusColor = statusColorMap[result.status] || ((t: string) => t);
+      const freshnessColor = freshnessColorMap[result.freshness] || ((t: string) => t);
+      const actionColor = actionColorMap[result.action] || ((t: string) => t);
+
+      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(normalizedUrl)}`);
+      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
+      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      this.log(`${colors.cyan('Status:'.padEnd(25))} ${statusColor(result.status)}`);
+      this.log(`${colors.cyan('Freshness:'.padEnd(25))} ${freshnessColor(result.freshness)}`);
+      this.log(`${colors.cyan('Action:'.padEnd(25))} ${actionColor(result.action)}`);
+      if (showSeparator) {
+        this.log('-'.repeat(40));
+      }
     }
 
-    // Align with inspect's CACHE_MISS contract: a miss is actionable, not a usage error. Exit 1
-    // lets scripts branch on $? while JSON still returns the structured status payload. Unlike
-    // inspect, we do not throw here — status must always return structured data even on a miss.
-    if (result.status === 'miss') {
-      // Human mode: actionable hint on stderr. JSON mode: same info lives in the envelope (see
-      // toSuccessJson) so agents get code/suggestions without parsing warn() line wraps.
-      if (!this.jsonEnabled()) {
-        this.warn(`Cache miss — run: ${this.config.bin} ${normalizedUrl}`);
-      }
-      process.exitCode = 1;
+    if (result.status === 'miss' && !this.jsonEnabled()) {
+      this.warn(`Cache miss — run: ${this.config.bin} ${normalizedUrl}`);
     }
 
     return {

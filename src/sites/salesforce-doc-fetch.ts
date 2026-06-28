@@ -1,8 +1,19 @@
-import { openCdpPage, waitForLoad, waitForContentReady } from '../lib/research/browser.js';
+import {
+  openCdpPage,
+  waitForLoad,
+  ResponseCapture,
+  type CdpPage,
+} from '../lib/research/browser.js';
 import { checkDnsSafety } from '../lib/research/fetcher.js';
 import { htmlToMarkdown } from '../lib/research/markdown.js';
+import { contentMetrics, contentRicherThan } from '../lib/research/regression.js';
 import type { ExtractionResult } from '../lib/research/extract.js';
 import type { SiteFetchResult } from './types.js';
+import {
+  SALESFORCE_SHADOW_DOM_HELPERS,
+  buildPriorityContainerPickBlock,
+  pollSalesforceContentReady,
+} from './salesforce-dom-probe.js';
 
 // Both help.salesforce.com and developer.salesforce.com are LWR sites that render doc content
 // client-side inside web components (shadow DOM). document.documentElement.outerHTML captures
@@ -11,11 +22,14 @@ import type { SiteFetchResult } from './types.js';
 
 const TIMEOUT_MS = 45_000;
 const SETTLE_MS = 1_500;
-const MIN_CONTENT_CHARS = 100;
+/** Minimum text on the priority content host before wait/capture proceed (shared threshold). */
+const MIN_CONTAINER_CHARS = 100;
 // Below this a capture is treated as a shell and retried (a fresh reload of the heavy page).
 const SUBSTANTIAL_CHARS = 300;
 const MAX_ATTEMPTS = 2;
 const BODY_LIMIT_BYTES = 6 * 1024 * 1024;
+/** Grace period after DOM settle for late /docs/get_document_content/ responses on guide pages. */
+const DOCS_API_GRACE_MS = 500;
 
 const ACCEPT_CONSENT_EXPRESSION =
   "(() => { const b = document.querySelector('#onetrust-accept-btn-handler'); if (b) b.click(); })()";
@@ -79,6 +93,38 @@ export function stripBoilerplate(markdown: string): string {
     .trim();
 }
 
+const DOCS_CONTENT_API = '/docs/get_document_content/';
+
+/** Parses the Salesforce private content API JSON payload. */
+export function parseDocsApiPayload(raw: string): { content: string; title: string } | null {
+  if (!raw?.trim()) return null;
+  try {
+    const payload = JSON.parse(raw) as { content?: string; title?: string; id?: string };
+    if (!payload.content) return null;
+    return { content: payload.content, title: payload.title || payload.id || '' };
+  } catch {
+    return null;
+  }
+}
+
+/** Keeps whichever Markdown source carries more structural content (DOM vs content API HTML). */
+export function preferRicherMarkdown(
+  domMarkdown: string,
+  apiHtml: string,
+  domTitle: string,
+  apiTitle: string
+): { markdown: string; title: string; usedApi: boolean } {
+  const apiMarkdown = stripBoilerplate(htmlToMarkdown(apiHtml));
+  if (contentRicherThan(contentMetrics(apiMarkdown), contentMetrics(domMarkdown))) {
+    return {
+      markdown: apiMarkdown,
+      title: apiTitle || domTitle,
+      usedApi: true,
+    };
+  }
+  return { markdown: domMarkdown, title: domTitle, usedApi: false };
+}
+
 /**
  * In-page capture. Expands collapsed "Show" sections, inlines dx-code-block source (its code
  * lives in a `code-block` attribute, not text), strips chrome, then picks the richest content
@@ -86,22 +132,9 @@ export function stripBoilerplate(markdown: string): string {
  * Help pages (which lack those components) and load-bearing on Developer API-reference pages.
  */
 function buildCaptureScript(contentSelectors: string[], extraRemove: string[]): string {
+  const containerPick = buildPriorityContainerPickBlock(contentSelectors, MIN_CONTAINER_CHARS);
   return `(async () => {
-    // Collects every descendant element across open shadow roots AND light DOM, including the
-    // root's own shadow root (so it works both document-wide and scoped to a single component).
-    const deepElements = (root) => {
-      const out = [];
-      const visit = (node) => {
-        if (node.shadowRoot) visit(node.shadowRoot);
-        for (const child of Array.from(node.children || [])) {
-          out.push(child);
-          visit(child);
-        }
-      };
-      visit(root);
-      return out;
-    };
-
+    ${SALESFORCE_SHADOW_DOM_HELPERS}
     // Collapse controls vary by page: <anypoint-button class="toggle-button">, <dx-button>, and
     // older <* class="complex-toggle">. They all render as a button-like element whose entire
     // label is just "Show"/"Hide", so match on that shape rather than a fixed tag list.
@@ -242,25 +275,7 @@ function buildCaptureScript(contentSelectors: string[], extraRemove: string[]): 
     };
     const serialize = (el) => { const root = document.createElement('div'); append(el, root, 0); return root.innerHTML; };
 
-    // Pick the content container by selector PRIORITY, not by max text: the selectors are ordered
-    // specific→general, so the first one with substantial content is the tight article/doc wrapper.
-    // Picking the largest match instead pulls in broader page chrome (nav tree, breadcrumb, chat
-    // widget) that surrounds the article. innerText is used because it pierces shadow roots
-    // (textContent does not), so a real container is measured rather than scoring 0.
-    const SELECTORS = ${JSON.stringify(contentSelectors)};
-    const MIN_PICK_CHARS = 200;
-    let container = null;
-    for (const sel of SELECTORS) {
-      let best = null, bestLen = 0;
-      for (const el of deepElements(document)) {
-        let matched; try { matched = el.matches && el.matches(sel); } catch (e) { matched = false; }
-        if (!matched) continue;
-        const len = (el.innerText || '').trim().length;
-        if (len > bestLen) { best = el; bestLen = len; }
-      }
-      if (best && bestLen >= MIN_PICK_CHARS) { container = best; break; }
-    }
-    container = container || document.body || document.documentElement;
+    ${containerPick}
     const title = (document.querySelector('h1')?.textContent || document.title || '').trim();
     return { html: serialize(container), title };
   })()`;
@@ -273,14 +288,14 @@ export interface SalesforceDocOptions {
   removeSelectors?: string[];
 }
 
-/**
- * Renders a Salesforce LWR doc page, serializes its shadow-DOM content container, and converts
- * it to Markdown. Validates the host before any network access.
- */
-export async function fetchSalesforceDoc(
-  url: string,
-  { allowedHost, contentSelectors, removeSelectors = [] }: SalesforceDocOptions
-): Promise<SiteFetchResult> {
+interface CaptureAttemptResult {
+  html: string;
+  title: string;
+  detailedMarkdown: string;
+  usedDocsApi: boolean;
+}
+
+function parseSalesforceDocUrl(url: string, allowedHost: string): URL {
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -290,6 +305,104 @@ export async function fetchSalesforceDoc(
   if (parsed.hostname.toLowerCase() !== allowedHost) {
     throw new Error(`Refusing to fetch host "${parsed.hostname}" (expected ${allowedHost}).`);
   }
+  return parsed;
+}
+
+function assertReadableSalesforceContent(detailedMarkdown: string, url: string): void {
+  if (detailedMarkdown.length < MIN_CONTAINER_CHARS || looksLikeSalesforceError(detailedMarkdown)) {
+    throw new Error(
+      `Salesforce returned no readable content for ${url} (page may be missing, gated, or still loading).`
+    );
+  }
+}
+
+async function captureSalesforceAttempt(
+  page: CdpPage,
+  url: string,
+  captureScript: string,
+  contentSelectors: string[]
+): Promise<CaptureAttemptResult> {
+  const docsCapture = new ResponseCapture(page, [
+    {
+      key: 'docs-content',
+      test: (request) => request.url.includes(DOCS_CONTENT_API),
+      accept: (body) => parseDocsApiPayload(body) !== null,
+    },
+  ]);
+
+  await page.client.send('Page.navigate', { url }, page.sessionId);
+  await waitForLoad(page.client, page.sessionId, TIMEOUT_MS, 0).catch(() => {});
+  await page.client
+    .send('Runtime.evaluate', { expression: ACCEPT_CONSENT_EXPRESSION }, page.sessionId)
+    .catch(() => {});
+  await pollSalesforceContentReady(page, contentSelectors, MIN_CONTAINER_CHARS, TIMEOUT_MS);
+  await new Promise((r) => setTimeout(r, SETTLE_MS));
+  const docsPayload = parseDocsApiPayload(
+    (await docsCapture.waitFor('docs-content', DOCS_API_GRACE_MS)) ?? ''
+  );
+  const docsApiHtml = docsPayload?.content ?? '';
+  const docsApiTitle = docsPayload?.title ?? '';
+
+  const result = await page.client.send(
+    'Runtime.evaluate',
+    { expression: captureScript, awaitPromise: true, returnByValue: true },
+    page.sessionId
+  );
+  const captured = result?.result?.value;
+  const html = typeof captured?.html === 'string' ? captured.html : '';
+  const title = captured?.title || '';
+  if (Buffer.byteLength(html) > BODY_LIMIT_BYTES) {
+    throw new Error(`Page exceeded body size limit (${Buffer.byteLength(html)} bytes).`);
+  }
+  let detailedMarkdown = stripBoilerplate(htmlToMarkdown(html));
+  let usedDocsApi = false;
+
+  if (docsApiHtml) {
+    const picked = preferRicherMarkdown(detailedMarkdown, docsApiHtml, title, docsApiTitle);
+    detailedMarkdown = picked.markdown;
+    if (picked.usedApi) {
+      usedDocsApi = true;
+    }
+    return { html, title: picked.title, detailedMarkdown, usedDocsApi };
+  }
+
+  return { html, title, detailedMarkdown, usedDocsApi };
+}
+
+function buildSalesforceFetchResult(
+  url: string,
+  html: string,
+  title: string,
+  detailedMarkdown: string,
+  qualityNotes: string[]
+): SiteFetchResult {
+  return {
+    fetchResult: {
+      contentType: 'text/html',
+      etag: null,
+      lastModified: null,
+      finalUrl: url,
+      responseSize: Buffer.byteLength(html),
+      content: html,
+    },
+    extraction: {
+      title: title || url,
+      detailedMarkdown,
+      confidence: confidenceFor(detailedMarkdown.length),
+      qualityNotes,
+    },
+  };
+}
+
+/**
+ * Renders a Salesforce LWR doc page, serializes its shadow-DOM content container, and converts
+ * it to Markdown. Validates the host before any network access.
+ */
+export async function fetchSalesforceDoc(
+  url: string,
+  { allowedHost, contentSelectors, removeSelectors = [] }: SalesforceDocOptions
+): Promise<SiteFetchResult> {
+  const parsed = parseSalesforceDocUrl(url, allowedHost);
   await checkDnsSafety(parsed.hostname);
 
   const captureScript = buildCaptureScript(contentSelectors, removeSelectors);
@@ -298,55 +411,24 @@ export async function fetchSalesforceDoc(
     let html = '';
     let title = '';
     let detailedMarkdown = '';
+    let usedDocsApi = false;
+    const qualityNotes = ['extracted from rendered shadow-DOM content container'];
 
-    // The heavy api-console renders intermittently slowly; reload and retry if a capture comes
-    // back shell-thin rather than caching an empty page.
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      await page.client.send('Page.navigate', { url }, page.sessionId);
-      await waitForLoad(page.client, page.sessionId, TIMEOUT_MS, 0).catch(() => {});
-      await page.client
-        .send('Runtime.evaluate', { expression: ACCEPT_CONSENT_EXPRESSION }, page.sessionId)
-        .catch(() => {});
-      await waitForContentReady(page, contentSelectors, MIN_CONTENT_CHARS, TIMEOUT_MS);
-      await new Promise((r) => setTimeout(r, SETTLE_MS));
-
-      const result = await page.client.send(
-        'Runtime.evaluate',
-        { expression: captureScript, awaitPromise: true, returnByValue: true },
-        page.sessionId
-      );
-      const captured = result?.result?.value;
-      html = typeof captured?.html === 'string' ? captured.html : '';
-      title = captured?.title || '';
-      if (Buffer.byteLength(html) > BODY_LIMIT_BYTES) {
-        throw new Error(`Page exceeded body size limit (${Buffer.byteLength(html)} bytes).`);
-      }
-      detailedMarkdown = stripBoilerplate(htmlToMarkdown(html));
+      const captured = await captureSalesforceAttempt(page, url, captureScript, contentSelectors);
+      html = captured.html;
+      title = captured.title;
+      detailedMarkdown = captured.detailedMarkdown;
+      usedDocsApi = usedDocsApi || captured.usedDocsApi;
       if (detailedMarkdown.length >= SUBSTANTIAL_CHARS) break;
     }
 
-    if (detailedMarkdown.length < MIN_CONTENT_CHARS || looksLikeSalesforceError(detailedMarkdown)) {
-      throw new Error(
-        `Salesforce returned no readable content for ${url} (page may be missing, gated, or still loading).`
-      );
+    assertReadableSalesforceContent(detailedMarkdown, url);
+    if (usedDocsApi) {
+      qualityNotes.push('article body from /docs/get_document_content/ API');
     }
 
-    return {
-      fetchResult: {
-        contentType: 'text/html',
-        etag: null,
-        lastModified: null,
-        finalUrl: url,
-        responseSize: Buffer.byteLength(html),
-        content: html,
-      },
-      extraction: {
-        title: title || url,
-        detailedMarkdown,
-        confidence: confidenceFor(detailedMarkdown.length),
-        qualityNotes: ['extracted from rendered shadow-DOM content container'],
-      },
-    };
+    return buildSalesforceFetchResult(url, html, title, detailedMarkdown, qualityNotes);
   } finally {
     await page.close();
   }

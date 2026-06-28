@@ -1,19 +1,34 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { looksLikeSalesforceError, stripBoilerplate } from './salesforce-doc-fetch.js';
+import {
+  looksLikeSalesforceError,
+  stripBoilerplate,
+  parseDocsApiPayload,
+  preferRicherMarkdown,
+} from './salesforce-doc-fetch.js';
 
 // Mock the browser + DNS boundaries so fetchSalesforceDoc never spawns Chrome or hits the network.
 // htmlToMarkdown stays real: it is a pure HTML->Markdown transform whose output the fetcher asserts on.
 vi.mock('../lib/research/browser.js', () => ({
   openCdpPage: vi.fn(),
   waitForLoad: vi.fn().mockResolvedValue(undefined),
-  waitForContentReady: vi.fn().mockResolvedValue(undefined),
+  ResponseCapture: class {
+    waitFor = vi.fn().mockResolvedValue(null);
+  },
 }));
+vi.mock('./salesforce-dom-probe.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./salesforce-dom-probe.js')>();
+  return {
+    ...actual,
+    pollSalesforceContentReady: vi.fn().mockResolvedValue(undefined),
+  };
+});
 vi.mock('../lib/research/fetcher.js', () => ({
   checkDnsSafety: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { fetchSalesforceDoc } from './salesforce-doc-fetch.js';
-import { openCdpPage, waitForContentReady } from '../lib/research/browser.js';
+import { openCdpPage } from '../lib/research/browser.js';
+import { pollSalesforceContentReady } from './salesforce-dom-probe.js';
 import { checkDnsSafety } from '../lib/research/fetcher.js';
 
 const DOC_OPTIONS = {
@@ -29,24 +44,75 @@ const DOC_OPTIONS = {
 function fakePage(captures: Array<{ html: string; title: string } | null>) {
   let captureCalls = 0;
   const close = vi.fn().mockResolvedValue(undefined);
-  const send = vi.fn(async (method: string, params?: { expression?: string }) => {
-    if (method === 'Runtime.evaluate' && params?.expression?.includes('deepElements')) {
-      const value = captures[Math.min(captureCalls, captures.length - 1)];
-      captureCalls += 1;
-      return { result: { value } };
-    }
-    return {};
-  });
-  return { client: { send }, sessionId: 's1', close };
+  const handlers = new Map<string, Array<(params: unknown) => void>>();
+  const client = {
+    on(event: string, handler: (params: unknown) => void) {
+      const list = handlers.get(event) ?? [];
+      list.push(handler);
+      handlers.set(event, list);
+    },
+    send: vi.fn(async (method: string, params?: { expression?: string }) => {
+      if (method === 'Runtime.evaluate' && params?.expression?.includes('deepElements')) {
+        const value = captures[Math.min(captureCalls, captures.length - 1)];
+        captureCalls += 1;
+        return { result: { value } };
+      }
+      return {};
+    }),
+  };
+  return { client, sessionId: 's1', close };
 }
 
 beforeEach(() => {
   vi.mocked(checkDnsSafety).mockResolvedValue(undefined);
-  vi.mocked(waitForContentReady).mockResolvedValue(undefined);
+  vi.mocked(pollSalesforceContentReady).mockResolvedValue(undefined);
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+describe('parseDocsApiPayload', () => {
+  it('returns content and title from the Salesforce content API JSON', () => {
+    const raw = JSON.stringify({ content: '<p>Article body</p>', title: 'Guide Title' });
+    expect(parseDocsApiPayload(raw)).toEqual({
+      content: '<p>Article body</p>',
+      title: 'Guide Title',
+    });
+  });
+
+  it('returns null for invalid or empty payloads', () => {
+    expect(parseDocsApiPayload('')).toBeNull();
+    expect(parseDocsApiPayload('not-json')).toBeNull();
+    expect(parseDocsApiPayload(JSON.stringify({ title: 'no content' }))).toBeNull();
+  });
+});
+
+describe('preferRicherMarkdown', () => {
+  it('prefers the docs API HTML when it converts to richer structural content', () => {
+    const picked = preferRicherMarkdown(
+      'short',
+      '<h1>Guide</h1><table><tr><th>A</th></tr><tr><td>1</td></tr></table><p>' +
+        'detailed article body. '.repeat(20) +
+        '</p>',
+      'dom title',
+      'api title'
+    );
+    expect(picked.usedApi).toBe(true);
+    expect(picked.title).toBe('api title');
+    expect(picked.markdown).toContain('| --- |');
+  });
+
+  it('keeps DOM capture when it is already richer', () => {
+    const picked = preferRicherMarkdown(
+      '# Full article\n\n' + 'x'.repeat(500),
+      '<p>tiny</p>',
+      'dom',
+      'api'
+    );
+    expect(picked.usedApi).toBe(false);
+    expect(picked.title).toBe('dom');
+  });
 });
 
 describe('stripBoilerplate', () => {

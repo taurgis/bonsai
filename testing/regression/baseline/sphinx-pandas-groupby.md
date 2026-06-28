@@ -1,4 +1,4 @@
-DataFrame.groupby(_by\=None_, _level\=None_, _\*_, _as\_index\=True_, _sort\=True_, _group\_keys\=True_, _observed\=True_, _dropna\=True_)[\[source\]](https://github.com/pandas-dev/pandas/blob/v3.0.3/pandas/core/frame.py#L10608-L10842)[#](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html#pandas.DataFrame.groupby "Link to this definition")
+DataFrame.groupby(_by\=None_, _level\=None_, _\*_, _as\_index\=True_, _sort\=True_, _group\_keys\=True_, _observed\=True_, _dropna\=True_)[\[source\]](https://github.com/pandas-dev/pandas/blob/v3.0.4/pandas/core/frame.py#L10610-L10844)[#](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html#pandas.DataFrame.groupby "Link to this definition")
 
 Group DataFrame using a mapper or by a Series of columns.
 

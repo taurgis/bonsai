@@ -17,6 +17,7 @@ Each fixture is captured by one of two paths, chosen per fixture — there is no
 - `fixtures.json` — the cases: `{ id, url, site?, expectEngine?, expectFramework?, focus }`.
   `focus` tags the content shape each case exercises (tables, code, sections, landing cleanup, …).
 - `baseline/<id>.md` — committed expected output; the source of truth a run compares against.
+- `baseline/<id>.timing.json` — committed capture duration (`durationMs`) for performance regression checks.
 - `current/` — per-run output and `report.json` (git-ignored).
 
 ## Usage
@@ -26,14 +27,17 @@ Requires network access and a local Chrome (same as any real fetch).
 ```bash
 pnpm regression:suite     # fetch every fixture, compare to baseline, write current/report.json
 pnpm regression:promote   # adopt current output as the new baseline (after an intended change)
-pnpm regression:check     # strict: non-zero exit on any drift, new, failed, or leaking fixture (CI)
+node testing/regression/run-suite.mjs --promote-timing   # refresh timing baselines only
+pnpm regression:check     # strict: non-zero exit on drift, new, failed, leaking, or >15% slower capture
 
 # Run a subset by id substring (the Salesforce fixtures are slow/rendered; this skips them):
 node testing/regression/run-suite.mjs vue node mdn tailwind
 ```
 
 Each line reports a state: `same`, `changed`, `LOSS` (a structural metric dropped vs baseline —
-likely lost content), `new` (no baseline yet), or `error`, plus any `✗ LEAK` of chrome noise.
+likely lost content), `new` (no baseline yet), or `error`, plus capture duration in milliseconds
+(with `%` delta vs `baseline/<id>.timing.json` when present), and any `✗ LEAK` of chrome noise.
+Strict mode also fails when capture duration regresses more than **15%** vs the timing baseline.
 
 ## Coverage
 

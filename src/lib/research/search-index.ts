@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { existsSync, readdirSync, readFileSync, statSync, type Stats } from 'node:fs';
 import { atomicWriteFile } from '../atomic-write.js';
 import { parseArtifactShallow } from './artifact.js';
-import { isResearchFile } from './storage.js';
+import { isResearchFile } from './url.js';
 import type { ResearchArtifact } from './schema.js';
 
 // Sidecar index that caches the lightweight (metadata + summary + compressed) view of each artifact

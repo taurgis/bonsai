@@ -1,12 +1,12 @@
 {
   "summary": {
-    "startedAt": "2026-06-27T11:55:14.436Z",
-    "finishedAt": "2026-06-27T12:04:12.062Z",
+    "startedAt": "2026-06-28T17:21:08.405Z",
+    "finishedAt": "2026-06-28T17:29:57.748Z",
     "fixtureCount": 64,
     "failed": 0,
     "unchanged": 63,
     "changed": 1,
-    "infoLoss": 0,
+    "infoLoss": 1,
     "leaking": 0,
     "new": 0,
     "promoted": true
@@ -177,7 +177,7 @@
         "headings": 12
       },
       "baseline": {
-        "chars": 8935,
+        "chars": 8979,
         "codeBlocks": 1,
         "tables": 6,
         "images": 7,
@@ -185,8 +185,8 @@
         "bullets": 0,
         "headings": 12
       },
-      "exactMatch": false,
-      "charDeltaPct": 0.49,
+      "exactMatch": true,
+      "charDeltaPct": 0,
       "infoLoss": [],
       "leaks": [],
       "baselineExists": true,
@@ -562,7 +562,7 @@
       ],
       "captureMethod": "site:salesforce",
       "current": {
-        "chars": 6752,
+        "chars": 6708,
         "codeBlocks": 15,
         "tables": 0,
         "images": 2,
@@ -579,9 +579,11 @@
         "bullets": 12,
         "headings": 7
       },
-      "exactMatch": true,
-      "charDeltaPct": 0,
-      "infoLoss": [],
+      "exactMatch": false,
+      "charDeltaPct": -0.65,
+      "infoLoss": [
+        "chars 6752→6708"
+      ],
       "leaks": [],
       "baselineExists": true,
       "error": null
@@ -1920,22 +1922,22 @@
       ],
       "captureMethod": "route_markdown",
       "current": {
-        "chars": 2567,
-        "codeBlocks": 2,
+        "chars": 4566,
+        "codeBlocks": 7,
         "tables": 0,
         "images": 0,
-        "orderedSteps": 0,
+        "orderedSteps": 2,
         "bullets": 4,
-        "headings": 3
+        "headings": 4
       },
       "baseline": {
-        "chars": 2567,
-        "codeBlocks": 2,
+        "chars": 4566,
+        "codeBlocks": 7,
         "tables": 0,
         "images": 0,
-        "orderedSteps": 0,
+        "orderedSteps": 2,
         "bullets": 4,
-        "headings": 3
+        "headings": 4
       },
       "exactMatch": true,
       "charDeltaPct": 0,
@@ -2092,7 +2094,7 @@
       "id": "sphinx-pandas-groupby",
       "site": null,
       "url": "https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html",
-      "title": "pandas.DataFrame.groupby — pandas 3.0.3 documentation",
+      "title": "pandas.DataFrame.groupby — pandas 3.0.4 documentation",
       "focus": [
         "sphinx",
         "parameter-table",

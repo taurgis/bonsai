@@ -24,9 +24,11 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   flags!: Interfaces.InferredFlags<T['flags']>;
   args!: Interfaces.InferredArgs<T['args']>;
 
+  public parsedArgv!: string[];
+
   public override async init(): Promise<void> {
     await super.init();
-    const { args, flags } = await this.parse({
+    const { args, flags, argv } = await this.parse({
       flags: this.ctor.flags,
       enableJsonFlag: this.ctor.enableJsonFlag,
       args: this.ctor.args,
@@ -34,6 +36,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     });
     this.flags = flags as Interfaces.InferredFlags<T['flags']>;
     this.args = args as Interfaces.InferredArgs<T['args']>;
+    this.parsedArgv = argv as string[];
 
     // Surface a set-but-invalid BONSAI_* override once per run. Resolution silently drops such a
     // value, so without this a typo'd env var would take no effect with no signal. Warnings go to

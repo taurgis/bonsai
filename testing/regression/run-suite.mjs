@@ -23,6 +23,10 @@ import {
   normalizeRegressionMarkdown,
   contentMetrics,
   leakageSignals,
+  timingRegression,
+  TIMING_REGRESSION_LIMIT_PCT,
+  parseTimingBaseline,
+  formatTimingBaseline,
 } from '../../dist/lib/research/regression.js';
 
 const ROOT_DIR = path.join('testing', 'regression');
@@ -37,6 +41,7 @@ const argv = process.argv.slice(2);
 const flags = new Set(argv.filter((a) => a.startsWith('--')));
 const filters = argv.filter((a) => !a.startsWith('--'));
 const promote = flags.has('--promote');
+const promoteTiming = flags.has('--promote-timing');
 const strict = flags.has('--strict');
 
 const CAPTURE_DEPS = {
@@ -47,15 +52,27 @@ const CAPTURE_DEPS = {
 
 // Captures a fixture via its custom site module, or the generic pipeline when no `site` is set.
 async function captureFixture(fixture) {
+  const started = Date.now();
   if (fixture.site) {
     const site = getSiteModuleById(fixture.site);
     if (!site) throw new Error(`Unknown site "${fixture.site}"`);
     if (!site.fetchPage) throw new Error(`Site "${fixture.site}" has no custom fetchPage`);
     const { extraction } = await site.fetchPage(fixture.url);
-    return { extraction, captureMethod: `site:${fixture.site}` };
+    return { extraction, captureMethod: `site:${fixture.site}`, durationMs: Date.now() - started };
   }
   const outcome = await capturePage(fixture.url, {}, CAPTURE_DEPS);
-  return { extraction: outcome.extraction, captureMethod: outcome.captureMethod };
+  return {
+    extraction: outcome.extraction,
+    captureMethod: outcome.captureMethod,
+    durationMs: Date.now() - started,
+  };
+}
+
+async function readTimingBaseline(id) {
+  const timingPath = path.join(BASELINE_DIR, `${id}.timing.json`);
+  if (!(await fileExists(timingPath))) return null;
+  const record = parseTimingBaseline(await fs.readFile(timingPath, 'utf8'));
+  return record?.durationMs ?? null;
 }
 
 async function fileExists(filePath) {
@@ -98,17 +115,20 @@ for (const [index, fixture] of fixtures.entries()) {
   const ordinal = String(index + 1).padStart(2, '0');
   const id = fixture.id || `fixture-${ordinal}`;
   const baselineMdPath = path.join(BASELINE_DIR, `${id}.md`);
+  const baselineTimingPath = path.join(BASELINE_DIR, `${id}.timing.json`);
   const currentMdPath = path.join(CURRENT_DIR, `${id}.md`);
   const currentJsonPath = path.join(CURRENT_DIR, `${id}.json`);
 
   try {
-    const { extraction, captureMethod } = await captureFixture(fixture);
+    const { extraction, captureMethod, durationMs } = await captureFixture(fixture);
     const markdown = normalizeRegressionMarkdown(extraction.detailedMarkdown);
     const current = contentMetrics(markdown);
     const leaks = leakageSignals(markdown);
     await fs.writeFile(currentMdPath, `${markdown}\n`, 'utf8');
 
     const baselineExists = await fileExists(baselineMdPath);
+    const baselineDurationMs = await readTimingBaseline(id);
+    const timing = timingRegression(durationMs, baselineDurationMs);
     let baseline = null;
     let exactMatch = null;
     let infoLoss = [];
@@ -128,6 +148,10 @@ for (const [index, fixture] of fixtures.entries()) {
       title: extraction.title,
       focus: Array.isArray(fixture.focus) ? fixture.focus : [],
       captureMethod,
+      durationMs,
+      baselineDurationMs,
+      timingDeltaPct: timing.deltaPct,
+      timingRegression: timing.regressed,
       current,
       baseline,
       exactMatch,
@@ -140,13 +164,20 @@ for (const [index, fixture] of fixtures.entries()) {
     await fs.writeFile(currentJsonPath, `${JSON.stringify({ fixture, analysis: row }, null, 2)}\n`, 'utf8');
 
     if (promote) await fs.copyFile(currentMdPath, baselineMdPath);
+    if (promote || promoteTiming) {
+      await fs.writeFile(baselineTimingPath, formatTimingBaseline(durationMs));
+    }
 
     const state = !baselineExists ? 'new' : exactMatch ? 'same' : infoLoss.length ? 'LOSS' : 'changed';
     const delta = baseline ? ` Δchars=${row.charDeltaPct ?? 0}%` : '';
+    const timingLabel =
+      baselineDurationMs != null
+        ? ` ${durationMs}ms (${timing.deltaPct >= 0 ? '+' : ''}${timing.deltaPct}% vs ${baselineDurationMs}ms${timing.regressed ? ' SLOW' : ''})`
+        : ` ${durationMs}ms`;
     const loss = infoLoss.length ? `  ⚠ ${infoLoss.join(', ')}` : '';
     const leak = leaks.length ? `  ✗ LEAK: ${leaks.join(', ')}` : '';
     console.log(
-      `[${ordinal}] ${state.padEnd(7)} ${(row.title || id).slice(0, 38).padEnd(38)} :: ${captureMethod.padEnd(16)} ${current.chars} chars${delta}${loss}${leak}`
+      `[${ordinal}] ${state.padEnd(7)} ${(row.title || id).slice(0, 38).padEnd(38)} :: ${captureMethod.padEnd(16)} ${current.chars} chars${delta}${timingLabel}${loss}${leak}`
     );
     results.push(row);
   } catch (error) {
@@ -164,8 +195,11 @@ const summary = {
   changed: results.filter((r) => r.exactMatch === false).length,
   infoLoss: results.filter((r) => r.infoLoss?.length).length,
   leaking: results.filter((r) => r.leaks?.length).length,
+  timingRegression: results.filter((r) => r.timingRegression).length,
+  timingRegressionLimitPct: TIMING_REGRESSION_LIMIT_PCT,
   new: results.filter((r) => !r.baselineExists && !r.error).length,
   promoted: promote,
+  timingPromoted: promoteTiming,
 };
 
 await fs.writeFile(path.join(CURRENT_DIR, 'report.json'), `${JSON.stringify({ summary, results }, null, 2)}\n`, 'utf8');
@@ -174,15 +208,20 @@ if (promote) await fs.copyFile(path.join(CURRENT_DIR, 'report.json'), path.join(
 console.log('\nSummary:', summary);
 if (summary.leaking > 0) console.log(`✗ ${summary.leaking} fixture(s) leaked chrome/menu/placeholder noise into Markdown.`);
 if (summary.infoLoss > 0) console.log(`⚠ ${summary.infoLoss} fixture(s) lost structural content vs baseline.`);
+if (summary.timingRegression > 0) {
+  console.log(
+    `✗ ${summary.timingRegression} fixture(s) exceeded the ${TIMING_REGRESSION_LIMIT_PCT}% capture-duration regression limit.`
+  );
+}
 
 if (strict) {
   const drift = summary.changed + summary.new;
-  if (summary.failed > 0 || drift > 0 || summary.leaking > 0) {
+  if (summary.failed > 0 || drift > 0 || summary.leaking > 0 || summary.timingRegression > 0) {
     console.error(
-      `Strict check failed: failed=${summary.failed}, changed=${summary.changed}, new=${summary.new}, infoLoss=${summary.infoLoss}, leaking=${summary.leaking}`
+      `Strict check failed: failed=${summary.failed}, changed=${summary.changed}, new=${summary.new}, infoLoss=${summary.infoLoss}, leaking=${summary.leaking}, timingRegression=${summary.timingRegression}`
     );
     process.exitCode = 1;
   }
-} else if (summary.failed > 0 || summary.leaking > 0) {
+} else if (summary.failed > 0 || summary.leaking > 0 || summary.timingRegression > 0) {
   process.exitCode = 1;
 }

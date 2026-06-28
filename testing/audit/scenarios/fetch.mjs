@@ -3,6 +3,14 @@ export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
   const { createWorkspace, networkEnabled } = fixtures;
 
+  function expectFetchJsonOk(r, env, { format, ok } = {}) {
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+    expect(env?.command === 'bonsai', `command ${env?.command}`);
+    if (format !== undefined) expect(env?.data?.format === format, `format ${env?.data?.format}`);
+    if (ok) expect(env?.ok === true, 'ok');
+    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
+  }
+
   function seedFetchCache() {
     const ws = createWorkspace();
     const url = 'https://example.com/audit-fetch-cache-hit';
@@ -63,21 +71,13 @@ export default function register(harness, fixtures) {
   check('fetch shorthand accepts flags before URL', () => {
     const { ws, url } = seedFetchCache();
     const r = run(['--format', 'detailed', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
-    const env = parseJson(r.stdout);
-    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
-    expect(env?.command === 'bonsai', `command ${env?.command}`);
-    expect(env?.data?.format === 'detailed', `format ${env?.data?.format}`);
-    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
+    expectFetchJsonOk(r, parseJson(r.stdout), { format: 'detailed' });
   });
 
   check('fetch shorthand accepts --json before URL', () => {
     const { ws, url } = seedFetchCache();
     const r = run(['--json', url], { cwd: ws.cwd, xdg: ws.xdg });
-    const env = parseJson(r.stdout);
-    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
-    expect(env?.command === 'bonsai', `command ${env?.command}`);
-    expect(env?.ok === true, 'ok');
-    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
+    expectFetchJsonOk(r, parseJson(r.stdout), { ok: true });
   });
 
   check('bogus flag no stack trace', () => {

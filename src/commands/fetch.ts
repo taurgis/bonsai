@@ -1,4 +1,4 @@
-import { Args, Flags, ux } from '@oclif/core';
+import { Args, Flags, ux, Errors } from '@oclif/core';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -47,6 +47,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
         '<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json',
     },
   ];
+
+  static strict = false;
 
   static args = {
     url: Args.string({
@@ -357,89 +359,121 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   }
 
   async run(): Promise<unknown> {
-    const { url } = this.args;
+    const urls = this.parsedArgv;
     const { format, ttl, 'max-age': maxAge, 'dry-run': dryRun } = this.flags;
 
     this.validateDurationFlags(ttl, maxAge);
 
+    const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());
+    const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;
+    const currentTime = new Date();
+
+    const results: any[] = [];
+    try {
+      for (const url of urls) {
+        results.push(
+          await this.fetchSingleTarget(
+            url,
+            currentTime,
+            tmpDir,
+            summaryLevel,
+            format,
+            urls.length > 1
+          )
+        );
+      }
+
+      return urls.length === 1 ? results[0] : results;
+    } catch (err) {
+      if (!this.jsonEnabled()) {
+        ux.action.stop('failed');
+      }
+      if (err instanceof Errors.CLIError) throw err;
+      // Stale-serve (exit 5) signals via process.exitCode and never throws, so it bypasses this
+      // path; only genuine fetch/extract failures land here and get classified guidance. Use the
+      // normalized URL in hints so the copy-paste command is canonical (and never echoes raw,
+      // unsanitized user input back to the terminal).
+      const failedUrl = urls[results.length] || urls[0] || '';
+      this.emitFetchError(err, failedUrl);
+    } finally {
+      if (tmpDir) {
+        rmSync(tmpDir, { recursive: true, force: true });
+      }
+    }
+  }
+
+  private async fetchSingleTarget(
+    url: string,
+    currentTime: Date,
+    tmpDir: string | null,
+    summaryLevel: SummaryLevel,
+    format: 'compressed' | 'detailed',
+    showSeparator: boolean
+  ): Promise<any> {
     const target = this.resolveResearchTargetOrFail(url, {
       flagOverride: this.flags.storage as StorageMode | undefined,
       lookup: !this.flags.force,
     });
 
     const { cacheKey, located, normalizedUrl, roots } = target;
-    const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());
-    const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;
-    const currentTime = new Date();
 
-    try {
-      if (!this.jsonEnabled()) {
-        ux.action.start('Fetching ' + normalizedUrl);
-      }
+    if (!this.jsonEnabled()) {
+      ux.action.start('Fetching ' + normalizedUrl);
+    }
 
-      const { cacheStatus, freshnessState, artifact, storageDir, redirectedToGlobal } =
-        await this.resolveArtifact(
-          normalizedUrl,
-          cacheKey,
-          roots,
-          tmpDir,
-          currentTime,
-          located,
-          summaryLevel
-        );
-
-      this.persistSectionsIfFresh(
-        tmpDir ?? storageDir,
-        artifact,
+    const { cacheStatus, freshnessState, artifact, storageDir, redirectedToGlobal } =
+      await this.resolveArtifact(
+        normalizedUrl,
+        cacheKey,
+        roots,
+        tmpDir,
         currentTime,
-        cacheStatus,
+        located,
         summaryLevel
       );
 
-      if (!this.jsonEnabled()) {
-        const CACHE_STATUS_LABEL: Record<string, string> = {
-          hit: 'cached',
-          miss: 'done',
-          refreshed: 'refreshed',
-          revalidated: 'revalidated',
-          stale: 'served stale',
-        };
-        ux.action.stop(CACHE_STATUS_LABEL[cacheStatus] ?? cacheStatus);
-      }
+    this.persistSectionsIfFresh(
+      tmpDir ?? storageDir,
+      artifact,
+      currentTime,
+      cacheStatus,
+      summaryLevel
+    );
 
-      const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
-      const resultData = this.buildResultData(
-        url,
-        normalizedUrl,
-        cacheKey,
-        storageDir,
-        roots.mode,
-        cacheStatus,
-        freshnessState,
-        format,
-        artifact,
-        content,
-        redirectedToGlobal
-      );
+    if (!this.jsonEnabled()) {
+      const CACHE_STATUS_LABEL: Record<string, string> = {
+        hit: 'cached',
+        miss: 'done',
+        refreshed: 'refreshed',
+        revalidated: 'revalidated',
+        stale: 'served stale',
+      };
+      ux.action.stop(CACHE_STATUS_LABEL[cacheStatus] ?? cacheStatus);
+    }
 
-      if (!this.jsonEnabled()) {
-        this.log(content);
-      }
-      return resultData;
-    } catch (err) {
-      if (!this.jsonEnabled()) {
-        ux.action.stop('failed');
-      }
-      // Stale-serve (exit 5) signals via process.exitCode and never throws, so it bypasses this
-      // path; only genuine fetch/extract failures land here and get classified guidance. Use the
-      // normalized URL in hints so the copy-paste command is canonical (and never echoes raw,
-      // unsanitized user input back to the terminal).
-      this.emitFetchError(err, normalizedUrl);
-    } finally {
-      if (tmpDir) {
-        rmSync(tmpDir, { recursive: true, force: true });
+    const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
+    const resultData = this.buildResultData(
+      url,
+      normalizedUrl,
+      cacheKey,
+      storageDir,
+      roots.mode,
+      cacheStatus,
+      freshnessState,
+      format,
+      artifact,
+      content,
+      redirectedToGlobal
+    );
+
+    if (!this.jsonEnabled()) {
+      this.log(content);
+      if (showSeparator) {
+        this.log('\n' + '='.repeat(40) + '\n');
       }
     }
+
+    return resultData;
   }
 }
 

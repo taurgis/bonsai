@@ -56,6 +56,70 @@ export interface ContentMetrics {
   headings: number;
 }
 
+/** Maximum allowed capture-duration regression vs baseline (percent slower). */
+export const TIMING_REGRESSION_LIMIT_PCT = 25;
+
+export interface TimingRegression {
+  deltaPct: number | null;
+  regressed: boolean;
+}
+
+/** Returns whether `currentMs` exceeds baseline by more than TIMING_REGRESSION_LIMIT_PCT. */
+export function timingRegression(
+  currentMs: number,
+  baselineMs: number | null | undefined
+): TimingRegression {
+  if (!baselineMs || baselineMs <= 0) return { deltaPct: null, regressed: false };
+  const deltaPct = Number((((currentMs - baselineMs) / baselineMs) * 100).toFixed(2));
+  return { deltaPct, regressed: deltaPct > TIMING_REGRESSION_LIMIT_PCT };
+}
+
+export interface TimingBaselineRecord {
+  durationMs: number;
+  capturedAt: string;
+}
+
+/** Parses a committed `baseline/<id>.timing.json` file. */
+export function parseTimingBaseline(raw: string): TimingBaselineRecord | null {
+  try {
+    const parsed = JSON.parse(raw) as { durationMs?: unknown; capturedAt?: unknown };
+    if (typeof parsed.durationMs !== 'number' || parsed.durationMs <= 0) return null;
+    return {
+      durationMs: parsed.durationMs,
+      capturedAt: typeof parsed.capturedAt === 'string' ? parsed.capturedAt : '',
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Serializes a timing baseline record for `baseline/<id>.timing.json`. */
+export function formatTimingBaseline(
+  durationMs: number,
+  capturedAt = new Date().toISOString()
+): string {
+  return `${JSON.stringify({ durationMs, capturedAt }, null, 2)}\n`;
+}
+
+/** Structural signals compared before char count when picking DOM vs API Markdown. */
+const CONTENT_RICHNESS_KEYS: Array<keyof ContentMetrics> = [
+  'tables',
+  'codeBlocks',
+  'headings',
+  'images',
+  'orderedSteps',
+  'chars',
+];
+
+/** True when `candidate` carries strictly more structural content than `baseline`. */
+export function contentRicherThan(candidate: ContentMetrics, baseline: ContentMetrics): boolean {
+  for (const key of CONTENT_RICHNESS_KEYS) {
+    if (candidate[key] > baseline[key]) return true;
+    if (candidate[key] < baseline[key]) return false;
+  }
+  return false;
+}
+
 /**
  * Structural content signals used to catch information loss between baseline and current output:
  * a sudden drop in code blocks, tables, images, or steps flags that a fetch change dropped content.

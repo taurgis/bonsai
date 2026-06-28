@@ -1,3 +1,5 @@
+import { expectNonIntegerLimitInvalid, expectSingleCachedHit } from '../helpers.mjs';
+
 /** list command filters and empty states. */
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
@@ -10,11 +12,7 @@ export default function register(harness, fixtures) {
   });
 
   check('list non-integer limit INVALID_LIMIT', () => {
-    const r = run(['list', '--limit', 'abc', '--json']);
-    expect(r.exitCode === 2, `exit ${r.exitCode}`);
-    const env = parseJson(r.stdout);
-    expect(env?.code === 'INVALID_LIMIT', env?.code);
-    expect(env?.stderr?.includes('Code: INVALID_LIMIT'), env?.stderr);
+    expectNonIntegerLimitInvalid(harness, ['list']);
   });
 
   check('list extra arg --json UNEXPECTED_ARGUMENT not command-not-found', () => {
@@ -46,13 +44,11 @@ export default function register(harness, fixtures) {
     );
     expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
 
-    const r = run(['list', '--topic', 'Audit List', '--tags', 'audit-tag', '--json'], {
-      cwd: ws.cwd,
-      xdg: ws.xdg,
-    });
-    const env = parseJson(r.stdout);
-    expect(r.exitCode === 0, `exit ${r.exitCode}`);
-    expect(env?.data?.length === 1, `results ${env?.data?.length}`);
-    expect(env?.data?.[0]?.sourceUrls?.includes(url), JSON.stringify(env?.data?.[0]));
+    expectSingleCachedHit(
+      harness,
+      ['list', '--topic', 'Audit List', '--tags', 'audit-tag', '--json'],
+      ws,
+      url
+    );
   });
 }

@@ -175,7 +175,7 @@ If the coupon had system-generated codes, in this example, the prefix would be "
 		<virtual-codes>
 ```
 
-If the coupon had multiple codes, they would be listed here. For coupons with large numbers of codes, use system-generated coupons. See [System-Generated Coupon Codes](https://help.salesforce.com/s/articleView?id=cc.b2c_system_generated_coupon_codes_intro.htm&language=en_US&type=5 "To auto-generate many unique, one-time-use codes, use system-generated coupon codes. These codes are useful for large-scale promotions, like an email blast, and you can customize These codes are useful for large-scale promotions, like an email blast, and you can customize them for a personalized shopping experience. for the coupon campaign or pool.").
+If the coupon had multiple codes, they would be listed here. For coupons with large numbers of codes, use system-generated coupons. See [System-Generated Coupon Codes](/apex/HTViewHelpDoc?id=cc.b2c_system_generated_coupon_codes_intro.htm "To auto-generate many unique, one-time-use codes, use system-generated coupon codes. These codes are useful for large-scale promotions, like an email blast, and you can customize These codes are useful for large-scale promotions, like an email blast, and you can customize them for a personalized shopping experience. for the coupon campaign or pool.").
 
 ```markup
 		</coupon>

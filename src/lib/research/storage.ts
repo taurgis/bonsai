@@ -10,15 +10,8 @@ import {
 import { atomicWriteFile } from '../atomic-write.js';
 import { parseArtifact, serializeArtifact } from './artifact.js';
 import type { ResearchArtifact } from './schema.js';
-
-export function isResearchFile(file: string): boolean {
-  return (
-    file.endsWith('.md') &&
-    !file.includes('.tmp') &&
-    !file.includes('.corrupt') &&
-    !file.includes('.superseded')
-  );
-}
+import { loadSearchableArtifactsForDir } from './search-index.js';
+import { isResearchFile } from './url.js';
 
 /**
  * Scans a cache directory and maps each valid artifact file through a callback.
@@ -205,12 +198,16 @@ export function scanCacheDirs<T>(
   fn: (artifact: ResearchArtifact, filePath: string) => T | null
 ): T[] {
   const seen = new Set<string>();
-  return dataDirs.flatMap((dataDir) =>
-    scanCacheDir(join(dataDir, 'research'), (artifact, filePath) => {
-      const key = artifact.metadata.cache_key;
-      if (seen.has(key)) return null;
-      seen.add(key);
-      return fn(artifact, filePath);
-    })
-  );
+  return dataDirs.flatMap((dataDir) => {
+    const researchDir = join(dataDir, 'research');
+    const searchable = loadSearchableArtifactsForDir(researchDir);
+    return searchable
+      .map(({ artifact, filePath }) => {
+        const key = artifact.metadata.cache_key;
+        if (seen.has(key)) return null;
+        seen.add(key);
+        return fn(artifact, filePath);
+      })
+      .filter((x): x is T => x !== null);
+  });
 }

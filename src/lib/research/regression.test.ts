@@ -4,6 +4,11 @@ import {
   normalizeRegressionMarkdown,
   contentMetrics,
   leakageSignals,
+  timingRegression,
+  TIMING_REGRESSION_LIMIT_PCT,
+  contentRicherThan,
+  parseTimingBaseline,
+  formatTimingBaseline,
 } from './regression.js';
 
 describe('normalizeRegressionAssetUrl', () => {
@@ -68,6 +73,65 @@ describe('contentMetrics', () => {
     expect(m.images).toBe(1);
     expect(m.codeBlocks).toBe(1);
     expect(m.chars).toBe(md.length);
+  });
+});
+
+describe('timingRegression', () => {
+  it('flags regressions beyond the configured limit', () => {
+    expect(timingRegression(11500, 10000)).toEqual({ deltaPct: 15, regressed: false });
+    expect(timingRegression(11501, 10000).regressed).toBe(true);
+    expect(timingRegression(9000, 10000)).toEqual({ deltaPct: -10, regressed: false });
+  });
+
+  it('does not regress when no baseline timing exists', () => {
+    expect(timingRegression(5000, null)).toEqual({ deltaPct: null, regressed: false });
+    expect(timingRegression(5000, 0)).toEqual({ deltaPct: null, regressed: false });
+  });
+
+  it('exports a 15% default limit', () => {
+    expect(TIMING_REGRESSION_LIMIT_PCT).toBe(15);
+  });
+});
+
+describe('parseTimingBaseline', () => {
+  it('parses a valid timing baseline record', () => {
+    expect(
+      parseTimingBaseline('{"durationMs":6016,"capturedAt":"2026-01-01T00:00:00.000Z"}')
+    ).toEqual({
+      durationMs: 6016,
+      capturedAt: '2026-01-01T00:00:00.000Z',
+    });
+  });
+
+  it('returns null for invalid records', () => {
+    expect(parseTimingBaseline('not json')).toBeNull();
+    expect(parseTimingBaseline('{"durationMs":0}')).toBeNull();
+  });
+});
+
+describe('formatTimingBaseline', () => {
+  it('serializes durationMs with trailing newline', () => {
+    const out = formatTimingBaseline(6016, '2026-01-01T00:00:00.000Z');
+    expect(JSON.parse(out.trimEnd())).toEqual({
+      durationMs: 6016,
+      capturedAt: '2026-01-01T00:00:00.000Z',
+    });
+  });
+});
+
+describe('contentRicherThan', () => {
+  it('prefers more tables over raw char count', () => {
+    const dom = contentMetrics('x'.repeat(500));
+    const api = contentMetrics('| A |\n| --- |\n| 1 |\n');
+    expect(contentRicherThan(api, dom)).toBe(true);
+    expect(contentRicherThan(dom, api)).toBe(false);
+  });
+
+  it('breaks ties on char count', () => {
+    const shorter = contentMetrics('abc');
+    const longer = contentMetrics('abcdef');
+    expect(contentRicherThan(longer, shorter)).toBe(true);
+    expect(contentRicherThan(shorter, longer)).toBe(false);
   });
 });
 

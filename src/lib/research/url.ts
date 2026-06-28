@@ -131,3 +131,44 @@ export function normalizeUrl(input: string): string {
 
   return url.toString();
 }
+
+/**
+ * Checks if a URL matches a wildcard pattern (case-insensitive, supports * wildcard).
+ */
+export function matchesUrlGlob(url: string, glob: string): boolean {
+  // Collapse consecutive wildcards to prevent ReDoS
+  const collapsedGlob = glob.replace(/\*+/g, '*');
+  const normalizedGlob = collapsedGlob.toLowerCase();
+  const normalizedUrl = url.toLowerCase();
+
+  // Escape regex characters except *
+  const escapedGlob = normalizedGlob.replace(/[/\-\\^$+?.()|[\]{}]/g, '\\$&');
+  // Replace * with .*
+  const regexString = '^' + escapedGlob.replace(/\*/g, '.*') + '$';
+  const regex = new RegExp(regexString);
+  return regex.test(normalizedUrl);
+}
+
+/**
+ * Checks if artifact metadata contains any URL matching the filter glob.
+ */
+export function artifactMatchesUrlFilter(
+  meta: { source_urls?: string[]; source_url?: string },
+  filterUrl: string | undefined
+): boolean {
+  if (!filterUrl) return true;
+  const urls = meta.source_urls || (meta.source_url ? [meta.source_url] : []);
+  return urls.some((u) => matchesUrlGlob(u, filterUrl));
+}
+
+/**
+ * Checks if a filename matches the standard research note naming pattern.
+ */
+export function isResearchFile(file: string): boolean {
+  return (
+    file.endsWith('.md') &&
+    !file.includes('.tmp') &&
+    !file.includes('.corrupt') &&
+    !file.includes('.superseded')
+  );
+}

@@ -1,6 +1,7 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
+import { colors } from '../lib/color.js';
 
 interface SectionSummary {
   cacheKey: string;
@@ -26,6 +27,8 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     },
   ];
 
+  static strict = false;
+
   static args = {
     url: Args.string({
       required: true,
@@ -36,45 +39,75 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   static stdoutIsPrimaryData = true;
 
   async run(): Promise<unknown> {
-    const { url } = this.args;
+    const urls = this.parsedArgv;
 
-    const target = this.resolveResearchTargetOrFail(url);
+    const results: any[] = [];
+    const missingUrls: string[] = [];
 
-    const { cacheKey, located, normalizedUrl, roots } = target;
-
-    if (!located) {
-      // inspect makes no network call, so the bare message reads like the network-failure case the
-      // exit-1 contract describes. Point at the fix instead: fetch the page so it lands in the cache.
-      this.error(`No cached research found for URL: ${normalizedUrl}`, {
-        exit: 1,
-        code: 'CACHE_MISS',
-        suggestions: [`Fetch and cache it first: ${this.config.bin} ${normalizedUrl}`],
-      });
+    for (const url of urls) {
+      const target = this.resolveResearchTargetOrFail(url);
+      if (!target.located) {
+        missingUrls.push(target.normalizedUrl);
+        continue;
+      }
+      results.push(this.inspectSingleTarget(target, urls.length > 1));
     }
 
+    if (missingUrls.length > 0) {
+      const firstMissing = missingUrls[0]!;
+      const suggestions = missingUrls.map(
+        (u) => `Fetch and cache it first: ${this.config.bin} ${u}`
+      );
+      this.error(
+        `No cached research found for URL: ${firstMissing}` +
+          (missingUrls.length > 1 ? ` and ${missingUrls.length - 1} other URLs` : ''),
+        {
+          exit: 1,
+          code: 'CACHE_MISS',
+          suggestions,
+        }
+      );
+    }
+
+    return urls.length === 1 ? results[0] : results;
+  }
+
+  private logMetadata(metadata: Record<string, any>): void {
+    this.log(colors.cyan(`--- Metadata ---`));
+    for (const [key, val] of Object.entries(metadata)) {
+      const paddedKey = colors.cyan((key + ':').padEnd(Math.max(25, key.length + 2)));
+      if (typeof val === 'object' && val !== null) {
+        this.log(`${paddedKey} ${colors.bold(JSON.stringify(val))}`);
+      } else {
+        this.log(`${paddedKey} ${colors.bold(String(val))}`);
+      }
+    }
+  }
+
+  private logSections(sections: SectionSummary[]): void {
+    this.log(colors.cyan(`--- Sections (${sections.length}) ---`));
+    for (const s of sections) {
+      this.log(
+        `${colors.cyan(s.headingPath || '')} [${colors.yellow(s.anchor || '')}] (${colors.magenta(String(s.tokenEstimate.detailed || 0))} tokens) ${colors.gray(s.cacheKey)}`
+      );
+    }
+  }
+
+  private inspectSingleTarget(target: any, showSeparator: boolean): any {
+    const { cacheKey, located, roots } = target;
     const cached = located.artifact;
     const artifactPath = located.path;
     const sections = this.findSections(roots.readRoots, cacheKey);
 
     if (!this.jsonEnabled()) {
-      this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
-      this.log(`${'Cache Path:'.padEnd(25)} ${artifactPath}`);
-      this.log(`--- Metadata ---`);
-      for (const [key, val] of Object.entries(cached.metadata)) {
-        const paddedKey = (key + ':').padEnd(Math.max(25, key.length + 2));
-        if (typeof val === 'object' && val !== null) {
-          this.log(`${paddedKey} ${JSON.stringify(val)}`);
-        } else {
-          this.log(`${paddedKey} ${val}`);
-        }
-      }
+      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
+      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      this.logMetadata(cached.metadata);
       if (sections.length) {
-        this.log(`--- Sections (${sections.length}) ---`);
-        for (const s of sections) {
-          this.log(
-            `${s.headingPath} [${s.anchor}] (${s.tokenEstimate.detailed} tokens) ${s.cacheKey}`
-          );
-        }
+        this.logSections(sections);
+      }
+      if (showSeparator) {
+        this.log('='.repeat(40));
       }
     }
 

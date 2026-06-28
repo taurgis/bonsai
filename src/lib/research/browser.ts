@@ -216,56 +216,6 @@ export async function waitForLoad(
   throw new Error(`Navigation timed out after ${timeoutMs}ms`);
 }
 
-/**
- * Polls until a content-container element holds enough RENDERED text, so SPAs that fetch their
- * body after load are captured rendered rather than as a "Loading…" shell. Pierces open shadow
- * roots (the container is matched across shadow boundaries) and measures `innerText`, which
- * reflects shadow-rendered text — `document.querySelector` + `textContent` miss both. Returns
- * without throwing on timeout; the caller captures whatever rendered and judges its quality.
- */
-export async function waitForContentReady(
-  page: CdpPage,
-  selectors: string[],
-  minChars: number,
-  timeoutMs: number
-): Promise<void> {
-  // Reports whether a content container has rendered (innerText pierces shadow), plus the total
-  // rendered text length so the caller can wait for the render to *settle* — heavy pages (e.g.
-  // the api-console) render the container early but keep filling it in.
-  const expression = `(() => {
-    const out = [];
-    const visit = (r) => { for (const c of Array.from(r.children || [])) { out.push(c); if (c.shadowRoot) visit(c.shadowRoot); visit(c); } };
-    visit(document);
-    const SELS = ${JSON.stringify(selectors)};
-    let has = false;
-    for (const el of out) {
-      if (!el.matches) continue;
-      if (!SELS.some((s) => { try { return el.matches(s); } catch (e) { return false; } })) continue;
-      if (((el.innerText) || '').trim().length >= ${minChars}) { has = true; break; }
-    }
-    return { has, len: document.body ? (document.body.innerText || '').length : 0 };
-  })()`;
-
-  const start = Date.now();
-  let previousLength = -1;
-  let stablePolls = 0;
-  while (Date.now() - start < timeoutMs) {
-    const value = (
-      await page.client
-        .send('Runtime.evaluate', { expression, returnByValue: true }, page.sessionId)
-        .catch(() => null)
-    )?.result?.value;
-    if (value?.has) {
-      const grew =
-        Math.abs((value.len || 0) - previousLength) > Math.max(40, previousLength * 0.02);
-      if (!grew && ++stablePolls >= 2) return; // content present and rendering has settled
-      if (grew) stablePolls = 0;
-      previousLength = value.len || 0;
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-}
-
 export const BLOCKED_ASSET_URLS = [
   '*.css',
   '*.png',
