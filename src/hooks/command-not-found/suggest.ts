@@ -88,6 +88,57 @@ function emitJsonError(
   return envelope;
 }
 
+export function buildCommandNotFoundDetails(
+  id: string,
+  argv: string[] | undefined,
+  config: Interfaces.Config
+): {
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME';
+  command: string;
+  jsonMode: boolean;
+  message: string;
+} {
+  const hiddenIds = new Set(config.commands.filter((c) => c.hidden).map((c) => c.id));
+  const visibleIds = config.commandIDs.filter((commandId) => !hiddenIds.has(commandId));
+
+  // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
+  // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which
+  // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
+  const bareUrl = bareUrlInput(id);
+  if (bareUrl) {
+    return {
+      code: 'MISSING_URL_SCHEME',
+      command: bareUrl,
+      jsonMode: isJsonMode(argv),
+      message: [
+        `${bareUrl} is not a ${config.bin} command.`,
+        `Run ${config.bin} help for a list of available commands.`,
+        `Did you mean ${config.bin} https://${bareUrl}? URLs need an http:// or https:// scheme.`,
+      ].join('\n'),
+    };
+  }
+
+  const segments = id.split(':');
+  const { suggestion, commandSegments } = findSuggestion(segments, visibleIds);
+  // Show only the segments that name the command, never the positional args oclif folded into the id
+  // (which would otherwise glue the arg on and turn `://` into ` //`).
+  const displaySegments = commandSegments || topicChainLength(segments, config);
+  const attempted = toConfiguredId(segments.slice(0, displaySegments).join(':'), config);
+
+  // Order so the most actionable line lands last, where the eye rests (clig.dev): the help pointer
+  // is the floor, and a concrete "Did you mean …?" correction — when we have one — goes below it.
+  const lines = [`${attempted} is not a ${config.bin} command.`];
+  lines.push(`Run ${config.bin} help for a list of available commands.`);
+  if (suggestion) lines.push(`Did you mean ${toConfiguredId(suggestion, config)}?`);
+
+  return {
+    code: 'COMMAND_NOT_FOUND',
+    command: attempted,
+    jsonMode: isJsonMode(argv),
+    message: lines.join('\n'),
+  };
+}
+
 /**
  * Typo-aware "command not found" handler. oclif fires this before printing its own terse error;
  * throwing here (via `this.error`) replaces that default with a more helpful message. A correction
@@ -95,39 +146,9 @@ function emitJsonError(
  * re-runs the corrected command themselves, so they learn the right syntax (clig.dev guidance).
  */
 const hook: Hook<'command_not_found'> = async function (opts) {
-  const hiddenIds = new Set(opts.config.commands.filter((c) => c.hidden).map((c) => c.id));
-  const visibleIds = opts.config.commandIDs.filter((id) => !hiddenIds.has(id));
-
-  // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
-  // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which
-  // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
-  const bareUrl = bareUrlInput(opts.id);
-  if (bareUrl) {
-    const message = [
-      `${bareUrl} is not a ${opts.config.bin} command.`,
-      `Run ${opts.config.bin} help for a list of available commands.`,
-      `Did you mean ${opts.config.bin} https://${bareUrl}? URLs need an http:// or https:// scheme.`,
-    ].join('\n');
-    if (isJsonMode(opts.argv)) return emitJsonError(bareUrl, message, 'MISSING_URL_SCHEME');
-    this.error(message, { exit: 2 });
-  }
-
-  const segments = opts.id.split(':');
-  const { suggestion, commandSegments } = findSuggestion(segments, visibleIds);
-  // Show only the segments that name the command, never the positional args oclif folded into the id
-  // (which would otherwise glue the arg on and turn `://` into ` //`).
-  const displaySegments = commandSegments || topicChainLength(segments, opts.config);
-  const attempted = toConfiguredId(segments.slice(0, displaySegments).join(':'), opts.config);
-
-  // Order so the most actionable line lands last, where the eye rests (clig.dev): the help pointer
-  // is the floor, and a concrete "Did you mean …?" correction — when we have one — goes below it.
-  const lines = [`${attempted} is not a ${opts.config.bin} command.`];
-  lines.push(`Run ${opts.config.bin} help for a list of available commands.`);
-  if (suggestion) lines.push(`Did you mean ${toConfiguredId(suggestion, opts.config)}?`);
-
-  const message = lines.join('\n');
-  if (isJsonMode(opts.argv)) return emitJsonError(attempted, message, 'COMMAND_NOT_FOUND');
-  this.error(message, { exit: 2 });
+  const details = buildCommandNotFoundDetails(opts.id, opts.argv, opts.config);
+  if (details.jsonMode) return emitJsonError(details.command, details.message, details.code);
+  this.error(details.message, { exit: 2, code: details.code });
 };
 
 export default hook;

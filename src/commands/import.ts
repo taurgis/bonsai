@@ -35,6 +35,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       description: 'import research from a local Markdown file',
       command: '<%= config.bin %> import https://example.com/docs --file path/to/notes.md',
     },
+    {
+      description: 'import research from stdin using the standard file placeholder',
+      command: 'cat notes.md | <%= config.bin %> import https://example.com/docs --file -',
+    },
   ];
 
   static args = {
@@ -54,7 +58,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       default: false,
     }),
     file: Flags.string({
-      description: 'path to a Markdown file containing research notes to import',
+      description: 'path to a Markdown file containing research notes to import, or "-" for stdin',
     }),
     'input-format': Flags.option({
       description: 'format of the input provided',
@@ -194,6 +198,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     const bin = this.config.bin;
     return [
       `Pipe Markdown content, e.g. cat notes.md | ${bin} import <url> --stdin`,
+      `Or use the standard stdin placeholder: cat notes.md | ${bin} import <url> --file -`,
       `Or read from a file: ${bin} import <url> --file notes.md`,
     ];
   }
@@ -253,7 +258,9 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   }
 
   private async readAndValidateInput(): Promise<string> {
-    if (this.flags.stdin) {
+    const fileReadsStdin = this.flags.file === '-';
+
+    if (this.flags.stdin || fileReadsStdin) {
       const rawInput = await this.readStdinWithGuard();
       if (!rawInput.trim()) {
         this.error('Empty stdin content provided.', { exit: 2, code: 'EMPTY_INPUT' });

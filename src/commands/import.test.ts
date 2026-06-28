@@ -117,6 +117,27 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('treats --file - as stdin', async () => {
+    const stdinSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('## Notes\nStandard stdin placeholder content');
+    const existsSpy = vi.spyOn(ResearchImport.prototype as any, 'fsExistsSync');
+
+    const result = (await ResearchImport.run([
+      'https://example.com/file-dash-import',
+      '--file',
+      '-',
+    ])) as any;
+
+    expect(stdinSpy).toHaveBeenCalled();
+    expect(existsSpy).not.toHaveBeenCalled();
+    expect(result.cache.status).toBe('imported');
+    expect(result.content).toBe('## Notes\nStandard stdin placeholder content');
+
+    stdinSpy.mockRestore();
+    existsSpy.mockRestore();
+  });
+
   it('fails if both stdin and file flags are missing', async () => {
     const runPromise = ResearchImport.run(['https://example.com']);
     await expect(runPromise).rejects.toThrow(/Either --stdin or --file/);

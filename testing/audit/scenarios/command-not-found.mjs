@@ -19,6 +19,23 @@ export default function register(harness) {
     expect(!env?.stderr?.includes('Did you mean'), 'no suggestion');
   });
 
+  check('unknown topic subcommand with --help stays friendly', () => {
+    const r = run(['config', 'gett', '--help']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('config gett is not a bonsai command.'), r.stderr);
+    expect(r.stderr.includes('Did you mean config get?'), r.stderr);
+    expect(r.stderr.includes('Code: COMMAND_NOT_FOUND'), r.stderr);
+  });
+
+  check('unknown topic subcommand with --json --help returns envelope', () => {
+    const r = run(['--json', 'config', 'gett', '--help']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
+    expect(env?.stderr?.includes('Did you mean config get?'), env?.stderr);
+  });
+
   check('bare hostname example.com --json MISSING_URL_SCHEME', () => {
     const r = run(['--json', 'example.com']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

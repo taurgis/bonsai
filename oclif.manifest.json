@@ -155,6 +155,10 @@
         {
           "description": "import research from a local Markdown file",
           "command": "<%= config.bin %> import https://example.com/docs --file path/to/notes.md"
+        },
+        {
+          "description": "import research from stdin using the standard file placeholder",
+          "command": "cat notes.md | <%= config.bin %> import https://example.com/docs --file -"
         }
       ],
       "flags": {
@@ -172,7 +176,7 @@
           "type": "boolean"
         },
         "file": {
-          "description": "path to a Markdown file containing research notes to import",
+          "description": "path to a Markdown file containing research notes to import, or \"-\" for stdin",
           "name": "file",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -918,5 +922,5 @@
       "stdoutIsPrimaryData": true
     }
   },
-  "version": "1.0.5"
+  "version": "1.0.6"
 }

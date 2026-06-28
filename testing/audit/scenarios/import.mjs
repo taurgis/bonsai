@@ -79,6 +79,17 @@ export default function register(harness, fixtures) {
     expect(env?.data?.cache?.status === 'imported', JSON.stringify(env?.data?.cache));
   });
 
+  check('import --file - reads stdin --json', () => {
+    const r = run(['import', 'https://example.com/import-file-dash', '--file', '-', '--json'], {
+      input: '# Dash\n\nContent from stdin placeholder.\n',
+    });
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
+    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
+    expect(env?.ok === true, 'ok false');
+    expect(env?.data?.content?.includes('stdin placeholder'), 'content');
+  });
+
   check('import from file in workspace', () => {
     const ws = createWorkspace();
     const file = writeNote(ws.cwd, 'notes.md', '# File import\n\nFrom audit fixture.\n');

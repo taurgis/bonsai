@@ -300,6 +300,26 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stdout).toContain('Successfully imported');
   });
 
+  it('import --file - reads Markdown from stdin', () => {
+    const result = runContract(
+      ['import', 'https://example.com/file-dash-contract', '--file', '-', '--json'],
+      {
+        input: '# File dash\n\nContent from stdin.\n',
+        env: { BONSAI_STORAGE: 'project' },
+        raw: true,
+      }
+    );
+    expect(result.exitCode).toBe(0);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: true,
+      exitCode: 0,
+      command: 'import',
+    });
+    expect(envelope.data.content).toContain('Content from stdin.');
+    expect(result.stderr).toBe('');
+  });
+
   it('a malformed URL reports an actionable error without stuttering "Invalid URL"', () => {
     const result = runContract(['inspect', 'notaurl']);
     expect(result.exitCode).toBe(2);
@@ -328,6 +348,29 @@ describe('CLI ergonomics and error contracts', () => {
     // URL — otherwise oclif throws "command https://... not found" and dumps a stack trace.
     expect(result.stderr).not.toContain('not found');
     expect(result.stderr).not.toMatch(/\n\s+at /);
+  });
+
+  it('unknown topic subcommand with --help uses command-not-found suggestions', () => {
+    const result = runContract(['config', 'gett', '--help']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('config gett is not a bonsai command.');
+    expect(result.stderr).toContain('Did you mean config get?');
+    expect(result.stderr).toContain('Code: COMMAND_NOT_FOUND');
+  });
+
+  it('unknown topic subcommand with --json --help returns command-not-found envelope', () => {
+    const result = runContract(['--json', 'config', 'gett', '--help'], { raw: true });
+    expect(result.exitCode).toBe(2);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 2,
+      command: 'config gett',
+      code: 'COMMAND_NOT_FOUND',
+      data: null,
+    });
+    expect(envelope.stderr).toContain('Did you mean config get?');
+    expect(result.stderr).toBe('');
   });
 
   it('non-http(s) URL shorthand reports the protocol error, not "command not found"', () => {

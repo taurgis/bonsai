@@ -7,6 +7,7 @@ import updateNotifier from 'update-notifier';
 import { createRequire } from 'node:module';
 
 import { normalizeArgv } from '../dist/lib/argv.js';
+import { tryUnknownHelpOutput } from '../dist/lib/help-preflight.js';
 import { tryJsonMetaOutput } from '../dist/lib/json-meta.js';
 
 const req = createRequire(import.meta.url);
@@ -21,6 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // process.argv itself so both the run path and the help/error path agree.
 const rawArgv = process.argv.slice(2);
 const result = normalizeArgv(rawArgv);
+const root = __dirname + '/../';
 
 if (result.exitWithJson) {
   process.exitCode = result.exitWithJson.exitCode;
@@ -28,7 +30,18 @@ if (result.exitWithJson) {
   process.exit();
 }
 
-const jsonMeta = await tryJsonMetaOutput(result.argv, __dirname + '/../');
+const unknownHelp = await tryUnknownHelpOutput(result.argv, root);
+if (unknownHelp) {
+  process.exitCode = unknownHelp.exitCode;
+  if (unknownHelp.kind === 'json') {
+    console.log(JSON.stringify(unknownHelp.envelope, null, 2));
+  } else {
+    console.error(` ›   Error: ${unknownHelp.message.replaceAll('\n', '\n ›   ')}`);
+  }
+  process.exit();
+}
+
+const jsonMeta = await tryJsonMetaOutput(result.argv, root);
 if (jsonMeta) {
   process.exitCode = jsonMeta.exitCode;
   console.log(JSON.stringify(jsonMeta.envelope, null, 2));
@@ -45,5 +58,5 @@ process.argv = [process.argv[0], process.argv[1], ...result.argv];
 
 await execute({
   development: false,
-  dir: __dirname + '/../',
+  dir: root,
 });
