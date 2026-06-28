@@ -187,15 +187,19 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     let prunedCount = 0;
     if (dryRun) {
       if (!this.jsonEnabled()) {
-        const noun = pluralize(count, 'entry', 'entries');
-        this.log(
-          colors.yellow(`[Dry Run] Found ${count} research cache ${noun} that would be pruned:\n`)
-        );
-        filesToPrune.forEach((f) => {
+        if (count === 0) {
+          this.log(colors.yellow('[Dry Run] No research cache entries match the given filters.'));
+        } else {
+          const noun = pluralize(count, 'entry', 'entries');
           this.log(
-            `- [${f.topic ? colors.cyan(f.topic) : colors.gray(NO_TOPIC_LABEL)}] Key: ${colors.bold(f.cacheKey)} (${colors.gray(f.url || 'Imported note')})`
+            colors.yellow(`[Dry Run] Found ${count} research cache ${noun} that would be pruned:\n`)
           );
-        });
+          filesToPrune.forEach((f) => {
+            this.log(
+              `- [${f.topic ? colors.cyan(f.topic) : colors.gray(NO_TOPIC_LABEL)}] Key: ${colors.bold(f.cacheKey)} (${colors.gray(f.url || 'Imported note')})`
+            );
+          });
+        }
       }
     } else {
       prunedCount = this.deletePruneCandidates(filesToPrune);

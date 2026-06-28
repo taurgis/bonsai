@@ -43,11 +43,28 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'INVALID_URL', 'code');
   });
 
-  check('search no results human tip', () => {
+  check('search no results human tip (empty cache → populate)', () => {
     const r = run(['search', 'zzzznonexistentquery99999']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(r.stdout.includes('No matching'), r.stdout);
     expect(r.stdout.includes('populate the cache'), r.stdout);
+  });
+
+  check('search no results with populated cache suggests broadening not populating', () => {
+    const ws = createWorkspace();
+    const imported = run(['import', 'https://example.com/audit-broaden', '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Cached\n\nThis note exists so the cache is not empty.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['search', 'zzzznonexistentquery99999'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('No matching'), r.stdout);
+    // Cache has entries, so the tip must not tell the user to populate it.
+    expect(!r.stdout.includes('populate the cache'), r.stdout);
+    expect(r.stdout.includes('broaden your search'), r.stdout);
   });
 
   check('search unsupported domain UNSUPPORTED_DOMAIN', () => {
@@ -104,7 +121,10 @@ export default function register(harness, fixtures) {
     const r = run(['search', '"delta-tango phrase"', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     const row = parseJson(r.stdout)?.data?.[0];
-    expect(row?.matchedTerms?.some((m) => m.kind === 'phrase'), 'phrase match metadata');
+    expect(
+      row?.matchedTerms?.some((m) => m.kind === 'phrase'),
+      'phrase match metadata'
+    );
   });
 
   check('search missing query --json MISSING_ARGUMENT', () => {

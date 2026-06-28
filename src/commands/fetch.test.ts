@@ -10,7 +10,8 @@ describe('fetchFailureGuidance', () => {
     for (const status of ['401 Unauthorized', '403 Forbidden']) {
       const g = fetchFailureGuidance(`Fetch failed with status ${status}`, url);
       expect(g?.suggestions.some((s) => s.includes(`bonsai import ${url} --stdin`))).toBe(true);
-      expect(g?.ref).toContain('troubleshooting');
+      // Must point at the published docs site, not a stale GitHub Pages host.
+      expect(g?.ref).toBe('https://bonsai.rhino-inquisitor.com/troubleshooting');
     }
   });
 
