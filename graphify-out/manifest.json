@@ -580,13 +580,13 @@
     "semantic_hash": ""
   },
   "src/lib/research/browser.test.ts": {
-    "mtime": 1782672375.5848238,
+    "mtime": 1782720327.573873,
     "ast_hash": "a0ca19569bf6d6b248b63776d9a5e4bf",
     "semantic_hash": ""
   },
   "src/lib/research/browser.ts": {
-    "mtime": 1782672353.9779487,
-    "ast_hash": "24bdc1035088e5f3e5bfe40f75da3a9a",
+    "mtime": 1782720328.7040203,
+    "ast_hash": "c3fae219807506eb2f7802f0eb0ff7e8",
     "semantic_hash": ""
   },
   "agents/instructions/web-research.instructions.md": {
@@ -615,8 +615,8 @@
     "semantic_hash": ""
   },
   "src/lib/research/regression.test.ts": {
-    "mtime": 1782672752.2490492,
-    "ast_hash": "43ccb66c557a12f2f576f79e048be8fc",
+    "mtime": 1782720265.1207333,
+    "ast_hash": "7865e4a864740e08bf75e855d2850587",
     "semantic_hash": ""
   },
   "src/lib/research/regression.ts": {

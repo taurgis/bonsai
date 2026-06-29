@@ -379,7 +379,15 @@ export class ResponseCapture {
   }
 }
 
-export async function fetchRenderedHtml(
+// Chrome can emit these on first navigation in headless CI when the cert verifier reloads mid-run.
+const TRANSIENT_NAV_ERROR_CODES = ['ERR_CERT_VERIFIER_CHANGED'];
+
+function isTransientBrowserNavigationError(err: unknown): boolean {
+  const message = err instanceof Error ? err.message : String(err);
+  return TRANSIENT_NAV_ERROR_CODES.some((code) => message.includes(code));
+}
+
+async function fetchRenderedHtmlOnce(
   url: string,
   options: BrowserFetchOptions = {}
 ): Promise<BrowserFetchResult> {
@@ -461,4 +469,20 @@ export async function fetchRenderedHtml(
   } finally {
     await page.close();
   }
+}
+
+export async function fetchRenderedHtml(
+  url: string,
+  options: BrowserFetchOptions = {}
+): Promise<BrowserFetchResult> {
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fetchRenderedHtmlOnce(url, options);
+    } catch (err) {
+      if (attempt === maxAttempts || !isTransientBrowserNavigationError(err)) throw err;
+    }
+  }
+
+  throw new Error('Failed to fetch rendered HTML after transient browser navigation errors.');
 }

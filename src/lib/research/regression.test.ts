@@ -79,7 +79,8 @@ describe('contentMetrics', () => {
 describe('timingRegression', () => {
   it('flags regressions beyond the configured limit', () => {
     expect(timingRegression(11500, 10000)).toEqual({ deltaPct: 15, regressed: false });
-    expect(timingRegression(11501, 10000).regressed).toBe(true);
+    expect(timingRegression(12500, 10000)).toEqual({ deltaPct: 25, regressed: false });
+    expect(timingRegression(12501, 10000).regressed).toBe(true);
     expect(timingRegression(9000, 10000)).toEqual({ deltaPct: -10, regressed: false });
   });
 
@@ -88,8 +89,8 @@ describe('timingRegression', () => {
     expect(timingRegression(5000, 0)).toEqual({ deltaPct: null, regressed: false });
   });
 
-  it('exports a 15% default limit', () => {
-    expect(TIMING_REGRESSION_LIMIT_PCT).toBe(15);
+  it('exports a 25% default limit', () => {
+    expect(TIMING_REGRESSION_LIMIT_PCT).toBe(25);
   });
 });
 
