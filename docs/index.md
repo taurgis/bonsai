@@ -3,15 +3,15 @@ layout: home
 
 hero:
   name: Bonsai
-  text: Prune docs to fit the context window.
-  tagline: A local research cache for AI agents — fetch a page once, compress it to a token budget, and reuse it instead of scraping the same page again.
+  text: Better grounding for the tokens you spend.
+  tagline: We ran the same research prompts in Codex, Cursor, Antigravity, and Claude Code with native web search and with Bonsai. Bonsai often costs more per session — but leaves official pages on disk, scores higher on accuracy, and reuses cleanly. Popular library docs worked either way; client-rendered enterprise portals usually did not.
   actions:
     - theme: brand
       text: Get Started
       link: /guide/getting-started
     - theme: brand
-      text: Teach your agent to research
-      link: /how-to/agent-kit
+      text: SFCC benchmark scenario
+      link: /examples/agent-research-comparison#scenario-2-salesforce-b2c-commerce-chunk-oriented-job-step
     - theme: alt
       text: Why Bonsai?
       link: /guide/introduction
@@ -47,13 +47,28 @@ features:
     details: Cache agent-synthesized notes or private docs straight from stdin or a file, with the same metadata, listing, and freshness rules.
     link: /reference/commands
     linkText: Command reference
+  - icon: 🏢
+    title: Enterprise docs, handled
+    details: Site modules add custom fetch and extraction when generic agents hit JavaScript-rendered docs, unstable URLs, or gated vendor portals. Salesforce ships as a reference example.
+    link: /reference/site-modules
+    linkText: Site modules
 ---
+
+## When native web search is enough — and when it is not
+
+We ran three research prompts twice in **Codex**, **Cursor**, **Antigravity**, and **Claude Code**: native web search, then the Bonsai workflow.
+
+On TanStack Query and React Server Components, native search plus training data often produced inline answers close to Bonsai. In Cursor's TanStack run, native WebFetch matched Bonsai's depth at **31k vs 47k tokens**. Nothing from that native run landed on disk for the next session.
+
+Enterprise and vendor documentation was different. Our benchmark used a [Salesforce B2C Commerce](/examples/agent-research-comparison#scenario-2-salesforce-b2c-commerce-chunk-oriented-job-step) job-step prompt as the hard case; the same failure modes appear on other client-rendered portals. Codex spent ~80k tokens and produced no usable answer. Claude and Antigravity wrote confident guides with subtle schema mistakes. These hosts render in the browser, gate content behind cookie consent, and rewrite URLs when products rebrand. A generic fetch often gets an empty shell or a search snippet, not the article you meant to cite.
+
+That is what **[site modules](/reference/site-modules)** are for: host-specific fetch and extraction when the generic pipeline fails. Salesforce Help and Developer ship as a reference implementation; the same pattern covers any SPA-heavy docs site.
+
+Reach for Bonsai when you need **grounding and reuse per token spent**, not the lowest meter on the first pass. Full benchmark: [research workflow comparison](/examples/agent-research-comparison) — the [enterprise SFCC scenario](/examples/agent-research-comparison#scenario-2-salesforce-b2c-commerce-chunk-oriented-job-step) is the clearest split.
 
 ## From a sprawling page to a tidy bonsai
 
-The hero above shows the whole idea in motion: a verbose page, rendered as text,
-then **pruned and compressed** to the essential shape that fits an agent's
-context window. The structure that matters stays intact.
+The hero animation uses Codex's [enterprise SFCC prompt](/examples/agent-research-comparison#scenario-2-salesforce-b2c-commerce-chunk-oriented-job-step) from the [research benchmark](/examples/agent-research-comparison): **~80k** native tokens, no usable answer, versus **~74k** with Bonsai and official pages on disk. Grounding climbs from **no capture** to **100%** as the tree compresses — same order of spend, very different outcome.
 
 ```bash
 # Fetch, extract, convert to Markdown, and cache — one command

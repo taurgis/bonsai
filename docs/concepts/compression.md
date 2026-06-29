@@ -16,9 +16,9 @@ Both variants are cached together, and the stored `token_estimate` records the
 size of each (`{ compressed, detailed }`) so an agent can pick the variant that
 fits its budget.
 
-See [Agent web fetch vs Bonsai](/examples) for a measured, head-to-head comparison
-on popular library docs, including how a built-in agent web fetch silently drops
-or refuses content that Bonsai keeps.
+See the [agent research benchmark](/examples/agent-research-comparison) for
+measured session token usage across Codex, Cursor, Antigravity, and Claude Code —
+including how built-in fetch drops or refuses content that Bonsai keeps on disk.
 
 ## What compression does
 

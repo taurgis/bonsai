@@ -35,8 +35,8 @@ without writing anything to disk. Nothing is stored, and you still get the
 pruned page back.
 
 Take the cache away entirely and Bonsai still does its job. It just does it every
-time instead of once. The [token comparison](/examples) holds whether the result
-is cached or thrown away after a single read.
+time instead of once. The [research benchmark](/examples/agent-research-comparison)
+holds whether the result is cached or thrown away after a single read.
 
 ## But speed matters too
 

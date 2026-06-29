@@ -23,16 +23,27 @@ const defaultKeywords = [
 
 const pageMetadata: Record<string, PageMetadata> = {
   'index.md': {
-    title: 'Bonsai Documentation',
+    title: 'Bonsai — Grounded research for AI agents',
     description:
-      'Bonsai is a local research cache CLI for AI agents that captures docs once, compresses them for token budgets, and reuses source-cited Markdown.',
-    keywords: ['AI documentation workflow', 'research cache CLI', 'source-cited Markdown'],
+      'Bonsai often costs more tokens per research session than native web search, but scores higher on official-source grounding and leaves captured pages on disk. Benchmarked in Codex, Cursor, Antigravity, and Claude Code.',
+    keywords: [
+      'AI documentation workflow',
+      'native web search comparison',
+      'enterprise documentation',
+      'Salesforce docs',
+      'research cache CLI',
+    ],
   },
   'guide/introduction.md': {
     title: 'Introduction to Bonsai',
     description:
-      'Learn how Bonsai turns official documentation and web pages into reusable, deterministic, source-cited Markdown artifacts for AI agents.',
-    keywords: ['Bonsai introduction', 'AI agent docs', 'deterministic research'],
+      'When native agent web search is sufficient, and when you need Bonsai: deterministic capture, site modules for enterprise docs, and a durable local research cache.',
+    keywords: [
+      'Bonsai introduction',
+      'native web search',
+      'enterprise documentation',
+      'site modules',
+    ],
   },
   'guide/getting-started.md': {
     title: 'Getting Started with Bonsai',
@@ -124,19 +135,14 @@ const pageMetadata: Record<string, PageMetadata> = {
       'Definitions for Bonsai cache artifacts, freshness states, capture methods, storage modes, and documentation research workflow terms.',
     keywords: ['Bonsai glossary', 'freshness states', 'capture methods'],
   },
-  'examples.md': {
-    title: 'Agent Web Fetch vs Bonsai',
-    description:
-      'Compare built-in agent web fetch behavior with Bonsai on real documentation pages, including token counts and missing-content analysis.',
-    keywords: ['agent web fetch comparison', 'documentation benchmark', 'token counts'],
-  },
   'examples/agent-research-comparison.md': {
     title: 'Agent Research: Bonsai vs Native Web Search',
     description:
-      'Codex, Antigravity, and Claude Code session comparison of Bonsai-backed research versus native web search on TanStack Query, React Server Components, and Salesforce B2C Commerce prompts.',
+      'Codex, Cursor, Antigravity, and Claude Code session comparison of Bonsai-backed research versus native web search on TanStack Query, React Server Components, and Salesforce B2C Commerce prompts.',
     keywords: [
       'agent research comparison',
       'Bonsai workflow benchmark',
+      'Cursor tokens',
       'Claude Code tokens',
       'Codex tokens',
       'Antigravity context usage',
@@ -172,7 +178,7 @@ function routeSection(relativePath: string): string {
   if (firstSegment === 'concepts') return 'Concepts';
   if (firstSegment === 'how-to') return 'How-to Guides';
   if (firstSegment === 'reference') return 'Reference';
-  if (firstSegment === 'examples') return 'Examples';
+  if (firstSegment === 'examples') return 'Benchmark';
   return 'More';
 }
 
@@ -331,7 +337,7 @@ export default defineConfig({
   title: 'Bonsai',
   titleTemplate: `:title | ${siteName}`,
   description:
-    'A local research cache CLI for AI agents. Fetch docs once, prune them to fit a token budget, and reuse the cache instead of re-scraping.',
+    'Better grounding for the tokens you spend. Bonsai captures official documentation native search cannot reliably keep — often at higher session cost, with pages on disk to reuse.',
   lang: 'en-US',
   base: '/',
   cleanUrls: true,
@@ -373,7 +379,7 @@ export default defineConfig({
       },
       { text: 'How-to', link: '/how-to/share-cache-with-your-team', activeMatch: '/how-to/' },
       { text: 'Reference', link: '/reference/commands', activeMatch: '/reference/' },
-      { text: 'Examples', link: '/examples' },
+      { text: 'Benchmark', link: '/examples/agent-research-comparison' },
       { text: 'Troubleshooting', link: '/troubleshooting' },
     ],
 
@@ -419,11 +425,17 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Examples',
+        text: 'Benchmark',
         collapsed: false,
         items: [
-          { text: 'Agent fetch vs Bonsai', link: '/examples' },
-          { text: 'Research workflow comparison', link: '/examples/agent-research-comparison' },
+          {
+            text: 'Agent research vs native search',
+            link: '/examples/agent-research-comparison',
+          },
+          {
+            text: 'Enterprise SFCC scenario',
+            link: '/examples/agent-research-comparison#scenario-2-salesforce-b2c-commerce-chunk-oriented-job-step',
+          },
         ],
       },
       {

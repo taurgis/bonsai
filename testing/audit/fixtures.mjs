@@ -7,7 +7,7 @@ import { join } from 'node:path';
 /** URL guaranteed absent from a fresh sandbox cache. */
 const CACHE_MISS_URL = 'https://example.com/audit-cache-miss-xyz';
 
-/** Opt-in network-heavy scenarios (remote search, extra live fetches). */
+/** Opt-in network-heavy scenarios (extra live fetches, e.g. `--rendered`). */
 function networkEnabled() {
   return process.env.AUDIT_NETWORK === '1';
 }

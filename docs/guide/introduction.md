@@ -29,6 +29,35 @@ tokens, and nondeterminism. Bonsai fetches a page **once**, normalizes and hashe
 its URL, and serves every later request from the local cache while the entry is
 still fresh. Repeated research becomes a near-instant, deterministic lookup.
 
+## Native web search vs Bonsai
+
+CLI agents ship with built-in web search and fetch. For many questions that is
+enough. Training data covers popular libraries well, and official docs for React,
+TanStack, and similar stacks usually rank in search results. Our
+[research workflow benchmark](/examples/agent-research-comparison) (Codex, Cursor,
+Antigravity, Claude Code, 2026-06-29) showed native search often matching Bonsai on
+inline answer quality for mainstream topics — sometimes at lower token cost.
+
+The gap opens in **enterprise territory**:
+
+- Platform documentation is thinner in training data and harder to discover.
+- Vendor sites render in JavaScript, gate content behind cookie consent, or expose
+  search APIs that native fetch tools never reach.
+- A cheap native run can still **look** authoritative while citing mirrors,
+  outdated snippets, or schema details that would fail in production.
+
+Bonsai addresses that gap in two ways:
+
+1. **Deterministic capture** — fetch, extract, and store the full official page as
+   source-cited Markdown with freshness metadata, not a one-off summary.
+2. **[Site modules](/reference/site-modules)** — custom per-host pipelines when
+   the generic path is not enough (Salesforce Help and Developer are built in;
+   more hosts follow as we prove the need).
+
+Use native search for quick orientation on well-covered topics. Reach for Bonsai when
+you need **verified official artifacts on disk**, shared across sessions and agents,
+or when a documentation host has already failed a generic fetch.
+
 ## What it does
 
 | Feature | How it works | Typical use case |
@@ -54,6 +83,9 @@ still fresh. Repeated research becomes a near-instant, deterministic lookup.
 ## Where to next
 
 - [Getting Started](/guide/getting-started): install and fetch your first page.
+- [Research workflow comparison](/examples/agent-research-comparison): when native
+  web search is enough vs when Bonsai earns its cost.
+- [Site modules](/reference/site-modules): custom capture for enterprise documentation hosts.
 - [Caching & Freshness](/concepts/caching-and-freshness): how reuse and tiers work.
 - [Compression & Token Budgeting](/concepts/compression): `compressed` vs `detailed`.
 - [Importing Synthesis](/how-to/importing-synthesis): cache an agent's own research.

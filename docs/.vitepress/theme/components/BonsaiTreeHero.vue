@@ -1,13 +1,9 @@
 <script setup lang="ts">
 /**
- * Animated hero: a tall tree built from characters of "documentation" text
- * prunes and compresses down into a compact bonsai — the same thing Bonsai
- * does to verbose docs to fit a token budget. A live token counter falls as
- * the surplus text is shed.
- *
- * SSR-safe: the server renders only the markup below. Every browser API
- * (canvas, requestAnimationFrame, ResizeObserver, matchMedia) is touched only
- * inside onMounted. https://vitepress.dev/guide/ssr-compat
+ * Animated hero: documentation text assembles into a tall tree, then prunes into a
+ * bonsai. The pill uses Codex SFCC numbers from the 2026-06-29 benchmark: ~80k
+ * native tokens with no usable answer → ~74k Bonsai with official pages captured.
+ * Grounding climbs; token count is not the win — getting an answer is.
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { withBase } from 'vitepress';
@@ -42,20 +38,19 @@ interface Particle {
 const wrapEl = ref<HTMLDivElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const tokens = ref(0);
-const savings = ref(0);
+const quality = ref(0);
 const reduced = ref(false);
 const ready = ref(false);
 
-// The hero is a link to the page with real measured savings. withBase keeps the
-// URL correct under the site's `base` ('/bonsai/'); it is a pure function, so it
-// is safe on the server. https://vitepress.dev/reference/runtime-api#withbase
-const examplesHref = withBase('/examples');
-// Single accessible name for the link: describes both the decorative animation
-// and where the link goes, so screen readers announce one meaningful control
-// (the inner canvas is aria-hidden) rather than re-reading the ticking counter.
+// The hero links to the research-workflow benchmark. withBase keeps the URL
+// correct under the site's `base`; it is a pure function, so it is safe on the
+// server. https://vitepress.dev/reference/runtime-api#withbase
+const researchHref = withBase(
+  '/examples/agent-research-comparison#scenario-2-salesforce-b2c-commerce-chunk-oriented-job-step',
+);
 const linkLabel =
-  'A large tree of text compressing into a small bonsai — how Bonsai prunes docs ' +
-  'to fit a token budget. Open the example page with real before-and-after token savings.';
+  'A large tree of text compressing into a small bonsai — pruning research noise ' +
+  'while keeping official sources. Open the native web search vs Bonsai benchmark.';
 
 const ASSEMBLE = 900;
 const HOLD = 450;
@@ -63,14 +58,17 @@ const COMPRESS = 1800;
 const SETTLE = ASSEMBLE + HOLD + COMPRESS;
 const MAX_PARTICLES = 720;
 
-// Real measured averages from the agent comparison on /examples (captured
-// 2026-06-25): the mean built-in web-fetch across 5 agents × 4 docs pages
-// (37,905 tokens) vs Bonsai's compressed cache for the same pages (4,256) —
-// an 89% reduction. The counter falls from one to the other as the tree
-// compresses, so the headline savings are real, not decorative. See
-// docs/examples.md for the per-agent, per-page figures behind these means.
-const AVG_WEBFETCH_TOKENS = 37905;
-const AVG_COMPRESSED_TOKENS = 4256;
+// Codex SFCC chunk-job prompt (2026-06-29 benchmark): native web search spent
+// 79,888 tokens and produced no usable answer; Bonsai workflow spent 73,997
+// and captured the official guide with a correct steptypes.json example.
+const START_TOKENS = 79_888;
+const END_TOKENS = 73_997;
+
+/** Compact token label so the hero pill stays on one line (50k, not 50,000). */
+function formatK(value: number): string {
+  const k = Math.round(value / 1000);
+  return `${k}k`;
+}
 
 let ctx: CanvasRenderingContext2D | null = null;
 let raf = 0;
@@ -153,25 +151,28 @@ function build(): void {
     };
   });
 
-  startTokens = AVG_WEBFETCH_TOKENS;
-  endTokens = AVG_COMPRESSED_TOKENS;
+  startTokens = START_TOKENS;
+  endTokens = END_TOKENS;
   // Seed the visible count so the first paint shows the start value rather than
   // flashing "0" for one frame before the first requestAnimationFrame runs.
-  lastTokenDisplay = Math.round(startTokens / 10) * 10;
+  lastTokenDisplay = Math.round(startTokens / 1000) * 1000;
   tokens.value = lastTokenDisplay;
-  savings.value = 0;
+  quality.value = 0;
   startTime = performance.now();
   ready.value = true;
 }
 
 function setTokens(value: number): void {
-  const rounded = Math.round(value / 10) * 10;
+  const rounded = Math.round(value / 1000) * 1000;
   if (rounded !== lastTokenDisplay) {
     lastTokenDisplay = rounded;
     tokens.value = rounded;
-    // Savings climbs from 0 to ~89% as the page compresses toward the cache.
-    savings.value = startTokens > 0 ? Math.round((1 - value / startTokens) * 100) : 0;
   }
+}
+
+/** 0–100: how much of the session is grounded in captured official pages. */
+function setQuality(progress: number): void {
+  quality.value = Math.round(progress * 100);
 }
 
 function setTextStyle(): void {
@@ -191,6 +192,7 @@ function drawStatic(): void {
     ctx.fillText(p.ch, p.toX, p.toY);
   }
   setTokens(endTokens);
+  setQuality(1);
 }
 
 function frame(now: number): void {
@@ -239,6 +241,7 @@ function frame(now: number): void {
   ctx.globalAlpha = 1;
 
   setTokens(e < ASSEMBLE + HOLD ? startTokens : lerp(startTokens, endTokens, eased));
+  setQuality(e < ASSEMBLE + HOLD ? 0 : eased);
   raf = requestAnimationFrame(frame);
 }
 
@@ -327,13 +330,22 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="wrapEl" class="bonsai-hero">
-    <a class="bonsai-hero__link" :href="examplesHref" :aria-label="linkLabel">
+    <a class="bonsai-hero__link" :href="researchHref" :aria-label="linkLabel">
       <canvas ref="canvasRef" class="bonsai-hero__canvas" aria-hidden="true" />
       <span v-show="ready" class="bonsai-hero__meta" aria-hidden="true">
         <span class="bonsai-hero__dot" />
-        <span class="bonsai-hero__count">≈ {{ tokens.toLocaleString() }} tokens</span>
-        <span v-show="savings > 0" class="bonsai-hero__save">{{ savings }}% smaller</span>
-        <span class="bonsai-hero__cta">see the real numbers →</span>
+        <span class="bonsai-hero__line">
+          <span class="bonsai-hero__count">≈ {{ formatK(tokens) }}</span>
+          <span class="bonsai-hero__sep">·</span>
+          <span
+            class="bonsai-hero__quality"
+            :style="{ opacity: quality > 0 ? 1 : 0.45 }"
+          >
+            {{ quality > 0 ? `${quality}% grounded` : 'no capture' }}
+          </span>
+          <span class="bonsai-hero__sep">·</span>
+          <span class="bonsai-hero__cta">SFCC scenario →</span>
+        </span>
       </span>
     </a>
     <button
@@ -375,49 +387,55 @@ onBeforeUnmount(() => {
   bottom: 6px;
   transform: translateX(-50%);
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  gap: 4px 8px;
-  /*
-   * Without a min-width the pill shrink-wraps to its widest line, so its wrapped
-   * rows sit pressed against the rounded sides. Hold it at least ~320px wide (but
-   * never past the hero) so the centered rows keep breathing room from the edges.
-   * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Aligning_items_in_a_flex_container
-   */
-  min-width: min(100%, 320px);
+  gap: 8px;
   max-width: calc(100% - 24px);
   padding: 5px 12px;
   font-family: var(--vp-font-family-mono);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--vp-c-text-2);
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
   border-radius: 999px;
-  text-align: center;
+}
+
+.bonsai-hero__line {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.bonsai-hero__sep {
+  color: var(--vp-c-text-3);
+  user-select: none;
 }
 
 /*
- * On phones the hero canvas spans the full viewport width, but the pill
- * shrink-wraps to its widest line, so its wrapped rows sit hugging the sides.
- * Let it fill the canvas width (the base max-width keeps a small screen inset)
- * so the centered rows gain even horizontal breathing room.
- * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Aligning_items_in_a_flex_container
+ * On phones the hero canvas spans the full viewport width. Keep the pill on one
+ * line with abbreviated counts; scale down slightly before wrapping.
  */
 @media (max-width: 639px) {
   .bonsai-hero__meta {
-    display: flex;
-    width: 100%;
+    font-size: 10px;
+    padding: 5px 10px;
+    gap: 6px;
   }
 }
 
-.bonsai-hero__save {
+.bonsai-hero__quality {
+  min-width: 7.25em;
   padding: 1px 8px;
   font-weight: 700;
+  text-align: center;
   color: var(--vp-c-brand-1);
   background: var(--vp-c-brand-soft);
   border-radius: 999px;
+  transition: opacity 0.15s ease;
 }
 
 .bonsai-hero__cta {
