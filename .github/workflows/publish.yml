@@ -17,6 +17,8 @@ name: Publish
 #     (publishes use OIDC via `id-token: write`; no `NPM_TOKEN` is required).
 #     Configure the trusted publisher for workflow file `publish.yml` in this
 #     repository (`taurgis/bonsai`).
+#   - Publish job must run Node.js 24+ so npm is >= 11.5.1 (OIDC trusted
+#     publishing). Node 22 ships npm 10 and fails with misleading E404 errors.
 #   - Optional secret `RELEASE_GITHUB_TOKEN`: a fine-grained PAT or GitHub
 #     App token with `contents: write` and `pull-requests: write`. Using a
 #     PAT is recommended so the release PR's merge commit triggers
@@ -56,12 +58,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: pnpm
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Verify npm supports OIDC trusted publishing
+        run: |
+          node --version
+          npm --version
+          node -e "const v=require('node:child_process').execSync('npm --version',{encoding:'utf8'}).trim().split('.').map(Number); const ok=v[0]>11||(v[0]===11&&v[1]>5)||(v[0]===11&&v[1]===5&&v[2]>=1); if(!ok){console.error('npm',v.join('.'),'is too old for OIDC trusted publishing (need >=11.5.1)'); process.exit(1)}"
 
       # Type check and tests already ran in the CI workflow that gates this job.
       - name: Build

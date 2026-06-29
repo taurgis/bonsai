@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782721073.9458,
-    "ast_hash": "466210f26d514a735d50f32b1d094e83",
+    "mtime": 1782721847.2641728,
+    "ast_hash": "1f7716cc003a3512bf05e7347087216a",
     "semantic_hash": ""
   },
   "scripts/check-line-counts.ts": {
@@ -5545,8 +5545,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/publish.yml": {
-    "mtime": 1782713332.1324131,
-    "ast_hash": "6221a9685932df588a45998e770863e5",
+    "mtime": 1782721864.2898042,
+    "ast_hash": "aeac788b7900079b0a11ef637a1146ea",
     "semantic_hash": ""
   },
   "testing/audit/scenarios/color.mjs": {

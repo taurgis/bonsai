@@ -79,6 +79,10 @@
   "engines": {
     "node": ">=22"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "packageManager": "pnpm@10.17.1",
   "oclif": {
     "bin": "bonsai",
