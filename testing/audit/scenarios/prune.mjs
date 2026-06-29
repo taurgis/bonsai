@@ -17,6 +17,14 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'SAFETY_CHECK_REQUIRED', 'code');
   });
 
+  check('prune --dry-run + --yes CONFLICTING_FLAGS exit 2', () => {
+    const r = run(['prune', '--older-than', '90d', '--dry-run', '--yes', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CONFLICTING_FLAGS', env?.code);
+    expect(env?.stderr?.includes('mutually exclusive'), env?.stderr);
+  });
+
   check('prune invalid older-than exit 2', () => {
     const r = run(['prune', '--older-than', '5z', '--dry-run']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

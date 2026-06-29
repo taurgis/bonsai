@@ -21,6 +21,11 @@ describe('prune command unit tests', () => {
     await expect(runPromise).rejects.toThrow(/Safety check: use --yes to confirm pruning/);
   });
 
+  it('fails if both --dry-run and --yes are specified', async () => {
+    const runPromise = ResearchPrune.run(['--older-than', '30d', '--dry-run', '--yes']);
+    await expect(runPromise).rejects.toThrow(/--dry-run and --yes are mutually exclusive/);
+  });
+
   it('performs dry-run and actual pruning successfully', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

@@ -156,7 +156,7 @@ npx @taurgis/bonsai list [flags]
 
 ### `prune`
 
-Delete old or inactive cache entries. Requires a filter (`--older-than`, `--inactive`, or `--artifact-type`) and either `--dry-run` or `--yes`.
+Delete old or inactive cache entries. Requires a filter (`--older-than`, `--inactive`, `--artifact-type`, or `--url`) and exactly one of `--dry-run` or `--yes` (passing both is a usage error).
 
 ```bash
 npx @taurgis/bonsai prune --older-than 90d --dry-run
