@@ -36,6 +36,14 @@ export default function register(harness, fixtures) {
     expect(env?.ok === true, 'ok false');
   });
 
+  check('prune --dry-run zero matches gives clean human message (no dangling colon)', () => {
+    const r = run(['prune', '--older-than', '9999d', '--dry-run']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('No research cache entries match'), r.stdout);
+    // The old "Found 0 ... that would be pruned:" wording left a dangling colon and empty list.
+    expect(!r.stdout.includes('Found 0'), r.stdout);
+  });
+
   check('import then prune --yes removes matching entry', () => {
     const ws = createWorkspace();
     const url = 'https://example.com/audit-prune-delete';

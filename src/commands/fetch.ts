@@ -485,7 +485,7 @@ export function fetchFailureGuidance(
   message: string,
   url: string
 ): { suggestions: string[]; ref?: string } | undefined {
-  const ref = 'https://taurgis.github.io/bonsai/troubleshooting';
+  const ref = 'https://bonsai.rhino-inquisitor.com/troubleshooting';
   // Name the pipe step explicitly: bare `import --stdin` blocks waiting for input, so a reader (or
   // an agent) running the hint verbatim would hang. Show the content being piped in from a file.
   const importHint = `Open it in a browser, save the page, then import it: cat page.md | bonsai import ${url} --stdin`;

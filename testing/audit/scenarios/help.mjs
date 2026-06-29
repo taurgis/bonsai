@@ -9,6 +9,23 @@ export default function register(harness) {
     expect(r.stdout.includes('$ bonsai https://'), 'missing URL shorthand docs');
   });
 
+  check('root --help points to `help fetch` for URL-form flags', () => {
+    // fetch is hidden, so the headline URL form has no flags in the command list. The root
+    // description must tell users how to discover them.
+    const r = run(['--help']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    // Tolerate help's line wrapping, which may break between "help" and "fetch".
+    expect(/help\s+fetch/.test(r.stdout), 'root help should point at `bonsai help fetch`');
+  });
+
+  check('help fetch reveals the URL-form flags', () => {
+    const r = run(['help', 'fetch']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    for (const flag of ['--force', '--rendered', '--format', '--dry-run']) {
+      expect(r.stdout.includes(flag), `missing ${flag} in fetch help`);
+    }
+  });
+
   check('root -h exits 0 with COMMANDS', () => {
     const r = run(['-h']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);

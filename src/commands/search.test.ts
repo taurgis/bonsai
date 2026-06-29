@@ -198,7 +198,7 @@ describe('search command unit tests', () => {
     }));
     const scanSpy = vi
       .spyOn(ResearchSearch.prototype as any, 'scanCacheDirForResults')
-      .mockReturnValue(fake);
+      .mockReturnValue({ results: fake, activeCount: fake.length });
     const logged: string[] = [];
     const logSpy = vi
       .spyOn(ResearchSearch.prototype as any, 'log')
@@ -240,7 +240,7 @@ describe('search command unit tests', () => {
     }));
     const scanSpy = vi
       .spyOn(ResearchSearch.prototype as any, 'scanCacheDirForResults')
-      .mockReturnValue(fake);
+      .mockReturnValue({ results: fake, activeCount: fake.length });
     const warned: string[] = [];
     const warnSpy = vi
       .spyOn(ResearchSearch.prototype as any, 'warn')
