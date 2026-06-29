@@ -12,7 +12,7 @@ differs.
 The hooks deny native URL-fetch tools and return model-visible guidance like:
 
 ```bash
-bonsai https://example.com/docs --format detailed
+npx @taurgis/bonsai https://example.com/docs --format detailed
 ```
 
 Most hook systems cannot transparently replace a web-fetch tool call with a shell
@@ -48,15 +48,8 @@ that tells the agent to prefer Bonsai for URLs.
 
 ## Published Command
 
-The examples use `bonsai` on the assumption that the CLI is installed. For
-one-shot usage, tell agents to run:
+Run Bonsai through the published npm package:
 
 ```bash
 npx @taurgis/bonsai <url> --format detailed
-```
-
-Inside the Bonsai repository, use the development binary:
-
-```bash
-node bin/cli.mjs <url> --format detailed
 ```

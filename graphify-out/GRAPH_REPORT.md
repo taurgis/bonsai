@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-29)
 
 ## Corpus Check
-- 1095 files · ~1,066,118 words
+- 1096 files · ~1,068,232 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 10391 nodes · 11177 edges · 1022 communities (963 shown, 59 thin omitted)
+- 10398 nodes · 11194 edges · 1022 communities (961 shown, 61 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `907d9fd8`
+- Built from commit: `b1af9550`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1043,19 +1043,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `captureFixture()` --calls--> `capturePage()`  [EXTRACTED]
   testing/regression/run-suite.mjs → src/lib/research/capture.ts
-- `captureFixture()` --calls--> `getSiteModuleById()`  [EXTRACTED]
-  testing/regression/run-suite.mjs → src/sites/index.ts
 - `expectNonIntegerLimitInvalid()` --calls--> `parseJson()`  [INFERRED]
   testing/audit/helpers.mjs → src/sites/salesforce/browser-search.ts
 - `expectSingleCachedHit()` --calls--> `parseJson()`  [INFERRED]
   testing/audit/helpers.mjs → src/sites/salesforce/browser-search.ts
 - `SummarizeOptions` --references--> `SummaryLevel`  [EXTRACTED]
   src/lib/research/summarize.ts → src/lib/config/schema.ts
+- `defaultFetcher()` --calls--> `fetchText()`  [EXTRACTED]
+  src/lib/research/docs/machine-readable.ts → src/lib/research/fetcher.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (1022 total, 59 thin omitted)
+## Communities (1022 total, 61 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -1082,8 +1082,8 @@ Cohesion: 0.08
 Nodes (25): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. Search before fetching, Bonsai, Command Reference, `config` (+17 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.10
-Nodes (41): ConfigCommand, configScopeFlags(), iso, ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel() (+33 more)
+Cohesion: 0.09
+Nodes (42): ConfigCommand, configScopeFlags(), iso, ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel() (+34 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -1143,7 +1143,7 @@ Nodes (17): `captureOutput` — Test a Command Class Directly, Common Patterns, 
 
 ### Community 21 - "Community 21"
 Cohesion: 0.20
-Nodes (14): defaultFetcher(), llmsTxtCandidates(), MachineReadableResult, probeLlmsTxt(), probeRouteMarkdown(), tryFetchValidText(), ArtifactValidation, ERROR_PAGE_PATTERNS (+6 more)
+Nodes (12): analyzeMarkdownQuality(), countMatches(), hasCollapsedCode(), proseLineCount(), QualitySignals, ArtifactValidation, ERROR_PAGE_PATTERNS, isSameDocsOrigin() (+4 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.12
@@ -1174,8 +1174,8 @@ Cohesion: 0.09
 Nodes (22): Compressed, Creating a dynamic segment, Creating a dynamic segment, Creating a layout, Creating a layout, Creating a nested route, Creating a nested route, Creating a page (+14 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.18
-Nodes (14): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, analyzeMarkdownQuality(), countMatches(), hasCollapsedCode() (+6 more)
+Cohesion: 0.16
+Nodes (17): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, detectLanguage(), flattenCodeStructure(), normalizeCodeBlocks() (+9 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.14
@@ -1194,12 +1194,12 @@ Cohesion: 0.14
 Nodes (13): All Options (applicable to all flag types unless noted), Complex (using `relationships` array), `Flags.boolean()`, `Flags.custom<T, P>()`, `Flags.file()` and `Flags.directory()`, `Flags.integer()`, `Flags.option()` — factory pattern, `Flags.url()` (+5 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.14
-Nodes (13): Combined Dead Code + Duplication, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Migration from knip, Production audit, Production vs Full Audit, Step 1: Preview migration, Step 1: Run combined analysis (+5 more)
+Cohesion: 0.15
+Nodes (12): Combined Dead Code + Duplication, Custom Plugin Setup, Fallow: Common Workflow Patterns & Recipes, Full audit (default), Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory, Production audit (+4 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.08
-Nodes (49): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp() (+41 more)
+Cohesion: 0.09
+Nodes (41): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp() (+33 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -1222,8 +1222,8 @@ Cohesion: 0.26
 Nodes (14): staticIndexSearch(), collectDocIndices(), parseSphinxObject(), queryTerms(), resolve(), scoreSphinxDocs(), scoreText(), searchJekyllIndex() (+6 more)
 
 ### Community 41 - "Community 41"
-Cohesion: 0.29
-Nodes (6): Default Workflow, Fallbacks, Freshness Policy, Official Docs Researcher Agent, Response Contract, Scope
+Cohesion: 0.25
+Nodes (7): Default Workflow, Fallbacks, Freshness Policy, Official Docs Researcher Agent, Response Contract, Scope, Invocation
 
 ### Community 42 - "Community 42"
 Cohesion: 0.29
@@ -1351,7 +1351,7 @@ Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only
 
 ### Community 74 - "Community 74"
 Cohesion: 0.13
-Nodes (19): cleanKumaScript(), confidenceFor(), convertHtmlTables(), dropEmptySections(), dropEmptySectionsOnce(), extractFromSource(), headingLevel(), KUMASCRIPT_BADGES (+11 more)
+Nodes (18): cleanKumaScript(), confidenceFor(), convertHtmlTables(), dropEmptySections(), dropEmptySectionsOnce(), extractFromSource(), headingLevel(), KUMASCRIPT_BADGES (+10 more)
 
 ### Community 75 - "Community 75"
 Cohesion: 0.22
@@ -1419,7 +1419,7 @@ Nodes (6): Default Workflow, Guardrails, Primary Objective, Reporting Format, Re
 
 ### Community 91 - "Community 91"
 Cohesion: 0.08
-Nodes (31): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, captureFixture(), CURRENT_DIR, fileExists(), filters (+23 more)
+Nodes (30): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, CURRENT_DIR, fileExists(), filters, FIXTURES_PATH (+22 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.29
@@ -1490,8 +1490,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, Enable or disable auto memory, Enable or disable auto memory, Provenance, Summary
 
 ### Community 109 - "Community 109"
-Cohesion: 0.25
-Nodes (7): Cache Operations, Fetch Rules, Manual Fallbacks, Required Pre-Step, Source Rules, Web Research Skill, When This Does Not Apply
+Cohesion: 0.22
+Nodes (8): Cache Operations, Fetch Rules, Manual Fallbacks, Required Pre-Step, Source Rules, Web Research Skill, When This Does Not Apply, Invocation
 
 ### Community 110 - "Community 110"
 Cohesion: 0.04
@@ -1602,8 +1602,8 @@ Cohesion: 0.50
 Nodes (3): Senior Quality Engineer Reporting, Severity Expectations, When Invoking This Agent
 
 ### Community 137 - "Community 137"
-Cohesion: 0.18
-Nodes (11): __dirname, pkg, rawArgv, req, result, CaptureHelp, envelopeCommandId(), helpSubject() (+3 more)
+Cohesion: 0.35
+Nodes (12): assertOk(), checkDnsSafety(), FetchOptions, fetchStaticHtml(), fetchText(), fetchWithRedirects(), headerMeta(), notModifiedResult() (+4 more)
 
 ### Community 138 - "Community 138"
 Cohesion: 0.50
@@ -2231,7 +2231,7 @@ Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `
 
 ### Community 326 - "Community 326"
 Cohesion: 0.08
-Nodes (36): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, PageMapEntry, SearchCapability, SourceHint (+28 more)
+Nodes (35): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, PageMapEntry, SearchCapability, SourceHint (+27 more)
 
 ### Community 327 - "Community 327"
 Cohesion: 0.09
@@ -2278,8 +2278,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
 
 ### Community 338 - "Community 338"
-Cohesion: 0.10
-Nodes (21): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, fetchFailureGuidance(), handleStaleRevalidationResult(), SectionSummary, StorageMode, SummaryLevel (+13 more)
+Cohesion: 0.11
+Nodes (25): applyCaptureMetadata(), CAPTURE_DEPS, FetchCommand, fetchFailureGuidance(), handleStaleRevalidationResult(), SummaryLevel, buildCompressed(), compressMarkdown() (+17 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -2443,7 +2443,7 @@ Nodes (7): API Styles {#api-styles}, Composition API {#composition-api}, Introdu
 
 ### Community 379 - "Community 379"
 Cohesion: 0.06
-Nodes (54): ResearchSearch, applyAutoTags(), calculateFrequencies(), cleanNoise(), dedupeTags(), extractKeywords(), getHeadingTerms(), STOPWORDS (+46 more)
+Nodes (49): REMOTE_SEARCH_DEPS, ResearchSearch, SEARCH_LABELS, ADJACENT_PHRASE_BONUS, adjacentPhraseBonus(), bm25TermScore(), buildSearchCorpusStats(), compareMatches() (+41 more)
 
 ### Community 380 - "Community 380"
 Cohesion: 0.29
@@ -3110,8 +3110,8 @@ Cohesion: 0.67
 Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
 
 ### Community 564 - "Community 564"
-Cohesion: 0.12
-Nodes (28): ABBREVIATIONS, applySalienceBoost(), BlockState, buildFrequencies(), collectHeadingTerms(), collectSentences(), contentTokens(), findBoundaryEnd() (+20 more)
+Cohesion: 0.09
+Nodes (36): applyAutoTags(), calculateFrequencies(), cleanNoise(), dedupeTags(), extractKeywords(), getHeadingTerms(), STOPWORDS, tokenize() (+28 more)
 
 ### Community 565 - "Community 565"
 Cohesion: 0.06
@@ -3402,8 +3402,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, [FCFS matching], [FCFS matching](https://prismjs.com/extending.html#fcfs-matching), Provenance, Summary
 
 ### Community 637 - "Community 637"
-Cohesion: 0.17
-Nodes (19): MachineReadableArtifact, SiteCapabilities, TextFetcher, CaptureDeps, CaptureOptions, CaptureOutcome, capturePage(), captureRendered() (+11 more)
+Cohesion: 0.10
+Nodes (35): MachineReadableArtifact, SiteCapabilities, defaultFetcher(), llmsTxtCandidates(), MachineReadableResult, probeLlmsTxt(), probeRouteMarkdown(), TextFetcher (+27 more)
 
 ### Community 638 - "Community 638"
 Cohesion: 0.10
@@ -3454,8 +3454,8 @@ Cohesion: 0.13
 Nodes (15): Connecting to an external system, Controlling a non-React widget, Custom `useChatRoom` Hook, Deep Dive, Displaying different content on the server and the client, Examples of wrapping Effects in custom Hooks, Fetching data with Effects, Reading the latest props and state from an Effect (+7 more)
 
 ### Community 650 - "Community 650"
-Cohesion: 0.14
-Nodes (23): CdpPage, CONTENT_SELECTORS, fetchSalesforcePage(), salesforce, assertReadableSalesforceContent(), BASE_REMOVE_SELECTORS, buildCaptureScript(), buildSalesforceFetchResult() (+15 more)
+Cohesion: 0.15
+Nodes (22): CdpPage, CONTENT_SELECTORS, fetchDeveloperPage(), assertReadableSalesforceContent(), BASE_REMOVE_SELECTORS, buildCaptureScript(), buildSalesforceFetchResult(), CaptureAttemptResult (+14 more)
 
 ### Community 651 - "Community 651"
 Cohesion: 0.14
@@ -4050,12 +4050,12 @@ Cohesion: 0.12
 Nodes (17): Analytics, Arguments and flags, Configuration, Distribution, Documentation, Environment variables, Errors, Future-proofing (+9 more)
 
 ### Community 809 - "Community 809"
-Cohesion: 0.25
-Nodes (7): Default Workflow, Fallbacks, Freshness Policy, Response Contract, Salesforce Docs Researcher Agent, Scope, Working with Salesforce Sites
+Cohesion: 0.22
+Nodes (8): Default Workflow, Fallbacks, Freshness Policy, Invocation, Response Contract, Salesforce Docs Researcher Agent, Scope, Working with Salesforce Sites
 
 ### Community 810 - "Community 810"
-Cohesion: 0.15
-Nodes (11): ResearchInspect, ResearchList, closestMatch(), levenshtein(), pluralize(), resultListHeading(), ResultListLabels, LIST (+3 more)
+Cohesion: 0.10
+Nodes (20): LIST_LABELS, LISTABLE_ARTIFACT_TYPES, ResearchList, ResearchPrune, limitFlag(), closestMatch(), levenshtein(), maxFuzzyDistance() (+12 more)
 
 ### Community 811 - "Community 811"
 Cohesion: 0.25
@@ -4066,12 +4066,8 @@ Cohesion: 0.04
 Nodes (46): afterAgentResponse, afterAgentResponse, afterAgentThought, afterAgentThought, afterFileEdit, afterFileEdit, afterMCPExecution, afterMCPExecution (+38 more)
 
 ### Community 813 - "Community 813"
-Cohesion: 0.11
-Nodes (23): nextjs, Fixture, fixtures, CONTENT_SELECTORS, fetchDeveloperPage(), salesforceDeveloper, cypress, jest (+15 more)
-
-### Community 814 - "Community 814"
-Cohesion: 0.36
-Nodes (8): detectLanguage(), flattenCodeStructure(), normalizeCodeBlocks(), reconstructLines(), removeCopyButtons(), FIXTURES, load(), toMarkdown()
+Cohesion: 0.12
+Nodes (23): nextjs, Fixture, fixtures, captureFixture(), salesforceDeveloper, salesforce, cypress, jest (+15 more)
 
 ### Community 815 - "Community 815"
 Cohesion: 0.07
@@ -4086,16 +4082,16 @@ Cohesion: 0.10
 Nodes (21): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+13 more)
 
 ### Community 818 - "Community 818"
-Cohesion: 0.08
-Nodes (24): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+16 more)
+Cohesion: 0.10
+Nodes (21): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecution, afterShellExecution, afterTabFileEdit, beforeReadFile, beforeShellExecution / beforeMCPExecution (+13 more)
 
 ### Community 819 - "Community 819"
 Cohesion: 0.09
-Nodes (22): Cloud Distribution (Enterprise Only), Command-Based Hooks, Compressed, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types (+14 more)
+Nodes (23): Agent security and safety, Cloud Distribution (Enterprise Only), Code security and best practices, Command-Based Hooks, Dependency security, Enterprise hooks and distribution, Environment Variables, Hook categories (+15 more)
 
 ### Community 820 - "Community 820"
-Cohesion: 0.10
-Nodes (21): Cloud agent support, Command-Based Hooks, Configuration sources, Detailed, Enterprise hooks and distribution, Environment Variables, Examples, Execution type limits (+13 more)
+Cohesion: 0.11
+Nodes (19): Command-Based Hooks, Common schema, Detailed, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories, Hook Types (+11 more)
 
 ### Community 821 - "Community 821"
 Cohesion: 0.11
@@ -4546,8 +4542,8 @@ Cohesion: 0.20
 Nodes (10): Chaos, Consistency across programs, Conversation as the norm, Ease of discovery, Empathy, Human-first design, Philosophy, Robustness (+2 more)
 
 ### Community 933 - "Community 933"
-Cohesion: 0.13
-Nodes (26): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), REMOTE_SEARCH_DEPS, SEARCH_LABELS, limitFlag() (+18 more)
+Cohesion: 0.08
+Nodes (30): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), SectionSummary, CacheStatus, describeCacheStatus() (+22 more)
 
 ### Community 934 - "Community 934"
 Cohesion: 0.20
@@ -4574,8 +4570,8 @@ Cohesion: 0.13
 Nodes (14): appearance, cleanUrls, Compressed, Customization, Detailed, lastUpdated, markdown, rewrites (+6 more)
 
 ### Community 947 - "Community 947"
-Cohesion: 0.17
-Nodes (12): appearance, cleanUrls, Customization, lastUpdated, markdown, Provenance, rewrites, Routing (+4 more)
+Cohesion: 0.13
+Nodes (15): appearance, cleanUrls, Config Intellisense, Config Resolution, Directory-Level Overrides, lastUpdated, Overview, Page-Level Overrides (+7 more)
 
 ### Community 948 - "Community 948"
 Cohesion: 0.18
@@ -4602,8 +4598,8 @@ Cohesion: 0.22
 Nodes (9): Build Hooks, buildEnd, Example: Adding a canonical URL `<link>`, Example: Adding a `<meta name="og:title">`, Example: Adding `og:image` meta, postRender, transformHead, transformHtml (+1 more)
 
 ### Community 954 - "Community 954"
-Cohesion: 0.08
-Nodes (31): bareUrlInput(), buildCommandNotFoundDetails(), emitJsonError(), exactZeroArgCommandPrefix(), findSuggestion(), hook(), isJsonMode(), fakeConfig (+23 more)
+Cohesion: 0.07
+Nodes (39): __dirname, pkg, rawArgv, req, result, bareUrlInput(), buildCommandNotFoundDetails(), emitJsonError() (+31 more)
 
 ### Community 955 - "Community 955"
 Cohesion: 0.29
@@ -4694,8 +4690,8 @@ Cohesion: 0.38
 Nodes (6): Compressed, Detailed, Provenance, Summary, test note, test note
 
 ### Community 977 - "Community 977"
-Cohesion: 0.18
-Nodes (20): waitForLoad(), cacheToken(), dbg(), DEBUG, searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor }, RESULTS (+12 more)
+Cohesion: 0.15
+Nodes (22): waitForLoad(), cacheToken(), dbg(), DEBUG, searchSalesforce(), searchViaBrowser(), { fakePage, captureWaitFor }, RESULTS (+14 more)
 
 ### Community 978 - "Community 978"
 Cohesion: 0.29
@@ -4810,16 +4806,16 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, Ease of discovery, Ease of discovery, Provenance, Summary
 
 ### Community 1006 - "Community 1006"
-Cohesion: 0.08
-Nodes (24): createFixtures(), networkEnabled(), CLI, createHarness(), DIST_COMMANDS, ensureBuilt(), REPO_ROOT, expectNonIntegerLimitInvalid() (+16 more)
+Cohesion: 0.07
+Nodes (25): createFixtures(), networkEnabled(), CLI, createHarness(), DIST_COMMANDS, ensureBuilt(), REPO_ROOT, expectNonIntegerLimitInvalid() (+17 more)
 
 ### Community 1007 - "Community 1007"
 Cohesion: 0.22
 Nodes (8): Compressed, Detailed, IDF information theoretic interpretation, IDF information theoretic interpretation, Provenance, Summary, The ranking function, The ranking function
 
 ### Community 1008 - "Community 1008"
-Cohesion: 0.10
-Nodes (23): LIST_LABELS, LISTABLE_ARTIFACT_TYPES, ResearchPrune, CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness() (+15 more)
+Cohesion: 0.40
+Nodes (5): Migration from knip, Step 1: Preview migration, Step 2: Apply migration, Step 3: Compare results, Step 4: Remove knip config
 
 ### Community 1009 - "Community 1009"
 Cohesion: 0.33
@@ -4834,20 +4830,16 @@ Cohesion: 0.40
 Nodes (4): Compressed, Detailed, Provenance, Summary
 
 ### Community 1012 - "Community 1012"
-Cohesion: 0.50
-Nodes (6): GithubSource, mapMdnSource(), mapNodeApiSource(), mapUrlToSource(), parseGithubSourceLink(), vitepressRouteMarkdown()
+Cohesion: 0.40
+Nodes (5): Cloud agent support, Configuration sources, Execution type limits, Hooks not available in cloud agents, Supported hooks
 
 ### Community 1013 - "Community 1013"
 Cohesion: 0.33
 Nodes (5): Changeset Requirement, Mandatory Follow-Up, Verification, When This Is Not Required, When This Is Required
 
 ### Community 1014 - "Community 1014"
-Cohesion: 0.29
-Nodes (7): Config Intellisense, Config Resolution, Directory-Level Overrides, Overview, Page-Level Overrides, Typed Theme Config, Vite, Vue & Markdown Config
-
-### Community 1015 - "Community 1015"
-Cohesion: 0.33
-Nodes (6): Agent security and safety, Code security and best practices, Dependency security, MCP governance and visibility, Partner Integrations, Secrets management
+Cohesion: 0.50
+Nodes (4): Customization, markdown, vite, vue
 
 ### Community 1016 - "Community 1016"
 Cohesion: 0.33
@@ -4858,8 +4850,8 @@ Cohesion: 0.50
 Nodes (3): Changesets, Common Commands, Snapshot Releases
 
 ### Community 1018 - "Community 1018"
-Cohesion: 0.50
-Nodes (4): Custom Plugin Setup, Option 1: Inline framework config, Option 2: External plugin file, Option 3: Plugin directory
+Cohesion: 0.67
+Nodes (3): Common schema, Input (all hooks), Reference
 
 ### Community 1019 - "Community 1019"
 Cohesion: 0.50
@@ -4867,12 +4859,12 @@ Nodes (4): Fork the current conversation, How forks differ from named subagents,
 
 ### Community 1020 - "Community 1020"
 Cohesion: 0.67
-Nodes (3): Common schema, Input (all hooks), Reference
+Nodes (3): Examples, Python manifest guard hook, TypeScript stop automation hook
 
 ## Knowledge Gaps
-- **7109 isolated node(s):** `$schema`, `changelog`, `commit`, `fixed`, `linked` (+7104 more)
+- **7112 isolated node(s):** `$schema`, `changelog`, `commit`, `fixed`, `linked` (+7107 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **59 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **61 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -4884,7 +4876,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `Callback API` connect `Community 61` to `Community 555`, `Community 235`, `Community 558`, `Community 560`, `Community 562`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `$schema`, `changelog`, `commit` to the rest of the system?**
-  _7109 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _7112 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

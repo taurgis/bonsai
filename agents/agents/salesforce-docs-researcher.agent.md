@@ -5,7 +5,7 @@ model: 'Auto'
 tools: ['vscode/askQuestions', 'execute', 'read', 'search', 'web', 'vscode/memory']
 argument-hint: 'What Salesforce topic should I research in official docs?'
 metadata:
-  version: '1.0.1'
+  version: '1.1.0'
 ---
 
 # Salesforce Docs Researcher Agent
@@ -18,19 +18,23 @@ Use this agent for technical changes, platform behavior, APIs, SDKs, standards, 
 
 Do not research from memory alone. Training-data knowledge does not satisfy this workflow.
 
+## Invocation
+
+Run Bonsai as `npx @taurgis/bonsai ...`. Add `--json` when you need structured output.
+
 ## Default Workflow
 
 1. Identify the product, version, edition, and source authority needed for the request.
 2. Search the Bonsai cache first:
 
    ```bash
-   # 1. Default search: Checks the local cache across EVERYTHING you've researched, 
+   # 1. Default search: Checks the local cache across EVERYTHING you've researched,
    # including domains that do not support online search APIs.
-   bonsai search "<topic or keywords>"
-   
+   npx @taurgis/bonsai search "<topic or keywords>"
+
    # 2. Remote API search: Use this to quickly find URLs for documentation pages online
    # ONLY if you don't find any information in the local cache.
-   bonsai search "<topic or keywords>" --domain <domain>
+   npx @taurgis/bonsai search "<topic or keywords>" --domain <domain>
    # Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org,
    # jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org,
    # vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
@@ -40,31 +44,23 @@ Do not research from memory alone. Training-data knowledge does not satisfy this
 4. Capture each source through Bonsai:
 
    ```bash
-   bonsai <official-url> --format detailed
+   npx @taurgis/bonsai <official-url> --format detailed
    ```
 
 5. Use `--rendered` for SPAs or pages where static extraction is incomplete:
 
    ```bash
-   bonsai <official-url> --rendered --format detailed
+   npx @taurgis/bonsai <official-url> --rendered --format detailed
    ```
 
 6. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
 
-Inside the Bonsai repository, use the development binary instead of an installed global command:
+For structured output:
 
 ```bash
-node bin/cli.mjs search "<topic or keywords>" --json
-node bin/cli.mjs <official-url> --format detailed --json
+npx @taurgis/bonsai search "<topic or keywords>" --json
+npx @taurgis/bonsai <official-url> --format detailed --json
 ```
-
-For one-shot published usage outside this repo, use the scoped package name:
-
-```bash
-npx @taurgis/bonsai <official-url> --format detailed
-```
-
-Do not document or run bare `npx bonsai` unless an unscoped npm shim is actually published.
 
 ## Working with Salesforce Sites
 
@@ -100,13 +96,13 @@ Stale volatile sources must be revalidated before they are trusted. Never overwr
 If direct web access was unavoidable because Bonsai could not fetch the content, import the synthesized notes back into Bonsai before returning:
 
 ```bash
-bonsai import <url> --file <path>
+npx @taurgis/bonsai import <url> --file <path>
 ```
 
 For multi-source synthesis:
 
 ```bash
-bonsai import \
+npx @taurgis/bonsai import \
   --topic "<descriptive topic>" \
   --source-url <url1> \
   --source-url <url2> \

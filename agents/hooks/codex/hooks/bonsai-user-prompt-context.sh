@@ -12,7 +12,7 @@ process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
     hookEventName: "UserPromptSubmit",
     additionalContext:
-      "When fetching documentation or URL content for this prompt, use Bonsai first: bonsai <url> --format detailed. Use --rendered only when static extraction is incomplete."
+      "When fetching documentation or URL content for this prompt, use Bonsai first: npx @taurgis/bonsai <url> --format detailed. Use --rendered only when static extraction is incomplete."
   }
 }) + "\n");
 ' <<< "$input"
