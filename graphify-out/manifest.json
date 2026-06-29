@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "skills-lock.json": {
-    "mtime": 1782727929.7350202,
-    "ast_hash": "151321a966f9a7358f490ab64d0592dd",
+    "mtime": 1782740049.6726575,
+    "ast_hash": "8ca0367b8b08eede3db64f651b5d2e55",
     "semantic_hash": ""
   },
   "src/base-command.ts": {

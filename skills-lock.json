@@ -104,7 +104,7 @@
     "fallow": {
       "source": "fallow-rs/fallow-skills",
       "sourceType": "github",
-      "computedHash": "1690e1e47c4ee2825983d8127a44e8a6843d50699729c68b03ccb5be519bc812",
+      "computedHash": "93841b18ff160f45bc630bb3000b5ac6650cf8a869f501f451c81e11c841efc1",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -113,8 +113,8 @@
       ],
       "repoPath": "fallow/skills/fallow/SKILL.md",
       "installPath": ".agents/skills/fallow",
-      "installHash": "5e05a2c0e3b939ab7d7444b75ebe929067850f1ac85766dad84080a8d6074332",
-      "sourceHash": "1690e1e47c4ee2825983d8127a44e8a6843d50699729c68b03ccb5be519bc812",
+      "installHash": "35f0d66f941a12ddea97118d37bddfba4367dc495399cdb2b669c6a10e4aa3f2",
+      "sourceHash": "93841b18ff160f45bc630bb3000b5ac6650cf8a869f501f451c81e11c841efc1",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.0.0",
