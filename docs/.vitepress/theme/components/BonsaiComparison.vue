@@ -315,7 +315,7 @@ onBeforeUnmount(() => {
   <section class="bonsai-cmp" aria-labelledby="bonsai-cmp-title">
     <div ref="wrapEl" class="bonsai-cmp__container">
       <div class="bonsai-cmp__head">
-        <h2 id="bonsai-cmp-title" class="bonsai-cmp__title">More tokens sometimes. Better sources almost always.</h2>
+        <h2 id="bonsai-cmp-title" class="bonsai-cmp__title">More tokens sometimes. Better sources always.</h2>
         <p class="bonsai-cmp__sub">
           Three prompts, four agents: native web search vs the Bonsai workflow.
           Scores weight <strong>official-source grounding</strong>, technical accuracy,
