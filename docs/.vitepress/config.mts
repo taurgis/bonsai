@@ -130,6 +130,19 @@ const pageMetadata: Record<string, PageMetadata> = {
       'Compare built-in agent web fetch behavior with Bonsai on real documentation pages, including token counts and missing-content analysis.',
     keywords: ['agent web fetch comparison', 'documentation benchmark', 'token counts'],
   },
+  'examples/agent-research-comparison.md': {
+    title: 'Agent Research: Bonsai vs Native Web Search',
+    description:
+      'Codex, Antigravity, and Claude Code session comparison of Bonsai-backed research versus native web search on TanStack Query, React Server Components, and Salesforce B2C Commerce prompts.',
+    keywords: [
+      'agent research comparison',
+      'Bonsai workflow benchmark',
+      'Claude Code tokens',
+      'Codex tokens',
+      'Antigravity context usage',
+      'answer quality',
+    ],
+  },
   'troubleshooting.md': {
     title: 'Troubleshooting and Limits',
     description:
@@ -159,6 +172,7 @@ function routeSection(relativePath: string): string {
   if (firstSegment === 'concepts') return 'Concepts';
   if (firstSegment === 'how-to') return 'How-to Guides';
   if (firstSegment === 'reference') return 'Reference';
+  if (firstSegment === 'examples') return 'Examples';
   return 'More';
 }
 
@@ -407,7 +421,10 @@ export default defineConfig({
       {
         text: 'Examples',
         collapsed: false,
-        items: [{ text: 'Agent fetch vs Bonsai', link: '/examples' }],
+        items: [
+          { text: 'Agent fetch vs Bonsai', link: '/examples' },
+          { text: 'Research workflow comparison', link: '/examples/agent-research-comparison' },
+        ],
       },
       {
         text: 'Help',

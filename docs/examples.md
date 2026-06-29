@@ -4,6 +4,9 @@ Every AI coding agent has a built-in way to read a web page. This page puts that
 built-in fetch **head-to-head with Bonsai** on four popular library docs pages,
 and measures what each one actually returns.
 
+For **full research sessions** (multi-page synthesis, not single-URL fetches),
+see [Research workflow comparison](/examples/agent-research-comparison).
+
 The headline isn't "Bonsai uses fewer tokens." It sometimes uses *more*. The point
 is that **a built-in web fetch quietly drops, summarizes, or refuses content**,
 while Bonsai returns the complete page every time, deterministically, and caches

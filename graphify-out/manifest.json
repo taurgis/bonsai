@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782721847.2641728,
-    "ast_hash": "1f7716cc003a3512bf05e7347087216a",
+    "mtime": 1782721913.3808858,
+    "ast_hash": "687c8d50de3cd50cfaea10837ae316ee",
     "semantic_hash": ""
   },
   "scripts/check-line-counts.ts": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "skills-lock.json": {
-    "mtime": 1782564824.57727,
-    "ast_hash": "446ec0f49d8eef63f25ea28b3f23197a",
+    "mtime": 1782727929.7350202,
+    "ast_hash": "151321a966f9a7358f490ab64d0592dd",
     "semantic_hash": ""
   },
   "src/base-command.ts": {
@@ -520,7 +520,7 @@
     "semantic_hash": ""
   },
   ".github/agents/official-docs-researcher.agent.md": {
-    "mtime": 1782719561.9777315,
+    "mtime": 1782727929.723125,
     "ast_hash": "5a1cd2671bedee358545e21be770f3e9",
     "semantic_hash": ""
   },
@@ -600,12 +600,12 @@
     "semantic_hash": ""
   },
   ".agents/skills/web-research/SKILL.md": {
-    "mtime": 1782719586.7790174,
+    "mtime": 1782727929.7221363,
     "ast_hash": "5590a08c059c60089488bd3c1afddbc0",
     "semantic_hash": ""
   },
   ".github/instructions/web-research.instructions.md": {
-    "mtime": 1782719568.1851997,
+    "mtime": 1782727929.7228792,
     "ast_hash": "f17b993e7782030155f602f104955e5a",
     "semantic_hash": ""
   },
@@ -3770,8 +3770,8 @@
     "semantic_hash": ""
   },
   "docs/examples.md": {
-    "mtime": 1782406947.9890723,
-    "ast_hash": "6aa17b6e1fdf6d35cda4954059c74438",
+    "mtime": 1782723432.9639053,
+    "ast_hash": "2f2cf8a1a651ecaa7440e0e6861e3021",
     "semantic_hash": ""
   },
   "docs/guide/getting-started.md": {
@@ -5524,11 +5524,6 @@
     "ast_hash": "36276fb8d71baca4aa6007e4efdda89f",
     "semantic_hash": ""
   },
-  ".changeset/witty-rooms-jam.md": {
-    "mtime": 1782713333.3314242,
-    "ast_hash": "2ee28f1e1b449ccc2dd97fdcc6c2bc1f",
-    "semantic_hash": ""
-  },
   ".claude/rules/generated/changeset-requirement.md": {
     "mtime": 1782712974.386127,
     "ast_hash": "ebf99705937d53ec0904fdccbd72cf79",
@@ -5579,9 +5574,14 @@
     "ast_hash": "ed0f223145c73f04c3a8dd87bca15f18",
     "semantic_hash": ""
   },
-  ".changeset/remove-search-command.md": {
-    "mtime": 1782718767.6205997,
-    "ast_hash": "11350bd26e0b0710bf08de80d7cb3d74",
+  "CHANGELOG.md": {
+    "mtime": 1782721913.3804402,
+    "ast_hash": "0275ef5798caf2f5ee1cd2a9bf4b69ef",
+    "semantic_hash": ""
+  },
+  "docs/examples/agent-research-comparison.md": {
+    "mtime": 1782727575.6280031,
+    "ast_hash": "fcf8f033d754de7dc1fef902794f1a3d",
     "semantic_hash": ""
   }
 }
