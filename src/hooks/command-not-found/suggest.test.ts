@@ -11,7 +11,6 @@ const fakeConfig = {
     'inspect',
     'list',
     'prune',
-    'search',
     'status',
     'fetch',
     'config',
@@ -24,7 +23,6 @@ const fakeConfig = {
     { id: 'list', hidden: false, args: {} },
     { id: 'prune', hidden: false, args: {} },
     { id: 'status', hidden: false },
-    { id: 'search', hidden: false },
     { id: 'config', hidden: false, args: {} },
     { id: 'config:get', hidden: false },
     { id: 'config:set', hidden: false },
@@ -85,17 +83,17 @@ describe('command_not_found hook', () => {
   });
 
   it('emits the standard JSON error envelope when --json is present', async () => {
-    const envelope = await runJsonHook('serch:hello');
+    const envelope = await runJsonHook('lisst');
     expect(envelope).toMatchObject({
       schemaVersion: 1,
-      command: 'serch',
+      command: 'lisst',
       ok: false,
       exitCode: 2,
       code: 'COMMAND_NOT_FOUND',
       stdout: '',
       data: null,
     });
-    expect(envelope.stderr).toContain('Did you mean search?');
+    expect(envelope.stderr).toContain('Did you mean list?');
     expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
   });
 
@@ -109,9 +107,9 @@ describe('command_not_found hook', () => {
   // (`serch hello` → `serch:hello`). The suggestion must still fire, and the folded-in arg must not
   // appear in the displayed attempt.
   it('suggests the nearest command when a positional arg follows the typo', async () => {
-    const msg = await runHook('serch:hello');
-    expect(msg).toContain('serch is not a bonsai command.');
-    expect(msg).toContain('Did you mean search?');
+    const msg = await runHook('lisst:extra');
+    expect(msg).toContain('lisst is not a bonsai command.');
+    expect(msg).toContain('Did you mean list?');
   });
 
   it('does not mangle a URL argument folded into the attempted id', async () => {

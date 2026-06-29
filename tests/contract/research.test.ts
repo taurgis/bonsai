@@ -7,7 +7,7 @@ describe('research contract tests', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('COMMANDS');
     expect(result.stdout).toContain('import');
-    expect(result.stdout).toContain('search');
+    expect(result.stdout).toContain('list');
     expect(result.stdout).toContain('config');
   });
 
@@ -176,19 +176,19 @@ describe('research contract tests', () => {
   });
 
   it('accepts --json before an unknown command and returns the JSON error envelope', () => {
-    const result = runContract(['--json', 'serch', 'alpha'], { raw: true });
+    const result = runContract(['--json', 'lisst'], { raw: true });
     expect(result.exitCode).toBe(2);
     const envelope = JSON.parse(result.stdout);
     expect(envelope).toMatchObject({
       schemaVersion: 1,
-      command: 'serch',
+      command: 'lisst',
       ok: false,
       exitCode: 2,
       code: 'COMMAND_NOT_FOUND',
       stdout: '',
       data: null,
     });
-    expect(envelope.stderr).toContain('Did you mean search?');
+    expect(envelope.stderr).toContain('Did you mean list?');
     expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
     expect(result.stderr).toBe('');
   });
@@ -545,14 +545,6 @@ describe('CLI ergonomics and error contracts', () => {
     expect(envelope.stderr).toContain('Code: INVALID_LIMIT');
   });
 
-  it('search JSON non-integer limit includes INVALID_LIMIT in the envelope', () => {
-    const result = runContract(['search', 'docs', '--limit', 'abc', '--json'], { raw: true });
-    expect(result.exitCode).toBe(2);
-    const envelope = JSON.parse(result.stdout);
-    expect(envelope.code).toBe('INVALID_LIMIT');
-    expect(envelope.stderr).toContain('Code: INVALID_LIMIT');
-  });
-
   it('fetch JSON duration errors include INVALID_DURATION in the envelope', () => {
     const result = runContract(['https://example.com', '--ttl', '5z', '--json'], { raw: true });
     const envelope = JSON.parse(result.stdout);
@@ -562,20 +554,6 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'INVALID_DURATION',
     });
     expect(envelope.stderr).toContain('Code: INVALID_DURATION');
-  });
-
-  it('search --remote with invalid URL fails with INVALID_URL instead of silent fallback', () => {
-    const result = runContract(['search', 'foo', '--remote', 'notaurl', '--json'], { raw: true });
-    expect(result.exitCode).toBe(2);
-    const envelope = JSON.parse(result.stdout);
-    expect(envelope).toMatchObject({
-      ok: false,
-      exitCode: 2,
-      code: 'INVALID_URL',
-      data: null,
-    });
-    expect(envelope.stderr).toContain('Invalid --remote URL');
-    expect(result.stderr).toBe('');
   });
 
   it('import missing url JSON includes MISSING_URL code', () => {

@@ -1,6 +1,6 @@
 {
   "name": "@taurgis/bonsai",
-  "version": "1.0.6",
+  "version": "2.0.0",
   "description": "Bonsai is a standalone local research cache CLI for AI agents",
   "repository": {
     "type": "git",
@@ -84,7 +84,7 @@
   "oclif": {
     "bin": "bonsai",
     "dirname": "bonsai",
-    "description": "Bonsai is a standalone local research cache CLI for AI agents.\nResearch and cache a web page by passing its URL directly:\n\n  $ bonsai https://nodejs.org/api/url.html\n\nThe URL form is shorthand for fetching and caching the page; run `bonsai help fetch` for its full reference. The commands listed below search, inspect, list, import, and prune the local research cache.",
+    "description": "Bonsai is a standalone local research cache CLI for AI agents.\nResearch and cache a web page by passing its URL directly:\n\n  $ bonsai https://nodejs.org/api/url.html\n\nThe URL form is shorthand for fetching and caching the page; run `bonsai help fetch` for its full reference. The commands listed below inspect, list, import, and prune the local research cache.",
     "plugins": [
       "@oclif/plugin-autocomplete"
     ],

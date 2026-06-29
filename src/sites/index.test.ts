@@ -3,11 +3,10 @@ import { SITES, detectSite, getSiteModuleById } from './index.js';
 
 describe('site modules', () => {
   it('detectSite matches on exact hostname', () => {
-    expect(detectSite('https://react.dev/learn')?.id).toBe('react');
+    expect(detectSite('https://tanstack.com/query/latest')?.id).toBe('tanstack');
   });
 
   it("detectSite matches any of a module's domains", () => {
-    expect(detectSite('https://legacy.reactjs.org/docs')?.id).toBe('react');
     expect(detectSite('https://help.salesforce.com/articleView')?.id).toBe('salesforce');
   });
 
@@ -40,7 +39,7 @@ describe('site modules', () => {
   it('JS-rendered sites default to rendered fetch', () => {
     expect(getSiteModuleById('salesforce')?.defaults?.rendered).toBe(true);
     expect(getSiteModuleById('salesforce-developer')?.defaults?.rendered).toBe(true);
-    expect(getSiteModuleById('react')?.defaults?.rendered).toBeUndefined();
+    expect(getSiteModuleById('tanstack')?.defaults?.rendered).toBeUndefined();
   });
 
   it('TanStack does not force rendered so source-Markdown capture keeps code blocks', () => {
@@ -48,15 +47,13 @@ describe('site modules', () => {
     expect(getSiteModuleById('tanstack')?.defaults?.rendered).toBeUndefined();
   });
 
-  it('salesforce help exposes fetchPage and search', () => {
+  it('salesforce help exposes fetchPage', () => {
     const sf = getSiteModuleById('salesforce');
     expect(typeof sf?.fetchPage).toBe('function');
-    expect(typeof sf?.search).toBe('function');
   });
 
-  it('salesforce developer exposes fetchPage only (no search backend yet)', () => {
+  it('salesforce developer exposes fetchPage', () => {
     const dev = getSiteModuleById('salesforce-developer');
     expect(typeof dev?.fetchPage).toBe('function');
-    expect(dev?.search).toBeUndefined();
   });
 });

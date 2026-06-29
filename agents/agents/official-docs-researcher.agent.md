@@ -5,7 +5,7 @@ model: 'Auto'
 tools: ['vscode/askQuestions', 'execute', 'read', 'search', 'web', 'vscode/memory']
 argument-hint: 'What topic should I research in official docs?'
 metadata:
-  version: '3.1.0'
+  version: '4.0.0'
 ---
 
 # Official Docs Researcher Agent
@@ -25,40 +25,24 @@ Run Bonsai as `npx @taurgis/bonsai ...`. Add `--json` when you need structured o
 ## Default Workflow
 
 1. Identify the product, version, edition, and source authority needed for the request.
-2. Search the Bonsai cache first:
-
-   ```bash
-   # 1. Default search: Checks the local cache across EVERYTHING you've researched,
-   # including domains that do not support online search APIs.
-   npx @taurgis/bonsai search "<topic or keywords>"
-
-   # 2. Remote API search: Use this to quickly find URLs for documentation pages online
-   # ONLY if you don't find any information in the local cache.
-   npx @taurgis/bonsai search "<topic or keywords>" --domain <domain>
-   # Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org,
-   # jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org,
-   # vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
-   ```
-
-3. If the cache misses or does not cover the question, locate official source URLs. Prefer vendor docs, standards bodies, API references, and official release notes.
-4. Capture each source through Bonsai:
+2. Locate official source URLs. Prefer vendor docs, standards bodies, API references, and official release notes. Use your native web/search tools when you do not yet know the URL.
+3. Capture each source through Bonsai:
 
    ```bash
    npx @taurgis/bonsai <official-url> --format detailed
    ```
 
-5. Use `--rendered` for SPAs or pages where static extraction is incomplete:
+4. Use `--rendered` for SPAs or pages where static extraction is incomplete:
 
    ```bash
    npx @taurgis/bonsai <official-url> --rendered --format detailed
    ```
 
-6. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
+5. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
 
 For structured output:
 
 ```bash
-npx @taurgis/bonsai search "<topic or keywords>" --json
 npx @taurgis/bonsai <official-url> --format detailed --json
 ```
 

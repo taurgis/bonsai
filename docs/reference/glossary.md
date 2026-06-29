@@ -74,7 +74,7 @@ rather than downloading the page again.
 
 ### Site module
 
-A small per-domain plug-in that overrides parts of the fetch or search pipeline
+A small per-domain plug-in that overrides parts of the fetch pipeline
 for a site that needs special handling (such as JavaScript-rendered pages). See
 [Site Modules](/reference/site-modules).
 

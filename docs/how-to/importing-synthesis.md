@@ -37,7 +37,7 @@ echo "# Node URL API: field notes" | \
 
 Because the cache key matches what a fetch of that URL would use, a later
 `bonsai https://nodejs.org/api/url.html` serves your imported note straight from
-the cache while it is still fresh. `search` finds it too.
+the cache while it is still fresh. `list` can find it too.
 
 ### A synthesis from many sources
 
@@ -54,7 +54,7 @@ cat synthesis.md | npx @taurgis/bonsai import --stdin \
 
 `--topic` is required here. A synthesis has no single URL to fetch, so the topic
 and tags are how you find it again. Retrieve it with
-[`search`](/how-to/search), filtering by `--topic` or `--artifact-type research_note`.
+[`list`](/reference/commands#list), filtering by `--topic` or `--artifact-type research_note`.
 
 ## Giving Bonsai the text
 
@@ -82,7 +82,7 @@ An imported artifact is tagged with its origin. Its capture method is
 `agent_supplied`, its extraction status is `agent_supplied`, and it has no
 `fetchedAt` time because nothing was fetched. The usual freshness controls still
 apply: `--tier` and `--ttl` set when the note goes stale, and `--topic` plus
-`--tags` feed the search index.
+`--tags` feed metadata and list filters.
 
 ::: tip A synthesis ages by the clock, not the source
 There is no remote page to revalidate an imported note against, so it simply
@@ -113,8 +113,8 @@ cat synthesis.md | npx @taurgis/bonsai import --stdin \
   --source-url https://example.com/oauth/device \
   --source-url https://www.rfc-editor.org/rfc/rfc8628
 
-# 3. Later, any agent retrieves it without re-reading the sources:
-npx @taurgis/bonsai search "device flow" --artifact-type research_note
+# 3. Later, any agent retrieves it with list filters:
+npx @taurgis/bonsai list --topic "OAuth device flow" --artifact-type research_note
 ```
 
 For where this fits in a fuller agent workflow, see

@@ -50,7 +50,7 @@ export function maxFuzzyDistance(input: string): number {
 
 /**
  * Levenshtein edit distance: the minimum number of single-character insertions, deletions, or
- * substitutions to turn `s1` into `s2`. Shared by fuzzy search ranking and command-typo suggestion.
+ * substitutions to turn `s1` into `s2`. Shared by command-typo suggestion.
  */
 export function levenshtein(s1: string, s2: string): number {
   if (s1.length < s2.length) return levenshtein(s2, s1);

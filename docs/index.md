@@ -44,7 +44,7 @@ features:
     linkText: Limits & safety
   - icon: 📥
     title: Manual import
-    details: Cache agent-synthesized notes or private docs straight from stdin or a file, with the same metadata, search, and freshness rules.
+    details: Cache agent-synthesized notes or private docs straight from stdin or a file, with the same metadata, listing, and freshness rules.
     link: /reference/commands
     linkText: Command reference
 ---

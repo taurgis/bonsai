@@ -37,7 +37,7 @@ const pageMetadata: Record<string, PageMetadata> = {
   'guide/getting-started.md': {
     title: 'Getting Started with Bonsai',
     description:
-      'Run Bonsai from an empty cache, fetch a documentation page, inspect the stored artifact, and search cached research from the command line.',
+      'Run Bonsai from an empty cache, fetch a documentation page, and inspect the stored artifact from the command line.',
     keywords: ['Bonsai getting started', 'npx @taurgis/bonsai', 'CLI tutorial'],
   },
   'concepts/caching-and-freshness.md': {
@@ -75,12 +75,6 @@ const pageMetadata: Record<string, PageMetadata> = {
     description:
       'Import authenticated, blocked, localhost, or JavaScript-rendered pages into Bonsai when automatic static fetching is not enough.',
     keywords: ['manual import', 'browser-rendered docs', 'authenticated documentation'],
-  },
-  'how-to/search.md': {
-    title: 'Search Cached Research',
-    description:
-      'Use Bonsai search to find cached research by keyword, topic, tag, freshness, and remote documentation search before fetching again.',
-    keywords: ['bonsai search', 'cached docs search', 'remote docs discovery'],
   },
   'how-to/importing-synthesis.md': {
     title: 'Import Synthesized Research',
@@ -394,7 +388,6 @@ export default defineConfig({
         items: [
           { text: 'Share your cache with a team', link: '/how-to/share-cache-with-your-team' },
           { text: 'Cache pages you can’t fetch', link: '/how-to/cache-pages-you-cant-fetch' },
-          { text: 'Search your research', link: '/how-to/search' },
           { text: 'Import synthesized research', link: '/how-to/importing-synthesis' },
           { text: 'Drive Bonsai from an agent', link: '/how-to/agent-integration' },
           { text: 'Install the agent kit', link: '/how-to/agent-kit' },

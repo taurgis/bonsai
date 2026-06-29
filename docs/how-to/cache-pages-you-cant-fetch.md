@@ -72,7 +72,7 @@ npx @taurgis/bonsai status https://docs.example.com/private-page
 
 A `Status: hit` with `Action: would_return_cached` means the page is now served
 from the cache like any fetched page. It also shows up in
-[`search`](/how-to/search).
+[`list`](/reference/commands#list).
 
 ## Keeping imported notes fresh
 

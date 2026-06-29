@@ -114,8 +114,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       if (artifact.metadata.status !== 'active') return null;
       // Section children are sub-chunks of a page, not artifacts a user "has" — they would flood the
       // listing (one page yields dozens) and aren't in the documented source/research_note contract.
-      // They stay discoverable through `search` (which ranks them) and `inspect` (which lists a
-      // page's sections). `list` answers "what pages/notes do I have?", so keep it page-level. This
+      // They stay discoverable through `inspect` (which lists a page's sections). `list` answers "what pages/notes do I have?", so keep it page-level. This
       // unconditional guard owns the exclusion (the default no-filter case relies on it);
       // LISTABLE_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
       // type list can never return. Keep both in sync if section handling ever changes.

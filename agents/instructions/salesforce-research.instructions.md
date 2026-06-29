@@ -4,7 +4,7 @@ applyTo: '**'
 skills:
   - web-research
 metadata:
-  version: '1.0.2'
+  version: '2.0.0'
 ---
 
 # Web Research Requirement (Salesforce)
@@ -25,23 +25,21 @@ metadata:
 ## Shared Cache
 
 - **Invocation**: Run Bonsai as `npx @taurgis/bonsai ...`.
-- **Local Cache Search (Default)**: Always search the local cache first using `npx @taurgis/bonsai search "<query>"`. This checks everything you've researched across all domains, even ones that don't support online search APIs.
-- **Online URL Discovery (Fallback)**: If the local cache comes up empty, use `--domain <domain>` or `--remote <docs-url>` to quickly hit a site's search API and find the official URLs you need to fetch. This is specifically for online URL discovery when local cache fails.
+- **URL discovery**: When you do not yet know the official URL, discover it with your native web/search tools, then fetch the page through Bonsai so it is cached for future agents.
+- **Browse cached entries**: Use `npx @taurgis/bonsai list` when you need to see what is already cached by topic, tags, or freshness.
 - If Bonsai is configured for project storage and `.bonsai/research/` is not ignored by git, treat those cache artifacts as intentional shared project files. It is OK to check them in, and agents must not delete them as incidental generated output without an explicit request.
 - Re-running on a recent topic is cheap — research the topic rather than skipping it to "save" a fetch.
-- Supported remote API domains: `help.salesforce.com`, `react.dev`, `vuejs.org`, `tailwindcss.com`, `nextjs.org`, `jestjs.io`, `cypress.io`, `vitest.dev`, `vitepress.dev`, `angular.dev`, `redux.js.org`, `vitejs.dev`, `fastify.dev`, `rollupjs.org`, `vueuse.org`.
 
 ## Working with Salesforce Sites
 
 Salesforce Help and Developer docs are JavaScript-rendered (LWR), so Bonsai uses per-host **site modules** that render and extract them for you — a normal Bonsai fetch returns clean Markdown for these hosts without `--rendered`.
 
-- **Search Help live** when you do not have a URL yet — this hits Salesforce's own backend, not the local cache:
+- **Help and Developer fetch.** Once you have a URL, capture it through Bonsai:
 
   ```bash
-  npx @taurgis/bonsai search "single sign-on" --domain help.salesforce.com
+  npx @taurgis/bonsai <official-url> --format detailed
   ```
 
-- `developer.salesforce.com` has a rendered fetch but **no** `--domain` search (passing it errors); find Developer URLs another way, then fetch them through Bonsai.
 - Matching is by exact hostname; prefer canonical `/s/articleView?id=…` Help URLs (Bonsai normalizes legacy `/help_doccontent?id=…` links automatically).
 
 ## When Not to Use
@@ -53,7 +51,7 @@ Salesforce Help and Developer docs are JavaScript-rendered (LWR), so Bonsai uses
 ## Examples
 
 - ✅ Confirming one platform's current flag or frontmatter field before a small edit → run the web-research skill inline.
-- ✅ Finding a Salesforce Help article by topic → `npx @taurgis/bonsai search "<topic>" --domain help.salesforce.com`, then fetch the chosen URL through Bonsai.
+- ✅ Finding a Salesforce Help article by topic → discover the official URL with native web/search tools, then fetch it through Bonsai.
 - ✅ Comparing conventions across several platforms, or auditing/refactoring source broadly → delegate to the Salesforce Docs Researcher subagent.
 - ✅ Before editing instructions, prompts, agents, skills, workflows, or docs — reading source code does not replace checking current platform guidance.
 - ✅ Include official source URLs when the change references platform behavior or standards.

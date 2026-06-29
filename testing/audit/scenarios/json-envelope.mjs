@@ -85,12 +85,4 @@ export default function register(harness) {
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(Array.isArray(env?.data), `data not array: ${typeof env?.data}`);
   });
-
-  check('search --json no results ok true', () => {
-    const r = run(['search', 'zzzznonexistent99999', '--json']);
-    const env = parseJson(r.stdout);
-    expect(r.exitCode === 0, `exit ${r.exitCode}`);
-    expect(env?.ok === true, `ok ${env?.ok}`);
-    expect(Array.isArray(env?.data), 'data not array');
-  });
 }

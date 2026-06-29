@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync, readFileSync, unlinkSync, existsSyn
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { writeArtifact } from './storage.js';
-import { loadSearchableArtifacts, loadSearchableArtifactsForDir } from './search-index.js';
+import { loadIndexedArtifacts, loadIndexedArtifactsForDir } from './artifact-index.js';
 import type { ResearchArtifact } from './schema.js';
 
 function makeArtifact(key: string, summary: string): ResearchArtifact {
@@ -45,24 +45,24 @@ function makeArtifact(key: string, summary: string): ResearchArtifact {
     },
     summary,
     compressed: 'Compressed body.',
-    detailed: 'A very long detailed body that search never needs.',
+    detailed: 'A very long detailed body that list never needs.',
     provenance: 'Provenance.',
   };
 }
 
 const INDEX_PATH = (dataDir: string) => join(dataDir, 'research', '.search-index.json');
 
-describe('loadSearchableArtifacts (sidecar index)', () => {
+describe('loadIndexedArtifacts (sidecar index)', () => {
   it('returns shallow artifacts (no detailed body) and writes the index file', () => {
     const dir = mkdtempSync(join(tmpdir(), 'fnr-index-test-'));
     try {
       writeArtifact(dir, 'abc123', makeArtifact('abc123', 'Summary one.'));
 
-      const results = loadSearchableArtifacts([dir]);
+      const results = loadIndexedArtifacts([dir]);
       expect(results).toHaveLength(1);
       expect(results[0]!.artifact.summary).toBe('Summary one.');
       expect(results[0]!.artifact.compressed).toBe('Compressed body.');
-      // Shallow parse skips the detailed/provenance bodies the search path never reads.
+      // Shallow parse skips the detailed/provenance bodies the list path never reads.
       expect(results[0]!.artifact.detailed).toBe('');
       expect(existsSync(INDEX_PATH(dir))).toBe(true);
     } finally {
@@ -75,7 +75,7 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
     try {
       writeArtifact(dir, 'abc123', makeArtifact('abc123', 'Original summary.'));
       const researchDir = join(dir, 'research');
-      loadSearchableArtifactsForDir(researchDir); // build the index
+      loadIndexedArtifactsForDir(researchDir); // build the index
 
       // Tamper the index with a sentinel. Because the .md file is unchanged, the loader must trust
       // the cached entry and return the sentinel rather than re-reading the file.
@@ -83,7 +83,7 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
       idx.entries['abc123.md'].artifact.summary = 'SENTINEL_FROM_INDEX';
       writeFileSync(INDEX_PATH(dir), JSON.stringify(idx));
 
-      const results = loadSearchableArtifactsForDir(researchDir);
+      const results = loadIndexedArtifactsForDir(researchDir);
       expect(results[0]!.artifact.summary).toBe('SENTINEL_FROM_INDEX');
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -95,13 +95,13 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
     try {
       writeArtifact(dir, 'abc123', makeArtifact('abc123', 'First.'));
       const researchDir = join(dir, 'research');
-      loadSearchableArtifactsForDir(researchDir);
+      loadIndexedArtifactsForDir(researchDir);
 
       // Rewriting goes through atomic temp+rename, so the inode (part of the signature) changes and
       // forces a re-read even if mtime resolution is coarse.
       writeArtifact(dir, 'abc123', makeArtifact('abc123', 'Second.'));
 
-      const results = loadSearchableArtifactsForDir(researchDir);
+      const results = loadIndexedArtifactsForDir(researchDir);
       expect(results[0]!.artifact.summary).toBe('Second.');
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -113,10 +113,10 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
     try {
       writeArtifact(dir, 'abc123', makeArtifact('abc123', 'Kept.'));
       const researchDir = join(dir, 'research');
-      loadSearchableArtifactsForDir(researchDir);
+      loadIndexedArtifactsForDir(researchDir);
 
       unlinkSync(join(researchDir, 'abc123.md'));
-      const results = loadSearchableArtifactsForDir(researchDir);
+      const results = loadIndexedArtifactsForDir(researchDir);
       expect(results).toHaveLength(0);
 
       const idx = JSON.parse(readFileSync(INDEX_PATH(dir), 'utf-8'));
@@ -133,7 +133,7 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
       writeArtifact(projectDir, 'dada01', makeArtifact('dada01', 'Project copy.'));
       writeArtifact(globalDir, 'dada01', makeArtifact('dada01', 'Global copy.'));
 
-      const results = loadSearchableArtifacts([projectDir, globalDir]);
+      const results = loadIndexedArtifacts([projectDir, globalDir]);
       expect(results).toHaveLength(1);
       expect(results[0]!.artifact.summary).toBe('Project copy.');
     } finally {
@@ -143,7 +143,7 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
   });
 
   it('returns an empty array when the research dir does not exist', () => {
-    expect(loadSearchableArtifacts([join(tmpdir(), 'fnr-does-not-exist-xyz')])).toEqual([]);
+    expect(loadIndexedArtifacts([join(tmpdir(), 'fnr-does-not-exist-xyz')])).toEqual([]);
   });
 
   it('rebuilds from scratch when the index is corrupt or a different version', () => {
@@ -153,7 +153,7 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
 
       // Corrupt JSON: the loader must ignore it and rebuild rather than throw.
       writeFileSync(INDEX_PATH(dir), '{ not valid json');
-      let results = loadSearchableArtifacts([dir]);
+      let results = loadIndexedArtifacts([dir]);
       expect(results).toHaveLength(1);
       expect(results[0]!.artifact.summary).toBe('Rebuilt.');
 
@@ -162,7 +162,7 @@ describe('loadSearchableArtifacts (sidecar index)', () => {
         INDEX_PATH(dir),
         JSON.stringify({ version: 0, entries: { 'abc123.md': { sig: 'x', artifact: {} } } })
       );
-      results = loadSearchableArtifacts([dir]);
+      results = loadIndexedArtifacts([dir]);
       expect(results).toHaveLength(1);
       expect(results[0]!.artifact.summary).toBe('Rebuilt.');
     } finally {

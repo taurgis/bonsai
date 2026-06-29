@@ -24,13 +24,13 @@ export default function register(harness) {
 
   expectCodeBothModes(
     'invalid enum flag value carries INVALID_FLAG_VALUE in both modes',
-    ['search', 'foo', '--artifact-type', 'bogus'],
+    ['list', '--artifact-type', 'bogus'],
     'INVALID_FLAG_VALUE'
   );
 
   expectCodeBothModes(
     'flag missing its value carries MISSING_FLAG_VALUE in both modes',
-    ['search', 'foo', '--domain'],
+    ['list', '--freshness'],
     'MISSING_FLAG_VALUE'
   );
 
@@ -38,13 +38,13 @@ export default function register(harness) {
   // ("expects one of these values: …") than a free-form flag; both must map to one code.
   expectCodeBothModes(
     'options flag missing its value carries MISSING_FLAG_VALUE in both modes',
-    ['search', 'foo', '--artifact-type'],
+    ['list', '--artifact-type'],
     'MISSING_FLAG_VALUE'
   );
 
   expectCodeBothModes(
     'unknown flag carries UNKNOWN_FLAG in both modes',
-    ['search', 'foo', '--bogus'],
+    ['list', '--bogus'],
     'UNKNOWN_FLAG'
   );
 
@@ -56,7 +56,7 @@ export default function register(harness) {
 
   expectCodeBothModes(
     'unexpected extra args carry UNEXPECTED_ARGUMENT in both modes',
-    ['search', 'foo', 'bar', 'baz'],
+    ['list', 'foo', 'bar', 'baz'],
     'UNEXPECTED_ARGUMENT'
   );
 }

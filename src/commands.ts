@@ -8,7 +8,6 @@ import ImportCommand from './commands/import.js';
 import InspectCommand from './commands/inspect.js';
 import ListCommand from './commands/list.js';
 import PruneCommand from './commands/prune.js';
-import SearchCommand from './commands/search.js';
 import StatusCommand from './commands/status.js';
 
 export const commands = {
@@ -17,7 +16,6 @@ export const commands = {
   inspect: InspectCommand,
   list: ListCommand,
   prune: PruneCommand,
-  search: SearchCommand,
   status: StatusCommand,
   config: ConfigIndex,
   'config:get': ConfigGet,

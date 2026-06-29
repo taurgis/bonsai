@@ -1,51 +1,41 @@
 ---
 name: web-research
-description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when searching/listing/pruning the local research cache, or when importing manually gathered notes.'
+description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when listing/pruning the local research cache, or when importing manually gathered notes.'
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '2.1.1'
+  version: '3.0.0'
 ---
 
 # Web Research Skill
 
 Use Bonsai as the cache-first research path for official documentation and web content. Prefer current official sources, keep research reusable, and avoid direct one-off web fetches when Bonsai can capture the same page.
 
+## Invocation
+
+Always run Bonsai through the published npm package:
+
+```bash
+npx @taurgis/bonsai <command> [flags]
+```
+
+Add `--json` when you need machine-readable output for agent callers.
+
 ## Required Pre-Step
 
 Before creating, updating, refactoring, scaffolding, or deleting technical content, verify relevant current official documentation in the same task.
 
-```bash
-# 1. Default search: Checks the local cache across EVERYTHING you've researched, 
-# including domains that do not support online search APIs.
-bonsai search "<topic or keywords>"
-
-# 2. Remote API search: Use this to quickly find URLs for documentation pages online
-# ONLY if you don't find any information in the local cache.
-bonsai search "<topic or keywords>" --domain <domain>
-# Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org, jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org, vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
-```
-
-If the cache misses or does not cover the question, fetch the source through Bonsai:
-
-```bash
-bonsai <official-url> --format detailed
-```
-
-Inside the Bonsai repository, use the development binary:
-
-```bash
-node bin/cli.mjs search "<topic or keywords>" --json
-node bin/cli.mjs <official-url> --format detailed --json
-```
-
-For one-shot published usage outside this repo, use the scoped package name:
+When you do not yet know the official URL, discover it with your native web/search tools first. Once you have a URL, capture it through Bonsai:
 
 ```bash
 npx @taurgis/bonsai <official-url> --format detailed
 ```
 
-Do not document or run bare `npx bonsai` unless an unscoped npm shim is actually published.
+For agent callers that need structured output:
+
+```bash
+npx @taurgis/bonsai <official-url> --format detailed --json
+```
 
 ## Source Rules
 
@@ -62,12 +52,10 @@ Use `--format compressed` for context-budgeted reading and `--format detailed` f
 Use `--rendered` when static extraction is incomplete or the page is an SPA:
 
 ```bash
-bonsai <official-url> --rendered --format detailed
+npx @taurgis/bonsai <official-url> --rendered --format detailed
 ```
 
 Never reach for direct `WebFetch` or `WebSearch` to retrieve a specific page when Bonsai can fetch it. Bonsai returns reusable Markdown and keeps it cached for future agents.
-
-Pure discovery searches are allowed when you do not yet know which URL to fetch. Once a URL is selected, capture it with Bonsai.
 
 ## Manual Fallbacks
 
@@ -76,19 +64,19 @@ If direct web access was unavoidable because of authentication, browser interact
 Single-source import:
 
 ```bash
-bonsai import <url> --file path/to/notes.md
+npx @taurgis/bonsai import <url> --file path/to/notes.md
 ```
 
 Stdin import:
 
 ```bash
-echo "# My Synthesis Note" | bonsai import <url> --stdin
+echo "# My Synthesis Note" | npx @taurgis/bonsai import <url> --stdin
 ```
 
 Multi-source synthesis:
 
 ```bash
-bonsai import \
+npx @taurgis/bonsai import \
   --topic "<descriptive topic>" \
   --source-url <url1> \
   --source-url <url2> \
@@ -100,27 +88,26 @@ bonsai import \
 Check status without fetching:
 
 ```bash
-bonsai status <url>
+npx @taurgis/bonsai status <url>
 ```
 
 Inspect stored metadata:
 
 ```bash
-bonsai inspect <url>
+npx @taurgis/bonsai inspect <url>
 ```
 
-List or search cached entries:
+List cached entries by metadata:
 
 ```bash
-bonsai list --tags node
-bonsai search "react suspense"
+npx @taurgis/bonsai list --tags node
 ```
 
 Preview pruning before deleting:
 
 ```bash
-bonsai prune --older-than 90d --dry-run
-bonsai prune --older-than 90d --yes
+npx @taurgis/bonsai prune --older-than 90d --dry-run
+npx @taurgis/bonsai prune --older-than 90d --yes
 ```
 
 ## When This Does Not Apply
@@ -128,4 +115,4 @@ bonsai prune --older-than 90d --yes
 - No technical content or web content is involved.
 - You already fetched and applied current official docs in the current task.
 - The request is a trivial typo or formatting fix that does not involve platform behavior.
-- Bonsai is not installed and `npx @taurgis/bonsai ...` is not available; use the best available official-source workflow and import notes later.
+- `npx @taurgis/bonsai` is unavailable in the environment; use the best available official-source workflow and import notes later.

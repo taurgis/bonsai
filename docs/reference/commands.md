@@ -23,7 +23,7 @@ npx @taurgis/bonsai <url> [flags]
 ### Command-Line Flags
 | Flag | Short | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `--topic` | `-t` | string | `null` | Main topic category for search index and metadata tagging. |
+| `--topic` | `-t` | string | `null` | Main topic category for metadata tagging. |
 | `--tags` | `-g` | string | `[]` | taxonomic tags (can be repeated). |
 | `--format` | `-f` | choice | `compressed` | Output density format: `compressed` or `detailed`. |
 | `--tier` | — | choice | `standard` | Freshness tier logic: `stable`, `standard`, or `volatile`. |
@@ -193,48 +193,10 @@ npx @taurgis/bonsai inspect <url>
 
 ---
 
-## 5. `search`
+## 5. `list`
 
-Rank local cache contents by keyword relevance. Every non-stopword term must
-match (AND). Quoted phrases must appear contiguously. See
-[Search](/how-to/search) for ranking details.
-
-### Usage
-```bash
-npx @taurgis/bonsai search "<query>" [flags]
-```
-
-### JSON Output envelope `data` block
-```json
-[
-  {
-    "cacheKey": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
-    "path": "/path/to/cache/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
-    "artifactType": "source",
-    "sourceUrls": ["https://example.com"],
-    "topic": "example",
-    "tags": ["test"],
-    "freshness": "fresh",
-    "captureMethod": "static_fetch",
-    "tokenEstimate": { "compressed": 29, "detailed": 65 },
-    "snippet": "...example domain is for use in documentation...",
-    "matchedTerms": [
-      { "term": "example", "field": "topic", "kind": "exact" }
-    ],
-    "siteModuleId": null,
-    "score": 145
-  }
-]
-```
-
----
-
-## 6. `list`
-
-Browse the cache by metadata, without printing page content. Where `search`
-ranks entries against a query, `list` filters the whole cache and sorts the
-matches newest-first, so it answers "what do I have?" rather than "what matches
-this?".
+Browse the cache by metadata, without printing page content. `list` filters the
+whole cache and sorts the matches newest-first, so it answers "what do I have?"
 
 ### Usage
 ```bash
@@ -246,8 +208,7 @@ it returns the most recent entries across all read roots.
 
 `list` reports page-level artifacts (`source` and `research_note`). The
 `section` sub-chunks a page is split into are omitted so a single fetch does not
-flood the listing — find them with `search` (which ranks sections) or `inspect`
-(which lists a page's sections).
+flood the listing — find them with `inspect` (which lists a page's sections).
 
 ### Command-Line Flags
 | Flag | Short | Type | Default | Description |
@@ -285,7 +246,7 @@ first, then truncated to `--limit`.
 
 ---
 
-## 7. `prune`
+## 6. `prune`
 
 Delete cached entries by age, inactivity, or type to reclaim disk space. Pruning
 spans **every read root** (project and global), so a key present in both is
@@ -336,7 +297,7 @@ would delete. On a real run, `prunedCount` is the number actually removed.
 
 ---
 
-## 8. `config`
+## 7. `config`
 
 Manage where the research cache is stored. Configuration is layered, resolved in
 precedence order: per-command `--storage` flag > `BONSAI_STORAGE` env var >

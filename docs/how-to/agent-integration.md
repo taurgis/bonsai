@@ -62,22 +62,18 @@ text:
 
 ## A cache-first workflow
 
-Agents get the most value by checking the cache before reaching for the network:
+Agents get the most value by fetching through Bonsai once they know the official URL:
 
-1. **Search** existing research first; it is the cheapest path:
-   ```bash
-   bonsai search "node url api" --json
-   ```
-2. **Plan** with `status` to see what a fetch *would* do, without doing it:
+1. **Plan** with `status` to see what a fetch *would* do, without doing it:
    ```bash
    bonsai status https://nodejs.org/api/url.html --json
    ```
-3. **Fetch** only when needed; use `--dry-run` to validate extraction before
+2. **Fetch** only when needed; use `--dry-run` to validate extraction before
    committing it to the cache:
    ```bash
    bonsai https://nodejs.org/api/url.html --dry-run --json
    ```
-4. **Synthesize** multi-source notes back into the cache with
+3. **Synthesize** multi-source notes back into the cache with
    [`import`](/how-to/importing-synthesis) and repeated `--source-url` flags so
    the synthesis stays source-cited:
    ```bash

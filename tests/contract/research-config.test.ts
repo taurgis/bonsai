@@ -123,7 +123,7 @@ describe('storage routing end to end', () => {
     expect(r.stderr).not.toContain('ghp_');
   });
 
-  it('search falls back to the global cache for project storage', () => {
+  it('list falls back to the global cache for project storage', () => {
     setProject();
     const file = noteFile('g.md', '# Global\nContent stored globally.\n');
     runContract(
@@ -139,7 +139,7 @@ describe('storage routing end to end', () => {
       ],
       { cwd, env: env() }
     );
-    const r = runContract(['search', 'globaltopic', '--json'], {
+    const r = runContract(['list', '--topic', 'globaltopic', '--json'], {
       cwd,
       env: env(),
       raw: true,

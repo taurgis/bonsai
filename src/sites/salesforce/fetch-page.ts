@@ -1,6 +1,6 @@
 import type { SiteFetchResult } from '../types.js';
 import { fetchSalesforceDoc } from '../salesforce-doc-fetch.js';
-import { normalizeHelpDocContentUrl } from './coveo.js';
+import { normalizeHelpDocContentUrl } from '../coveo.js';
 
 // Containers a Help article renders into (inside shadow DOM); the shared fetcher pierces
 // shadow roots to find them, falling back to the page body when none match.

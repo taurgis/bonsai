@@ -6,9 +6,9 @@ import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 /**
  * The nearest visible command to a typo, plus how many leading segments of the attempted id name
  * the command. With `topicSeparator: ' '`, oclif folds every leading token of an unknown command
- * into one colon-delimited id, so `bonsai serch hello` arrives as `serch:hello`. Matching that whole
+ * into one colon-delimited id, so `bonsai lisst extra` arrives as `lisst:extra`. Matching that whole
  * string never finds a short command, so walk prefixes longest→shortest and suggest off the closest:
- * `serch:hello` resolves to nothing, but its prefix `serch` resolves to `search`. The matched prefix
+ * `lisst:extra` resolves to nothing, but its prefix `lisst` resolves to `list`. The matched prefix
  * length doubles as the command-segment count, so a folded-in positional arg is dropped from display.
  */
 function findSuggestion(

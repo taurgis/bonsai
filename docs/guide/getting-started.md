@@ -2,7 +2,7 @@
 
 This is a first run from an empty cache. By the end you will have fetched a page,
 served it again from the local cache with no network call, inspected what got
-stored, and searched for it by keyword. Five commands, a few minutes, no
+stored, and listed what got cached. Five commands, a few minutes, no
 configuration.
 
 We use the Node.js URL docs throughout because they are public, stable, and
@@ -125,25 +125,16 @@ echo "# Synthesized React data-fetching guide" | npx @taurgis/bonsai import --st
 See [Import synthesized research](/how-to/importing-synthesis) for the difference
 between the two shapes.
 
-## 5. Search before you fetch again
+## 5. List what you have cached
 
-Searching the cache is the cheapest way to reuse prior research:
+Listing is the quickest way to see prior research without reading full content:
 
 ```bash
-npx @taurgis/bonsai search "node url api"
-```
-
-```
-Found 2 matching cached research entries:
-
-1. [No Topic] Score: 137
-   Cache Key: 7f3a…c9e1
-   Snippet: The `node:url` module provides utilities for URL resolution...
-   Source URLs: https://nodejs.org/api/url.html
+npx @taurgis/bonsai list --url "https://nodejs.org/*"
 ```
 
 You now have the full loop: fetch once, reuse for free, import your own notes,
-and find any of it again by keyword.
+and browse cached entries by metadata.
 
 ## What's next
 

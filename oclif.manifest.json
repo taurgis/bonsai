@@ -497,107 +497,6 @@
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
-    "search": {
-      "aliases": [],
-      "args": {
-        "query": {
-          "description": "the search query containing terms to match",
-          "name": "query",
-          "required": true
-        }
-      },
-      "description": "Scans the local research cache database and ranks matching entries based on topic, tags, source URLs, summary, and content.",
-      "examples": [
-        {
-          "description": "search for cached notes containing specific keywords",
-          "command": "<%= config.bin %> <%= command.id %> \"authentication flow\""
-        },
-        {
-          "description": "search with remote docs fallback",
-          "command": "<%= config.bin %> <%= command.id %> \"router\" --remote https://react.dev"
-        },
-        {
-          "description": "search local cache with tag filtering",
-          "command": "<%= config.bin %> <%= command.id %> \"setup\" --tags node --tags tutorial"
-        }
-      ],
-      "flags": {
-        "json": {
-          "description": "Format output as json.",
-          "helpGroup": "GLOBAL",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "topic": {
-          "char": "t",
-          "description": "filter results by exact topic (case-insensitive)",
-          "name": "topic",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "tags": {
-          "char": "g",
-          "description": "filter results by tags (must match all tags specified)",
-          "name": "tags",
-          "hasDynamicHelp": false,
-          "multiple": true,
-          "type": "option"
-        },
-        "artifact-type": {
-          "description": "filter results by artifact type",
-          "name": "artifact-type",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "source",
-            "research_note",
-            "index",
-            "section"
-          ],
-          "type": "option"
-        },
-        "limit": {
-          "description": "maximum number of results to return (default 10, max 50)",
-          "name": "limit",
-          "default": 10,
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "include-stale": {
-          "description": "include stale expired cache entries in the search results",
-          "name": "include-stale",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "domain": {
-          "description": "search a documentation site directly (requires compatible site module)",
-          "name": "domain",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "remote": {
-          "description": "discover uncached docs via public search or index (falls back to local cache)",
-          "name": "remote",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "search",
-      "pluginAlias": "@taurgis/bonsai",
-      "pluginName": "@taurgis/bonsai",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Search locally cached research artifacts by keywords.",
-      "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
-    },
     "status": {
       "aliases": [],
       "args": {
@@ -944,5 +843,5 @@
       "stdoutIsPrimaryData": true
     }
   },
-  "version": "1.0.6"
+  "version": "2.0.0"
 }

@@ -39,7 +39,7 @@ still fresh. Repeated research becomes a near-instant, deterministic lookup.
 | **Freshness tiers** | Supports `stable`, `standard`, `volatile`, custom TTLs, and stale revalidation | Handling standards differently from release notes or beta docs |
 | **Browser fallback** | Uses `--rendered` for pages that need client-side JavaScript | Capturing SPA documentation when static HTML is incomplete |
 | **[Manual import](/how-to/importing-synthesis)** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
-| **[Search](/how-to/search)** | Ranks local cache entries by topic, tags, snippets, fuzzy terms, and phrases | Finding existing research before fetching again |
+| **[List](/reference/commands#list)** | Filters cached entries by topic, tags, freshness, and metadata | Seeing what is already cached without reading full content |
 
 ## Safe by default
 
@@ -56,6 +56,5 @@ still fresh. Repeated research becomes a near-instant, deterministic lookup.
 - [Getting Started](/guide/getting-started): install and fetch your first page.
 - [Caching & Freshness](/concepts/caching-and-freshness): how reuse and tiers work.
 - [Compression & Token Budgeting](/concepts/compression): `compressed` vs `detailed`.
-- [Search](/how-to/search): rank the cache, then reach past it when nothing matches.
 - [Importing Synthesis](/how-to/importing-synthesis): cache an agent's own research.
 - [Agent Integration](/how-to/agent-integration): the JSON envelope and exit codes.

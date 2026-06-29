@@ -2,8 +2,7 @@
 
 Most pages go through one generic pipeline: fetch the HTML, extract the main
 article, convert it to Markdown, and cache it. Some documentation sites don't
-cooperate. They render content client-side, hide it in shadow DOM, or expose a
-search API that the local cache can't reach.
+cooperate. They render content client-side or hide it in shadow DOM.
 
 **Site modules** are Bonsai's answer. A site module is a small, per-domain
 plug-in that overrides just the parts of the pipeline a particular site needs
@@ -59,21 +58,18 @@ export interface SiteModule {
   // Per-site fetch overrides. Only `rendered` is honored today; it ORs with the
   // user's --rendered flag, so a missing/false value is a safe default.
   defaults?: { rendered?: boolean };
-  // Optional site-specific capabilities. When absent, callers fall back to the
-  // generic fetch/extract pipeline (fetchPage) or local cache search (search).
+  // Optional site-specific fetch. When absent, callers use the generic fetch/extract pipeline.
   fetchPage?: (url: string) => Promise<SiteFetchResult>;
-  search?: (query: string) => Promise<SiteSearchResult[]>;
 }
 ```
 
 | Item | Type | Required | What it does |
 | --- | --- | :---: | --- |
 | `id` | `string` | ✅ | Stable identifier (e.g. `salesforce`). Stored on every artifact this module produces as `site_module_id`, and used to re-find the module on revalidation. Must be unique. |
-| `name` | `string` | ✅ | Human-readable label (e.g. `Salesforce Help`). Shown in search output. |
+| `name` | `string` | ✅ | Human-readable label (e.g. `Salesforce Help`). |
 | `domains` | `string[]` | ✅ | The exact hostnames this module owns. A module can claim several (e.g. a site plus its legacy domain). |
 | `defaults.rendered` | `boolean` | — | Force browser rendering for this site. **ORs** with the user's `--rendered` flag, so `true` means "always render," and absent means "respect the flag." It is the only `defaults` key honored today. |
 | `fetchPage` | `(url) => Promise<SiteFetchResult>` | — | Replaces the generic fetch **and** extraction for this site. See [Custom fetching](#capability-custom-fetching). |
-| `search` | `(query) => Promise<SiteSearchResult[]>` | — | Search the site's own backend instead of the local cache, via `bonsai search --domain <host>`. See [Custom search](#capability-custom-search). |
 
 ### Capability: custom fetching
 
@@ -103,34 +99,10 @@ metadata, and caching. A module only has to solve the part that's actually hard
 for its site, which is usually getting clean article HTML out of a
 JavaScript-rendered page.
 
-### Capability: custom search
-
-When a module defines `search`, the host becomes searchable directly:
-
-```bash
-bonsai search "single sign-on" --domain help.salesforce.com
-```
-
-Instead of scanning the local cache, this calls the module's `search(query)`
-and returns live results from the site's own backend. Each result is a small,
-predictable object:
-
-```ts
-// src/sites/types.ts
-export interface SiteSearchResult {
-  url: string;
-  title: string;
-  snippet?: string;
-}
-```
-
-If a module has no `search`, `--domain <host>` for it exits with an error
-rather than silently doing a cache scan.
-
 ## Where each hook runs in the pipeline
 
-Site modules hook into three flows. In all three a module is optional; the
-generic path runs when no module matches.
+Site modules hook into two flows. In both a module is optional; the generic path
+runs when no module matches.
 
 **1. Fetch (cache miss).** Detection happens first, then the module's overrides
 apply:
@@ -176,18 +148,6 @@ The generic path can revalidate cheaply with `ETag`/`If-Modified-Since`. A
 conditional shortcut for client-rendered content.
 :::
 
-**3. Search (`--domain`).** The domain is resolved to a module, which must
-implement `search`:
-
-```ts
-// src/commands/search.ts (executeSiteSearch)
-const siteModule = detectSite(`https://${domain}`);
-if (!siteModule) this.error(`No site module registered for domain: ${domain}`);
-if (!siteModule.search) this.error(`Site module '${siteModule.id}' does not implement search.`);
-const results = await siteModule.search(query);
-return results.map((r) => ({ ...r, site_module_id: siteModule.id }));
-```
-
 ## The `site_module_id` field
 
 Every artifact records which module produced it, in its frontmatter:
@@ -210,14 +170,9 @@ site_module_id: string | null;
 
 | `id` | Domains | Custom behavior |
 | --- | --- | --- |
-| Algolia Sites | `react.dev`, `legacy.reactjs.org`, `vuejs.org`, `tailwindcss.com`, `jestjs.io`, `cypress.io`, `vitest.dev`, `vitepress.dev` | `search`. Standard Algolia search implementations. |
-| Auto-discovery Sites | `angular.dev`, `redux.js.org`, `vitejs.dev`, `fastify.dev`, `rollupjs.org`, `vueuse.org` | `search`. Automatically proxy the remote search connectors for these standard domains. |
-| `nextjs` | `nextjs.org` | `search`. Uses a custom JSON POST fetcher to hit Next.js's native app router search API. |
-| `salesforce` | `help.salesforce.com` | `fetchPage` + `search`, `rendered: true`. |
-| `salesforce-developer` | `developer.salesforce.com` | `fetchPage`, `rendered: true`. No search. |
+| `salesforce` | `help.salesforce.com` | `fetchPage`, `rendered: true`. |
+| `salesforce-developer` | `developer.salesforce.com` | `fetchPage`, `rendered: true`. |
 | `tanstack` | `tanstack.com` | None. Relies on the generic source-resolution path that prefers a page's GitHub Markdown source (keeping fenced code intact), so it deliberately does **not** force `rendered`. |
-
-Only the Salesforce and Next.js modules carry heavy site-specific code. The Algolia and Auto-discovery sites leverage shared search factories, and `tanstack` is listed so its domain is recognized but it rides the generic pipeline.
 
 ## The Salesforce modules in detail
 
@@ -238,7 +193,6 @@ export const salesforce: SiteModule = {
   domains: ['help.salesforce.com'],
   defaults: { rendered: true },
   fetchPage: fetchSalesforcePage,
-  search: searchSalesforce,
 };
 ```
 
@@ -247,11 +201,6 @@ export const salesforce: SiteModule = {
   chrome (the article-feedback widget, in-page table of contents, breadcrumbs,
   screen-reader-only text), and normalizes Coveo's internal
   `/help_doccontent?id=…` links to the canonical `/s/articleView?id=…` page.
-- **`search`** queries Salesforce's **Coveo** search backend. It uses a cached
-  Coveo token for a fast direct API call and falls back to a headless browser
-  (which also re-captures a fresh token) when the token is missing or stale.
-  Results are validated against an allow-list of Salesforce documentation hosts
-  before being returned.
 
 Example URLs it owns:
 
@@ -277,8 +226,6 @@ export const salesforceDeveloper: SiteModule = {
   components (`doc-content-layout`, `doc-amf-reference`, …). Its capture step
   also expands collapsed sections, inlines `<dx-code-block>` code samples, and
   folds API-reference field stacks into compact Markdown tables.
-- **No `search`.** Developer docs use a different backend than Help's Coveo
-  hub, so site search isn't wired up for this domain yet.
 
 Example URLs it owns:
 
@@ -304,7 +251,6 @@ from the default pipeline.
      // Only add what differs from the generic pipeline:
      // defaults: { rendered: true },
      // fetchPage: fetchAcmePage,
-     // search: searchAcme,
    };
    ```
 
@@ -313,25 +259,24 @@ from the default pipeline.
 
 3. **Add a sibling test** (`index.test.ts`, `fetch-page.test.ts`, …). The
    existing Salesforce tests in `src/sites/` are good templates; they cover
-   hostname matching, URL normalization, and the fetch/search hooks.
+   hostname matching, URL normalization, and the fetch hooks.
 
 4. **Decide which hooks you actually need.** If the generic pipeline already
    extracts the site well, you may need no hooks at all, just `id`, `name`,
-   and `domains` to claim the domain (as `react` does).
+   and `domains` to claim the domain.
 
 ::: tip Reach for a module only when the generic path falls short
-A site module is the right tool when a domain renders client-side, hides
-content in shadow DOM, or has a search API worth exposing. If a plain fetch
-already produces clean Markdown, no module is needed, and none is the simplest
-thing that works.
+A site module is the right tool when a domain renders client-side or hides
+content in shadow DOM. If a plain fetch already produces clean Markdown, no
+module is needed, and none is the simplest thing that works.
 :::
 
 ## What's Salesforce-specific vs. general
 
 - **General / reusable:** the `SiteModule` interface, hostname detection, the
-  `site_module_id` metadata round-trip, revalidation-by-module, and the
-  `--domain` search wiring. None of it assumes Salesforce.
+  `site_module_id` metadata round-trip, and revalidation-by-module. None of
+  it assumes Salesforce.
 - **Salesforce-specific:** the implementations under `src/sites/salesforce/`
-  and `src/sites/salesforce-developer/`, namely the shadow-DOM extraction, Coveo
-  search, token caching, and URL normalization. Those live entirely inside
-  their modules and don't leak into the shared pipeline.
+  and `src/sites/salesforce-developer/`, namely the shadow-DOM extraction and URL
+  normalization. Those live entirely inside their modules and don't leak into
+  the shared pipeline.

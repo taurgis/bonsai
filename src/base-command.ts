@@ -47,7 +47,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
 
   /**
    * Always surface warnings on stderr, even under `--json`. oclif silences `warn()` in JSON mode,
-   * but our warnings (secret-redirect, stale-serve, remote-search fallback, prune failures) are
+   * but our warnings (secret-redirect, stale-serve, prune failures) are
    * security- and freshness-relevant side effects users must see. stderr never pollutes the stdout
    * JSON envelope, so machine output stays clean.
    */

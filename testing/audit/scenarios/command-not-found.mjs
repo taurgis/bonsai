@@ -2,12 +2,12 @@
 export default function register(harness) {
   const { check, run, expect, parseJson } = harness;
 
-  check('unknown command serch suggests search', () => {
-    const r = run(['--json', 'serch', 'q']);
+  check('unknown command lisst suggests list', () => {
+    const r = run(['--json', 'lisst']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
     expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
-    expect(env?.stderr?.includes('Did you mean search?'), 'suggestion');
+    expect(env?.stderr?.includes('Did you mean list?'), 'suggestion');
     expect(env?.stderr?.includes('Code: COMMAND_NOT_FOUND'), 'code in stderr');
   });
 

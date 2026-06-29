@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { colors, highlightQuery } from './color.js';
+import { colors } from './color.js';
 
 describe('color helpers', () => {
   const originalEnv = { ...process.env };
@@ -144,21 +144,5 @@ describe('color helpers', () => {
     process.env.FORCE_COLOR = '1';
 
     expect(colors.bold('text')).toBe('\x1b[1mtext\x1b[0m');
-  });
-
-  it('highlights query terms within a text snippet', () => {
-    setStdoutTty(true);
-
-    const text = 'This is about React Suspense and components.';
-    const query = ['react', 'suspense'];
-    const highlighted = highlightQuery(text, query);
-
-    expect(highlighted).toContain('\x1b[1m\x1b[33mReact\x1b[0m');
-    expect(highlighted).toContain('\x1b[1m\x1b[33mSuspense\x1b[0m');
-  });
-
-  it('returns unchanged text if text is empty or no query terms are provided', () => {
-    expect(highlightQuery('', ['term'])).toBe('');
-    expect(highlightQuery('some text', [])).toBe('some text');
   });
 });

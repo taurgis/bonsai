@@ -1,8 +1,8 @@
 # Install the agent kit
 
 Bonsai ships a small kit that teaches an AI coding agent to research the
-cache-first way: search what's already captured, fetch through Bonsai when the
-cache misses, and import anything it had to read by hand. The core kit is three
+cache-first way: fetch through Bonsai when you have an official URL, and import
+anything it had to read by hand. The core kit is three
 files — a skill, an instruction, and a subagent — plus an optional Salesforce
 variant, and you install it into your own agent's config.
 
@@ -18,8 +18,7 @@ If you are new to agent config, use this order:
 1. Install Bonsai and make sure `bonsai --help` works.
 2. Install the agent kit with `forward-nexus`.
 3. Add a hook example only if you want to block the agent's built-in web fetch.
-4. Ask the agent to research one doc page and watch for a `bonsai search` or
-   `bonsai <url> --format detailed` command.
+4. Ask the agent to research one doc page and watch for a `bonsai <url> --format detailed` command.
 
 You do not need to understand every generated file before you start. The skill
 teaches the agent what to do, the instruction tells it when to do it, and the
@@ -30,7 +29,7 @@ output.
 
 | Piece             | File                       | What it does                                                                                                                                                               |
 | ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Skill**         | `web-research`             | The actual workflow: search the cache, fetch with `--format detailed`, use `--rendered` for SPAs, import manual notes. The agent runs this whenever it needs docs.         |
+| **Skill**         | `web-research`             | The actual workflow: discover official URLs, fetch with `--format detailed`, use `--rendered` for SPAs, import manual notes. The agent runs this whenever it needs docs.         |
 | **Instruction**   | `web-research`             | The always-on rule that _requires_ the agent to verify current official docs before technical changes, and says when to run the skill inline vs. delegate to the subagent. |
 | **Subagent**      | `official-docs-researcher` | A focused researcher the main agent delegates to for large or multi-source research, so verbose fetching stays out of the main context. It returns source-cited findings.  |
 | **Hook examples** | `hooks/`                   | Optional native hook configs that block one-off URL fetch tools and tell the agent to run Bonsai instead.                                                                  |
@@ -42,9 +41,8 @@ isolates the heavy research. You can install all three or just the skill.
 
 The kit also ships a Salesforce specialization of the instruction and subagent,
 for teams whose research targets Salesforce docs. They reuse the same
-`web-research` skill but add Bonsai's [Salesforce site modules](/reference/site-modules):
-searching Help live with `--domain help.salesforce.com`, and letting the modules
-render and extract the JavaScript-only Help and Developer pages.
+`web-research` skill but add Bonsai's [Salesforce site modules](/reference/site-modules)
+for rendered fetch and extraction of the JavaScript-only Help and Developer pages.
 
 | Piece           | File                         | What it does                                                                                                          |
 | --------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -178,20 +176,19 @@ because no official project hook surface is currently documented for replacing
 After installing the kit, you can give the agent a simple instruction like this:
 
 ```text
-Before changing code that depends on external docs, search Bonsai first. If the
-page is not cached, fetch it with `bonsai <url> --format detailed`. Use
-`--rendered` only when a normal fetch misses client-rendered content. Cite the
+Before changing code that depends on external docs, fetch the official page through
+Bonsai when you have the URL. Use `--format detailed` for exact technical content.
+Use `--rendered` only when a normal fetch misses client-rendered content. Cite the
 sources you used.
 ```
 
 That is enough for most junior-friendly workflows. The agent should follow this
 loop:
 
-1. Search: `bonsai search "<topic>" --json`
-2. Check a known URL: `bonsai status <url> --json`
-3. Fetch only on a miss: `bonsai <url> --format detailed --json`
-4. Use `--rendered` for JavaScript-heavy docs pages.
-5. Import manual notes when Bonsai cannot fetch a page:
+1. Check a known URL: `bonsai status <url> --json`
+2. Fetch on a miss: `bonsai <url> --format detailed --json`
+3. Use `--rendered` for JavaScript-heavy docs pages.
+4. Import manual notes when Bonsai cannot fetch a page:
    `bonsai import <url> --file notes.md --json`
 
 The agent does not need to browse first and cache later. Bonsai should be the
@@ -276,8 +273,8 @@ but treat it as a convention, not an official Cursor feature.
 ## Verify it works
 
 After installing, the agent should reach for Bonsai before fetching. A quick
-check: ask it to research a doc page and confirm it runs a `bonsai search` first,
-then a `bonsai <url> --format detailed` on a miss. If you installed the subagent,
+check: ask it to research a doc page and confirm it runs `bonsai <url> --format detailed`.
+If you installed the subagent,
 ask for a multi-source comparison and confirm it delegates to
 `official-docs-researcher` rather than fetching inline.
 

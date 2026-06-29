@@ -115,9 +115,6 @@ Agents working in this codebase or utilizing Bonsai must run the compiled CLI co
 * **Import Synthesized Notes**: `node bin/cli.mjs import <url> --file <path> [--json]`
 * **Status Checklist**: `node bin/cli.mjs status <url> [--json]`
 * **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
-* **Search Cache (Local)**: `node bin/cli.mjs search "<query>" [--json]` — Default search checks the **local cache** across everything you've researched, even for domains that don't support online search.
-* **Remote Docs Search (API)**: `node bin/cli.mjs search "<query>" --domain <domain> [--json]` — Quickly hits a supported documentation site's native search API to find official URLs if you couldn't find the information in the local cache. Supported domains include `help.salesforce.com`, `react.dev`, `vuejs.org`, `nextjs.org`, `tailwindcss.com`, `jestjs.io`, `cypress.io`, `vitest.dev`, `vitepress.dev`, `angular.dev`, `redux.js.org`, `vitejs.dev`, `fastify.dev`, `rollupjs.org`, `vueuse.org`.
-* **Remote Docs Search (Discovery/Fallback)**: `node bin/cli.mjs search "<query>" --remote <docs-url> [--json]` — Discovers uncached pages via a site's public search or index (Algolia DocSearch, MkDocs/Sphinx/Just-the-Docs indexes, llms.txt, sitemap.xml); selected URLs are then captured through `<url>`. Degrades to local cache search when no connector applies.
 * **List Database**: `node bin/cli.mjs list [filters] [--json]`
 * **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
 
@@ -132,17 +129,13 @@ Use `--rendered` when the target page is a Single Page Application (SPA) or reli
 - The same DNS safety, URL validation, body size limits, and timeout constraints apply.
 - The resulting `capture_method` metadata is set to `browser_fallback`.
 
-### Advanced Full-Text Search
-
-`search` uses AND semantics (every term must match), quoted-phrase support, token-aware matching (exact/prefix/fuzzy), BM25-lite body ranking with metadata field boosts, and returns `matchedTerms` in JSON results for agent transparency.
-
 ### Manual CLI audit (`pnpm audit:cli`) — keep it up to date
 
 `testing/manual-audit.mjs` is the entry point for a living, end-to-end inventory of the CLI's
 happy and unhappy flows. It runs the **built** `bin/cli.mjs` (building once if `dist/` is missing)
 in an isolated cwd + XDG sandbox per invocation and asserts exit codes, stdout/stderr routing,
 JSON envelopes, and on-disk cache side effects. Run it with `pnpm audit:cli`. Opt into extra
-network-heavy scenarios (remote docs search, `--rendered` fetch) with
+network-heavy scenarios (live `--rendered` fetch) with
 `AUDIT_NETWORK=1 pnpm audit:cli`.
 
 It is split for manageability and must stay that way as the CLI grows:

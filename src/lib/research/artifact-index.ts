@@ -6,9 +6,9 @@ import { isResearchFile } from './url.js';
 import type { ResearchArtifact } from './schema.js';
 
 // Sidecar index that caches the lightweight (metadata + summary + compressed) view of each artifact
-// so repeat searches avoid re-reading and re-parsing every file. It is a derived cache only: a stale
-// or missing index never changes results, because each entry is validated against the file's current
-// signature and re-read on any mismatch.
+// so repeat list/scan operations avoid re-reading and re-parsing every file. It is a derived cache
+// only: a stale or missing index never changes results, because each entry is validated against the
+// file's current signature and re-read on any mismatch.
 
 const INDEX_FILE = '.search-index.json';
 const INDEX_VERSION = 1;
@@ -26,7 +26,7 @@ interface IndexFile {
   entries: Record<string, IndexEntry>;
 }
 
-export interface SearchableArtifact {
+export interface IndexedArtifact {
   artifact: ResearchArtifact;
   filePath: string;
 }
@@ -76,18 +76,18 @@ function getOrUpdateIndexEntry(
 }
 
 /**
- * Returns the searchable view of every active artifact in one research dir, using the sidecar index
+ * Returns the indexed view of every active artifact in one research dir, using the sidecar index
  * to skip unchanged files. Re-reads only files whose signature changed, then persists the refreshed
- * index (best-effort; a write failure never breaks search). Corrupt/unreadable files are skipped —
+ * index (best-effort; a write failure never breaks callers). Corrupt/unreadable files are skipped —
  * the real read paths in storage.ts handle archiving them.
  */
-export function loadSearchableArtifactsForDir(researchDir: string): SearchableArtifact[] {
+export function loadIndexedArtifactsForDir(researchDir: string): IndexedArtifact[] {
   if (!existsSync(researchDir)) return [];
 
   const indexPath = join(researchDir, INDEX_FILE);
   const previous = loadIndex(indexPath);
   const entries: Record<string, IndexEntry> = {};
-  const results: SearchableArtifact[] = [];
+  const results: IndexedArtifact[] = [];
   let changed = false;
 
   for (const file of readdirSync(researchDir)) {
@@ -114,7 +114,7 @@ export function loadSearchableArtifactsForDir(researchDir: string): SearchableAr
     try {
       atomicWriteFile(indexPath, JSON.stringify({ version: INDEX_VERSION, entries }));
     } catch {
-      // Best-effort cache write; search results are already computed without it.
+      // Best-effort cache write; results are already computed without it.
     }
   }
 
@@ -126,11 +126,11 @@ export function loadSearchableArtifactsForDir(researchDir: string): SearchableAr
  * key so a project entry shadows the same key in the global cache. Mirrors the dedup semantics of
  * {@link scanCacheDirs} but reads through the per-root sidecar index.
  */
-export function loadSearchableArtifacts(dataDirs: string[]): SearchableArtifact[] {
+export function loadIndexedArtifacts(dataDirs: string[]): IndexedArtifact[] {
   const seen = new Set<string>();
-  const all: SearchableArtifact[] = [];
+  const all: IndexedArtifact[] = [];
   for (const dataDir of dataDirs) {
-    for (const located of loadSearchableArtifactsForDir(join(dataDir, 'research'))) {
+    for (const located of loadIndexedArtifactsForDir(join(dataDir, 'research'))) {
       const key = located.artifact.metadata.cache_key;
       if (seen.has(key)) continue;
       seen.add(key);

@@ -1,10 +1,10 @@
 ---
 name: web-research
-description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when searching/listing/pruning the local research cache, or when importing manually gathered notes.'
+description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when listing/pruning the local research cache, or when importing manually gathered notes.'
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '2.2.0'
+  version: '3.0.0'
 ---
 
 # Web Research Skill
@@ -25,18 +25,7 @@ Add `--json` when you need machine-readable output for agent callers.
 
 Before creating, updating, refactoring, scaffolding, or deleting technical content, verify relevant current official documentation in the same task.
 
-```bash
-# 1. Default search: Checks the local cache across EVERYTHING you've researched,
-# including domains that do not support online search APIs.
-npx @taurgis/bonsai search "<topic or keywords>"
-
-# 2. Remote API search: Use this to quickly find URLs for documentation pages online
-# ONLY if you don't find any information in the local cache.
-npx @taurgis/bonsai search "<topic or keywords>" --domain <domain>
-# Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org, jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org, vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
-```
-
-If the cache misses or does not cover the question, fetch the source through Bonsai:
+When you do not yet know the official URL, discover it with your native web/search tools first. Once you have a URL, capture it through Bonsai:
 
 ```bash
 npx @taurgis/bonsai <official-url> --format detailed
@@ -45,7 +34,6 @@ npx @taurgis/bonsai <official-url> --format detailed
 For agent callers that need structured output:
 
 ```bash
-npx @taurgis/bonsai search "<topic or keywords>" --json
 npx @taurgis/bonsai <official-url> --format detailed --json
 ```
 
@@ -68,8 +56,6 @@ npx @taurgis/bonsai <official-url> --rendered --format detailed
 ```
 
 Never reach for direct `WebFetch` or `WebSearch` to retrieve a specific page when Bonsai can fetch it. Bonsai returns reusable Markdown and keeps it cached for future agents.
-
-Pure discovery searches are allowed when you do not yet know which URL to fetch. Once a URL is selected, capture it with Bonsai.
 
 ## Manual Fallbacks
 
@@ -111,11 +97,10 @@ Inspect stored metadata:
 npx @taurgis/bonsai inspect <url>
 ```
 
-List or search cached entries:
+List cached entries by metadata:
 
 ```bash
 npx @taurgis/bonsai list --tags node
-npx @taurgis/bonsai search "react suspense"
 ```
 
 Preview pruning before deleting:

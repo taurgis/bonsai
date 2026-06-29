@@ -5,7 +5,7 @@ model: 'Auto'
 tools: ['vscode/askQuestions', 'execute', 'read', 'search', 'web', 'vscode/memory']
 argument-hint: 'What Salesforce topic should I research in official docs?'
 metadata:
-  version: '1.1.0'
+  version: '2.0.0'
 ---
 
 # Salesforce Docs Researcher Agent
@@ -25,40 +25,24 @@ Run Bonsai as `npx @taurgis/bonsai ...`. Add `--json` when you need structured o
 ## Default Workflow
 
 1. Identify the product, version, edition, and source authority needed for the request.
-2. Search the Bonsai cache first:
-
-   ```bash
-   # 1. Default search: Checks the local cache across EVERYTHING you've researched,
-   # including domains that do not support online search APIs.
-   npx @taurgis/bonsai search "<topic or keywords>"
-
-   # 2. Remote API search: Use this to quickly find URLs for documentation pages online
-   # ONLY if you don't find any information in the local cache.
-   npx @taurgis/bonsai search "<topic or keywords>" --domain <domain>
-   # Supported domains: help.salesforce.com, react.dev, vuejs.org, tailwindcss.com, nextjs.org,
-   # jestjs.io, cypress.io, vitest.dev, vitepress.dev, angular.dev, redux.js.org,
-   # vitejs.dev, fastify.dev, rollupjs.org, vueuse.org
-   ```
-
-3. If the cache misses or does not cover the question, locate official source URLs. Prefer vendor docs, standards bodies, API references, and official release notes.
-4. Capture each source through Bonsai:
+2. Locate official Salesforce source URLs. Use your native web/search tools when you do not yet know the URL.
+3. Capture each source through Bonsai:
 
    ```bash
    npx @taurgis/bonsai <official-url> --format detailed
    ```
 
-5. Use `--rendered` for SPAs or pages where static extraction is incomplete:
+4. Use `--rendered` for SPAs or pages where static extraction is incomplete:
 
    ```bash
    npx @taurgis/bonsai <official-url> --rendered --format detailed
    ```
 
-6. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
+5. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
 
 For structured output:
 
 ```bash
-npx @taurgis/bonsai search "<topic or keywords>" --json
 npx @taurgis/bonsai <official-url> --format detailed --json
 ```
 
@@ -68,16 +52,9 @@ Salesforce Help and Developer docs are Lightning Web Runtime (LWR) pages: the ar
 
 | Host | Module | Capabilities |
 | --- | --- | --- |
-| `help.salesforce.com` | `salesforce` (Salesforce Help) | Rendered fetch and live `--domain` search (Coveo backend) |
-| `developer.salesforce.com` | `salesforce-developer` (Salesforce Developer) | Rendered fetch only — no search |
+| `help.salesforce.com` | `salesforce` (Salesforce Help) | Rendered fetch |
+| `developer.salesforce.com` | `salesforce-developer` (Salesforce Developer) | Rendered fetch |
 
-- **Search Help live.** For Help topics where you do not yet have a URL, search Salesforce's own backend instead of guessing:
-
-  ```bash
-  npx @taurgis/bonsai search "single sign-on" --domain help.salesforce.com
-  ```
-
-  Results come straight from Coveo and are validated against an allow-list of Salesforce documentation hosts. There is no `--domain` search for `developer.salesforce.com`; passing it exits with an error, so find Developer URLs another way, then fetch them through Bonsai.
 - **Matching is by exact hostname.** `help.salesforce.com` matches; subdomains do not. Prefer canonical `/s/articleView?id=…` Help URLs; Bonsai normalizes legacy `/help_doccontent?id=…` links to them automatically.
 - **Revalidation re-fetches in full.** Module-fetched pages have no cheap `ETag`/`If-Modified-Since` shortcut, so refreshing a stale Salesforce page does a full re-render. `siteModuleId` in the JSON output confirms which module captured a page.
 

@@ -20,7 +20,7 @@ The package is published as `@taurgis/bonsai` and installs a `bonsai` binary.
 | **Freshness tiers** | Supports `stable`, `standard`, `volatile`, custom TTLs, and stale revalidation | Handling standards differently from release notes or beta docs |
 | **Browser fallback** | Uses `--rendered` for pages that need client-side JavaScript | Capturing SPA documentation when static HTML is incomplete |
 | **Manual import** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
-| **Search** | Ranks local cache entries by topic, tags, snippets, fuzzy terms, and phrases | Finding existing research before fetching again |
+| **List** | Filters cached entries by topic, tags, freshness, and metadata | Seeing what is already cached without reading full content |
 
 ---
 
@@ -82,10 +82,10 @@ echo "# My Custom Node API Notes" | npx @taurgis/bonsai import https://nodejs.or
 echo "# Synthesized React Cache Guide" | npx @taurgis/bonsai import --stdin --topic "React Suspense" --source-url https://react.dev/a --source-url https://react.dev/b
 ```
 
-### 5. Search before fetching
+### 5. List cached entries
 
 ```bash
-npx @taurgis/bonsai search "node api url"
+npx @taurgis/bonsai list --tags node
 ```
 
 ---
@@ -136,14 +136,6 @@ Display stored YAML frontmatter metadata for a URL.
 
 ```bash
 npx @taurgis/bonsai inspect <url>
-```
-
-### `search <query>`
-
-Search cached research by metadata and content snippets.
-
-```bash
-npx @taurgis/bonsai search "<keywords>" [flags]
 ```
 
 ### `list`

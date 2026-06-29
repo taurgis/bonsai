@@ -10,7 +10,6 @@ import registerHelp from './audit/scenarios/help.mjs';
 import registerJsonEnvelope from './audit/scenarios/json-envelope.mjs';
 import registerFetch from './audit/scenarios/fetch.mjs';
 import registerInspectStatus from './audit/scenarios/inspect-status.mjs';
-import registerSearch from './audit/scenarios/search.mjs';
 import registerList from './audit/scenarios/list.mjs';
 import registerPrune from './audit/scenarios/prune.mjs';
 import registerImport from './audit/scenarios/import.mjs';
@@ -30,7 +29,6 @@ const scenarios = [
   registerJsonEnvelope,
   registerFetch,
   registerInspectStatus,
-  registerSearch,
   registerList,
   registerPrune,
   registerImport,

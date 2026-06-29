@@ -10,7 +10,7 @@ import {
 import { atomicWriteFile } from '../atomic-write.js';
 import { parseArtifact, serializeArtifact } from './artifact.js';
 import type { ResearchArtifact } from './schema.js';
-import { loadSearchableArtifactsForDir } from './search-index.js';
+import { loadIndexedArtifactsForDir } from './artifact-index.js';
 import { isResearchFile } from './url.js';
 
 /**
@@ -200,7 +200,7 @@ export function scanCacheDirs<T>(
   const seen = new Set<string>();
   return dataDirs.flatMap((dataDir) => {
     const researchDir = join(dataDir, 'research');
-    const searchable = loadSearchableArtifactsForDir(researchDir);
+    const searchable = loadIndexedArtifactsForDir(researchDir);
     return searchable
       .map(({ artifact, filePath }) => {
         const key = artifact.metadata.cache_key;

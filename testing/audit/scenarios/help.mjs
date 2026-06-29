@@ -38,7 +38,7 @@ export default function register(harness) {
     expect(r.stdout.includes('USAGE'), 'missing USAGE');
   });
 
-  for (const cmd of ['search', 'inspect', 'status', 'list', 'import', 'prune', 'config']) {
+  for (const cmd of ['inspect', 'status', 'list', 'import', 'prune', 'config']) {
     check(`${cmd} --help exits 0`, () => {
       const r = run([cmd, '--help']);
       expect(r.exitCode === 0, `exit ${r.exitCode}`);
@@ -47,7 +47,7 @@ export default function register(harness) {
   }
 
   check('help subcommand works', () => {
-    const r = run(['help', 'search']);
+    const r = run(['help', 'list']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(r.stdout.includes('USAGE'), 'no usage');
   });

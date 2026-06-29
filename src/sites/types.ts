@@ -14,12 +14,6 @@ export interface SiteFetchResult {
   extraction: ExtractionResult;
 }
 
-export interface SiteSearchResult {
-  url: string;
-  title: string;
-  snippet?: string;
-}
-
 export interface SiteModule {
   id: string;
   name: string;
@@ -27,8 +21,6 @@ export interface SiteModule {
   // Per-site fetch overrides. Only `rendered` is honored today; it ORs with the
   // user's --rendered flag, so a missing/false value is a safe default.
   defaults?: { rendered?: boolean };
-  // Optional site-specific capabilities. When absent, callers fall back to the
-  // generic fetch/extract pipeline (fetchPage) or local cache search (search).
+  // Optional site-specific fetch. When absent, callers use the generic fetch/extract pipeline.
   fetchPage?: (url: string) => Promise<SiteFetchResult>;
-  search?: (query: string) => Promise<SiteSearchResult[]>;
 }
