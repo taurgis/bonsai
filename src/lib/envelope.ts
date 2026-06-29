@@ -8,7 +8,7 @@ export interface CliErrorShape {
 
 /** Map oclif parse-time errors to stable Bonsai codes when the throw site did not set one. */
 export function stableErrorCodeFrom(err: unknown): string | undefined {
-  const e = err as { code?: string; constructor?: { name?: string } };
+  const e = err as { code?: string; message?: string; constructor?: { name?: string } };
   if (typeof e?.code === 'string' && e.code) return e.code;
   switch (e?.constructor?.name) {
     case 'RequiredArgsError':
@@ -20,9 +20,17 @@ export function stableErrorCodeFrom(err: unknown): string | undefined {
       return 'UNKNOWN_FLAG';
     case 'UnexpectedArgsError':
       return 'UNEXPECTED_ARGUMENT';
-    default:
-      return undefined;
   }
+  // A flag supplied without its value throws a plain CLIError with no dedicated class to switch on,
+  // so it would otherwise reach agents with no stable code. oclif phrases it two ways: "expects a
+  // value" for a free-form flag, "expects one of these values: …" for an options-constrained flag.
+  if (
+    typeof e?.message === 'string' &&
+    /^Flag --\S+ expects (a value$|one of these values:)/.test(e.message)
+  ) {
+    return 'MISSING_FLAG_VALUE';
+  }
+  return undefined;
 }
 
 /** Strip oclif's generic help suffix from JSON stderr — agents already have structured codes. */

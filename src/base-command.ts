@@ -73,10 +73,20 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    * contradiction breaks the deterministic-exit-code contract agents rely on. Pre-seed the code from
    * the shared resolver so the framework's `??` keeps it, then defer to the default behavior.
    */
-  public override async catch(err: Error & { oclif?: { exit?: number }; exitCode?: number }) {
+  public override async catch(
+    err: Error & { oclif?: { exit?: number }; exitCode?: number; code?: string }
+  ) {
     // Parse failures throw before `this.parse()` sets `parsed`, which makes oclif emit a spurious
     // [UnparsedCommand] warning to stderr even under `--json`. CLIParseError subclasses carry `parse`.
     if (err && typeof err === 'object' && 'parse' in err) this.parsed = true;
+    // Attach the stable code to the error itself so oclif's human pretty-print renders the same
+    // `Code:` line that `--json` already reports via stableErrorCodeFrom. Without this, built-in
+    // oclif parse errors (invalid enum value, missing arg, unknown flag) printed a code under
+    // --json but not for humans — the two output modes disagreed on whether an error had a code.
+    if (err && typeof err === 'object' && !err.code) {
+      const code = stableErrorCodeFrom(err);
+      if (code) err.code = code;
+    }
     process.exitCode = process.exitCode ?? BaseCommand.exitCodeOf(err);
     return super.catch(err);
   }

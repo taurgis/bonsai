@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import ResearchSearch from './search.js';
 import ResearchImport from './import.js';
+import * as sites from '../sites/index.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 import type { LocalSearchResult } from '../lib/research/local-search.js';
 
@@ -31,6 +32,26 @@ describe('search command unit tests', () => {
   it('rejects an invalid --remote URL with exit 2', async () => {
     const runPromise = ResearchSearch.run(['router', '--remote', 'notaurl']);
     await expect(runPromise).rejects.toThrow(/Invalid --remote URL/);
+  });
+
+  it('wraps a site connector failure as a coded SEARCH_FAILED error (exit 1)', async () => {
+    const siteSpy = vi.spyOn(sites, 'detectSite').mockReturnValue({
+      id: 'fake',
+      name: 'Fake Docs',
+      search: vi
+        .fn()
+        .mockRejectedValue(new Error('Search request failed with status 403 Forbidden')),
+    } as unknown as ReturnType<typeof sites.detectSite>);
+    try {
+      const runPromise = ResearchSearch.run(['router', '--domain', 'fake.example.com']);
+      await expect(runPromise).rejects.toMatchObject({
+        code: 'SEARCH_FAILED',
+        oclif: { exit: 1 },
+        message: expect.stringContaining('Site search failed for fake.example.com'),
+      });
+    } finally {
+      siteSpy.mockRestore();
+    }
   });
 
   it('returns empty results if no match is found', async () => {
