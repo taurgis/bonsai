@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeUrl, isSafeIp } from './url.js';
+import { normalizeUrl, isSafeIp, looksLikeSchemelessUrl } from './url.js';
 
 describe('url validation and normalization', () => {
   it('normalizes protocol casing, default ports, and strips fragments', () => {
@@ -110,6 +110,42 @@ describe('normalizeUrl invalid input', () => {
     expect(() => normalizeUrl('not a url')).toThrow(/Could not parse/);
   });
 
+  it('suggests the https:// form for a scheme-less but domain-shaped input', () => {
+    expect(() => normalizeUrl('example.com')).toThrow(
+      'is missing a URL scheme. Did you mean https://example.com?'
+    );
+    expect(() => normalizeUrl('docs.nestjs.com/guide')).toThrow(
+      'Did you mean https://docs.nestjs.com/guide?'
+    );
+  });
+
+  it('keeps the generic parse error for junk that is not a forgotten scheme', () => {
+    // No dot in the host, or whitespace: not a "forgot https://" mistake.
+    expect(() => normalizeUrl('notaurl')).toThrow(/Could not parse/);
+    expect(() => normalizeUrl('not a url')).toThrow(/Could not parse/);
+  });
+});
+
+describe('looksLikeSchemelessUrl', () => {
+  it('is true for domain- or IPv4-shaped hosts missing a scheme', () => {
+    expect(looksLikeSchemelessUrl('example.com')).toBe(true);
+    expect(looksLikeSchemelessUrl('docs.nestjs.com/guide')).toBe(true);
+    expect(looksLikeSchemelessUrl('192.168.1.1')).toBe(true);
+  });
+
+  it('is false for inputs that already carry a scheme or are not URL-shaped', () => {
+    expect(looksLikeSchemelessUrl('https://example.com')).toBe(false);
+    expect(looksLikeSchemelessUrl('notaurl')).toBe(false);
+    expect(looksLikeSchemelessUrl('not a url')).toBe(false);
+    expect(looksLikeSchemelessUrl('.env')).toBe(false);
+    expect(looksLikeSchemelessUrl('./relative/path')).toBe(false);
+    // Bracketed IPv6 hosts are not dot-separated labels, so they are not treated as a bare domain.
+    expect(looksLikeSchemelessUrl('[::1]')).toBe(false);
+    expect(looksLikeSchemelessUrl('[2001:db8::1]')).toBe(false);
+  });
+});
+
+describe('normalizeUrl port handling', () => {
   it('clears the http default port and a custom https port stays', () => {
     expect(normalizeUrl('http://example.com:80/x')).toBe('http://example.com/x');
     expect(normalizeUrl('https://example.com:8443/x')).toBe('https://example.com:8443/x');

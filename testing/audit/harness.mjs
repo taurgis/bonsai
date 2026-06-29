@@ -46,6 +46,7 @@ export function createHarness() {
    * @param {object} [opts.xdg] Reuse { dataHome, configHome } from createWorkspace()
    * @param {Record<string,string>} [opts.env] Extra env vars
    * @param {boolean} [opts.keepEnv] Keep BONSAI_* overrides instead of clearing them
+   * @param {boolean} [opts.keepColorEnv] Let opts.env set NO_COLOR/FORCE_COLOR/TERM (color scenarios)
    * @param {string} [opts.input] Stdin payload
    * @param {number} [opts.timeout] Subprocess timeout ms
    */
@@ -58,13 +59,23 @@ export function createHarness() {
 
     mkdirSync(sandbox.cwd, { recursive: true });
 
-    const env = { ...process.env, ...(opts.env ?? {}) };
+    // Start from a color-neutral base so output is deterministic, then layer opts.env LAST. Color
+    // scenarios opt in via keepColorEnv to set NO_COLOR/FORCE_COLOR/TERM explicitly; all others run
+    // with color detection neutralized regardless of the ambient terminal.
+    const env = { ...process.env };
     delete env.NO_COLOR;
     delete env.FORCE_COLOR;
     delete env.CI;
+    delete env.TERM;
     if (!opts.keepEnv) {
       delete env.BONSAI_STORAGE;
       delete env.BONSAI_SUMMARY;
+    }
+    Object.assign(env, opts.env ?? {});
+    if (!opts.keepColorEnv) {
+      delete env.NO_COLOR;
+      delete env.FORCE_COLOR;
+      delete env.TERM;
     }
     if (sandbox.xdg) {
       env.XDG_DATA_HOME = sandbox.xdg.dataHome;
@@ -82,6 +93,9 @@ export function createHarness() {
     return {
       stdout: stripAnsi(result.stdout ?? ''),
       stderr: stripAnsi(result.stderr ?? ''),
+      // Unstripped output for scenarios that assert on ANSI color sequences directly.
+      rawStdout: result.stdout ?? '',
+      rawStderr: result.stderr ?? '',
       exitCode: result.status ?? 1,
       cwd: sandbox.cwd,
       xdg: sandbox.xdg,

@@ -298,11 +298,13 @@ npx @taurgis/bonsai prune [flags]
 
 Two guardrails make accidental deletion hard:
 
-- At least one of `--older-than`, `--inactive`, or `--artifact-type` is
+- At least one of `--older-than`, `--inactive`, `--artifact-type`, or `--url` is
   **required**; running `prune` with no filter exits `2` rather than matching
   everything.
 - The command refuses to delete unless you pass `--yes`. Use `--dry-run` first
-  to see exactly what would go.
+  to see exactly what would go. `--dry-run` and `--yes` are mutually exclusive —
+  passing both exits `2` (`CONFLICTING_FLAGS`) rather than guessing which you
+  meant.
 
 ### Command-Line Flags
 | Flag | Short | Type | Default | Description |
@@ -310,7 +312,8 @@ Two guardrails make accidental deletion hard:
 | `--older-than` | — | duration | — | Prune entries older than this age, e.g. `30d`, `90d`. |
 | `--inactive` | — | duration | — | Prune entries not validated or fetched within this window, e.g. `14d`. |
 | `--artifact-type` | — | choice | — | Limit pruning to `source`, `research_note`, `index`, or `section`. |
-| `--dry-run` | — | boolean | `false` | List what would be deleted, delete nothing. |
+| `--url` | — | glob | — | Limit pruning to source URLs matching a case-insensitive glob (supports `*`). |
+| `--dry-run` | — | boolean | `false` | List what would be deleted, delete nothing. Mutually exclusive with `--yes`. |
 | `--yes` | `-y` | boolean | `false` | Confirm deletion. Required for a real prune. |
 | `--json` | — | boolean | `false` | Return the machine-readable envelope. |
 

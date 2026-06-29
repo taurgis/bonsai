@@ -12,6 +12,9 @@ describe('color helpers', () => {
     delete process.env.NO_COLOR;
     delete process.env.NODE_DISABLE_COLORS;
     delete process.env.FORCE_COLOR;
+    // Isolate from the ambient terminal: TERM=dumb would otherwise suppress color in the
+    // "color is supported" baseline cases.
+    delete process.env.TERM;
 
     originalStdoutTty = Object.getOwnPropertyDescriptor(process.stdout, 'isTTY');
     originalStderrTty = Object.getOwnPropertyDescriptor(process.stderr, 'isTTY');
@@ -79,6 +82,53 @@ describe('color helpers', () => {
 
     expect(colors.bold('text')).toBe('text');
     expect(colors.cyan('text')).toBe('text');
+  });
+
+  it('disables color for any non-empty NO_COLOR value, including "0" (clig.dev/no-color.org)', () => {
+    setStdoutTty(true);
+    for (const value of ['0', 'false', 'yes', 'anything']) {
+      process.env.NO_COLOR = value;
+      expect(colors.bold('text'), `NO_COLOR=${value}`).toBe('text');
+    }
+  });
+
+  it('treats an empty NO_COLOR as unset and keeps color on a TTY', () => {
+    setStdoutTty(true);
+    process.env.NO_COLOR = '';
+
+    expect(colors.cyan('text')).toBe('\x1b[36mtext\x1b[0m');
+  });
+
+  it('disables color when TERM=dumb (cannot render ANSI)', () => {
+    setStdoutTty(true);
+    process.env.TERM = 'dumb';
+
+    expect(colors.bold('text')).toBe('text');
+  });
+
+  it('lets NO_COLOR win over a TTY but FORCE_COLOR still overrides NO_COLOR', () => {
+    setStdoutTty(true);
+    process.env.NO_COLOR = '1';
+    process.env.FORCE_COLOR = '1';
+
+    expect(colors.bold('text')).toBe('\x1b[1mtext\x1b[0m');
+  });
+
+  it('treats FORCE_COLOR=0 as off rather than a force-on signal', () => {
+    setStdoutTty(false);
+    setStderrTty(false);
+    process.env.FORCE_COLOR = '0';
+
+    expect(colors.bold('text')).toBe('text');
+  });
+
+  it('treats documented off-values of FORCE_COLOR ("false", "") as not forcing color on', () => {
+    setStdoutTty(false);
+    setStderrTty(false);
+    for (const value of ['false', '']) {
+      process.env.FORCE_COLOR = value;
+      expect(colors.bold('text'), `FORCE_COLOR=${JSON.stringify(value)}`).toBe('text');
+    }
   });
 
   it('returns plain text when TTY is not supported and FORCE_COLOR is absent', () => {

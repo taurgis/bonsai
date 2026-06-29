@@ -149,15 +149,19 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     readRoots: string[],
     parsedQuery: ParsedSearchQuery,
     currentTime: Date
-  ): LocalSearchResult[] {
+  ): { results: LocalSearchResult[]; activeCount: number } {
     const candidates: {
       prepared: ReturnType<typeof prepareSearchArtifact>;
       filePath: string;
       freshness: string;
     }[] = [];
+    // Count active artifacts before filters so a "no results" message can tell an empty cache
+    // ("populate it first") apart from a query that simply matched nothing ("broaden your search").
+    let activeCount = 0;
 
     for (const { artifact, filePath } of loadSearchableArtifacts(readRoots)) {
       if (artifact.metadata.status !== 'active') continue;
+      activeCount++;
       const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
       if (
         !this.matchesFilters(
@@ -183,18 +187,22 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       results.push(toLocalSearchResult(filePath, prepared, freshness, scored));
     }
 
-    return results;
+    return { results, activeCount };
   }
 
   private logSearchResults(
     finalResults: LocalSearchResult[],
     totalMatched: number,
-    highlightTerms: string[]
+    highlightTerms: string[],
+    cacheIsEmpty: boolean
   ): void {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
       this.log('No matching cached research entries found.');
-      this.log(`\nTip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`);
+      const tip = cacheIsEmpty
+        ? `Tip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`
+        : `Tip: broaden your search, or run ${colors.cyan(this.config.bin + ' list')} to see what is cached`;
+      this.log(`\n${tip}`);
       return;
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, SEARCH_LABELS)}\n`);
@@ -333,7 +341,11 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     });
     const currentTime = new Date();
 
-    const results = this.scanCacheDirForResults(roots.readRoots, parsedQuery, currentTime);
+    const { results, activeCount } = this.scanCacheDirForResults(
+      roots.readRoots,
+      parsedQuery,
+      currentTime
+    );
 
     results.sort((a, b) => b.score - a.score);
     const finalResults = results.slice(0, this.flags.limit);
@@ -344,7 +356,12 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     const notice = truncationNotice(results.length, finalResults.length, SEARCH_LABELS);
     if (notice && this.jsonEnabled()) this.warn(notice);
 
-    this.logSearchResults(finalResults, results.length, parsedQuery.highlightTerms);
+    this.logSearchResults(
+      finalResults,
+      results.length,
+      parsedQuery.highlightTerms,
+      activeCount === 0
+    );
 
     return finalResults;
   }

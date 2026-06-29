@@ -31,6 +31,15 @@ export default function register(harness) {
     expect(env?.stderr?.includes('Missing URL or command'), env?.stderr);
   });
 
+  check('unknown flag --json carries UNKNOWN_FLAG code exit 2', () => {
+    const r = run(['list', '--bogus', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.ok === false, 'ok false');
+    expect(env?.code === 'UNKNOWN_FLAG', env?.code);
+    expect(env?.exitCode === 2, `envelope exit ${env?.exitCode}`);
+  });
+
   check('--json --help returns JSON help envelope', () => {
     const r = run(['--json', '--help']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);

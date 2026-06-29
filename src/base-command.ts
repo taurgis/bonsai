@@ -11,6 +11,7 @@ import {
   type ResolveResearchTargetOptions,
   type ResolvedResearchTarget,
 } from './lib/research/resolve-target.js';
+import { looksLikeSchemelessUrl } from './lib/research/url.js';
 
 /**
  * Shared base for every Bonsai command. Enables oclif's native `--json` flag,
@@ -85,7 +86,12 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     return this.ctor.id ? toConfiguredId(this.ctor.id, this.config) : this.config.bin;
   }
 
-  /** Resolve a URL against the research cache, exiting with INVALID_URL on normalization failure. */
+  /**
+   * Resolve a URL against the research cache, exiting on a normalization failure. A scheme-less but
+   * domain-shaped input reports MISSING_URL_SCHEME — the same code the root `bonsai <url>` shorthand
+   * uses — so an agent sees one stable code for "forgot https://" everywhere; truly unparseable input
+   * stays INVALID_URL.
+   */
   protected resolveResearchTargetOrFail(
     url: string,
     extra?: Pick<ResolveResearchTargetOptions, 'flagOverride' | 'lookup'>
@@ -99,8 +105,20 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         ...extra,
       });
     } catch (err) {
-      this.error(`Invalid URL: ${(err as Error).message}`, { exit: 2, code: 'INVALID_URL' });
+      this.failInvalidUrl(url, (err as Error).message);
     }
+  }
+
+  /**
+   * Single exit point for a URL that failed normalization, shared by every URL-accepting command.
+   * The scheme-less message is already self-contained and actionable, so it is surfaced as-is;
+   * other parse failures keep the "Invalid URL:" prefix for context.
+   */
+  protected failInvalidUrl(url: string, message: string): never {
+    if (looksLikeSchemelessUrl(url)) {
+      this.error(message, { exit: 2, code: 'MISSING_URL_SCHEME' });
+    }
+    this.error(`Invalid URL: ${message}`, { exit: 2, code: 'INVALID_URL' });
   }
 
   /** Single source of truth for the `--json` envelope shape, shared by success and error output. */

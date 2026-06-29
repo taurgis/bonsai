@@ -17,6 +17,14 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'SAFETY_CHECK_REQUIRED', 'code');
   });
 
+  check('prune --dry-run + --yes CONFLICTING_FLAGS exit 2', () => {
+    const r = run(['prune', '--older-than', '90d', '--dry-run', '--yes', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CONFLICTING_FLAGS', env?.code);
+    expect(env?.stderr?.includes('mutually exclusive'), env?.stderr);
+  });
+
   check('prune invalid older-than exit 2', () => {
     const r = run(['prune', '--older-than', '5z', '--dry-run']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
@@ -34,6 +42,14 @@ export default function register(harness, fixtures) {
     const env = parseJson(r.stdout);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(env?.ok === true, 'ok false');
+  });
+
+  check('prune --dry-run zero matches gives clean human message (no dangling colon)', () => {
+    const r = run(['prune', '--older-than', '9999d', '--dry-run']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('No research cache entries match'), r.stdout);
+    // The old "Found 0 ... that would be pruned:" wording left a dangling colon and empty list.
+    expect(!r.stdout.includes('Found 0'), r.stdout);
   });
 
   check('import then prune --yes removes matching entry', () => {
