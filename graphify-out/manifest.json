@@ -2050,8 +2050,8 @@
     "semantic_hash": ""
   },
   "src/commands/inspect.test.ts": {
-    "mtime": 1782501420.8803804,
-    "ast_hash": "43ecd5947f791f49370862dc746e498e",
+    "mtime": 1782720649.1399696,
+    "ast_hash": "7c2269bf338cf0880fe4a67cb777d76d",
     "semantic_hash": ""
   },
   "src/commands/inspect.ts": {

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createHash } from 'node:crypto';
+import { dirname } from 'node:path';
 import ResearchInspect from './inspect.js';
 import ResearchImport from './import.js';
 import { writeArtifact, readArtifact } from '../lib/research/storage.js';
@@ -71,7 +72,7 @@ describe('inspect command unit tests', () => {
     ])) as any;
 
     // Clone the (valid) parent artifact into a section child so inspect's findSections returns it.
-    const dataDir = imp.cache.path.split('/research/')[0];
+    const dataDir = dirname(dirname(imp.cache.path));
     const parentKey = imp.cache.key;
     const parent = readArtifact(dataDir, parentKey);
     const sectionKey = createHash('sha256')
