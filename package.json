@@ -29,6 +29,7 @@
     "lint": "pnpm lint:line-counts && pnpm lint:health",
     "lint:line-counts": "node scripts/check-line-counts.ts --all",
     "lint:health": "pnpm test:coverage && pnpm exec fallow health --format human",
+    "postinstall": "npm run nexus:sync",
     "prepare": "husky",
     "publish:snapshot": "changeset version --snapshot snapshot && changeset publish --tag snapshot",
     "release": "changeset publish",

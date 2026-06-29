@@ -34,10 +34,15 @@ logs/
 .vscode/
 .DS_Store
 
+# Nexus-installed agent instruction files
+.agents/
+.claude/
+.cursor/
+.github/agents/
+.github/instructions/
+
 # Agent specific local paths
 .gemini/
-.claude/settings.local.json
-.cursor/
 
 # Temporary / testing artifacts
 tmp/
