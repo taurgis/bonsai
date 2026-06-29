@@ -87,6 +87,43 @@ export default function register(harness, fixtures) {
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
   });
 
+  // Multi-URL status returns an array; a single miss among hits flips the whole run to exit 1 with
+  // the CACHE_MISS code so an agent batching URLs can branch on one signal.
+  check('status multi-URL mixed hit/miss exit 1 array CACHE_MISS', () => {
+    const ws = createWorkspace();
+    const hitUrl = 'https://example.com/audit-multi-status-hit';
+    const imported = run(['import', hitUrl, '--stdin'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Multi Status\n\nCached entry.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['status', hitUrl, CACHE_MISS_URL, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CACHE_MISS', env?.code);
+    expect(Array.isArray(env?.data) && env.data.length === 2, `data ${JSON.stringify(env?.data)}`);
+    expect(env?.data?.[0]?.status === 'hit', `first ${env?.data?.[0]?.status}`);
+    expect(env?.data?.[1]?.status === 'miss', `second ${env?.data?.[1]?.status}`);
+  });
+
+  // Multi-URL inspect aborts with CACHE_MISS when any URL is uncached, naming how many others missed.
+  check('inspect multi-URL partial miss exit 1 CACHE_MISS', () => {
+    const ws = createWorkspace();
+    const hitUrl = 'https://example.com/audit-multi-inspect-hit';
+    const imported = run(['import', hitUrl, '--stdin'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Multi Inspect\n\nCached entry.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['inspect', hitUrl, CACHE_MISS_URL, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'CACHE_MISS', 'code');
+  });
+
   check('import then status and inspect hit (shared workspace)', () => {
     const ws = createWorkspace();
     const url = 'https://example.com/audit-workflow-chain';

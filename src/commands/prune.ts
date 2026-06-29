@@ -81,6 +81,12 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         }
       );
     }
+    if (this.flags['dry-run'] && this.flags.yes) {
+      this.error(
+        '--dry-run and --yes are mutually exclusive: --dry-run previews without deleting, --yes confirms deletion. Choose one.',
+        { exit: 2, code: 'CONFLICTING_FLAGS' }
+      );
+    }
     if (!this.flags['dry-run'] && !this.flags.yes) {
       const olderThanPart = this.flags['older-than']
         ? ` --older-than ${this.flags['older-than']}`
