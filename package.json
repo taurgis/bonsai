@@ -21,6 +21,8 @@
   ],
   "scripts": {
     "build": "tsc -b && oclif manifest",
+    "changeset": "changeset",
+    "changeset:status": "changeset status --verbose",
     "prepack": "pnpm build",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
@@ -28,6 +30,8 @@
     "lint:line-counts": "node scripts/check-line-counts.ts --all",
     "lint:health": "pnpm test:coverage && pnpm exec fallow health --format human",
     "prepare": "husky",
+    "publish:snapshot": "changeset version --snapshot snapshot && changeset publish --tag snapshot",
+    "release": "changeset publish",
     "regression:suite": "tsc -b && node testing/regression/run-suite.mjs",
     "regression:promote": "tsc -b && node testing/regression/run-suite.mjs --promote",
     "regression:check": "tsc -b && node testing/regression/run-suite.mjs --strict",
@@ -36,6 +40,7 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit",
+    "version-packages": "changeset version",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
@@ -54,6 +59,8 @@
     "update-notifier": "^7.3.1"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.31.0",
     "@types/jsdom": "^21.1.7",
     "@types/mozilla-readability": "^0.2.1",
     "@types/node": "^22.10.0",
