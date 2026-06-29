@@ -18,6 +18,7 @@ import registerConfig from './audit/scenarios/config.mjs';
 import registerCommandNotFound from './audit/scenarios/command-not-found.mjs';
 import registerEnv from './audit/scenarios/env.mjs';
 import registerColor from './audit/scenarios/color.mjs';
+import registerErrorCodes from './audit/scenarios/error-codes.mjs';
 
 ensureBuilt();
 
@@ -37,6 +38,7 @@ const scenarios = [
   registerCommandNotFound,
   registerEnv,
   registerColor,
+  registerErrorCodes,
 ];
 
 for (const register of scenarios) {

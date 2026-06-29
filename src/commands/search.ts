@@ -262,7 +262,19 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       return results.map((r) => ({ ...r, site_module_id: siteModule.id }));
     } catch (err) {
       if (!this.jsonEnabled()) ux.action.stop('failed');
-      throw err;
+      // The site connector throws plain Errors (e.g. an upstream 4xx/5xx). Without this they reach
+      // the user as a bare, code-less line — unlike every other Bonsai error. Re-emit as a coded
+      // runtime failure (exit 1) with the same fall-back-to-cache guidance the --remote path offers.
+      if (err && typeof err === 'object' && 'code' in err) throw err;
+      const message = err instanceof Error ? err.message : String(err);
+      this.error(`Site search failed for ${domain}: ${message}`, {
+        exit: 1,
+        code: 'SEARCH_FAILED',
+        suggestions: [
+          `Search the local cache instead: ${this.config.bin} search "${query}"`,
+          `Discover via the public docs index: ${this.config.bin} search "${query}" --remote https://${domain}`,
+        ],
+      });
     }
   }
 

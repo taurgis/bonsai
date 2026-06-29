@@ -28,6 +28,24 @@ describe('stableErrorCodeFrom', () => {
       'UNEXPECTED_ARGUMENT'
     );
   });
+
+  it('maps the class-less "flag expects a value" error by its message', () => {
+    expect(stableErrorCodeFrom({ message: 'Flag --domain expects a value' })).toBe(
+      'MISSING_FLAG_VALUE'
+    );
+  });
+
+  it('maps the options-flag "expects one of these values" variant', () => {
+    expect(
+      stableErrorCodeFrom({
+        message: 'Flag --artifact-type expects one of these values: source, research_note',
+      })
+    ).toBe('MISSING_FLAG_VALUE');
+  });
+
+  it('does not match unrelated messages', () => {
+    expect(stableErrorCodeFrom({ message: 'Flag value rejected' })).toBeUndefined();
+  });
 });
 
 describe('normalizeCliErrorMessage', () => {
