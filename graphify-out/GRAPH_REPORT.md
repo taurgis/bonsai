@@ -1,16 +1,16 @@
 # Graph Report - forward-nexus-research  (2026-06-30)
 
 ## Corpus Check
-- 1026 files · ~994,626 words
+- 1027 files · ~994,646 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 9655 nodes · 10230 edges · 960 communities (908 shown, 52 thin omitted)
+- 9656 nodes · 10230 edges · 962 communities (910 shown, 52 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a9d2eef0`
+- Built from commit: `a01ff49c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -146,8 +146,9 @@
 - [[_COMMUNITY_Community 129|Community 129]]
 - [[_COMMUNITY_Community 130|Community 130]]
 - [[_COMMUNITY_Community 131|Community 131]]
+- [[_COMMUNITY_Community 132|Community 132]]
 - [[_COMMUNITY_Community 133|Community 133]]
-- [[_COMMUNITY_Community 137|Community 137]]
+- [[_COMMUNITY_Community 134|Community 134]]
 - [[_COMMUNITY_Community 152|Community 152]]
 - [[_COMMUNITY_Community 158|Community 158]]
 - [[_COMMUNITY_Community 162|Community 162]]
@@ -995,7 +996,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (960 total, 52 thin omitted)
+## Communities (962 total, 52 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.15
@@ -1022,8 +1023,8 @@ Cohesion: 0.08
 Nodes (24): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. List cached entries, Bonsai, Command Reference, `config` (+16 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.10
-Nodes (41): ConfigCommand, configScopeFlags(), iso, ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel() (+33 more)
+Cohesion: 0.09
+Nodes (42): ConfigCommand, configScopeFlags(), iso, ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel() (+34 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -1082,8 +1083,8 @@ Cohesion: 0.13
 Nodes (14): Compressed, Detailed, Guardrails won’t protect you, Guardrails won’t protect you, It’s very easy to expose yourself to this risk, It’s very easy to expose yourself to this risk, Provenance, Summary (+6 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.09
-Nodes (31): CAPTURE_DEPS, SectionSummary, CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness(), StatusAction (+23 more)
+Cohesion: 0.15
+Nodes (24): CAPTURE_DEPS, checkMaxAgeExpired(), durationFlagError(), evaluateFreshness(), FreshnessPolicy, getPolicy(), parseTtlToMs(), buildErrorArtifact() (+16 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.67
@@ -1502,8 +1503,8 @@ Cohesion: 0.40
 Nodes (4): Compressed, Detailed, Provenance, Summary
 
 ### Community 128 - "Community 128"
-Cohesion: 0.67
-Nodes (3): Examples, Python manifest guard hook, TypeScript stop automation hook
+Cohesion: 0.18
+Nodes (10): CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness(), StatusAction, StatusResult, color() (+2 more)
 
 ### Community 129 - "Community 129"
 Cohesion: 0.67
@@ -1517,13 +1518,17 @@ Nodes (3): Framework-Specific Implementations[¶](https://cheatsheetseries.owasp
 Cohesion: 0.40
 Nodes (5): Adding a new setting in Cursor, Automating development workflows and documentation generation, Examples, Standards for frontend components and API validation, Templates for Express services and React components
 
+### Community 132 - "Community 132"
+Cohesion: 0.50
+Nodes (4): Cloud Distribution (Enterprise Only), MDM Distribution, Project Hooks (Version Control), Team Distribution
+
 ### Community 133 - "Community 133"
 Cohesion: 0.40
 Nodes (5): AGENTS.md, Compressed, Project Rules, Team Rules, User Rules
 
-### Community 137 - "Community 137"
-Cohesion: 0.29
-Nodes (7): Config Intellisense, Config Resolution, Directory-Level Overrides, Overview, Page-Level Overrides, Typed Theme Config, Vite, Vue & Markdown Config
+### Community 134 - "Community 134"
+Cohesion: 0.50
+Nodes (4): Customization, markdown, vite, vue
 
 ### Community 152 - "Community 152"
 Cohesion: 0.40
@@ -2114,8 +2119,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
 
 ### Community 338 - "Community 338"
-Cohesion: 0.27
-Nodes (3): ConfigIndex, stableErrorCodeFrom(), BaseCommand
+Cohesion: 0.19
+Nodes (4): ResearchInspect, ConfigIndex, stableErrorCodeFrom(), BaseCommand
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -3598,8 +3603,8 @@ Cohesion: 0.50
 Nodes (4): External Links, Internal Links, Links, Page Suffix
 
 ### Community 753 - "Community 753"
-Cohesion: 0.16
-Nodes (3): ResearchImport, IsolatedCache, useIsolatedCache()
+Cohesion: 0.14
+Nodes (5): ResearchImport, IsolatedCache, useIsolatedCache(), buildCompressed(), compressMarkdown()
 
 ### Community 754 - "Community 754"
 Cohesion: 0.14
@@ -3826,8 +3831,8 @@ Cohesion: 0.22
 Nodes (8): Default Workflow, Fallbacks, Freshness Policy, Invocation, Response Contract, Salesforce Docs Researcher Agent, Scope, Working with Salesforce Sites
 
 ### Community 810 - "Community 810"
-Cohesion: 0.10
-Nodes (17): ResearchInspect, LIST_LABELS, LISTABLE_ARTIFACT_TYPES, ResearchList, ResearchPrune, limitFlag(), closestMatch(), levenshtein() (+9 more)
+Cohesion: 0.12
+Nodes (16): LIST_LABELS, LISTABLE_ARTIFACT_TYPES, ResearchList, ResearchPrune, limitFlag(), closestMatch(), levenshtein(), maxFuzzyDistance() (+8 more)
 
 ### Community 811 - "Community 811"
 Cohesion: 0.25
@@ -3855,7 +3860,7 @@ Nodes (21): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecut
 
 ### Community 819 - "Community 819"
 Cohesion: 0.09
-Nodes (23): Agent security and safety, Cloud Distribution (Enterprise Only), Code security and best practices, Command-Based Hooks, Dependency security, Enterprise hooks and distribution, Environment Variables, Hook categories (+15 more)
+Nodes (22): Agent security and safety, Code security and best practices, Command-Based Hooks, Dependency security, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories (+14 more)
 
 ### Community 820 - "Community 820"
 Cohesion: 0.11
@@ -4310,8 +4315,8 @@ Cohesion: 0.20
 Nodes (10): Chaos, Consistency across programs, Conversation as the norm, Ease of discovery, Empathy, Human-first design, Philosophy, Robustness (+2 more)
 
 ### Community 933 - "Community 933"
-Cohesion: 0.20
-Nodes (12): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), isSafeIp(), isSafeIpv4() (+4 more)
+Cohesion: 0.15
+Nodes (17): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), SectionSummary, deriveCacheKey(), ResolvedResearchTarget (+9 more)
 
 ### Community 934 - "Community 934"
 Cohesion: 0.20
@@ -4334,8 +4339,8 @@ Cohesion: 0.13
 Nodes (14): appearance, cleanUrls, Compressed, Customization, Detailed, lastUpdated, markdown, rewrites (+6 more)
 
 ### Community 947 - "Community 947"
-Cohesion: 0.17
-Nodes (12): appearance, cleanUrls, Customization, lastUpdated, markdown, Provenance, rewrites, Routing (+4 more)
+Cohesion: 0.13
+Nodes (15): appearance, cleanUrls, Config Intellisense, Config Resolution, Directory-Level Overrides, lastUpdated, Overview, Page-Level Overrides (+7 more)
 
 ### Community 948 - "Community 948"
 Cohesion: 0.18
@@ -4582,8 +4587,8 @@ Cohesion: 0.40
 Nodes (4): Compressed, Detailed, Provenance, Summary
 
 ### Community 1015 - "Community 1015"
-Cohesion: 0.20
-Nodes (18): buildCompressed(), compressMarkdown(), getPolicy(), applyAutoTags(), calculateFrequencies(), cleanNoise(), dedupeTags(), extractKeywords() (+10 more)
+Cohesion: 0.42
+Nodes (7): applyAutoTags(), calculateFrequencies(), cleanNoise(), dedupeTags(), extractKeywords(), getHeadingTerms(), tokenize()
 
 ### Community 1017 - "Community 1017"
 Cohesion: 0.40
@@ -4618,4 +4623,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 5` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**
-  _Cohesion score 0.09588421528720036 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09482001755926252 - nodes in this community are weakly interconnected._

@@ -5358,5 +5358,10 @@
     "mtime": 1782838327.084388,
     "ast_hash": "f3a15b846a144cd8b4b1abbc4c59dd06",
     "semantic_hash": ""
+  },
+  ".changeset/fuzzy-prompt-shields.md": {
+    "mtime": 1782845597.041219,
+    "ast_hash": "fc2a9d523d0afc7156ca4e08b1369644",
+    "semantic_hash": ""
   }
 }
