@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782740162.543984,
-    "ast_hash": "e8467d2838479168757b10e817c57e00",
+    "mtime": 1782837766.8370535,
+    "ast_hash": "b73dc097ce042db719064b7784f654a0",
     "semantic_hash": ""
   },
   "scripts/check-line-counts.ts": {

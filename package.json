@@ -29,7 +29,7 @@
     "lint": "pnpm lint:line-counts && pnpm lint:health",
     "lint:line-counts": "node scripts/check-line-counts.ts --all",
     "lint:health": "pnpm test:coverage && pnpm exec fallow health --format human",
-    "postinstall": "npx forward-nexus sync --pull",
+    "postinstall": "node -e \"if (process.env.CI || process.env.FORWARD_NEXUS_SKIP_SYNC) { console.log('Skipping forward-nexus sync.'); process.exit(0); } require('node:child_process').execFileSync('npx', ['forward-nexus', 'sync', '--pull'], { stdio: 'inherit' });\"",
     "prepare": "husky",
     "publish:snapshot": "changeset version --snapshot snapshot && changeset publish --tag snapshot",
     "release": "changeset publish",
