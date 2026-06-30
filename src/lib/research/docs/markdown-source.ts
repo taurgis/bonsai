@@ -1,5 +1,6 @@
 import type { ExtractionResult } from '../extract.js';
 import { dropEmptyLinks, htmlToMarkdown } from '../markdown.js';
+import { sanitizePromptInjection } from '../prompt-injection.js';
 
 // Turns untrusted public Markdown/MDX source (route `.md`, raw GitHub) into the same
 // ExtractionResult shape the HTML pipeline produces, so source content slots into the cache
@@ -201,7 +202,9 @@ export function extractFromSource(md: string, sourceUrl: string): ExtractionResu
     ? cleanKumaScript(stripMdnHiddenSamples(body))
     : body;
   const tablesAsMarkdown = convertHtmlTables(sanitizeSourceMarkdown(deMacroed));
-  const cleaned = dropEmptySections(dropEmptyLinks(tablesAsMarkdown)).trim();
+  const cleaned = sanitizePromptInjection(
+    dropEmptySections(dropEmptyLinks(tablesAsMarkdown))
+  ).trim();
   const notes = [`captured from public Markdown/MDX source: ${sourceUrl}`];
   return {
     title: titleFrom(frontmatter, cleaned),

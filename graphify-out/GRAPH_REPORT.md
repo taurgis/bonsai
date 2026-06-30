@@ -1,16 +1,16 @@
-# Graph Report - forward-nexus-research  (2026-06-29)
+# Graph Report - forward-nexus-research  (2026-06-30)
 
 ## Corpus Check
-- 986 files · ~972,548 words
+- 1026 files · ~994,626 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 9226 nodes · 9821 edges · 911 communities (858 shown, 53 thin omitted)
+- 9655 nodes · 10230 edges · 960 communities (908 shown, 52 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7bea2338`
+- Built from commit: `a9d2eef0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -41,19 +41,29 @@
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
 - [[_COMMUNITY_Community 27|Community 27]]
 - [[_COMMUNITY_Community 28|Community 28]]
 - [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
 - [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
 - [[_COMMUNITY_Community 35|Community 35]]
 - [[_COMMUNITY_Community 36|Community 36]]
 - [[_COMMUNITY_Community 37|Community 37]]
 - [[_COMMUNITY_Community 38|Community 38]]
 - [[_COMMUNITY_Community 39|Community 39]]
 - [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
 - [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
 - [[_COMMUNITY_Community 51|Community 51]]
 - [[_COMMUNITY_Community 52|Community 52]]
@@ -61,6 +71,7 @@
 - [[_COMMUNITY_Community 54|Community 54]]
 - [[_COMMUNITY_Community 55|Community 55]]
 - [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
 - [[_COMMUNITY_Community 58|Community 58]]
 - [[_COMMUNITY_Community 59|Community 59]]
 - [[_COMMUNITY_Community 60|Community 60]]
@@ -68,21 +79,51 @@
 - [[_COMMUNITY_Community 62|Community 62]]
 - [[_COMMUNITY_Community 63|Community 63]]
 - [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
 - [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
 - [[_COMMUNITY_Community 77|Community 77]]
 - [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 79|Community 79]]
 - [[_COMMUNITY_Community 80|Community 80]]
 - [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 83|Community 83]]
 - [[_COMMUNITY_Community 84|Community 84]]
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 87|Community 87]]
+- [[_COMMUNITY_Community 88|Community 88]]
+- [[_COMMUNITY_Community 89|Community 89]]
+- [[_COMMUNITY_Community 90|Community 90]]
 - [[_COMMUNITY_Community 91|Community 91]]
+- [[_COMMUNITY_Community 92|Community 92]]
+- [[_COMMUNITY_Community 93|Community 93]]
+- [[_COMMUNITY_Community 94|Community 94]]
+- [[_COMMUNITY_Community 95|Community 95]]
+- [[_COMMUNITY_Community 96|Community 96]]
+- [[_COMMUNITY_Community 97|Community 97]]
+- [[_COMMUNITY_Community 98|Community 98]]
+- [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 101|Community 101]]
+- [[_COMMUNITY_Community 102|Community 102]]
+- [[_COMMUNITY_Community 103|Community 103]]
+- [[_COMMUNITY_Community 104|Community 104]]
 - [[_COMMUNITY_Community 105|Community 105]]
 - [[_COMMUNITY_Community 106|Community 106]]
 - [[_COMMUNITY_Community 107|Community 107]]
 - [[_COMMUNITY_Community 108|Community 108]]
+- [[_COMMUNITY_Community 109|Community 109]]
 - [[_COMMUNITY_Community 110|Community 110]]
 - [[_COMMUNITY_Community 111|Community 111]]
 - [[_COMMUNITY_Community 112|Community 112]]
@@ -92,10 +133,18 @@
 - [[_COMMUNITY_Community 116|Community 116]]
 - [[_COMMUNITY_Community 117|Community 117]]
 - [[_COMMUNITY_Community 118|Community 118]]
+- [[_COMMUNITY_Community 119|Community 119]]
 - [[_COMMUNITY_Community 120|Community 120]]
+- [[_COMMUNITY_Community 121|Community 121]]
 - [[_COMMUNITY_Community 122|Community 122]]
 - [[_COMMUNITY_Community 123|Community 123]]
+- [[_COMMUNITY_Community 124|Community 124]]
+- [[_COMMUNITY_Community 125|Community 125]]
 - [[_COMMUNITY_Community 126|Community 126]]
+- [[_COMMUNITY_Community 127|Community 127]]
+- [[_COMMUNITY_Community 128|Community 128]]
+- [[_COMMUNITY_Community 129|Community 129]]
+- [[_COMMUNITY_Community 130|Community 130]]
 - [[_COMMUNITY_Community 131|Community 131]]
 - [[_COMMUNITY_Community 133|Community 133]]
 - [[_COMMUNITY_Community 137|Community 137]]
@@ -200,7 +249,6 @@
 - [[_COMMUNITY_Community 267|Community 267]]
 - [[_COMMUNITY_Community 268|Community 268]]
 - [[_COMMUNITY_Community 269|Community 269]]
-- [[_COMMUNITY_Community 270|Community 270]]
 - [[_COMMUNITY_Community 271|Community 271]]
 - [[_COMMUNITY_Community 272|Community 272]]
 - [[_COMMUNITY_Community 273|Community 273]]
@@ -947,14 +995,14 @@
 ## Import Cycles
 - None detected.
 
-## Communities (911 total, 53 thin omitted)
+## Communities (960 total, 52 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.15
 Nodes (15): Fixture, fixtures, ExtractionResult, salesforceDeveloper, CONTENT_SELECTORS, fetchSalesforcePage(), salesforce, ALLOWED_DOC_HOSTS (+7 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.18
+Cohesion: 0.17
 Nodes (13): defaultFetcher(), llmsTxtCandidates(), probeLlmsTxt(), probeRouteMarkdown(), FIXTURES, tryFetchValidText(), ArtifactValidation, ERROR_PAGE_PATTERNS (+5 more)
 
 ### Community 2 - "Community 2"
@@ -962,8 +1010,8 @@ Cohesion: 0.22
 Nodes (5): applyCaptureMetadata(), FetchCommand, fetchFailureGuidance(), handleStaleRevalidationResult(), SummaryLevel
 
 ### Community 3 - "Community 3"
-Cohesion: 0.18
-Nodes (11): __dirname, pkg, rawArgv, req, result, CaptureHelp, envelopeCommandId(), helpSubject() (+3 more)
+Cohesion: 0.05
+Nodes (40): Compressed, Configure Prompt Shields, Configure Prompt Shields, Cost and limitations, Cost and limitations, Detailed, Enable Spotlighting, Enable Spotlighting (+32 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.35
@@ -974,8 +1022,8 @@ Cohesion: 0.08
 Nodes (24): 1. Fetch and cache a URL, 2. Reuse the cache, 3. Check cache state and metadata, 4. Import manual research notes, 5. List cached entries, Bonsai, Command Reference, `config` (+16 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.09
-Nodes (42): ConfigCommand, configScopeFlags(), iso, ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel() (+34 more)
+Cohesion: 0.10
+Nodes (41): ConfigCommand, configScopeFlags(), iso, ConfigGet, ConfigScope, effectiveConfig(), loadStorageMode(), loadSummaryLevel() (+33 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.09
@@ -986,8 +1034,8 @@ Cohesion: 0.36
 Nodes (8): detectLanguage(), flattenCodeStructure(), normalizeCodeBlocks(), reconstructLines(), removeCopyButtons(), FIXTURES, load(), toMarkdown()
 
 ### Community 9 - "Community 9"
-Cohesion: 0.33
-Nodes (6): PageMapEntry, dedupe(), extractNextRscData(), NextRscData, FIXTURES, unescapeFlight()
+Cohesion: 0.15
+Nodes (15): decodeBase64(), decodeBase64Tokens(), decodeHex(), decodeHexTokens(), detectionCandidates(), HARMFUL_INSTRUCTION_PATTERNS, isReadableDecodedText(), isTypoglycemiaMatch() (+7 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.06
@@ -1022,16 +1070,20 @@ Cohesion: 0.08
 Nodes (24): [Asking Copilot cloud agent to generate a `copilot-instructions.md` file], [Asking Copilot cloud agent to generate a `copilot-instructions.md` file](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions#asking-copilot-cloud-agent-to-generate-a-copilot-instructionsmd-file), Compressed, [Creating custom instructions], [Creating custom instructions](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions#creating-custom-instructions), [Creating path-specific custom instructions], [Creating path-specific custom instructions](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions#creating-path-specific-custom-instructions), [Creating repository-wide custom instructions] (+16 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.50
-Nodes (4): Cloud Distribution (Enterprise Only), MDM Distribution, Project Hooks (Version Control), Team Distribution
+Cohesion: 0.12
+Nodes (16): Anatomy of Prompt Injection Vulnerabilities[¶], Anatomy of Prompt Injection Vulnerabilities[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#anatomy-of-prompt-injection-vulnerabilities "Permanent link"), Best Practices Checklist[¶], Best Practices Checklist[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#best-practices-checklist "Permanent link"), Compressed, Detailed, Introduction[¶], Introduction[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#introduction "Permanent link") (+8 more)
 
 ### Community 19 - "Community 19"
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowJs, declaration, erasableSyntaxOnly, esModuleInterop, lib, module, moduleDetection (+10 more)
 
+### Community 20 - "Community 20"
+Cohesion: 0.13
+Nodes (14): Compressed, Detailed, Guardrails won’t protect you, Guardrails won’t protect you, It’s very easy to expose yourself to this risk, It’s very easy to expose yourself to this risk, Provenance, Summary (+6 more)
+
 ### Community 21 - "Community 21"
-Cohesion: 0.10
-Nodes (40): CAPTURE_DEPS, CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness(), StatusAction, StatusResult (+32 more)
+Cohesion: 0.09
+Nodes (31): CAPTURE_DEPS, SectionSummary, CacheStatus, describeCacheStatus(), FreshnessStatus, ResearchStatus, resolveFreshness(), StatusAction (+23 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.67
@@ -1045,6 +1097,10 @@ Nodes (21): Archiving Data of an Instance, Business Manager Import Location, Cat
 Cohesion: 0.67
 Nodes (3): Common schema, Input (all hooks), Reference
 
+### Community 26 - "Community 26"
+Cohesion: 0.17
+Nodes (12): Agent-Specific Attacks[¶], Best-of-N (BoN) Jailbreaking[¶], Common Attack Types[¶], Direct Prompt Injection[¶], Encoding and Obfuscation Techniques[¶], HTML and Markdown Injection[¶], Jailbreaking Techniques[¶], Multi-Turn and Persistent Attacks[¶] (+4 more)
+
 ### Community 27 - "Community 27"
 Cohesion: 0.12
 Nodes (15): 1. Network Constraints & Crawler Limits, 2. DNS Safety & Private IP Blocklist (SSRF Protection), 3. Client-Side Hydration (SPA) Limitations, 4. Exit Codes & Common Errors, Blocked Target Blocks (RFC1918 & Localhost), Common Failure Symptoms, Crawler Limits, Exit Code Directory (+7 more)
@@ -1054,8 +1110,12 @@ Cohesion: 0.09
 Nodes (22): Compressed, Creating a dynamic segment, Creating a dynamic segment, Creating a layout, Creating a layout, Creating a nested route, Creating a nested route, Creating a page (+14 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.18
-Nodes (14): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, analyzeMarkdownQuality(), countMatches(), hasCollapsedCode() (+6 more)
+Cohesion: 0.17
+Nodes (15): CHROME_SELECTORS, cleanDocsChrome(), dropDataImages(), removeMatching(), FIXTURES, analyzeMarkdownQuality(), countMatches(), hasCollapsedCode() (+7 more)
+
+### Community 30 - "Community 30"
+Cohesion: 0.17
+Nodes (12): Agent-Specific Attacks[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#agent-specific-attacks "Permanent link"), Best-of-N (BoN) Jailbreaking[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#best-of-n-bon-jailbreaking "Permanent link"), Common Attack Types[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#common-attack-types "Permanent link"), Direct Prompt Injection[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#direct-prompt-injection "Permanent link"), Encoding and Obfuscation Techniques[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#encoding-and-obfuscation-techniques "Permanent link"), HTML and Markdown Injection[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#html-and-markdown-injection "Permanent link"), Jailbreaking Techniques[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#jailbreaking-techniques "Permanent link"), Multi-Turn and Persistent Attacks[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#multi-turn-and-persistent-attacks "Permanent link") (+4 more)
 
 ### Community 31 - "Community 31"
 Cohesion: 0.09
@@ -1065,9 +1125,17 @@ Nodes (22): Compressed, Creating a dynamic segment, Creating a dynamic segment, 
 Cohesion: 0.09
 Nodes (22): Compressed, Customizing CSS, Customizing CSS, Detailed, Extending the Default Theme, Extending the Default Theme, Layout Slots, Layout Slots (+14 more)
 
+### Community 33 - "Community 33"
+Cohesion: 0.20
+Nodes (10): Example Attack Scenarios, Scenario #1: Direct Injection, Scenario #2: Indirect Injection, Scenario #3: Unintentional Injection, Scenario #4: Intentional Model Influence, Scenario #5: Code Injection, Scenario #6: Payload Splitting, Scenario #7: Multimodal Injection (+2 more)
+
+### Community 34 - "Community 34"
+Cohesion: 0.20
+Nodes (10): Example Attack Scenarios, Scenario #1: Direct Injection, Scenario #2: Indirect Injection, Scenario #3: Unintentional Injection, Scenario #4: Intentional Model Influence, Scenario #5: Code Injection, Scenario #6: Payload Splitting, Scenario #7: Multimodal Injection (+2 more)
+
 ### Community 35 - "Community 35"
-Cohesion: 0.14
-Nodes (21): atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp(), fileSignature(), getOrUpdateIndexEntry(), IndexFile (+13 more)
+Cohesion: 0.09
+Nodes (39): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), atomicWriteFile(), extractSection(), handleArrayItem(), handleNestedProp(), handleRootProp() (+31 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.28
@@ -1089,6 +1157,26 @@ Nodes (14): AGENTS.md, Architecture, Best practices, Code Style, How rules work,
 Cohesion: 0.04
 Nodes (44): Agent research: Bonsai workflow vs native web search, Answer delivery, Antigravity, Antigravity — Bonsai workflow, Antigravity — Bonsai workflow, Antigravity — Bonsai workflow, Antigravity — Native web search, Antigravity — Native web search (+36 more)
 
+### Community 41 - "Community 41"
+Cohesion: 0.22
+Nodes (8): Compressed, Direct Prompt Injections, Indirect Prompt Injections, Provenance, Reference Links, Related Frameworks and Taxonomies, Summary, Types of Prompt Injection Vulnerabilities
+
+### Community 42 - "Community 42"
+Cohesion: 0.25
+Nodes (8): 1\. Constrain model behavior, 2\. Define and validate expected output formats, 3\. Implement input and output filtering, 4\. Enforce privilege control and least privilege access, 5\. Require human approval for high-risk actions, 6\. Segregate and identify external content, 7\. Conduct adversarial testing and attack simulations\\, Prevention and Mitigation Strategies
+
+### Community 43 - "Community 43"
+Cohesion: 0.25
+Nodes (8): 1\. Constrain model behavior, 2\. Define and validate expected output formats, 3\. Implement input and output filtering, 4\. Enforce privilege control and least privilege access, 5\. Require human approval for high-risk actions, 6\. Segregate and identify external content, 7\. Conduct adversarial testing and attack simulations\\, Prevention and Mitigation Strategies
+
+### Community 44 - "Community 44"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Least Privilege[¶], Least Privilege[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#least-privilege "Permanent link"), Provenance, Summary
+
+### Community 45 - "Community 45"
+Cohesion: 0.29
+Nodes (6): Agent-Specific Attacks[¶], Agent-Specific Attacks[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#agent-specific-attacks "Permanent link"), Compressed, Detailed, Provenance, Summary
+
 ### Community 46 - "Community 46"
 Cohesion: 0.11
 Nodes (18): Artifact, Artifact type, Cache key, Capture method, Compressed vs. detailed, Conditional request, Extraction confidence, Freshness (+10 more)
@@ -1096,6 +1184,10 @@ Nodes (18): Artifact, Artifact type, Cache key, Capture method, Compressed vs. d
 ### Community 48 - "Community 48"
 Cohesion: 0.15
 Nodes (12): Compressed, Detailed, Organize rules with `.claude/rules/`, Organize rules with `.claude/rules/`, Path-specific rules, Path-specific rules, Provenance, Set up rules (+4 more)
+
+### Community 49 - "Community 49"
+Cohesion: 0.29
+Nodes (6): Anatomy of Prompt Injection Vulnerabilities[¶], Anatomy of Prompt Injection Vulnerabilities[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#anatomy-of-prompt-injection-vulnerabilities "Permanent link"), Compressed, Detailed, Provenance, Summary
 
 ### Community 50 - "Community 50"
 Cohesion: 0.15
@@ -1125,6 +1217,10 @@ Nodes (10): Compressed, Deploy organization-wide CLAUDE.md, Deploy organization-
 Cohesion: 0.18
 Nodes (10): [About personal custom instructions for Copilot Chat], [About personal custom instructions for Copilot Chat](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-personal-instructions#about-personal-custom-instructions-for-copilot-chat), [Adding personal custom instructions], [Adding personal custom instructions](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-personal-instructions#adding-personal-custom-instructions), Compressed, Detailed, [Further reading], [Further reading](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-personal-instructions#further-reading) (+2 more)
 
+### Community 57 - "Community 57"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Primary Defenses[¶], Primary Defenses[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#primary-defenses "Permanent link"), Provenance, Summary
+
 ### Community 58 - "Community 58"
 Cohesion: 0.11
 Nodes (18): Compressed, Custom Components, Custom Components, Customize link's "active" state, Customize link's "active" state, Customize link's "target" and "rel" attributes, Customize link's "target" and "rel" attributes, Detailed (+10 more)
@@ -1153,9 +1249,53 @@ Nodes (6): CLAUDE.md vs auto memory, CLAUDE.md vs auto memory, Compressed, Detai
 Cohesion: 0.29
 Nodes (6): Claude isn’t following my CLAUDE.md, Claude isn’t following my CLAUDE.md, Compressed, Detailed, Provenance, Summary
 
+### Community 65 - "Community 65"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Structured Prompts with Clear Separation[¶], Structured Prompts with Clear Separation[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#structured-prompts-with-clear-separation "Permanent link"), Summary
+
+### Community 66 - "Community 66"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Jailbreaking Techniques[¶], Jailbreaking Techniques[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#jailbreaking-techniques "Permanent link"), Provenance, Summary
+
+### Community 67 - "Community 67"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Remote/Indirect Prompt Injection[¶], Remote/Indirect Prompt Injection[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#remoteindirect-prompt-injection "Permanent link"), Summary
+
+### Community 68 - "Community 68"
+Cohesion: 0.29
+Nodes (6): Best Practices Checklist[¶], Best Practices Checklist[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#best-practices-checklist "Permanent link"), Compressed, Detailed, Provenance, Summary
+
+### Community 69 - "Community 69"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Human-in-the-Loop (HITL) Controls[¶], Human-in-the-Loop (HITL) Controls[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#human-in-the-loop-hitl-controls "Permanent link"), Provenance, Summary
+
+### Community 70 - "Community 70"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Remote Content Sanitization[¶], Remote Content Sanitization[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#remote-content-sanitization "Permanent link"), Summary
+
+### Community 71 - "Community 71"
+Cohesion: 0.29
+Nodes (6): Best-of-N (BoN) Jailbreaking[¶], Best-of-N (BoN) Jailbreaking[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#best-of-n-bon-jailbreaking "Permanent link"), Compressed, Detailed, Provenance, Summary
+
+### Community 72 - "Community 72"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Framework-Specific Implementations[¶], Framework-Specific Implementations[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#framework-specific-implementations "Permanent link"), Provenance, Summary
+
+### Community 73 - "Community 73"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Introduction[¶], Introduction[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#introduction "Permanent link"), Provenance, Summary
+
 ### Community 74 - "Community 74"
 Cohesion: 0.13
 Nodes (18): cleanKumaScript(), confidenceFor(), convertHtmlTables(), dropEmptySections(), dropEmptySectionsOnce(), extractFromSource(), headingLevel(), KUMASCRIPT_BADGES (+10 more)
+
+### Community 75 - "Community 75"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Multi-Turn and Persistent Attacks[¶], Multi-Turn and Persistent Attacks[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#multi-turn-and-persistent-attacks "Permanent link"), Provenance, Summary
+
+### Community 76 - "Community 76"
+Cohesion: 0.29
+Nodes (6): Agent-Specific Defenses[¶], Agent-Specific Defenses[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#agent-specific-defenses "Permanent link"), Compressed, Detailed, Provenance, Summary
 
 ### Community 77 - "Community 77"
 Cohesion: 0.29
@@ -1177,6 +1317,14 @@ Nodes (9): env(), PROJECT_CACHE, setProject(), CLI_ENTRY, defaultCwd(), REPO_ROO
 Cohesion: 0.29
 Nodes (6): Compressed, Detailed, Provenance, Storage location, Storage location, Summary
 
+### Community 82 - "Community 82"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Direct Prompt Injection[¶], Direct Prompt Injection[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#direct-prompt-injection "Permanent link"), Provenance, Summary
+
+### Community 83 - "Community 83"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Secure Implementation Pipeline[¶], Secure Implementation Pipeline[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#secure-implementation-pipeline "Permanent link"), Summary
+
 ### Community 84 - "Community 84"
 Cohesion: 0.25
 Nodes (3): baseline, PROTECTED_PATHS, REPO_ROOT
@@ -1189,13 +1337,77 @@ Nodes (6): Compressed, Detailed, Provenance, Summary, Troubleshoot memory issues
 Cohesion: 0.29
 Nodes (6): Audit and edit your memory, Audit and edit your memory, Compressed, Detailed, Provenance, Summary
 
+### Community 87 - "Community 87"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, LangChain[¶], LangChain[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#langchain "Permanent link"), Provenance, Summary
+
+### Community 88 - "Community 88"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Typoglycemia-Based Attacks[¶], Typoglycemia-Based Attacks[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#typoglycemia-based-attacks "Permanent link")
+
+### Community 89 - "Community 89"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Related Articles[¶], Related Articles[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#related-articles "Permanent link"), Summary
+
+### Community 90 - "Community 90"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Output Monitoring and Validation[¶], Output Monitoring and Validation[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#output-monitoring-and-validation "Permanent link"), Provenance, Summary
+
 ### Community 91 - "Community 91"
 Cohesion: 0.08
 Nodes (31): allFixtures, argv, BASELINE_DIR, CAPTURE_DEPS, captureFixture(), CURRENT_DIR, fileExists(), filters (+23 more)
 
+### Community 92 - "Community 92"
+Cohesion: 0.29
+Nodes (6): Additional Defenses[¶], Additional Defenses[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#additional-defenses "Permanent link"), Compressed, Detailed, Provenance, Summary
+
+### Community 93 - "Community 93"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Input Validation and Sanitization[¶], Input Validation and Sanitization[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#input-validation-and-sanitization "Permanent link"), Provenance, Summary
+
+### Community 94 - "Community 94"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, Summary, Testing for Vulnerabilities[¶], Testing for Vulnerabilities[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#testing-for-vulnerabilities "Permanent link")
+
+### Community 95 - "Community 95"
+Cohesion: 0.29
+Nodes (6): Best-of-N Attack Mitigation[¶], Best-of-N Attack Mitigation[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#best-of-n-attack-mitigation "Permanent link"), Compressed, Detailed, Provenance, Summary
+
+### Community 96 - "Community 96"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Provenance, RAG Poisoning (Retrieval Attacks)[¶], RAG Poisoning (Retrieval Attacks)[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#rag-poisoning-retrieval-attacks "Permanent link"), Summary
+
+### Community 97 - "Community 97"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, HTML and Markdown Injection[¶], HTML and Markdown Injection[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#html-and-markdown-injection "Permanent link"), Provenance, Summary
+
+### Community 98 - "Community 98"
+Cohesion: 0.29
+Nodes (6): Common Attack Types[¶], Common Attack Types[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#common-attack-types "Permanent link"), Compressed, Detailed, Provenance, Summary
+
+### Community 99 - "Community 99"
+Cohesion: 0.29
+Nodes (6): Comprehensive Monitoring[¶], Comprehensive Monitoring[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#comprehensive-monitoring "Permanent link"), Compressed, Detailed, Provenance, Summary
+
 ### Community 100 - "Community 100"
 Cohesion: 0.13
 Nodes (15): identifier, strategy, target, description, command_not_found, oclif, bin, commands (+7 more)
+
+### Community 101 - "Community 101"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Model-Based Guardrails[¶], Model-Based Guardrails[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#model-based-guardrails "Permanent link"), Provenance, Summary
+
+### Community 102 - "Community 102"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, OpenAI API[¶], OpenAI API[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#openai-api "Permanent link"), Provenance, Summary
+
+### Community 103 - "Community 103"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Encoding and Obfuscation Techniques[¶], Encoding and Obfuscation Techniques[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#encoding-and-obfuscation-techniques "Permanent link"), Provenance, Summary
+
+### Community 104 - "Community 104"
+Cohesion: 0.29
+Nodes (6): Compressed, Detailed, Multimodal Injection[¶], Multimodal Injection[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#multimodal-injection "Permanent link"), Provenance, Summary
 
 ### Community 105 - "Community 105"
 Cohesion: 0.29
@@ -1212,6 +1424,10 @@ Nodes (6): Compressed, Detailed, Provenance, Summary, Write effective instructio
 ### Community 108 - "Community 108"
 Cohesion: 0.29
 Nodes (6): Compressed, Detailed, Enable or disable auto memory, Enable or disable auto memory, Provenance, Summary
+
+### Community 109 - "Community 109"
+Cohesion: 0.33
+Nodes (6): Detailed, Direct Prompt Injections, Indirect Prompt Injections, Reference Links, Related Frameworks and Taxonomies, Types of Prompt Injection Vulnerabilities
 
 ### Community 110 - "Community 110"
 Cohesion: 0.04
@@ -1249,9 +1465,17 @@ Nodes (6): Compressed, Detailed, Provenance, Summary, When to add to CLAUDE.md, 
 Cohesion: 0.29
 Nodes (6): Compressed, Detailed, Import additional files, Import additional files, Provenance, Summary
 
+### Community 119 - "Community 119"
+Cohesion: 0.33
+Nodes (6): Additional Defenses[¶], Agent-Specific Defenses[¶], Comprehensive Monitoring[¶], Least Privilege[¶], Model-Based Guardrails[¶], Remote Content Sanitization[¶]
+
 ### Community 120 - "Community 120"
 Cohesion: 0.33
 Nodes (6): Can I create a rule from chat?, Can rules reference other rules or files?, Do rules impact Cursor Tab or other AI features?, Do User Rules apply to Inline Edit (Cmd/Ctrl+K)?, FAQ, Why isn't my rule being applied?
+
+### Community 121 - "Community 121"
+Cohesion: 0.33
+Nodes (6): Additional Defenses[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#additional-defenses "Permanent link"), Agent-Specific Defenses[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#agent-specific-defenses "Permanent link"), Comprehensive Monitoring[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#comprehensive-monitoring "Permanent link"), Least Privilege[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#least-privilege "Permanent link"), Model-Based Guardrails[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#model-based-guardrails "Permanent link"), Remote Content Sanitization[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#remote-content-sanitization "Permanent link")
 
 ### Community 122 - "Community 122"
 Cohesion: 0.33
@@ -1261,9 +1485,33 @@ Nodes (6): Can I create a rule from chat?, Can rules reference other rules or fi
 Cohesion: 0.29
 Nodes (7): dependencies, linkedom, @mozilla/readability, @oclif/core, @oclif/plugin-autocomplete, turndown, update-notifier
 
+### Community 124 - "Community 124"
+Cohesion: 0.33
+Nodes (6): Best-of-N Attack Mitigation[¶], Human-in-the-Loop (HITL) Controls[¶], Input Validation and Sanitization[¶], Output Monitoring and Validation[¶], Primary Defenses[¶], Structured Prompts with Clear Separation[¶]
+
+### Community 125 - "Community 125"
+Cohesion: 0.33
+Nodes (6): Best-of-N Attack Mitigation[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#best-of-n-attack-mitigation "Permanent link"), Human-in-the-Loop (HITL) Controls[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#human-in-the-loop-hitl-controls "Permanent link"), Input Validation and Sanitization[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#input-validation-and-sanitization "Permanent link"), Output Monitoring and Validation[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#output-monitoring-and-validation "Permanent link"), Primary Defenses[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#primary-defenses "Permanent link"), Structured Prompts with Clear Separation[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#structured-prompts-with-clear-separation "Permanent link")
+
 ### Community 126 - "Community 126"
 Cohesion: 0.40
 Nodes (5): Adding a new setting in Cursor, Automating development workflows and documentation generation, Examples, Standards for frontend components and API validation, Templates for Express services and React components
+
+### Community 127 - "Community 127"
+Cohesion: 0.40
+Nodes (4): Compressed, Detailed, Provenance, Summary
+
+### Community 128 - "Community 128"
+Cohesion: 0.67
+Nodes (3): Examples, Python manifest guard hook, TypeScript stop automation hook
+
+### Community 129 - "Community 129"
+Cohesion: 0.67
+Nodes (3): Framework-Specific Implementations[¶], LangChain[¶], OpenAI API[¶]
+
+### Community 130 - "Community 130"
+Cohesion: 0.67
+Nodes (3): Framework-Specific Implementations[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#framework-specific-implementations "Permanent link"), LangChain[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#langchain "Permanent link"), OpenAI API[¶](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html#openai-api "Permanent link")
 
 ### Community 131 - "Community 131"
 Cohesion: 0.40
@@ -1570,8 +1818,8 @@ Cohesion: 0.20
 Nodes (10): Class: `fs.Dirent`, `dirent.isBlockDevice()`, `dirent.isCharacterDevice()`, `dirent.isDirectory()`, `dirent.isFIFO()`, `dirent.isFile()`, `dirent.isSocket()`, `dirent.isSymbolicLink()` (+2 more)
 
 ### Community 243 - "Community 243"
-Cohesion: 0.21
-Nodes (11): activeChildrenOf(), buildSectionArtifacts(), persistSectionArtifacts(), breadcrumb(), findHeadings(), HeadingLine, headingPlainText(), SectionChunk (+3 more)
+Cohesion: 0.42
+Nodes (7): breadcrumb(), findHeadings(), HeadingLine, headingPlainText(), SectionChunk, slugifyHeading(), splitMarkdownSections()
 
 ### Community 244 - "Community 244"
 Cohesion: 0.22
@@ -1674,10 +1922,6 @@ Cohesion: 0.40
 Nodes (4): Api Key, Basic Authentication, OAuth 2.0, Settings
 
 ### Community 269 - "Community 269"
-Cohesion: 0.40
-Nodes (4): Api Key, Basic Authentication, OAuth 2.0, Settings
-
-### Community 270 - "Community 270"
 Cohesion: 0.40
 Nodes (4): Api Key, Basic Authentication, OAuth 2.0, Settings
 
@@ -1822,8 +2066,8 @@ Cohesion: 0.07
 Nodes (28): Class: `fs.Utf8Stream`, Event: `'close'`, Event: `'drain'`, Event: `'drop'`, Event: `'error'`, Event: `'finish'`, Event: `'ready'`, Event: `'write'` (+20 more)
 
 ### Community 326 - "Community 326"
-Cohesion: 0.12
-Nodes (26): DocsEngine, DocsFramework, emptyCapabilities(), Evidence, MachineReadableType, SearchCapability, SearchProvider, SourceHint (+18 more)
+Cohesion: 0.08
+Nodes (33): DocsEngine, DocsFramework, Evidence, MachineReadableType, PageMapEntry, SearchCapability, SearchProvider, SourceHint (+25 more)
 
 ### Community 327 - "Community 327"
 Cohesion: 0.09
@@ -1870,8 +2114,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, `fs.cpSync(src, dest[, options])`, `fs.cpSync(src, dest[, options])`, Provenance, Summary
 
 ### Community 338 - "Community 338"
-Cohesion: 0.14
-Nodes (9): ResearchInspect, SectionSummary, ConfigIndex, stableErrorCodeFrom(), ResolvedResearchTarget, resolveResearchTarget(), ResolveResearchTargetOptions, LocatedArtifact (+1 more)
+Cohesion: 0.27
+Nodes (3): ConfigIndex, stableErrorCodeFrom(), BaseCommand
 
 ### Community 339 - "Community 339"
 Cohesion: 0.13
@@ -2082,8 +2326,8 @@ Cohesion: 0.33
 Nodes (5): [Examples](https://tailwindcss.com/docs/grid-template-columns#examples), [Implementing a subgrid](https://tailwindcss.com/docs/grid-template-columns#implementing-a-subgrid), [Responsive design](https://tailwindcss.com/docs/grid-template-columns#responsive-design), [Specifying the grid columns](https://tailwindcss.com/docs/grid-template-columns#specifying-the-grid-columns), [Using a custom value](https://tailwindcss.com/docs/grid-template-columns#using-a-custom-value)
 
 ### Community 392 - "Community 392"
-Cohesion: 0.43
-Nodes (7): Before you begin, Deploy your documentation site, Make your first change, Next steps, Quickstart, Related topics, View your deployed site
+Cohesion: 0.52
+Nodes (6): Before you begin, Deploy your documentation site, Make your first change, Next steps, Quickstart, View your deployed site
 
 ### Community 393 - "Community 393"
 Cohesion: 0.33
@@ -2698,8 +2942,8 @@ Cohesion: 0.67
 Nodes (3): File descriptors, `fs.readFile(path[, options], callback)`, Performance Considerations
 
 ### Community 564 - "Community 564"
-Cohesion: 0.12
-Nodes (28): ABBREVIATIONS, applySalienceBoost(), BlockState, buildFrequencies(), collectHeadingTerms(), collectSentences(), contentTokens(), findBoundaryEnd() (+20 more)
+Cohesion: 0.11
+Nodes (29): STOPWORDS, ABBREVIATIONS, applySalienceBoost(), BlockState, buildFrequencies(), collectHeadingTerms(), collectSentences(), contentTokens() (+21 more)
 
 ### Community 565 - "Community 565"
 Cohesion: 0.06
@@ -2962,8 +3206,8 @@ Cohesion: 0.29
 Nodes (6): Compressed, Detailed, [FCFS matching], [FCFS matching](https://prismjs.com/extending.html#fcfs-matching), Provenance, Summary
 
 ### Community 637 - "Community 637"
-Cohesion: 0.13
-Nodes (24): MachineReadableArtifact, SiteCapabilities, detectDocsEngine(), getMetaGenerator(), MachineReadableResult, TextFetcher, CaptureDeps, CaptureOptions (+16 more)
+Cohesion: 0.14
+Nodes (23): emptyCapabilities(), MachineReadableArtifact, SiteCapabilities, detectDocsEngine(), MachineReadableResult, TextFetcher, CaptureDeps, CaptureOptions (+15 more)
 
 ### Community 638 - "Community 638"
 Cohesion: 0.10
@@ -3354,8 +3598,8 @@ Cohesion: 0.50
 Nodes (4): External Links, Internal Links, Links, Page Suffix
 
 ### Community 753 - "Community 753"
-Cohesion: 0.14
-Nodes (5): ResearchImport, IsolatedCache, useIsolatedCache(), buildCompressed(), compressMarkdown()
+Cohesion: 0.16
+Nodes (3): ResearchImport, IsolatedCache, useIsolatedCache()
 
 ### Community 754 - "Community 754"
 Cohesion: 0.14
@@ -3583,7 +3827,7 @@ Nodes (8): Default Workflow, Fallbacks, Freshness Policy, Invocation, Response C
 
 ### Community 810 - "Community 810"
 Cohesion: 0.10
-Nodes (23): LIST_LABELS, LISTABLE_ARTIFACT_TYPES, ResearchList, ResearchPrune, color(), colors, isColorEnabled(), limitFlag() (+15 more)
+Nodes (17): ResearchInspect, LIST_LABELS, LISTABLE_ARTIFACT_TYPES, ResearchList, ResearchPrune, limitFlag(), closestMatch(), levenshtein() (+9 more)
 
 ### Community 811 - "Community 811"
 Cohesion: 0.25
@@ -3611,7 +3855,7 @@ Nodes (21): afterAgentResponse, afterAgentThought, afterFileEdit, afterMCPExecut
 
 ### Community 819 - "Community 819"
 Cohesion: 0.09
-Nodes (22): Agent security and safety, Code security and best practices, Command-Based Hooks, Dependency security, Enterprise hooks and distribution, Environment Variables, Examples, Hook categories (+14 more)
+Nodes (23): Agent security and safety, Cloud Distribution (Enterprise Only), Code security and best practices, Command-Based Hooks, Dependency security, Enterprise hooks and distribution, Environment Variables, Hook categories (+15 more)
 
 ### Community 820 - "Community 820"
 Cohesion: 0.11
@@ -4066,7 +4310,7 @@ Cohesion: 0.20
 Nodes (10): Chaos, Consistency across programs, Conversation as the norm, Ease of discovery, Empathy, Human-first design, Philosophy, Robustness (+2 more)
 
 ### Community 933 - "Community 933"
-Cohesion: 0.22
+Cohesion: 0.20
 Nodes (12): fakeCapture(), fakeExtraction(), fakeFetchResult(), mocks, seedCachedArtifact(), deriveCacheKey(), isSafeIp(), isSafeIpv4() (+4 more)
 
 ### Community 934 - "Community 934"
@@ -4086,12 +4330,12 @@ Cohesion: 0.22
 Nodes (8): Alternative Flag Inputs[​], Alternative Flag Inputs[​](https://oclif.io/docs/flags#alternative-flag-inputs "Direct link to Alternative Flag Inputs"), Compressed, Custom Flags[​], Custom Flags[​](https://oclif.io/docs/flags#custom-flags "Direct link to Custom Flags"), Detailed, Provenance, Summary
 
 ### Community 946 - "Community 946"
-Cohesion: 0.17
-Nodes (12): appearance, cleanUrls, Customization, Detailed, lastUpdated, markdown, rewrites, Routing (+4 more)
+Cohesion: 0.13
+Nodes (14): appearance, cleanUrls, Compressed, Customization, Detailed, lastUpdated, markdown, rewrites (+6 more)
 
 ### Community 947 - "Community 947"
-Cohesion: 0.13
-Nodes (14): appearance, cleanUrls, Compressed, Customization, lastUpdated, markdown, Provenance, rewrites (+6 more)
+Cohesion: 0.17
+Nodes (12): appearance, cleanUrls, Customization, lastUpdated, markdown, Provenance, rewrites, Routing (+4 more)
 
 ### Community 948 - "Community 948"
 Cohesion: 0.18
@@ -4118,8 +4362,8 @@ Cohesion: 0.22
 Nodes (9): Build Hooks, buildEnd, Example: Adding a canonical URL `<link>`, Example: Adding a `<meta name="og:title">`, Example: Adding `og:image` meta, postRender, transformHead, transformHtml (+1 more)
 
 ### Community 954 - "Community 954"
-Cohesion: 0.11
-Nodes (28): bareUrlInput(), buildCommandNotFoundDetails(), emitJsonError(), exactZeroArgCommandPrefix(), findSuggestion(), hook(), isJsonMode(), fakeConfig (+20 more)
+Cohesion: 0.08
+Nodes (38): __dirname, pkg, rawArgv, req, result, bareUrlInput(), buildCommandNotFoundDetails(), emitJsonError() (+30 more)
 
 ### Community 955 - "Community 955"
 Cohesion: 0.29
@@ -4338,8 +4582,8 @@ Cohesion: 0.40
 Nodes (4): Compressed, Detailed, Provenance, Summary
 
 ### Community 1015 - "Community 1015"
-Cohesion: 0.36
-Nodes (8): applyAutoTags(), calculateFrequencies(), cleanNoise(), dedupeTags(), extractKeywords(), getHeadingTerms(), STOPWORDS, tokenize()
+Cohesion: 0.20
+Nodes (18): buildCompressed(), compressMarkdown(), getPolicy(), applyAutoTags(), calculateFrequencies(), cleanNoise(), dedupeTags(), extractKeywords() (+10 more)
 
 ### Community 1017 - "Community 1017"
 Cohesion: 0.40
@@ -4354,24 +4598,24 @@ Cohesion: 0.50
 Nodes (4): Fork the current conversation, How forks differ from named subagents, Limitations, Observe and steer running forks
 
 ## Knowledge Gaps
-- **6329 isolated node(s):** `$schema`, `changelog`, `commit`, `fixed`, `linked` (+6324 more)
+- **6629 isolated node(s):** `$schema`, `changelog`, `commit`, `fixed`, `linked` (+6624 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **53 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **52 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `File system` connect `Community 249` to `Community 194`, `Community 235`, `Community 238`, `Community 209`, `Community 61`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `File system` connect `Community 240` to `Community 110`, `Community 207`, `Community 239`, `Community 210`, `Community 249`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `Callback API` connect `Community 110` to `Community 556`, `Community 559`, `Community 240`, `Community 561`, `Community 563`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `File system` connect `Community 240` to `Community 110`, `Community 207`, `Community 239`, `Community 210`, `Community 249`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Why does `Promises API` connect `Community 209` to `Community 249`, `Community 217`?**
+  _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `$schema`, `changelog`, `commit` to the rest of the system?**
-  _6329 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _6629 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 3` be split into smaller, more focused modules?**
+  _Cohesion score 0.04878048780487805 - nodes in this community are weakly interconnected._
 - **Should `Community 5` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**
-  _Cohesion score 0.09482001755926252 - nodes in this community are weakly interconnected._
-- **Should `Community 7` be split into smaller, more focused modules?**
-  _Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09588421528720036 - nodes in this community are weakly interconnected._

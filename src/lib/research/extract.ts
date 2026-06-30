@@ -4,6 +4,7 @@ import { htmlToMarkdown } from './markdown.js';
 import { normalizeCodeBlocks } from './docs/code-blocks.js';
 import { cleanDocsChrome } from './docs/clean-dom.js';
 import { analyzeMarkdownQuality } from './docs/quality-gates.js';
+import { sanitizePromptInjection } from './prompt-injection.js';
 
 export interface ExtractionResult {
   title: string;
@@ -90,7 +91,7 @@ export function extractHtmlContent(html: string, finalUrl: string): ExtractionRe
     );
   }
 
-  const detailedMarkdown = htmlToMarkdown(article.content);
+  const detailedMarkdown = sanitizePromptInjection(htmlToMarkdown(article.content));
   const textLength = article.textContent ? article.textContent.trim().length : 0;
   const { confidence, notes } = determineConfidence(textLength);
   const quality = analyzeMarkdownQuality(detailedMarkdown, article.title || '');

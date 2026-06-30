@@ -11,6 +11,7 @@ import { writeArtifactSecurely } from '../lib/research/secure-write.js';
 import { loadSummaryLevel, type StorageMode } from '../lib/config/index.js';
 import { durationFlagError, getPolicy } from '../lib/research/freshness.js';
 import { buildCompressed } from '../lib/research/compress.js';
+import { sanitizePromptInjection } from '../lib/research/prompt-injection.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { estimateTokens } from '../lib/research/token-estimate.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from '../lib/research/schema.js';
@@ -313,12 +314,12 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     const staleAfterTime = new Date(currentTime.getTime() + freshWindowMs);
 
     const inputFormat = this.flags['input-format'];
-    const detailed = rawInput;
+    const detailed = sanitizePromptInjection(rawInput);
     // A caller-supplied compressed input is trusted as-is; only a detailed import is condensed here,
     // and it shares the same buildCompressed policy (structural pass + extractive fallback) as fetch.
     const compressed =
       inputFormat === 'detailed'
-        ? buildCompressed(rawInput, loadSummaryLevel(this.config.configDir, process.cwd()))
+        ? buildCompressed(detailed, loadSummaryLevel(this.config.configDir, process.cwd()))
         : rawInput;
     const contentHash = createHash('sha256').update(detailed).digest('hex');
 
