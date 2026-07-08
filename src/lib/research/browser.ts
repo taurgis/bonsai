@@ -2,6 +2,7 @@ import { spawn, ChildProcess } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { checkDnsSafety } from './fetcher.js';
+import { getChromeProxyArgs } from './proxy.js';
 import { normalizeUrl } from './url.js';
 
 export interface BrowserFetchOptions {
@@ -140,6 +141,9 @@ async function spawnChrome(
     '--disable-setuid-sandbox',
     '--disable-extensions',
     '--disable-dev-shm-usage',
+    // CDP navigation uses Chrome's own network stack, not Node's fetch/undici, so a sandbox
+    // proxy detected via *_PROXY env vars must be passed to Chrome separately (see proxy.ts).
+    ...getChromeProxyArgs(),
   ]);
 
   try {

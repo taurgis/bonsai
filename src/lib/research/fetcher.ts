@@ -1,6 +1,19 @@
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
+import { fetch as undiciFetch } from 'undici';
 import { isSafeIp, normalizeUrl } from './url.js';
+import { getProxyDispatcher } from './proxy.js';
+
+// Node's global fetch cannot be handed a Dispatcher from the separate `undici` package (their
+// internal request-handler interfaces don't line up across versions), so routing through a
+// sandbox-detected proxy requires switching to undici's own fetch for that one request. The
+// unproxied path keeps using the global fetch, matching existing tests that stub `globalThis.fetch`.
+async function doFetch(url: string, init: RequestInit): Promise<Response> {
+  const dispatcher = getProxyDispatcher();
+  if (!dispatcher) return fetch(url, init);
+  const proxiedInit = { ...init, dispatcher } as Parameters<typeof undiciFetch>[1];
+  return undiciFetch(url, proxiedInit) as unknown as Promise<Response>;
+}
 
 export interface FetchOptions {
   timeoutMs?: number;
@@ -179,7 +192,7 @@ async function fetchWithRedirects(
     const id = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const res = await fetch(currentUrl, {
+      const res = await doFetch(currentUrl, {
         method: 'GET',
         headers: initialHeaders,
         redirect: 'manual',
@@ -240,7 +253,7 @@ export async function postJson(
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
-    const res = await fetch(target, {
+    const res = await doFetch(target, {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...headers },
       body: JSON.stringify(body),

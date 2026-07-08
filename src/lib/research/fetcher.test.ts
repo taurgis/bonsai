@@ -1,10 +1,16 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { fetchStaticHtml, fetchText, postJson } from './fetcher.js';
 import * as dns from 'node:dns/promises';
+import * as undici from 'undici';
 
 vi.mock('node:dns/promises', () => ({
   lookup: vi.fn(),
 }));
+
+vi.mock('undici', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('undici')>();
+  return { ...actual, fetch: vi.fn() };
+});
 
 describe('static HTML fetcher', () => {
   const originalFetch = globalThis.fetch;
@@ -332,5 +338,45 @@ describe('postJson', () => {
     await expect(postJson('https://app-dsn.algolia.net/1/indexes/x/query', {})).rejects.toThrow(
       /Search request failed with status 403 Forbidden/
     );
+  });
+});
+
+describe('sandbox proxy routing', () => {
+  const originalFetch = globalThis.fetch;
+  const originalHttpsProxy = process.env.HTTPS_PROXY;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    vi.mocked(dns.lookup).mockResolvedValue([{ address: '93.184.215.14', family: 4 }] as any);
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    if (originalHttpsProxy === undefined) delete process.env.HTTPS_PROXY;
+    else process.env.HTTPS_PROXY = originalHttpsProxy;
+  });
+
+  it('routes through undici with a proxy dispatcher when HTTPS_PROXY is set, bypassing global fetch', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const globalFetchMock = vi.fn();
+    globalThis.fetch = globalFetchMock;
+
+    const undiciFetchMock = vi.mocked(undici.fetch);
+    undiciFetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'text/html' }),
+      body: (async function* () {
+        yield new TextEncoder().encode('<!doctype html><html><body>Proxied</body></html>');
+      })(),
+    } as any);
+
+    const result = await fetchStaticHtml('https://developer.salesforce.com/docs/x');
+
+    expect(result.content).toBe('<!doctype html><html><body>Proxied</body></html>');
+    expect(globalFetchMock).not.toHaveBeenCalled();
+    expect(undiciFetchMock).toHaveBeenCalledTimes(1);
+    const [, init] = undiciFetchMock.mock.calls[0]!;
+    expect((init as { dispatcher?: unknown }).dispatcher).toBeDefined();
   });
 });
