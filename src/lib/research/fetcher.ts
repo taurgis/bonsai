@@ -2,17 +2,30 @@ import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 import { fetch as undiciFetch } from 'undici';
 import { isSafeIp, normalizeUrl } from './url.js';
-import { getProxyDispatcher } from './proxy.js';
+import { getProxyDispatcher, isProxyConfigured } from './proxy.js';
 
 // Node's global fetch cannot be handed a Dispatcher from the separate `undici` package (their
 // internal request-handler interfaces don't line up across versions), so routing through a
 // sandbox-detected proxy requires switching to undici's own fetch for that one request. The
 // unproxied path keeps using the global fetch, matching existing tests that stub `globalThis.fetch`.
+//
+// A configured proxy isn't a guarantee the proxy can actually reach a given host (many sandbox
+// proxies only allowlist specific destinations), so a transport-level failure through the proxy
+// falls back to a direct connection rather than treating "proxy is configured" as "proxy or
+// nothing." Node/undici's fetch rejects with a `TypeError` for transport failures (DNS, refused
+// connection, a proxy that refuses to tunnel) before any response is received, distinct from the
+// plain `Error` this module throws once it has an actual HTTP response to reject (see assertOk) —
+// only the former is worth retrying, since the latter would just fail the same way again directly.
 async function doFetch(url: string, init: RequestInit): Promise<Response> {
   const dispatcher = getProxyDispatcher();
   if (!dispatcher) return fetch(url, init);
-  const proxiedInit = { ...init, dispatcher } as Parameters<typeof undiciFetch>[1];
-  return undiciFetch(url, proxiedInit) as unknown as Promise<Response>;
+  try {
+    const proxiedInit = { ...init, dispatcher } as Parameters<typeof undiciFetch>[1];
+    return (await undiciFetch(url, proxiedInit)) as unknown as Response;
+  } catch (err) {
+    if (!(err instanceof TypeError)) throw err;
+    return fetch(url, init);
+  }
 }
 
 export interface FetchOptions {
@@ -54,6 +67,13 @@ export async function checkDnsSafety(hostname: string): Promise<void> {
     }
     return;
   }
+
+  // Once a proxy is configured, DNS resolution and the actual connection happen on the proxy's
+  // side, not here: a local lookup can neither confirm nor deny what address the proxy will
+  // really contact, so it adds a spurious failure point (a sandbox that requires a proxy commonly
+  // also blocks the raw DNS queries this makes) without the safety guarantee it's meant to give.
+  // The literal-IP check above is unaffected by this — it never depended on local resolution.
+  if (isProxyConfigured()) return;
 
   try {
     const addresses = await lookup(hostToResolve, { all: true });

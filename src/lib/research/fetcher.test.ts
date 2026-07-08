@@ -379,4 +379,63 @@ describe('sandbox proxy routing', () => {
     const [, init] = undiciFetchMock.mock.calls[0]!;
     expect((init as { dispatcher?: unknown }).dispatcher).toBeDefined();
   });
+
+  it('does not consult DNS locally when a proxy is configured (the proxy resolves it)', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    vi.mocked(undici.fetch).mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'text/html' }),
+      body: (async function* () {
+        yield new TextEncoder().encode('<!doctype html><html><body>Proxied</body></html>');
+      })(),
+    } as any);
+
+    await fetchStaticHtml('https://developer.salesforce.com/docs/x');
+
+    expect(dns.lookup).not.toHaveBeenCalled();
+  });
+
+  it('falls back to a direct connection when the proxy fails at the transport level', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const globalFetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'text/html' }),
+      body: (async function* () {
+        yield new TextEncoder().encode('<!doctype html><html><body>Direct</body></html>');
+      })(),
+    });
+    globalThis.fetch = globalFetchMock;
+
+    vi.mocked(undici.fetch).mockRejectedValue(
+      new TypeError('fetch failed', {
+        cause: new Error('Proxy response (403) !== 200 when HTTP Tunneling'),
+      })
+    );
+
+    const result = await fetchStaticHtml('https://developer.salesforce.com/docs/x');
+
+    expect(result.content).toBe('<!doctype html><html><body>Direct</body></html>');
+    expect(globalFetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fall back to a direct connection for a plain HTTP-level rejection', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const globalFetchMock = vi.fn();
+    globalThis.fetch = globalFetchMock;
+
+    vi.mocked(undici.fetch).mockResolvedValue({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+      headers: new Headers({}),
+      body: null,
+    } as any);
+
+    await expect(fetchStaticHtml('https://developer.salesforce.com/docs/x')).rejects.toThrow(
+      /Fetch failed with status 404/
+    );
+    expect(globalFetchMock).not.toHaveBeenCalled();
+  });
 });

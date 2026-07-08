@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Config, Errors } from '@oclif/core';
-import FetchCommand, { fetchFailureGuidance } from './fetch.js';
+import FetchCommand, { fetchFailureGuidance, describeError } from './fetch.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 import { hasInternetAccess } from '../../tests/helpers/network.js';
 
@@ -53,6 +53,38 @@ describe('fetchFailureGuidance', () => {
 
   it('returns undefined for unrecognized failures (original message surfaces unchanged)', () => {
     expect(fetchFailureGuidance('Some novel failure mode', url)).toBeUndefined();
+  });
+
+  it('points a proxy tunnel rejection at NO_PROXY/the proxy allowlist, not the destination', () => {
+    const g = fetchFailureGuidance(
+      'fetch failed: Proxy response (403) !== 200 when HTTP Tunneling',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toMatch(/HTTPS_PROXY|NO_PROXY/);
+  });
+
+  it('gives a generic connectivity hint for an unqualified "fetch failed"', () => {
+    const g = fetchFailureGuidance('fetch failed', url);
+    expect(g?.suggestions.join(' ')).toMatch(/connect/i);
+  });
+});
+
+describe('describeError', () => {
+  it('returns a bare Error message unchanged when there is no cause', () => {
+    expect(describeError(new Error('boom'))).toBe('boom');
+  });
+
+  it('joins the full cause chain, deepest last', () => {
+    const err = new TypeError('fetch failed', {
+      cause: new Error('Proxy response (403) !== 200 when HTTP Tunneling'),
+    });
+    expect(describeError(err)).toBe(
+      'fetch failed: Proxy response (403) !== 200 when HTTP Tunneling'
+    );
+  });
+
+  it('stringifies a non-Error throw', () => {
+    expect(describeError('plain string')).toBe('plain string');
   });
 });
 
