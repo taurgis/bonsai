@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { runContract } from './runner.ts';
+import { hasInternetAccess } from '../helpers/network.ts';
 
 describe('research contract tests', () => {
   it('bonsai --help exits 0 and lists top-level commands', () => {
@@ -215,13 +216,15 @@ describe('research contract tests', () => {
     expect(result.exitCode).toBe(2);
   });
 
-  it('bonsai URL outputs mock content in human mode', () => {
+  it('bonsai URL outputs mock content in human mode', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const result = runContract(['https://example.com']);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('This domain is for use in documentation examples');
   });
 
-  it('bonsai URL --json outputs structured JSON envelope', () => {
+  it('bonsai URL --json outputs structured JSON envelope', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const result = runContract(['https://example.com', '--json'], { raw: true });
     expect(result.exitCode).toBe(0);
 

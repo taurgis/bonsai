@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Config, Errors } from '@oclif/core';
 import FetchCommand, { fetchFailureGuidance } from './fetch.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
+import { hasInternetAccess } from '../../tests/helpers/network.js';
 
 describe('fetchFailureGuidance', () => {
   const url = 'https://docs.example.com/page';
@@ -76,7 +77,8 @@ async function captureEnvelope(
 describe('root fetch command unit tests', () => {
   useIsolatedCache();
 
-  it('runs the command class in-process and returns structured data', async () => {
+  it('runs the command class in-process and returns structured data', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const result = await FetchCommand.run(['https://example.com']);
     expect(result).toBeDefined();
     if (result) {
@@ -85,7 +87,8 @@ describe('root fetch command unit tests', () => {
     }
   });
 
-  it('runs command with detailed format', async () => {
+  it('runs command with detailed format', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const result = await FetchCommand.run(['https://example.com', '--format', 'detailed']);
     expect(result).toBeDefined();
     if (result) {
@@ -93,7 +96,8 @@ describe('root fetch command unit tests', () => {
     }
   });
 
-  it('returns the data and emits the success envelope in JSON mode', async () => {
+  it('returns the data and emits the success envelope in JSON mode', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const { result, envelope } = await captureEnvelope(() =>
       FetchCommand.run(['https://example.com', '--json'])
     );
