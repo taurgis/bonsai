@@ -14,6 +14,7 @@ import {
 } from '../lib/research/freshness.js';
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
+import { PROXY_TUNNEL_REJECTION_PATTERN } from '../lib/research/proxy.js';
 import { fetchRenderedHtml } from '../lib/research/browser.js';
 import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
@@ -257,8 +258,14 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   // failure — validation errors (bad flags/URL) exit before the try — so the contract's runtime code
   // (1) applies. Suggestions render on stderr for humans only; under --json the envelope carries just
   // the message (toErrorJson), so machine output is unchanged.
+  //
+  // Uses `describeError` (below) rather than `err.message` alone: Node/undici's fetch wraps
+  // transport failures (DNS, refused connections, a proxy that won't tunnel to the host) in a
+  // generic "fetch failed" TypeError with the real reason nested in `.cause`, so reading only the
+  // top message would surface a content-free "fetch failed" for exactly the failures a user most
+  // needs a hint for.
   private emitFetchError(err: unknown, url: string): never {
-    const message = err instanceof Error ? err.message : String(err);
+    const message = describeError(err);
     const guidance = fetchFailureGuidance(message, url);
     this.error(message, {
       exit: 1,
@@ -477,6 +484,26 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   }
 }
 
+// How many `.cause` levels to walk. Real undici/Node transport errors nest at most 1-2 deep;
+// the cap exists so a self-referential or cyclic `.cause` chain (Error.cause is an arbitrary,
+// unvalidated property — nothing prevents `e.cause = e`, whether from a bug in this codebase or
+// a dependency) can't hang the process, rather than being a limit expected to matter in practice.
+const MAX_CAUSE_DEPTH = 10;
+
+// Walks an Error's `.cause` chain and joins every message, deepest last. Node/undici's fetch
+// throws a generic `TypeError: fetch failed` for transport-level failures, with the actionable
+// detail (e.g. a proxy's tunnel rejection) nested one or two `.cause` levels down.
+export function describeError(err: unknown): string {
+  if (!(err instanceof Error)) return String(err);
+  const parts = [err.message];
+  let cause: unknown = err.cause;
+  for (let depth = 0; depth < MAX_CAUSE_DEPTH && cause instanceof Error; depth++) {
+    parts.push(cause.message);
+    cause = cause.cause;
+  }
+  return parts.join(': ');
+}
+
 // Maps a runtime fetch failure to recovery steps keyed off its message. Returns undefined for
 // unrecognized failures, which then surface with their original message and no extra hint. The
 // patterns match the thrown text in fetcher.ts/browser.ts; keep them in sync if those messages
@@ -520,6 +547,32 @@ export function fetchFailureGuidance(
   if (/DNS resolution failed/.test(message)) {
     return {
       suggestions: ['Check the hostname is spelled correctly and resolves on a public network.'],
+    };
+  }
+  // A configured proxy (HTTPS_PROXY/HTTP_PROXY) refused to tunnel to this host — distinct from
+  // the destination's own 401/403 above, which is the site itself rejecting the request. Shared
+  // with fetcher.ts's retry-fallback check so the two stay in sync by construction.
+  if (PROXY_TUNNEL_REJECTION_PATTERN.test(message)) {
+    return {
+      suggestions: [
+        "The configured proxy (HTTPS_PROXY/HTTP_PROXY) won't reach this host. Check its allowlist, or add the host to NO_PROXY to bypass the proxy for it.",
+        importHint,
+      ],
+      ref,
+    };
+  }
+  // The connection failed before any HTTP response was received — network-down, DNS, TLS, or a
+  // proxy issue not specifically matched above. Node/undici's fetch reports all of these as a
+  // generic "fetch failed" TypeError with no further suffix; the negative lookahead keeps this
+  // from also matching assertOk's "Fetch failed with status NNN ..." (a real HTTP response was
+  // received in that case, so it isn't a transport failure at all).
+  if (/^fetch failed\b(?!\s+with status)/i.test(message)) {
+    return {
+      suggestions: [
+        'The connection failed before a response was received. Check network connectivity and any HTTPS_PROXY/HTTP_PROXY/NO_PROXY settings.',
+        importHint,
+      ],
+      ref,
     };
   }
   // A hostname that only resolves to a private/local IP at request time (literal private addresses

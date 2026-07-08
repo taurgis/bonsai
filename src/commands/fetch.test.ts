@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Config, Errors } from '@oclif/core';
-import FetchCommand, { fetchFailureGuidance } from './fetch.js';
+import FetchCommand, { fetchFailureGuidance, describeError } from './fetch.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
+import { hasInternetAccess } from '../../tests/helpers/network.js';
 
 describe('fetchFailureGuidance', () => {
   const url = 'https://docs.example.com/page';
@@ -53,6 +54,60 @@ describe('fetchFailureGuidance', () => {
   it('returns undefined for unrecognized failures (original message surfaces unchanged)', () => {
     expect(fetchFailureGuidance('Some novel failure mode', url)).toBeUndefined();
   });
+
+  it('points a proxy tunnel rejection at NO_PROXY/the proxy allowlist, not the destination', () => {
+    const g = fetchFailureGuidance(
+      'fetch failed: Proxy response (403) !== 200 when HTTP Tunneling',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toMatch(/HTTPS_PROXY|NO_PROXY/);
+  });
+
+  it('gives a generic connectivity hint for an unqualified "fetch failed"', () => {
+    const g = fetchFailureGuidance('fetch failed', url);
+    expect(g?.suggestions.join(' ')).toMatch(/connect/i);
+  });
+
+  it('does not mistake a real HTTP status response for a transport-level failure', () => {
+    for (const status of ['400 Bad Request', '405 Method Not Allowed', '429 Too Many Requests']) {
+      // Uncovered status codes fall through to no guidance (same as before the generic transport
+      // pattern was added) rather than being misclassified as a network/proxy failure.
+      expect(fetchFailureGuidance(`Fetch failed with status ${status}`, url)).toBeUndefined();
+    }
+  });
+});
+
+describe('describeError', () => {
+  it('returns a bare Error message unchanged when there is no cause', () => {
+    expect(describeError(new Error('boom'))).toBe('boom');
+  });
+
+  it('joins the full cause chain, deepest last', () => {
+    const err = new TypeError('fetch failed', {
+      cause: new Error('Proxy response (403) !== 200 when HTTP Tunneling'),
+    });
+    expect(describeError(err)).toBe(
+      'fetch failed: Proxy response (403) !== 200 when HTTP Tunneling'
+    );
+  });
+
+  it('stringifies a non-Error throw', () => {
+    expect(describeError('plain string')).toBe('plain string');
+  });
+
+  it('does not hang on a self-referential cause chain', () => {
+    const err = new Error('cyclic') as Error & { cause?: unknown };
+    err.cause = err;
+    expect(describeError(err)).toBe(Array(11).fill('cyclic').join(': '));
+  });
+
+  it('does not hang on a mutually-referential cause chain', () => {
+    const a = new Error('a') as Error & { cause?: unknown };
+    const b = new Error('b') as Error & { cause?: unknown };
+    a.cause = b;
+    b.cause = a;
+    expect(describeError(a).split(': ').length).toBeLessThanOrEqual(11);
+  });
 });
 
 // Capture stdout during `fn` so the `--json` envelope can be parsed. oclif's `logJson` routes
@@ -76,7 +131,8 @@ async function captureEnvelope(
 describe('root fetch command unit tests', () => {
   useIsolatedCache();
 
-  it('runs the command class in-process and returns structured data', async () => {
+  it('runs the command class in-process and returns structured data', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const result = await FetchCommand.run(['https://example.com']);
     expect(result).toBeDefined();
     if (result) {
@@ -85,7 +141,8 @@ describe('root fetch command unit tests', () => {
     }
   });
 
-  it('runs command with detailed format', async () => {
+  it('runs command with detailed format', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const result = await FetchCommand.run(['https://example.com', '--format', 'detailed']);
     expect(result).toBeDefined();
     if (result) {
@@ -93,7 +150,8 @@ describe('root fetch command unit tests', () => {
     }
   });
 
-  it('returns the data and emits the success envelope in JSON mode', async () => {
+  it('returns the data and emits the success envelope in JSON mode', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
     const { result, envelope } = await captureEnvelope(() =>
       FetchCommand.run(['https://example.com', '--json'])
     );

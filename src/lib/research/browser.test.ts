@@ -1,11 +1,51 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   assertRenderedHttpOk,
+  buildChromeArgs,
   fetchRenderedHtml,
   findChromePath,
   ResponseCapture,
   type CdpPage,
 } from './browser.js';
+import { ALL_PROXY_ENV_VARS } from './proxy.js';
+
+describe('buildChromeArgs (sandbox proxy CLI flags)', () => {
+  const originalEnv: Record<string, string | undefined> = {};
+
+  beforeEach(() => {
+    for (const key of ALL_PROXY_ENV_VARS) {
+      originalEnv[key] = process.env[key];
+      delete process.env[key];
+    }
+  });
+
+  afterEach(() => {
+    for (const key of ALL_PROXY_ENV_VARS) {
+      if (originalEnv[key] === undefined) delete process.env[key];
+      else process.env[key] = originalEnv[key];
+    }
+  });
+
+  it('has no proxy-server flag when no sandbox egress proxy is configured', () => {
+    const args = buildChromeArgs();
+    expect(args.some((a) => a.startsWith('--proxy-server='))).toBe(false);
+    // The rest of the fixed flags are always present regardless of proxy state.
+    expect(args).toContain('--headless=new');
+  });
+
+  it('includes the scheme-qualified proxy-server flag when a sandbox egress proxy is configured', () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const args = buildChromeArgs();
+    expect(args).toContain('--proxy-server=https=http://127.0.0.1:46271');
+  });
+
+  it('includes a proxy-bypass-list flag reflecting NO_PROXY when both are set', () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    process.env.NO_PROXY = 'internal.example.com';
+    const args = buildChromeArgs();
+    expect(args).toContain('--proxy-bypass-list=internal.example.com,*.internal.example.com');
+  });
+});
 
 describe('browser rendering unit and integration tests', () => {
   it('successfully locates Chrome executable or throws', () => {

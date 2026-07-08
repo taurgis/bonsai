@@ -6,6 +6,7 @@ export default defineConfig({
     setupFiles: [
       './tests/setup/disable-ci-color.ts',
       './tests/setup/guard-repo-mutations.ts',
+      './tests/setup/clear-proxy-env.ts',
     ],
     testTimeout: 30000,
     coverage: {

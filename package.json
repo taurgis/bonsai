@@ -57,6 +57,7 @@
     "@oclif/plugin-autocomplete": "^3.2.52",
     "linkedom": "^0.18.12",
     "turndown": "^7.2.0",
+    "undici": "^8.7.0",
     "update-notifier": "^7.3.1"
   },
   "devDependencies": {
@@ -78,7 +79,7 @@
     "vue": "^3.5.39"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.19.0"
   },
   "publishConfig": {
     "access": "public",
