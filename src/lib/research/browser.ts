@@ -130,10 +130,10 @@ export function findChromePath(): string {
   );
 }
 
-async function spawnChrome(
-  chromePath: string
-): Promise<{ chromeProcess: ChildProcess; wsUrl: string }> {
-  const chromeProcess = spawn(chromePath, [
+// Split out from spawnChrome so the exact CLI args (including the proxy flags) are unit-testable
+// without spawning a real browser process.
+export function buildChromeArgs(): string[] {
+  return [
     '--headless=new',
     '--remote-debugging-port=0',
     '--disable-gpu',
@@ -144,7 +144,13 @@ async function spawnChrome(
     // CDP navigation uses Chrome's own network stack, not Node's fetch/undici, so a sandbox
     // proxy detected via *_PROXY env vars must be passed to Chrome separately (see proxy.ts).
     ...getChromeProxyArgs(),
-  ]);
+  ];
+}
+
+async function spawnChrome(
+  chromePath: string
+): Promise<{ chromeProcess: ChildProcess; wsUrl: string }> {
+  const chromeProcess = spawn(chromePath, buildChromeArgs());
 
   try {
     const wsUrl = await new Promise<string>((resolve, reject) => {

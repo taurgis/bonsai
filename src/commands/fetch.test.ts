@@ -67,6 +67,14 @@ describe('fetchFailureGuidance', () => {
     const g = fetchFailureGuidance('fetch failed', url);
     expect(g?.suggestions.join(' ')).toMatch(/connect/i);
   });
+
+  it('does not mistake a real HTTP status response for a transport-level failure', () => {
+    for (const status of ['400 Bad Request', '405 Method Not Allowed', '429 Too Many Requests']) {
+      // Uncovered status codes fall through to no guidance (same as before the generic transport
+      // pattern was added) rather than being misclassified as a network/proxy failure.
+      expect(fetchFailureGuidance(`Fetch failed with status ${status}`, url)).toBeUndefined();
+    }
+  });
 });
 
 describe('describeError', () => {
@@ -85,6 +93,20 @@ describe('describeError', () => {
 
   it('stringifies a non-Error throw', () => {
     expect(describeError('plain string')).toBe('plain string');
+  });
+
+  it('does not hang on a self-referential cause chain', () => {
+    const err = new Error('cyclic') as Error & { cause?: unknown };
+    err.cause = err;
+    expect(describeError(err)).toBe(Array(11).fill('cyclic').join(': '));
+  });
+
+  it('does not hang on a mutually-referential cause chain', () => {
+    const a = new Error('a') as Error & { cause?: unknown };
+    const b = new Error('b') as Error & { cause?: unknown };
+    a.cause = b;
+    b.cause = a;
+    expect(describeError(a).split(': ').length).toBeLessThanOrEqual(11);
   });
 });
 

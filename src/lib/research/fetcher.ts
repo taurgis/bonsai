@@ -1,8 +1,44 @@
 import { lookup } from 'node:dns/promises';
+import type { LookupAddress } from 'node:dns';
 import { isIP } from 'node:net';
 import { fetch as undiciFetch } from 'undici';
 import { isSafeIp, normalizeUrl } from './url.js';
-import { getProxyDispatcher, isProxyConfigured } from './proxy.js';
+import { getProxyDispatcher, isProxyConfigured, PROXY_TUNNEL_REJECTION_PATTERN } from './proxy.js';
+
+// Runs one fetch attempt with its own fresh AbortController/timeout, so that when `doFetch` makes
+// a second attempt (the proxy fallback below) it gets the full timeout budget rather than
+// whatever was left over from the first attempt's signal. Loosely typed at this one boundary
+// because it bridges two structurally-similar-but-nominally-distinct fetch implementations
+// (Node's global fetch and the separate `undici` package's own fetch/RequestInit/Response).
+async function fetchWithTimeout(
+  fetchFn: (url: string, init: Record<string, unknown>) => Promise<unknown>,
+  url: string,
+  init: Record<string, unknown>,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return (await fetchFn(url, { ...init, signal: controller.signal })) as Response;
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+// True when `err` is a transport failure specifically caused by the proxy declining to tunnel to
+// the target host (e.g. an allowlist-only sandbox proxy), as opposed to any other pre-response
+// failure (DNS, refused connection, a genuinely unreachable destination). Only this class of
+// failure is worth retrying without the proxy — retrying on any transport TypeError would also
+// re-attempt destinations that are down regardless of the proxy, doubling their latency for no
+// benefit.
+function isProxyTunnelRejection(err: unknown): boolean {
+  let current: unknown = err;
+  while (current instanceof Error) {
+    if (PROXY_TUNNEL_REJECTION_PATTERN.test(current.message)) return true;
+    current = current.cause;
+  }
+  return false;
+}
 
 // Node's global fetch cannot be handed a Dispatcher from the separate `undici` package (their
 // internal request-handler interfaces don't line up across versions), so routing through a
@@ -10,21 +46,22 @@ import { getProxyDispatcher, isProxyConfigured } from './proxy.js';
 // unproxied path keeps using the global fetch, matching existing tests that stub `globalThis.fetch`.
 //
 // A configured proxy isn't a guarantee the proxy can actually reach a given host (many sandbox
-// proxies only allowlist specific destinations), so a transport-level failure through the proxy
-// falls back to a direct connection rather than treating "proxy is configured" as "proxy or
-// nothing." Node/undici's fetch rejects with a `TypeError` for transport failures (DNS, refused
-// connection, a proxy that refuses to tunnel) before any response is received, distinct from the
-// plain `Error` this module throws once it has an actual HTTP response to reject (see assertOk) —
-// only the former is worth retrying, since the latter would just fail the same way again directly.
-async function doFetch(url: string, init: RequestInit): Promise<Response> {
+// proxies only allowlist specific destinations), so a proxy-tunnel rejection falls back to a
+// direct connection rather than treating "proxy is configured" as "proxy or nothing." The
+// fallback gets its own fresh timeout (via fetchWithTimeout) rather than inheriting the proxied
+// attempt's spent budget.
+async function doFetch(
+  url: string,
+  init: Record<string, unknown>,
+  timeoutMs: number
+): Promise<Response> {
   const dispatcher = getProxyDispatcher();
-  if (!dispatcher) return fetch(url, init);
+  if (!dispatcher) return fetchWithTimeout(fetch, url, init, timeoutMs);
   try {
-    const proxiedInit = { ...init, dispatcher } as Parameters<typeof undiciFetch>[1];
-    return (await undiciFetch(url, proxiedInit)) as unknown as Response;
+    return await fetchWithTimeout(undiciFetch, url, { ...init, dispatcher }, timeoutMs);
   } catch (err) {
-    if (!(err instanceof TypeError)) throw err;
-    return fetch(url, init);
+    if (!isProxyTunnelRejection(err)) throw err;
+    return fetchWithTimeout(fetch, url, init, timeoutMs);
   }
 }
 
@@ -68,24 +105,26 @@ export async function checkDnsSafety(hostname: string): Promise<void> {
     return;
   }
 
-  // Once a proxy is configured, DNS resolution and the actual connection happen on the proxy's
-  // side, not here: a local lookup can neither confirm nor deny what address the proxy will
-  // really contact, so it adds a spurious failure point (a sandbox that requires a proxy commonly
-  // also blocks the raw DNS queries this makes) without the safety guarantee it's meant to give.
-  // The literal-IP check above is unaffected by this — it never depended on local resolution.
-  if (isProxyConfigured()) return;
-
+  let addresses: LookupAddress[];
   try {
-    const addresses = await lookup(hostToResolve, { all: true });
-    for (const addr of addresses) {
-      if (!isSafeIp(addr.address)) {
-        throw new Error(
-          `IP address "${addr.address}" resolved for "${hostname}" is a blocked local or private target.`
-        );
-      }
-    }
+    addresses = await lookup(hostToResolve, { all: true });
   } catch (err) {
+    // A sandbox that requires a proxy for HTTP egress may also block raw DNS queries (port 53)
+    // without blocking name resolution done through the proxy itself — so a failed *local*
+    // lookup isn't necessarily a dead end when a proxy is available to fall back on. Only skip
+    // the safety guarantee in that specific case; whenever local resolution succeeds (the common
+    // case, proxy or not), the resolved address is still validated below regardless of proxy
+    // configuration, so a hostname that resolves to a private/internal IP is still caught.
+    if (isProxyConfigured()) return;
     throw new Error(`DNS resolution failed for hostname "${hostname}": ${(err as Error).message}`);
+  }
+
+  for (const addr of addresses) {
+    if (!isSafeIp(addr.address)) {
+      throw new Error(
+        `IP address "${addr.address}" resolved for "${hostname}" is a blocked local or private target.`
+      );
+    }
   }
 }
 
@@ -208,34 +247,26 @@ async function fetchWithRedirects(
     const parsedUrl = new URL(currentUrl);
     await checkDnsSafety(parsedUrl.hostname);
 
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
+    const res = await doFetch(
+      currentUrl,
+      { method: 'GET', headers: initialHeaders, redirect: 'manual' },
+      timeout
+    );
 
-    try {
-      const res = await doFetch(currentUrl, {
-        method: 'GET',
-        headers: initialHeaders,
-        redirect: 'manual',
-        signal: controller.signal,
-      });
-
-      if ([301, 302, 303, 307, 308].includes(res.status)) {
-        redirectCount++;
-        if (redirectCount > maxRedirects) {
-          throw new Error(`Too many redirects. Exceeded limit of ${maxRedirects}.`);
-        }
-        const location = res.headers.get('location');
-        if (!location) {
-          throw new Error(`Redirect response status ${res.status} missing Location header.`);
-        }
-        currentUrl = normalizeUrl(new URL(location, currentUrl).toString());
-        continue;
+    if ([301, 302, 303, 307, 308].includes(res.status)) {
+      redirectCount++;
+      if (redirectCount > maxRedirects) {
+        throw new Error(`Too many redirects. Exceeded limit of ${maxRedirects}.`);
       }
-
-      return await process(res, limit, currentUrl);
-    } finally {
-      clearTimeout(id);
+      const location = res.headers.get('location');
+      if (!location) {
+        throw new Error(`Redirect response status ${res.status} missing Location header.`);
+      }
+      currentUrl = normalizeUrl(new URL(location, currentUrl).toString());
+      continue;
     }
+
+    return await process(res, limit, currentUrl);
   }
 }
 
@@ -270,21 +301,17 @@ export async function postJson(
   const target = normalizeUrl(url);
   await checkDnsSafety(new URL(target).hostname);
 
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    const res = await doFetch(target, {
+  const res = await doFetch(
+    target,
+    {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...headers },
       body: JSON.stringify(body),
       redirect: 'error',
-      signal: controller.signal,
-    });
-    if (!res.ok)
-      throw new Error(`Search request failed with status ${res.status} ${res.statusText}`);
-    const bytes = await readBodyWithLimit(res.body, limit);
-    return new TextDecoder().decode(bytes);
-  } finally {
-    clearTimeout(id);
-  }
+    },
+    timeout
+  );
+  if (!res.ok) throw new Error(`Search request failed with status ${res.status} ${res.statusText}`);
+  const bytes = await readBodyWithLimit(res.body, limit);
+  return new TextDecoder().decode(bytes);
 }

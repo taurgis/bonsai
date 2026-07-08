@@ -380,8 +380,52 @@ describe('sandbox proxy routing', () => {
     expect((init as { dispatcher?: unknown }).dispatcher).toBeDefined();
   });
 
-  it('does not consult DNS locally when a proxy is configured (the proxy resolves it)', async () => {
+  it('still validates the resolved IP via local DNS even when a proxy is configured', async () => {
     process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    vi.mocked(dns.lookup).mockResolvedValue([{ address: '10.0.0.5', family: 4 }] as any);
+
+    await expect(fetchStaticHtml('https://developer.salesforce.com/docs/x')).rejects.toThrow(
+      /blocked local or private target/
+    );
+    expect(dns.lookup).toHaveBeenCalled();
+  });
+
+  it('still blocks a literal private IP hostname even when a proxy is configured', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+
+    await expect(fetchStaticHtml('http://169.254.169.254/latest/meta-data')).rejects.toThrow(
+      /blocked local or private target/
+    );
+    // The literal-IP check never needed DNS in the first place, proxy or not.
+    expect(dns.lookup).not.toHaveBeenCalled();
+  });
+
+  it('routes every hop of a redirect chain through the proxy, validating DNS safety per hop', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    vi.mocked(dns.lookup).mockImplementation(async (hostname) => {
+      if (hostname === 'developer.salesforce.com') {
+        return [{ address: '93.184.215.14', family: 4 }] as any;
+      }
+      return [{ address: '10.0.0.5', family: 4 }] as any; // the redirect target is private
+    });
+
+    const undiciFetchMock = vi.mocked(undici.fetch);
+    undiciFetchMock.mockResolvedValueOnce({
+      status: 302,
+      headers: new Headers({ location: 'https://internal.example/docs' }),
+      body: null,
+    } as any);
+
+    await expect(fetchStaticHtml('https://developer.salesforce.com/docs/x')).rejects.toThrow(
+      /blocked local or private target/
+    );
+    // Only the first hop's fetch happened — the second hop was blocked before doFetch ran.
+    expect(undiciFetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the DNS safety check only when local resolution itself fails and a proxy is available', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    vi.mocked(dns.lookup).mockRejectedValue(new Error('getaddrinfo ENOTFOUND'));
     vi.mocked(undici.fetch).mockResolvedValue({
       ok: true,
       status: 200,
@@ -391,12 +435,21 @@ describe('sandbox proxy routing', () => {
       })(),
     } as any);
 
-    await fetchStaticHtml('https://developer.salesforce.com/docs/x');
+    const result = await fetchStaticHtml('https://developer.salesforce.com/docs/x');
 
-    expect(dns.lookup).not.toHaveBeenCalled();
+    expect(result.content).toBe('<!doctype html><html><body>Proxied</body></html>');
   });
 
-  it('falls back to a direct connection when the proxy fails at the transport level', async () => {
+  it('still fails on a local DNS lookup failure when no proxy is configured', async () => {
+    delete process.env.HTTPS_PROXY;
+    vi.mocked(dns.lookup).mockRejectedValue(new Error('getaddrinfo ENOTFOUND'));
+
+    await expect(fetchStaticHtml('https://nope.example/docs')).rejects.toThrow(
+      /DNS resolution failed/
+    );
+  });
+
+  it('falls back to a direct connection when the proxy refuses to tunnel to the host', async () => {
     process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
     const globalFetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -420,6 +473,43 @@ describe('sandbox proxy routing', () => {
     expect(globalFetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it("gives the fallback attempt a fresh, unaborted signal rather than the failed attempt's", async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const globalFetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'text/html' }),
+      body: (async function* () {
+        yield new TextEncoder().encode('ok');
+      })(),
+    });
+    globalThis.fetch = globalFetchMock;
+
+    vi.mocked(undici.fetch).mockRejectedValue(
+      new TypeError('fetch failed', {
+        cause: new Error('Proxy response (403) !== 200 when HTTP Tunneling'),
+      })
+    );
+
+    await fetchStaticHtml('https://developer.salesforce.com/docs/x');
+
+    const [, init] = globalFetchMock.mock.calls[0]!;
+    expect((init as { signal: AbortSignal }).signal.aborted).toBe(false);
+  });
+
+  it('does not fall back to a direct connection for a transport failure unrelated to the proxy', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const globalFetchMock = vi.fn();
+    globalThis.fetch = globalFetchMock;
+
+    vi.mocked(undici.fetch).mockRejectedValue(new TypeError('fetch failed'));
+
+    await expect(fetchStaticHtml('https://developer.salesforce.com/docs/x')).rejects.toThrow(
+      'fetch failed'
+    );
+    expect(globalFetchMock).not.toHaveBeenCalled();
+  });
+
   it('does not fall back to a direct connection for a plain HTTP-level rejection', async () => {
     process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
     const globalFetchMock = vi.fn();
@@ -437,5 +527,53 @@ describe('sandbox proxy routing', () => {
       /Fetch failed with status 404/
     );
     expect(globalFetchMock).not.toHaveBeenCalled();
+  });
+
+  it('routes postJson through the proxy dispatcher when configured', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const globalFetchMock = vi.fn();
+    globalThis.fetch = globalFetchMock;
+
+    const undiciFetchMock = vi.mocked(undici.fetch);
+    undiciFetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({}),
+      body: (async function* () {
+        yield new TextEncoder().encode('{"hits":[]}');
+      })(),
+    } as any);
+
+    const out = await postJson('https://app-dsn.algolia.net/1/indexes/x/query', { q: 'test' });
+
+    expect(out).toBe('{"hits":[]}');
+    expect(globalFetchMock).not.toHaveBeenCalled();
+    const [, init] = undiciFetchMock.mock.calls[0]!;
+    expect((init as { dispatcher?: unknown }).dispatcher).toBeDefined();
+    expect((init as { method?: string }).method).toBe('POST');
+  });
+
+  it('falls back postJson to a direct connection when the proxy refuses to tunnel', async () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const globalFetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({}),
+      body: (async function* () {
+        yield new TextEncoder().encode('{"hits":["direct"]}');
+      })(),
+    });
+    globalThis.fetch = globalFetchMock;
+
+    vi.mocked(undici.fetch).mockRejectedValue(
+      new TypeError('fetch failed', {
+        cause: new Error('Proxy response (403) !== 200 when HTTP Tunneling'),
+      })
+    );
+
+    const out = await postJson('https://app-dsn.algolia.net/1/indexes/x/query', { q: 'test' });
+
+    expect(out).toBe('{"hits":["direct"]}');
+    expect(globalFetchMock).toHaveBeenCalledTimes(1);
   });
 });

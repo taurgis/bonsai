@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   isProxyConfigured,
   getProxyDispatcher,
@@ -86,5 +86,31 @@ describe('sandbox proxy detection', () => {
     const first = getProxyDispatcher();
     const second = getProxyDispatcher();
     expect(second).toBe(first);
+  });
+
+  it('closes the previous dispatcher when rebuilding after a proxy env change', () => {
+    process.env.HTTPS_PROXY = 'http://first-proxy:8080';
+    const first = getProxyDispatcher()!;
+    const closeSpy = vi.spyOn(first, 'close').mockResolvedValue(undefined);
+
+    process.env.HTTPS_PROXY = 'http://second-proxy:8080';
+    getProxyDispatcher();
+
+    expect(closeSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not alias two different proxy configurations to the same cache key', () => {
+    // A naive `values.join(' ')` cache key aliases these: with HTTPS_PROXY held fixed, both
+    // no_proxy='a'/NO_PROXY='b c' and no_proxy='a b'/NO_PROXY='c' join to the identical string.
+    process.env.HTTPS_PROXY = 'http://proxy.example:8080';
+    process.env.no_proxy = 'a';
+    process.env.NO_PROXY = 'b c';
+    const first = getProxyDispatcher();
+
+    process.env.no_proxy = 'a b';
+    process.env.NO_PROXY = 'c';
+    const second = getProxyDispatcher();
+
+    expect(second).not.toBe(first);
   });
 });

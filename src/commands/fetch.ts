@@ -14,6 +14,7 @@ import {
 } from '../lib/research/freshness.js';
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
+import { PROXY_TUNNEL_REJECTION_PATTERN } from '../lib/research/proxy.js';
 import { fetchRenderedHtml } from '../lib/research/browser.js';
 import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
@@ -483,6 +484,12 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   }
 }
 
+// How many `.cause` levels to walk. Real undici/Node transport errors nest at most 1-2 deep;
+// the cap exists so a self-referential or cyclic `.cause` chain (Error.cause is an arbitrary,
+// unvalidated property — nothing prevents `e.cause = e`, whether from a bug in this codebase or
+// a dependency) can't hang the process, rather than being a limit expected to matter in practice.
+const MAX_CAUSE_DEPTH = 10;
+
 // Walks an Error's `.cause` chain and joins every message, deepest last. Node/undici's fetch
 // throws a generic `TypeError: fetch failed` for transport-level failures, with the actionable
 // detail (e.g. a proxy's tunnel rejection) nested one or two `.cause` levels down.
@@ -490,7 +497,7 @@ export function describeError(err: unknown): string {
   if (!(err instanceof Error)) return String(err);
   const parts = [err.message];
   let cause: unknown = err.cause;
-  while (cause instanceof Error) {
+  for (let depth = 0; depth < MAX_CAUSE_DEPTH && cause instanceof Error; depth++) {
     parts.push(cause.message);
     cause = cause.cause;
   }
@@ -543,8 +550,9 @@ export function fetchFailureGuidance(
     };
   }
   // A configured proxy (HTTPS_PROXY/HTTP_PROXY) refused to tunnel to this host — distinct from
-  // the destination's own 401/403 above, which is the site itself rejecting the request.
-  if (/proxy response.*tunneling/i.test(message)) {
+  // the destination's own 401/403 above, which is the site itself rejecting the request. Shared
+  // with fetcher.ts's retry-fallback check so the two stay in sync by construction.
+  if (PROXY_TUNNEL_REJECTION_PATTERN.test(message)) {
     return {
       suggestions: [
         "The configured proxy (HTTPS_PROXY/HTTP_PROXY) won't reach this host. Check its allowlist, or add the host to NO_PROXY to bypass the proxy for it.",
@@ -555,8 +563,10 @@ export function fetchFailureGuidance(
   }
   // The connection failed before any HTTP response was received — network-down, DNS, TLS, or a
   // proxy issue not specifically matched above. Node/undici's fetch reports all of these as a
-  // generic "fetch failed" TypeError.
-  if (/^fetch failed\b/i.test(message)) {
+  // generic "fetch failed" TypeError with no further suffix; the negative lookahead keeps this
+  // from also matching assertOk's "Fetch failed with status NNN ..." (a real HTTP response was
+  // received in that case, so it isn't a transport failure at all).
+  if (/^fetch failed\b(?!\s+with status)/i.test(message)) {
     return {
       suggestions: [
         'The connection failed before a response was received. Check network connectivity and any HTTPS_PROXY/HTTP_PROXY/NO_PROXY settings.',

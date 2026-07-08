@@ -13,6 +13,13 @@ export const ALL_PROXY_ENV_VARS = [
   ...NO_PROXY_ENV_VARS,
 ];
 
+// The message undici's ProxyAgent throws (nested in a fetch TypeError's `.cause`) when the proxy
+// itself declines to tunnel to the target host — as opposed to any other pre-response transport
+// failure (DNS, refused connection, a genuinely unreachable destination). Shared by fetcher.ts
+// (to decide whether a proxied failure is worth retrying direct) and fetch.ts's failure-guidance
+// patterns (to give proxy-specific advice), so the two stay in sync by construction.
+export const PROXY_TUNNEL_REJECTION_PATTERN = /proxy response.*tunneling/i;
+
 function firstEnv(names: string[]): string | undefined {
   for (const name of names) {
     const value = process.env[name];
@@ -34,8 +41,12 @@ export function isProxyConfigured(): boolean {
 let cachedDispatcher: Dispatcher | undefined;
 let cachedProxyEnvSnapshot: string | undefined;
 
+// JSON-encoded rather than joined with a plain delimiter: a delimiter that can also appear inside
+// a value (e.g. a space, and NO_PROXY conventionally uses "host1, host2") lets two different sets
+// of values collide on the same joined string. JSON.stringify's per-element quoting/escaping is a
+// well-tested way to avoid that ambiguity without hand-rolling an escape scheme.
 function proxyEnvSnapshot(): string {
-  return ALL_PROXY_ENV_VARS.map((name) => process.env[name] ?? '').join(' ');
+  return JSON.stringify(ALL_PROXY_ENV_VARS.map((name) => process.env[name] ?? ''));
 }
 
 /**
@@ -44,14 +55,17 @@ function proxyEnvSnapshot(): string {
  * enough to be worth reusing across requests, but undici's own agent captures its proxy targets
  * once at construction time and never re-reads them — so the cache is keyed on a snapshot of the
  * relevant env vars and rebuilt whenever that snapshot changes, instead of being pinned forever
- * to whatever was configured on the first call.
+ * to whatever was configured on the first call. The discarded dispatcher is closed (not just
+ * dropped) so its pooled keep-alive sockets don't leak past the env change that replaced it.
  */
 export function getProxyDispatcher(): Dispatcher | undefined {
   if (!isProxyConfigured()) return undefined;
   const snapshot = proxyEnvSnapshot();
   if (!cachedDispatcher || cachedProxyEnvSnapshot !== snapshot) {
+    const stale = cachedDispatcher;
     cachedDispatcher = new EnvHttpProxyAgent();
     cachedProxyEnvSnapshot = snapshot;
+    void stale?.close().catch(() => {});
   }
   return cachedDispatcher;
 }
