@@ -63,6 +63,10 @@ const BASE_REMOVE_SELECTORS = [
   'dx-scroll-manager',
   'dx-skip-nav-link',
   'dw-instrumentation',
+  // The left-hand TOC/search drawer nested inside doc-content-layout's shadow DOM. It renders the
+  // entire site's navigation tree (hundreds of <a> links) as a sibling of the real article body,
+  // so left unremoved it dwarfs and precedes the actual content in the captured Markdown.
+  'dx-sidebar-old',
   '[role="navigation"]',
   '[aria-label*="Table of Contents" i]',
   '#onetrust-consent-sdk',
