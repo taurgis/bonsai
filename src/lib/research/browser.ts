@@ -1,8 +1,9 @@
 import { spawn, ChildProcess } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
+import { join } from 'node:path';
 import { checkDnsSafety } from './fetcher.js';
-import { getChromeProxyArgs } from './proxy.js';
+import { getChromeProxyArgs, isProxyConfigured } from './proxy.js';
 import { normalizeUrl } from './url.js';
 
 export interface BrowserFetchOptions {
@@ -87,6 +88,13 @@ export function findChromePath(): string {
     return process.env.CHROME_PATH;
   }
   const paths: string[] = [];
+  // Claude Code's remote sandbox (and other Playwright-provisioned environments) pre-installs a
+  // Chromium build under PLAYWRIGHT_BROWSERS_PATH rather than a system package manager location,
+  // with a `chromium` symlink at its root pointing at the actual browser binary. It's headless-Chrome
+  // capable (needed for the CDP `--headless=new` flag this module uses), so it's checked first.
+  if (process.env.PLAYWRIGHT_BROWSERS_PATH) {
+    paths.push(join(process.env.PLAYWRIGHT_BROWSERS_PATH, 'chromium'));
+  }
   if (process.platform === 'darwin') {
     paths.push(
       '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -389,6 +397,54 @@ export class ResponseCapture {
   }
 }
 
+// Chrome has its own network stack (see getChromeProxyArgs), so when a sandbox's egress-enforcing
+// proxy declines to tunnel to a destination, Chrome surfaces one of these net-error codes instead
+// of the HTTP-level rejection undici sees in fetcher.ts (PROXY_TUNNEL_REJECTION_PATTERN). Matched
+// against Page.navigate's `errorText`, which arrives as e.g. "net::ERR_TUNNEL_CONNECTION_FAILED".
+const PROXY_BLOCKED_CHROME_NET_ERRORS = [
+  'ERR_TUNNEL_CONNECTION_FAILED',
+  'ERR_PROXY_CONNECTION_FAILED',
+  'ERR_SOCKS_CONNECTION_FAILED',
+];
+
+// Shared substring fetch.ts's fetchFailureGuidance matches on to attach suggestions/ref to this
+// error, without duplicating the message text it needs to match against.
+export const SANDBOX_EGRESS_ERROR_MARKER = 'sandboxed execution environment';
+
+/**
+ * Builds the error thrown for a failed Page.navigate. When a proxy is configured (proxy.ts's
+ * signal for "this is a sandboxed execution environment") and Chrome's failure code indicates the
+ * proxy itself declined the tunnel, the destination isn't reachable because of the sandbox's
+ * network egress gateway rejecting it, not a real navigation problem — so the message says that
+ * explicitly, rather than surfacing a bare Chrome net-error code that looks like a generic
+ * connectivity failure. It deliberately doesn't claim the fix is "ask an admin to allowlist this
+ * host": the gateway that rejects the CONNECT tunnel can disagree with an org's configured domain
+ * policy (a different layer may not reach it), so the safer, always-correct advice is to verify
+ * against the environment directly and fall back to a manual fetch if it's still unreachable.
+ */
+export function describeNavigationFailure(errorText: string, url: string): Error {
+  const isProxyBlock =
+    isProxyConfigured() && PROXY_BLOCKED_CHROME_NET_ERRORS.some((code) => errorText.includes(code));
+  if (!isProxyBlock) {
+    return new Error(`Navigation failed: ${errorText}`);
+  }
+
+  let host = url;
+  try {
+    host = new URL(url).hostname;
+  } catch {}
+
+  return new Error(
+    `Chrome could not reach "${host}" (${errorText}). This looks like a ${SANDBOX_EGRESS_ERROR_MARKER} ` +
+      `(e.g. Claude Code's remote sandbox) whose outbound network gateway rejected the connection to ` +
+      `this host, via the configured proxy (HTTPS_PROXY/HTTP_PROXY). This can happen even when the ` +
+      `environment's domain policy looks unrestricted, since the gateway enforcing egress can be a ` +
+      `separate layer from that policy. It can't be worked around from inside the sandbox by retrying ` +
+      `or bypassing the proxy: confirm "${host}" is reachable from this environment (e.g. test the ` +
+      `proxy directly), or fetch the page from a network with access and import it instead.`
+  );
+}
+
 // Chrome can emit these on first navigation in headless CI when the cert verifier reloads mid-run.
 const TRANSIENT_NAV_ERROR_CODES = ['ERR_CERT_VERIFIER_CHANGED'];
 
@@ -443,7 +499,7 @@ async function fetchRenderedHtmlOnce(
     // A network-level failure (DNS, refused/closed connection, TLS) never fires a load event, so
     // fail fast here instead of waiting out the full navigation timeout on a dead page.
     if (nav.errorText) {
-      throw new Error(`Navigation failed: ${nav.errorText}`);
+      throw describeNavigationFailure(nav.errorText, currentUrl);
     }
 
     await waitForLoad(page.client, page.sessionId, timeout, options.settleMs ?? 1000);

@@ -8,13 +8,19 @@ import {
 
 // Mock the browser + DNS boundaries so fetchSalesforceDoc never spawns Chrome or hits the network.
 // htmlToMarkdown stays real: it is a pure HTML->Markdown transform whose output the fetcher asserts on.
-vi.mock('../lib/research/browser.js', () => ({
-  openCdpPage: vi.fn(),
-  waitForLoad: vi.fn().mockResolvedValue(undefined),
-  ResponseCapture: class {
-    waitFor = vi.fn().mockResolvedValue(null);
-  },
-}));
+// describeNavigationFailure stays real too (importOriginal): it's a pure function over its
+// arguments/env, and the navigation-failure tests below assert on its actual output.
+vi.mock('../lib/research/browser.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/research/browser.js')>();
+  return {
+    ...actual,
+    openCdpPage: vi.fn(),
+    waitForLoad: vi.fn().mockResolvedValue(undefined),
+    ResponseCapture: class {
+      waitFor = vi.fn().mockResolvedValue(null);
+    },
+  };
+});
 vi.mock('./salesforce-dom-probe.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./salesforce-dom-probe.js')>();
   return {
@@ -39,9 +45,13 @@ const DOC_OPTIONS = {
 /**
  * Builds a fake CDP page whose Runtime.evaluate returns the supplied capture result the FIRST time
  * the capture script runs and `laterCapture` on subsequent attempts (to exercise the retry loop).
- * The consent Runtime.evaluate (a short expression) and Page.navigate resolve to empty.
+ * The consent Runtime.evaluate (a short expression) resolves to empty; Page.navigate resolves to
+ * `navResult` (empty — i.e. a successful navigation — unless a test overrides it).
  */
-function fakePage(captures: Array<{ html: string; title: string } | null>) {
+function fakePage(
+  captures: Array<{ html: string; title: string } | null>,
+  navResult: { errorText?: string } = {}
+) {
   let captureCalls = 0;
   const close = vi.fn().mockResolvedValue(undefined);
   const handlers = new Map<string, Array<(params: unknown) => void>>();
@@ -52,6 +62,9 @@ function fakePage(captures: Array<{ html: string; title: string } | null>) {
       handlers.set(event, list);
     },
     send: vi.fn(async (method: string, params?: { expression?: string }) => {
+      if (method === 'Page.navigate') {
+        return navResult;
+      }
       if (method === 'Runtime.evaluate' && params?.expression?.includes('deepElements')) {
         const value = captures[Math.min(captureCalls, captures.length - 1)];
         captureCalls += 1;
@@ -263,6 +276,47 @@ describe('fetchSalesforceDoc', () => {
     await expect(
       fetchSalesforceDoc('https://help.salesforce.com/s/articleView?id=sf.gone.htm', DOC_OPTIONS)
     ).rejects.toThrow(/no readable content/);
+  });
+
+  it("throws on a failed navigation instead of capturing Chrome's own error interstitial as content", async () => {
+    // Chrome renders a plausible-length "This site can't be reached" page on a network failure —
+    // long enough to clear MIN_CONTAINER_CHARS and not matching any looksLikeSalesforceError
+    // pattern, so without checking Page.navigate's errorText this would be captured as a "high
+    // confidence" successful fetch instead of failing.
+    const chromeErrorInterstitial = `<h1>This site can't be reached</h1><p>${'help.salesforce.com took too long to respond. '.repeat(20)}</p>`;
+    const page = fakePage(
+      [{ html: chromeErrorInterstitial, title: "This site can't be reached" }],
+      {
+        errorText: 'net::ERR_CONNECTION_TIMED_OUT',
+      }
+    );
+    vi.mocked(openCdpPage).mockResolvedValue(page as never);
+
+    await expect(
+      fetchSalesforceDoc('https://help.salesforce.com/s/articleView?id=sf.neterr.htm', DOC_OPTIONS)
+    ).rejects.toThrow('Navigation failed: net::ERR_CONNECTION_TIMED_OUT');
+    expect(page.close).toHaveBeenCalledOnce();
+  });
+
+  it('gives a sandbox-egress-specific error when a configured proxy rejects the tunnel', async () => {
+    const originalHttpsProxy = process.env.HTTPS_PROXY;
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:43369';
+    try {
+      const page = fakePage([{ html: '<p>irrelevant</p>', title: 'irrelevant' }], {
+        errorText: 'net::ERR_TUNNEL_CONNECTION_FAILED',
+      });
+      vi.mocked(openCdpPage).mockResolvedValue(page as never);
+
+      await expect(
+        fetchSalesforceDoc(
+          'https://help.salesforce.com/s/articleView?id=sf.blocked.htm',
+          DOC_OPTIONS
+        )
+      ).rejects.toThrow(/sandboxed execution environment/);
+    } finally {
+      if (originalHttpsProxy === undefined) delete process.env.HTTPS_PROXY;
+      else process.env.HTTPS_PROXY = originalHttpsProxy;
+    }
   });
 
   it('throws when the captured body exceeds the size limit', async () => {

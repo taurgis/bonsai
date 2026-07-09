@@ -1,13 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { mkdtempSync, rmSync, writeFileSync, chmodSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   assertRenderedHttpOk,
   buildChromeArgs,
+  describeNavigationFailure,
   fetchRenderedHtml,
   findChromePath,
   ResponseCapture,
+  SANDBOX_EGRESS_ERROR_MARKER,
   type CdpPage,
 } from './browser.js';
 import { ALL_PROXY_ENV_VARS } from './proxy.js';
+import { hasInternetAccess } from '../../../tests/helpers/network.js';
 
 describe('buildChromeArgs (sandbox proxy CLI flags)', () => {
   const originalEnv: Record<string, string | undefined> = {};
@@ -58,13 +64,17 @@ describe('browser rendering unit and integration tests', () => {
     }
   });
 
-  it('fetches and renders example.com', async () => {
+  it('fetches and renders example.com', async (ctx) => {
     try {
       findChromePath();
     } catch {
       // Skip test if Chrome is not installed on testing environment
       return;
     }
+    // Chrome is available (e.g. the Playwright-provisioned browser in a sandbox) but that sandbox
+    // may still deny egress to arbitrary hosts like example.com; skip rather than fail on that
+    // environment limitation, mirroring fetch.test.ts's use of the same probe.
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
 
     const result = await fetchRenderedHtml('https://example.com', {
       timeoutMs: 12000,
@@ -75,12 +85,13 @@ describe('browser rendering unit and integration tests', () => {
     expect(result.content.toLowerCase()).toContain('</html>');
   });
 
-  it('rejects pages exceeding body limit', async () => {
+  it('rejects pages exceeding body limit', async (ctx) => {
     try {
       findChromePath();
     } catch {
       return;
     }
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
 
     await expect(
       fetchRenderedHtml('https://example.com', {
@@ -96,12 +107,13 @@ describe('browser rendering unit and integration tests', () => {
     );
   });
 
-  it('rejects on timeout', async () => {
+  it('rejects on timeout', async (ctx) => {
     try {
       findChromePath();
     } catch {
       return;
     }
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
 
     await expect(
       fetchRenderedHtml('https://example.com', {
@@ -249,5 +261,83 @@ describe('findChromePath unit tests', () => {
     } finally {
       process.env.CHROME_PATH = originalEnv;
     }
+  });
+
+  it('finds the Playwright-provisioned Chromium under PLAYWRIGHT_BROWSERS_PATH', () => {
+    const originalChromePath = process.env.CHROME_PATH;
+    const originalBrowsersPath = process.env.PLAYWRIGHT_BROWSERS_PATH;
+    const dir = mkdtempSync(join(tmpdir(), 'bonsai-pw-browsers-'));
+    const chromiumPath = join(dir, 'chromium');
+    writeFileSync(chromiumPath, '#!/bin/sh\n');
+    chmodSync(chromiumPath, 0o755);
+    try {
+      delete process.env.CHROME_PATH;
+      process.env.PLAYWRIGHT_BROWSERS_PATH = dir;
+      expect(findChromePath()).toBe(chromiumPath);
+    } finally {
+      if (originalChromePath === undefined) delete process.env.CHROME_PATH;
+      else process.env.CHROME_PATH = originalChromePath;
+      if (originalBrowsersPath === undefined) delete process.env.PLAYWRIGHT_BROWSERS_PATH;
+      else process.env.PLAYWRIGHT_BROWSERS_PATH = originalBrowsersPath;
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('describeNavigationFailure', () => {
+  const originalEnv: Record<string, string | undefined> = {};
+
+  beforeEach(() => {
+    for (const key of ALL_PROXY_ENV_VARS) {
+      originalEnv[key] = process.env[key];
+      delete process.env[key];
+    }
+  });
+
+  afterEach(() => {
+    for (const key of ALL_PROXY_ENV_VARS) {
+      if (originalEnv[key] === undefined) delete process.env[key];
+      else process.env[key] = originalEnv[key];
+    }
+  });
+
+  it('returns a bare navigation-failed message when no proxy is configured', () => {
+    const err = describeNavigationFailure('net::ERR_CONNECTION_TIMED_OUT', 'https://example.com/');
+    expect(err.message).toBe('Navigation failed: net::ERR_CONNECTION_TIMED_OUT');
+  });
+
+  it('returns a bare navigation-failed message for non-proxy net errors even with a proxy configured', () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:9999';
+    const err = describeNavigationFailure('net::ERR_CONNECTION_TIMED_OUT', 'https://example.com/');
+    expect(err.message).toBe('Navigation failed: net::ERR_CONNECTION_TIMED_OUT');
+  });
+
+  it('names the sandbox egress policy when a configured proxy rejects the tunnel', () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:9999';
+    const err = describeNavigationFailure(
+      'net::ERR_TUNNEL_CONNECTION_FAILED',
+      'https://developer.salesforce.com/docs/foo'
+    );
+    expect(err.message).toContain(SANDBOX_EGRESS_ERROR_MARKER);
+    expect(err.message).toContain('developer.salesforce.com');
+    expect(err.message).toContain('net::ERR_TUNNEL_CONNECTION_FAILED');
+  });
+
+  it('also flags ERR_PROXY_CONNECTION_FAILED and ERR_SOCKS_CONNECTION_FAILED as sandbox egress blocks', () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:9999';
+    expect(
+      describeNavigationFailure('net::ERR_PROXY_CONNECTION_FAILED', 'https://x.example.com/')
+        .message
+    ).toContain(SANDBOX_EGRESS_ERROR_MARKER);
+    expect(
+      describeNavigationFailure('net::ERR_SOCKS_CONNECTION_FAILED', 'https://x.example.com/')
+        .message
+    ).toContain(SANDBOX_EGRESS_ERROR_MARKER);
+  });
+
+  it('falls back to the raw URL if it cannot be parsed as a hostname', () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:9999';
+    const err = describeNavigationFailure('net::ERR_TUNNEL_CONNECTION_FAILED', 'not-a-url');
+    expect(err.message).toContain('not-a-url');
   });
 });
