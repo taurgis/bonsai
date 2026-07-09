@@ -52,32 +52,57 @@ const INCLUDE_DIRECTIVE = /^\s*::include\{[^}]*\}\s*$/;
 /** Removes unresolvable `::include{…}` directive lines, reporting how many were dropped. */
 export function stripIncludeDirectives(md: string): { body: string; dropped: number } {
   let dropped = 0;
-  const kept = md.split('\n').filter((line) => {
-    if (!INCLUDE_DIRECTIVE.test(line)) return true;
-    dropped++;
-    return false;
-  });
-  return { body: kept.join('\n'), dropped };
+  const body = md
+    .split(/(```[\s\S]*?```)/)
+    .map((segment, i) => {
+      // Fenced code is untouched: an ::include shown as a syntax example is content.
+      if (i % 2 === 1) return segment;
+      return segment
+        .split('\n')
+        .filter((line) => {
+          if (!INCLUDE_DIRECTIVE.test(line)) return true;
+          dropped++;
+          return false;
+        })
+        .join('\n');
+    })
+    .join('');
+  return { body, dropped };
 }
 
 // A probe response counts as the Markdown twin only when the server labels it text/markdown AND
-// the redirect chain stayed on the developer host AND the body validates as non-HTML, non-error
-// text. Status 200 excludes conditional 304s; atlas shells fail the content-type check.
+// the redirect chain ended on https at the developer host AND the body validates as non-HTML,
+// non-error text. Atlas shells fail the content-type check; non-2xx statuses already threw in
+// the fetcher (the probe sends no conditional headers, so a 304 can't occur either).
 function isMarkdownResponse(res: FetchResult): boolean {
-  if (res.status !== 200 || !res.content) return false;
+  if (!res.content) return false;
   const mediaType = (res.contentType?.split(';')[0] ?? '').trim().toLowerCase();
   if (mediaType !== MARKDOWN_CONTENT_TYPE) return false;
+  let finalUrl: URL;
   try {
-    if (new URL(res.finalUrl).hostname.toLowerCase() !== DEVELOPER_HOST) return false;
+    finalUrl = new URL(res.finalUrl);
   } catch {
+    return false;
+  }
+  // Scheme matters, not just host: a redirect hop downgrading to plain http would let an on-path
+  // response be cached as the trusted twin.
+  if (finalUrl.protocol !== 'https:' || finalUrl.hostname.toLowerCase() !== DEVELOPER_HOST) {
     return false;
   }
   return validateTextArtifact(res.content).ok;
 }
 
+// A real twin is a small static file that answers fast; anything slower should mean "no twin,
+// fall back now" instead of stacking the fetcher's default 10s on top of the browser render.
+const PROBE_TIMEOUT_MS = 4_000;
+
+// The browser path refuses to cache captures under this floor (MIN_CONTAINER_CHARS); a twin that
+// thin is a rollout stub, and falling back gives the rendered page a chance to do better.
+const MIN_TWIN_CHARS = 100;
+
 export type RouteMarkdownFetcher = (
   url: string,
-  options?: { headers?: Record<string, string> }
+  options?: { headers?: Record<string, string>; timeoutMs?: number }
 ) => Promise<FetchResult>;
 
 /**
@@ -94,7 +119,7 @@ export async function fetchDeveloperRouteMarkdown(
 
   let res: FetchResult;
   try {
-    res = await fetcher(candidate, { headers: PROBE_HEADERS });
+    res = await fetcher(candidate, { headers: PROBE_HEADERS, timeoutMs: PROBE_TIMEOUT_MS });
   } catch {
     return null;
   }
@@ -102,6 +127,7 @@ export async function fetchDeveloperRouteMarkdown(
 
   const { body, dropped } = stripIncludeDirectives(res.content);
   const extraction = extractFromSource(body, res.finalUrl);
+  if (extraction.detailedMarkdown.length < MIN_TWIN_CHARS) return null;
   if (dropped > 0) {
     extraction.qualityNotes = [
       ...(extraction.qualityNotes ?? []),

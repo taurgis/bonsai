@@ -20,7 +20,7 @@ import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { detectSite } from '../sites/index.js';
-import type { SiteFetchResult } from '../sites/types.js';
+import { applySiteFetchProvenance, type SiteFetchResult } from '../sites/types.js';
 
 const CAPTURE_DEPS: CaptureDeps = {
   fetchStatic: (url) => fetchStaticHtml(url),
@@ -190,15 +190,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     if (capture) {
       applyCaptureMetadata(artifact, capture);
     } else if (siteFetch?.captureMethod) {
-      // The module resolved content away from the rendered page (e.g. a route .md twin).
-      artifact.metadata.capture_method = siteFetch.captureMethod;
-      artifact.metadata.source_doc_url = siteFetch.sourceDocUrl ?? null;
-      if (
-        siteFetch.sourceDocUrl &&
-        !artifact.metadata.source_urls.includes(siteFetch.sourceDocUrl)
-      ) {
-        artifact.metadata.source_urls.push(siteFetch.sourceDocUrl);
-      }
+      applySiteFetchProvenance(artifact.metadata, siteFetch);
     } else if (useRendered) {
       artifact.metadata.capture_method = 'browser_fallback';
     }

@@ -1,16 +1,4 @@
-Global Exceptions
-
-Attention!
-
-**The Open Commerce API (OCAPI) is now deprecated.** The provisions described in our [versioning and deprecation policy](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/versioninganddeprecationpolicy.html) fully apply. For all new projects and major refactoring work, use B2C Commerce API (SCAPI) as the default REST API. For additional details, refer to [Why Use SCAPI Instead of OCAPI](https://developer.salesforce.com/docs/commerce/commerce-api/guide/why-use-scapi.html).
-
 # OCAPI Global Exceptions
-
-Copy as Markdown
-
-View as Markdown
-
-Copy URL to Markdown
 
 The following table lists all OCAPI global exceptions:
 
@@ -85,3 +73,5 @@ The following table lists all OCAPI global exceptions:
 | 413 | RequestEntityTooLargeException |  | Request body size limit of 5 MB has been exceeded. |
 | 415 | UnsupportedContentTypeException | contentType (String) | Unsupported media type in Content-Type header. Only 'application/json', 'application/xml' and 'text/xml' are allowed. |
 | 415 | UnsupportedFormatException | format (String) | Unsupported format in format query parameter. Only 'json' and 'xml' are allowed. |
+
+</sfdocstbl>

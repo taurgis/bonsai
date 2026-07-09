@@ -128,7 +128,10 @@ export function contentMetrics(markdown: string): ContentMetrics {
   return {
     chars: markdown.length,
     codeBlocks: Math.floor((markdown.match(/```/g) || []).length / 2),
-    tables: (markdown.match(/^\|(?:\s*---\s*\|)+\s*$/gm) || []).length,
+    // Separator rows come in every authored width and alignment (| --- |, | ------ |, | :---: |).
+    // Converted HTML always emits exactly ---, but route/source Markdown keeps the author's
+    // padding, so a width-sensitive count would misreport source captures as losing tables.
+    tables: (markdown.match(/^\|(?:\s*:?-{3,}:?\s*\|)+\s*$/gm) || []).length,
     images: (markdown.match(/!\[[^\]]*\]\(/g) || []).length,
     orderedSteps: (markdown.match(/^\d+\.\s+/gm) || []).length,
     bullets: (markdown.match(/^[-*]\s+/gm) || []).length,

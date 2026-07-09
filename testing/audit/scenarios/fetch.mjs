@@ -94,5 +94,17 @@ export default function register(harness, fixtures) {
       const env = parseJson(r.stdout);
       expect(env?.schemaVersion === 1, 'envelope');
     });
+
+    check('fetch Salesforce Developer guide via route .md twin (AUDIT_NETWORK)', () => {
+      // Supported developer.salesforce.com articles publish a Markdown twin at <article>.md; the
+      // site module probes it before the browser and must record the provenance on the artifact.
+      const url = 'https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-auth';
+      const r = run([url, '--json'], { timeout: 90000 });
+      expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+      const env = parseJson(r.stdout);
+      expect(env?.data?.source?.captureMethod === 'route_markdown', `captureMethod ${env?.data?.source?.captureMethod}`);
+      expect(env?.data?.sourceDocUrl === `${url}.md`, `sourceDocUrl ${env?.data?.sourceDocUrl}`);
+      expect(env?.data?.content?.includes('Hybrid'), 'content mentions Hybrid');
+    });
   }
 }

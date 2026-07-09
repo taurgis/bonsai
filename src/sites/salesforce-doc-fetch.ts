@@ -418,6 +418,9 @@ function buildSalesforceFetchResult(
       confidence: confidenceFor(detailedMarkdown.length),
       qualityNotes,
     },
+    // Rendered capture is this fetcher's only strategy; reporting it lets a refresh overwrite
+    // route_markdown provenance when an article's .md twin has since vanished.
+    captureMethod: 'browser_fallback',
   };
 }
 

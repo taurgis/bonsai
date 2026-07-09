@@ -71,6 +71,11 @@ describe('stripIncludeDirectives', () => {
     const md = '# Title\n\nBody with ::include mentioned mid-sentence stays.\n';
     expect(stripIncludeDirectives(md)).toEqual({ body: md, dropped: 0 });
   });
+
+  it('keeps an ::include shown as a syntax example inside a code fence', () => {
+    const md = '# Title\n\n```\n::include{src="../shared/snippet.md"}\n```\n';
+    expect(stripIncludeDirectives(md)).toEqual({ body: md, dropped: 0 });
+  });
 });
 
 describe('fetchDeveloperRouteMarkdown', () => {
@@ -141,6 +146,20 @@ describe('fetchDeveloperRouteMarkdown', () => {
     const fetcher = vi
       .fn()
       .mockResolvedValue(markdownResponse({ finalUrl: 'https://evil.example.com/doc.md' }));
+    expect(await fetchDeveloperRouteMarkdown(DOC_URL, fetcher)).toBeNull();
+  });
+
+  it('rejects a redirect that downgraded to plain http on the developer host', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValue(markdownResponse({ finalUrl: MD_URL.replace('https://', 'http://') }));
+    expect(await fetchDeveloperRouteMarkdown(DOC_URL, fetcher)).toBeNull();
+  });
+
+  it('rejects a rollout-stub twin so the browser capture gets a chance at the full article', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValue(markdownResponse({ content: '# Hybrid Auth\n\nComing soon page.\n' }));
     expect(await fetchDeveloperRouteMarkdown(DOC_URL, fetcher)).toBeNull();
   });
 

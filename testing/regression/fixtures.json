@@ -278,6 +278,36 @@
     ]
   },
   {
+    "id": "dev-guide-slas",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html",
+    "focus": [
+      "route-markdown",
+      "code-blocks",
+      "admonitions"
+    ]
+  },
+  {
+    "id": "dev-guide-ampscript-get-started",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/marketing/marketing-cloud-ampscript/guide/mc-ampscript-get-started.md",
+    "focus": [
+      "route-markdown",
+      "direct-md-url",
+      "links"
+    ]
+  },
+  {
+    "id": "dev-guide-lwc-introduction",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/platform/lwc/guide/get-started-introduction",
+    "focus": [
+      "route-markdown",
+      "extensionless-url",
+      "code-blocks"
+    ]
+  },
+  {
     "id": "vue-introduction",
     "url": "https://vuejs.org/guide/introduction.html",
     "expectEngine": "vitepress",

@@ -146,7 +146,7 @@ const thenable = {
 Promise.resolve(thenable); // A promise fulfilled with 42
 ```
 
-The `then()` method is responsible for scheduling the execution of the provided `onFulfilled` and `onRejected` callbacks. Its semantics, including error handling and asynchronicity, are precisely defined in the [Promises/A+ specification](https://promisesaplus.com/), and we shall not repeat them here. It's very rare that you need to implement a thenable yourself; even if you are not using native promises, you would probably be using a Promise library such as [Bluebird](http://bluebirdjs.com/).
+The `then()` method is responsible for scheduling the execution of the provided `onFulfilled` and `onRejected` callbacks. Its semantics, including error handling and asynchronicity, are precisely defined in the [Promises/A+ specification](https://promisesaplus.com/), and we shall not repeat them here. It's very rare that you need to implement a thenable yourself; even if you are not using native promises, you would probably be using a Promise library such as [Bluebird](https://www.npmjs.com/package/bluebird).
 
 ### Promise concurrency
 
@@ -312,7 +312,7 @@ By clicking the button several times in a short amount of time, you'll even see 
 #### HTML
 
 ```html
-
+<button id="make-promise">Make a promise!</button>
 <div id="log"></div>
 ```
 
@@ -433,28 +433,62 @@ A settings object is an [environment](https://html.spec.whatwg.org/multipage/web
 
 To better picture this, we can take a closer look at how the realm might be an issue. A **realm** can be roughly thought of as the global object. What is unique about realms is that they hold all of the necessary information to run JavaScript code. This includes objects like [`Array`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) and [`Error`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error). Each settings object has its own "copy" of these and they are not shared. That can cause some unexpected behavior in relation to promises. In order to get around this, we track something called the **incumbent settings object**. This represents information specific to the context of the user code responsible for a certain function call.
 
-To illustrate this a bit further we can take a look at how an [`
-<!-- we have a realm here -->
+To illustrate this a bit further we can take a look at how an [`<iframe>`](/en-US/docs/Web/HTML/Reference/Elements/iframe) embedded in a document communicates with its host. Since all web APIs are aware of the incumbent settings object, the following will work in all browsers:
 
+```html
+<!doctype html>
+<iframe></iframe>
+<!-- we have a realm here -->
+<script>
+  // we have a realm here as well
+  const bound = frames[0].postMessage.bind(frames[0], "some data", "*");
+  // bound is a built-in function — there is no user
+  // code on the stack, so which realm do we use?
+  setTimeout(bound);
+  // this still works, because we use the youngest
+  // realm (the incumbent) on the stack
+</script>
 ```
 
 The same concept applies to promises. If we modify the above example a little bit, we get this:
 
 ```html
 <!doctype html>
-
+<iframe></iframe>
 <!-- we have a realm here -->
-
+<script>
+  // we have a realm here as well
+  const bound = frames[0].postMessage.bind(frames[0], "some data", "*");
+  // bound is a built in function — there is no user
+  // code on the stack — which realm do we use?
+  Promise.resolve(undefined).then(bound);
+  // this still works, because we use the youngest
+  // realm (the incumbent) on the stack
+</script>
 ```
 
-If we change this so that the `
+If we change this so that the `<iframe>` in the document is listening to post messages, we can observe the effect of the incumbent settings object:
 
+```html
+<!-- y.html -->
+<!doctype html>
+<iframe src="x.html"></iframe>
+<script>
+  const bound = frames[0].postMessage.bind(frames[0], "some data", "*");
+  Promise.resolve(undefined).then(bound);
+</script>
 ```
 
 ```html
 <!-- x.html -->
 <!doctype html>
-
+<script>
+  window.addEventListener("message", (event) => {
+    document.querySelector("#text").textContent = "hello";
+    // this code will only run in browsers that track the incumbent settings object
+    console.log(event);
+  });
+</script>
 ```
 
 In the above example, the inner text of the `<iframe>` will be updated only if the incumbent settings object is tracked. This is because without tracking the incumbent, we may end up using the wrong environment to send the message.

@@ -38,7 +38,9 @@ createApp({
 
 ```vue-html
 <div id="app">
-
+  <button @click="count++">
+    Count is: {{ count }}
+  </button>
 </div>
 ```
 
@@ -78,19 +80,42 @@ Despite the flexibility, the core knowledge about how Vue works is shared across
 In most build-tool-enabled Vue projects, we author Vue components using an HTML-like file format called **Single-File Component** (also known as `*.vue` files, abbreviated as **SFC**). A Vue SFC, as the name suggests, encapsulates the component's logic (JavaScript), template (HTML), and styles (CSS) in a single file. Here's the previous example, written in SFC format:
 
 ```vue
+<script>
+export default {
+  data() {
+    return {
+      count: 0
+    }
+  }
+}
+</script>
 
 <template>
-
+  <button @click="count++">Count is: {{ count }}</button>
 </template>
 
+<style scoped>
+button {
+  font-weight: bold;
+}
+</style>
 ```
 
 ```vue
+<script setup>
+import { ref } from 'vue'
+const count = ref(0)
+</script>
 
 <template>
-
+  <button @click="count++">Count is: {{ count }}</button>
 </template>
 
+<style scoped>
+button {
+  font-weight: bold;
+}
+</style>
 ```
 
 SFC is a defining feature of Vue and is the recommended way to author Vue components **if** your use case warrants a build setup. You can learn more about the [how and why of SFC](/guide/scaling-up/sfc) in its dedicated section - but for now, just know that Vue will handle all the build tools setup for you.
@@ -104,9 +129,35 @@ Vue components can be authored in two different API styles: **Options API** and 
 With Options API, we define a component's logic using an object of options such as `data`, `methods`, and `mounted`. Properties defined by options are exposed on `this` inside functions, which points to the component instance:
 
 ```vue
+<script>
+export default {
+  // Properties returned from data() become reactive state
+  // and will be exposed on `this`.
+  data() {
+    return {
+      count: 0
+    }
+  },
+
+  // Methods are functions that mutate state and trigger updates.
+  // They can be bound as event handlers in templates.
+  methods: {
+    increment() {
+      this.count++
+    }
+  },
+
+  // Lifecycle hooks are called at different stages
+  // of a component's lifecycle.
+  // This function will be called when the component is mounted.
+  mounted() {
+    console.log(`The initial count is ${this.count}.`)
+  }
+}
+</script>
 
 <template>
-
+  <button @click="increment">Count is: {{ count }}</button>
 </template>
 ```
 
@@ -114,10 +165,30 @@ With Options API, we define a component's logic using an object of options such 
 
 ### Composition API {#composition-api}
 
-With Composition API, we define a component's logic using imported API functions. In SFCs, Composition API is typically used with [`
+With Composition API, we define a component's logic using imported API functions. In SFCs, Composition API is typically used with [`<script setup>`](/api/sfc-script-setup). The `setup` attribute is a hint that makes Vue perform compile-time transforms that allow us to use Composition API with less boilerplate. For example, imports and top-level variables / functions declared in `<script setup>` are directly usable in the template.
+
+Here is the same component, with the exact same template, but using Composition API and `<script setup>` instead:
+
+```vue
+<script setup>
+import { ref, onMounted } from 'vue'
+
+// reactive state
+const count = ref(0)
+
+// functions that mutate state and trigger updates
+function increment() {
+  count.value++
+}
+
+// lifecycle hooks
+onMounted(() => {
+  console.log(`The initial count is ${count.value}.`)
+})
+</script>
 
 <template>
-
+  <button @click="increment">Count is: {{ count }}</button>
 </template>
 ```
 

@@ -427,5 +427,97 @@ describe('freshness and revalidation engine', () => {
       expect(fetcher.fetchStaticHtml).not.toHaveBeenCalled();
       expect(result.artifact.metadata.site_module_id).toBe('salesforce');
     });
+
+    it('records the provenance the site-module refresh reports, replacing carried-over values', async () => {
+      const mdUrl = 'https://developer.salesforce.com/docs/commerce/commerce-api/guide/x.md';
+      const mockFetchPage = vi.fn().mockResolvedValue({
+        fetchResult: {
+          contentType: 'text/markdown',
+          etag: null,
+          lastModified: null,
+          finalUrl: mdUrl,
+          responseSize: 200,
+          content: '# From Twin',
+        },
+        extraction: {
+          title: 'From Twin',
+          detailedMarkdown: '# From Twin\n\nA paragraph long enough to clear length checks.',
+          confidence: 'high' as const,
+          qualityNotes: [],
+        },
+        captureMethod: 'route_markdown' as const,
+        sourceDocUrl: mdUrl,
+      });
+      vi.mocked(sites.getSiteModuleById).mockReturnValue({
+        id: 'salesforce-developer',
+        name: 'Salesforce Developer',
+        domains: ['developer.salesforce.com'],
+        fetchPage: mockFetchPage,
+      });
+
+      const artifactWithModule: ResearchArtifact = {
+        ...sampleArtifact,
+        metadata: { ...sampleArtifact.metadata, site_module_id: 'salesforce-developer' },
+      };
+      const currentTime = new Date('2026-07-29T00:00:00.000Z'); // stale, in grace
+      writeArtifact(tempDir, artifactWithModule.metadata.cache_key, artifactWithModule);
+
+      const result = await revalidateCache(tempDir, artifactWithModule, currentTime, {
+        allowStale: false,
+        summaryLevel: 'conservative',
+      });
+
+      expect(result.status).toBe('refreshed');
+      expect(result.artifact.metadata.capture_method).toBe('route_markdown');
+      expect(result.artifact.metadata.source_doc_url).toBe(mdUrl);
+      expect(result.artifact.metadata.source_urls).toContain(mdUrl);
+    });
+
+    it('clears stale twin provenance when the refresh fell back to the rendered capture', async () => {
+      const mockFetchPage = vi.fn().mockResolvedValue({
+        fetchResult: {
+          contentType: 'text/html',
+          etag: null,
+          lastModified: null,
+          finalUrl: 'https://developer.salesforce.com/docs/commerce/commerce-api/guide/x',
+          responseSize: 200,
+          content: '<html></html>',
+        },
+        extraction: {
+          title: 'Rendered',
+          detailedMarkdown: '# Rendered\n\nA paragraph long enough to clear length checks.',
+          confidence: 'high' as const,
+          qualityNotes: [],
+        },
+        captureMethod: 'browser_fallback' as const,
+      });
+      vi.mocked(sites.getSiteModuleById).mockReturnValue({
+        id: 'salesforce-developer',
+        name: 'Salesforce Developer',
+        domains: ['developer.salesforce.com'],
+        fetchPage: mockFetchPage,
+      });
+
+      const artifactWithTwin: ResearchArtifact = {
+        ...sampleArtifact,
+        metadata: {
+          ...sampleArtifact.metadata,
+          site_module_id: 'salesforce-developer',
+          capture_method: 'route_markdown',
+          source_doc_url: 'https://developer.salesforce.com/docs/commerce/commerce-api/guide/x.md',
+        },
+      };
+      const currentTime = new Date('2026-07-29T00:00:00.000Z'); // stale, in grace
+      writeArtifact(tempDir, artifactWithTwin.metadata.cache_key, artifactWithTwin);
+
+      const result = await revalidateCache(tempDir, artifactWithTwin, currentTime, {
+        allowStale: false,
+        summaryLevel: 'conservative',
+      });
+
+      expect(result.status).toBe('refreshed');
+      expect(result.artifact.metadata.capture_method).toBe('browser_fallback');
+      expect(result.artifact.metadata.source_doc_url).toBeNull();
+    });
   });
 });

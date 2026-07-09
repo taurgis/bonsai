@@ -1,16 +1,4 @@
-Jobs: System
-
-Attention!
-
-**The Open Commerce API (OCAPI) is now deprecated.** The provisions described in our [versioning and deprecation policy](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/versioninganddeprecationpolicy.html) fully apply. For all new projects and major refactoring work, use B2C Commerce API (SCAPI) as the default REST API. For additional details, refer to [Why Use SCAPI Instead of OCAPI](https://developer.salesforce.com/docs/commerce/commerce-api/guide/why-use-scapi.html).
-
 # OCAPI System Jobs
-
-Copy as Markdown
-
-View as Markdown
-
-Copy URL to Markdown
 
 System jobs are predefined jobs called via the following OCAPI request:
 
@@ -18,7 +6,7 @@ System jobs are predefined jobs called via the following OCAPI request:
 POST dw/data/v24_5/jobs/{job_id}/executions
 ```
 
-Calling this resource triggers a background job and retrieves a response document containing information about the job’s status. Different System Jobs can use different request payloads.
+Calling this resource triggers a background job and retrieves a response document containing information about the job's status. Different System Jobs can use different request payloads.
 
 The job ID always starts with `sfcc-`. This prefix is a namespace specific to B2C Commerce System Jobs. You can’t use it in custom job IDs.
 

@@ -109,6 +109,45 @@ describe('extractFromSource', () => {
     expect(out).toContain('### Second');
   });
 
+  it('leaves fenced code untouched by sanitization and section/link cleanup', () => {
+    const md = [
+      '# Guide',
+      '',
+      'Intro text for the guide body.',
+      '',
+      '```html',
+      '<button onclick="checkout()">Buy</button>',
+      '<script src="pay.js"></script>',
+      'location.href = "javascript:void(0)";',
+      '```',
+      '',
+      '```bash',
+      '# Set your API key',
+      '# Then run the install',
+      'npm install commerce-sdk',
+      '```',
+      '',
+      '```md',
+      '[](https://example.com/empty-link-syntax)',
+      '```',
+    ].join('\n');
+    const out = extractFromSource(md, 'https://x/guide/y.md').detailedMarkdown;
+    expect(out).toContain('<button onclick="checkout()">Buy</button>');
+    expect(out).toContain('<script src="pay.js"></script>');
+    expect(out).toContain('javascript:void(0)');
+    expect(out).toContain('# Set your API key');
+    expect(out).toContain('# Then run the install');
+    expect(out).toContain('[](https://example.com/empty-link-syntax)');
+  });
+
+  it('still sanitizes dangerous HTML outside fences', () => {
+    const md =
+      '# Page\n\n<script>alert(1)</script>\n\n<a href="javascript:evil()">x</a>\n\nBody keeps going with enough text.';
+    const out = extractFromSource(md, 'https://x/y.md').detailedMarkdown;
+    expect(out).not.toContain('<script>');
+    expect(out).not.toContain('javascript:');
+  });
+
   it('does NOT touch {{ }} interpolation from non-MDN sources (Vue/Angular)', () => {
     const md =
       '# Vue\n\nRender with `{{ count }}` in templates.\n\n```vue\n<span>{{ count }}</span>\n```';

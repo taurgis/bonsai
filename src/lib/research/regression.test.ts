@@ -74,6 +74,19 @@ describe('contentMetrics', () => {
     expect(m.codeBlocks).toBe(1);
     expect(m.chars).toBe(md.length);
   });
+
+  it('counts source-authored tables with padded or aligned separator rows', () => {
+    const md = [
+      '| Method | Exists |',
+      '| ------ | -------------------------- |',
+      '| PUT    | Creates a resource.        |',
+      '',
+      '| L | R |',
+      '| :--- | ---: |',
+      '| a | b |',
+    ].join('\n');
+    expect(contentMetrics(md).tables).toBe(2);
+  });
 });
 
 describe('timingRegression', () => {
