@@ -63,6 +63,17 @@ describe('fetchFailureGuidance', () => {
     expect(g?.suggestions.join(' ')).toMatch(/HTTPS_PROXY|NO_PROXY/);
   });
 
+  it('points a Chrome sandbox-egress block at the import workaround', () => {
+    const g = fetchFailureGuidance(
+      'Chrome could not reach "developer.salesforce.com" (net::ERR_TUNNEL_CONNECTION_FAILED). ' +
+        "This looks like a sandboxed execution environment (e.g. Claude Code's remote sandbox) " +
+        'whose network egress policy is blocking this host.',
+      url
+    );
+    expect(g?.suggestions.some((s) => s.includes(`bonsai import ${url} --stdin`))).toBe(true);
+    expect(g?.ref).toBe('https://bonsai.rhino-inquisitor.com/troubleshooting');
+  });
+
   it('gives a generic connectivity hint for an unqualified "fetch failed"', () => {
     const g = fetchFailureGuidance('fetch failed', url);
     expect(g?.suggestions.join(' ')).toMatch(/connect/i);

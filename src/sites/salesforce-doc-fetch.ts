@@ -2,6 +2,7 @@ import {
   openCdpPage,
   waitForLoad,
   ResponseCapture,
+  describeNavigationFailure,
   type CdpPage,
 } from '../lib/research/browser.js';
 import { checkDnsSafety } from '../lib/research/fetcher.js';
@@ -330,7 +331,19 @@ async function captureSalesforceAttempt(
     },
   ]);
 
-  await page.client.send('Page.navigate', { url }, page.sessionId);
+  // A network-level failure (DNS, refused/closed connection, TLS, a proxy declining to tunnel) never
+  // fires a load event and renders Chrome's own "site can't be reached" interstitial instead. Without
+  // this check that interstitial sails through pollSalesforceContentReady/assertReadableSalesforceContent
+  // as if it were real article content — it's plausible-length HTML that isn't a 404/loading shell — so
+  // the fetch would silently "succeed" with Chrome's error page cached as the documentation.
+  const nav: { errorText?: string } = await page.client.send(
+    'Page.navigate',
+    { url },
+    page.sessionId
+  );
+  if (nav.errorText) {
+    throw describeNavigationFailure(nav.errorText, url);
+  }
   await waitForLoad(page.client, page.sessionId, TIMEOUT_MS, 0).catch(() => {});
   await page.client
     .send('Runtime.evaluate', { expression: ACCEPT_CONSENT_EXPRESSION }, page.sessionId)

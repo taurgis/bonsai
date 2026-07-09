@@ -15,7 +15,7 @@ import {
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
 import { PROXY_TUNNEL_REJECTION_PATTERN } from '../lib/research/proxy.js';
-import { fetchRenderedHtml } from '../lib/research/browser.js';
+import { fetchRenderedHtml, SANDBOX_EGRESS_ERROR_MARKER } from '../lib/research/browser.js';
 import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
@@ -548,6 +548,12 @@ export function fetchFailureGuidance(
     return {
       suggestions: ['Check the hostname is spelled correctly and resolves on a public network.'],
     };
+  }
+  // Chrome's own network stack hit a proxy-enforced sandbox egress block (browser.ts's
+  // describeNavigationFailure already explains the cause and the fix); only a workaround and the
+  // docs ref are added here.
+  if (message.includes(SANDBOX_EGRESS_ERROR_MARKER)) {
+    return { suggestions: [importHint], ref };
   }
   // A configured proxy (HTTPS_PROXY/HTTP_PROXY) refused to tunnel to this host — distinct from
   // the destination's own 401/403 above, which is the site itself rejecting the request. Shared
