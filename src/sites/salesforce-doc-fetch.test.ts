@@ -147,6 +147,23 @@ describe('stripBoilerplate', () => {
     expect(out).not.toMatch(/share your feedback/i);
   });
 
+  it('removes the "View as Markdown" toolbar labels but keeps prose mentioning them', () => {
+    const md = [
+      '# Hybrid Auth',
+      '',
+      'Copy as Markdown',
+      'View as Markdown',
+      'Copy URL to Markdown',
+      '',
+      'You can also view this article as Markdown from the toolbar.',
+    ].join('\n');
+    const out = stripBoilerplate(md);
+    expect(out).not.toMatch(/^copy as markdown$/im);
+    expect(out).not.toMatch(/^view as markdown$/im);
+    expect(out).not.toMatch(/^copy url to markdown$/im);
+    expect(out).toContain('You can also view this article as Markdown from the toolbar.');
+  });
+
   it('drops empty-anchor links but keeps real links and images', () => {
     const md = [
       '# Title',

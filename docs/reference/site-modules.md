@@ -171,7 +171,7 @@ site_module_id: string | null;
 | `id` | Domains | Custom behavior |
 | --- | --- | --- |
 | `salesforce` | `help.salesforce.com` | `fetchPage`, `rendered: true`. |
-| `salesforce-developer` | `developer.salesforce.com` | `fetchPage`, `rendered: true`. |
+| `salesforce-developer` | `developer.salesforce.com` | `fetchPage` (route `.md` twin first, rendered fallback), `rendered: true`. |
 | `tanstack` | `tanstack.com` | None. Relies on the generic source-resolution path that prefers a page's GitHub Markdown source (keeping fenced code intact), so it deliberately does **not** force `rendered`. |
 
 ## The Salesforce modules in detail
@@ -222,14 +222,28 @@ export const salesforceDeveloper: SiteModule = {
 };
 ```
 
-- **`fetchPage`** renders the page and reads content out of Developer's web
-  components (`doc-content-layout`, `doc-amf-reference`, …). Its capture step
-  also expands collapsed sections, inlines `<dx-code-block>` code samples, and
+- **`fetchPage`** first probes the article's **Markdown twin**. Supported
+  Developer articles publish a "View as Markdown" version at a deterministic
+  URL: `/docs/<cloud>/<book>/guide/<article>[.html]` also serves
+  `<article>.md` with `Content-Type: text/markdown`. The module derives that
+  URL, fetches it statically, and validates it strictly (markdown content
+  type, same host after redirects, non-HTML/non-error body) before trusting
+  it — unsupported articles 404, and `atlas.*` books answer the `.md` route
+  with an HTTP 200 HTML shell. A validated twin replaces the ~45 s browser
+  render with a single request, keeps code fences and admonitions intact, and
+  is recorded with `capture_method: route_markdown` plus the `.md` URL in
+  `source_doc_url`. Unresolvable `::include{…}` snippet directives are
+  stripped, with a quality note.
+- When no twin validates, **`fetchPage`** falls back to rendering the page
+  and reading content out of Developer's web components
+  (`doc-content-layout`, `doc-amf-reference`, …). Its capture step also
+  expands collapsed sections, inlines `<dx-code-block>` code samples, and
   folds API-reference field stacks into compact Markdown tables.
 
 Example URLs it owns:
 
 ```
+https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-auth        ← Markdown twin
 https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm
 https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes.htm
 ```

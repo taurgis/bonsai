@@ -1,4 +1,5 @@
 import type { ExtractionResult } from '../lib/research/extract.js';
+import type { CaptureMethod } from '../lib/research/schema.js';
 
 // Shape a site module's fetchPage must return — the same inputs createArtifactFromFetch
 // consumes, so a custom fetch slots into the generic caching pipeline unchanged.
@@ -12,6 +13,11 @@ export interface SiteFetchResult {
     content: string;
   };
   extraction: ExtractionResult;
+  // Optional capture provenance. A module that resolved content from somewhere other than the
+  // rendered page (e.g. a route `.md` twin) reports it here so artifact metadata records the
+  // real method/source instead of the module's rendered default.
+  captureMethod?: CaptureMethod;
+  sourceDocUrl?: string;
 }
 
 export interface SiteModule {

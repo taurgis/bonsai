@@ -161,9 +161,11 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     let fetchResult: SiteFetchResult['fetchResult'];
     let extraction: SiteFetchResult['extraction'];
     let capture: Awaited<ReturnType<typeof capturePage>> | null = null;
+    let siteFetch: SiteFetchResult | null = null;
     if (siteModule?.fetchPage) {
       // Custom site modules own their fetch/extract strategy; the generic capture path is skipped.
-      ({ fetchResult, extraction } = await siteModule.fetchPage(normalizedUrl));
+      siteFetch = await siteModule.fetchPage(normalizedUrl);
+      ({ fetchResult, extraction } = siteFetch);
     } else {
       capture = await capturePage(normalizedUrl, { forceRendered: useRendered }, CAPTURE_DEPS);
       fetchResult = capture.fetchResult;
@@ -187,6 +189,16 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     artifact.metadata.site_module_id = siteModule?.id ?? null;
     if (capture) {
       applyCaptureMetadata(artifact, capture);
+    } else if (siteFetch?.captureMethod) {
+      // The module resolved content away from the rendered page (e.g. a route .md twin).
+      artifact.metadata.capture_method = siteFetch.captureMethod;
+      artifact.metadata.source_doc_url = siteFetch.sourceDocUrl ?? null;
+      if (
+        siteFetch.sourceDocUrl &&
+        !artifact.metadata.source_urls.includes(siteFetch.sourceDocUrl)
+      ) {
+        artifact.metadata.source_urls.push(siteFetch.sourceDocUrl);
+      }
     } else if (useRendered) {
       artifact.metadata.capture_method = 'browser_fallback';
     }

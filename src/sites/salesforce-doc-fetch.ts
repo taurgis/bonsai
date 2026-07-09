@@ -85,6 +85,11 @@ function confidenceFor(length: number): ExtractionResult['confidence'] {
 const BOILERPLATE_LINE =
   /(did this article solve your issue|let us know so we can improve|share your feedback)/i;
 
+// Toolbar of the "View as Markdown" feature on Developer articles. When the .md route probe
+// succeeds the browser never runs, but rollout/network asymmetries can still land such a page
+// here, and the toolbar labels serialize as bare paragraph lines.
+const MARKDOWN_TOOLBAR_LINE = /^(copy as markdown|view as markdown|copy url to markdown)$/i;
+
 // A link with empty anchor text — e.g. an icon-only "home" logo link. It carries no readable
 // content and renders as a bare `[](url)`. (Images `![](url)` are intentionally not matched.)
 const EMPTY_LINK_LINE = /^\[\]\([^)]*\)$/;
@@ -92,7 +97,12 @@ const EMPTY_LINK_LINE = /^\[\]\([^)]*\)$/;
 export function stripBoilerplate(markdown: string): string {
   return markdown
     .split('\n')
-    .filter((line) => !BOILERPLATE_LINE.test(line) && !EMPTY_LINK_LINE.test(line.trim()))
+    .filter(
+      (line) =>
+        !BOILERPLATE_LINE.test(line) &&
+        !MARKDOWN_TOOLBAR_LINE.test(line.trim()) &&
+        !EMPTY_LINK_LINE.test(line.trim())
+    )
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
