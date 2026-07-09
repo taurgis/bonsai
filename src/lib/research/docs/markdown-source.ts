@@ -110,12 +110,21 @@ function stripMdnHiddenSamples(md: string): string {
   return md.replace(/<pre\b[^>]*\bhidden\b[^>]*>[\s\S]*?<\/pre>/gi, '');
 }
 
-function cleanKumaScript(md: string): string {
-  // Never touch fenced code blocks.
+/**
+ * Applies a cleanup transform to the parts of a document OUTSIDE fenced code blocks, passing the
+ * fences through verbatim. Every text-level cleanup in this pipeline must go through this guard:
+ * fenced code is quoted material, and "cleaning" it destroys the samples readers came for
+ * (a `<script>` line in an example, a bash `# comment`, a literal `javascript:` URL).
+ */
+export function outsideFences(md: string, transform: (segment: string) => string): string {
   return md
     .split(/(```[\s\S]*?```)/)
-    .map((segment, i) => (i % 2 === 1 ? segment : segment.replace(/\{\{(.+?)\}\}/g, replaceMacro)))
+    .map((segment, i) => (i % 2 === 1 ? segment : transform(segment)))
     .join('');
+}
+
+function cleanKumaScript(md: string): string {
+  return outsideFences(md, (segment) => segment.replace(/\{\{(.+?)\}\}/g, replaceMacro));
 }
 
 // MDN (and occasionally other docs) author tables as raw HTML inside their Markdown source, which
@@ -123,21 +132,16 @@ function cleanKumaScript(md: string): string {
 // GFM tables, so convert any literal <table> region to Markdown. Code fences are skipped so an HTML
 // table shown as a *code example* (```html …<table>…) is preserved, not rewritten.
 function convertHtmlTables(md: string): string {
-  return md
-    .split(/(```[\s\S]*?```)/)
-    .map((segment, i) =>
-      i % 2 === 1
-        ? segment
-        : // ponytail: non-greedy per-table match. A <table> nested in a cell would stop the match at
-          // the inner </table>, leaving the outer wrapper's closing tags as inert residue (no attrs,
-          // so it can't trip the leak gate). Doc sources use flat tables; upgrade to a DOM walk over
-          // the whole segment via htmlToMarkdown if a nested-table source ever appears.
-          segment.replace(
-            /<table\b[\s\S]*?<\/table>/gi,
-            (table) => `\n\n${htmlToMarkdown(table).trim()}\n\n`
-          )
+  // ponytail: non-greedy per-table match. A <table> nested in a cell would stop the match at
+  // the inner </table>, leaving the outer wrapper's closing tags as inert residue (no attrs,
+  // so it can't trip the leak gate). Doc sources use flat tables; upgrade to a DOM walk over
+  // the whole segment via htmlToMarkdown if a nested-table source ever appears.
+  return outsideFences(md, (segment) =>
+    segment.replace(
+      /<table\b[\s\S]*?<\/table>/gi,
+      (table) => `\n\n${htmlToMarkdown(table).trim()}\n\n`
     )
-    .join('');
+  );
 }
 
 const HEADING = /^(#{1,6})\s/;
@@ -162,15 +166,37 @@ function dropEmptySections(md: string): string {
   return current;
 }
 
+const FENCE_DELIMITER = /^\s*```/;
+
+// Marks each line that belongs to fenced code, delimiters included. Fenced lines are content,
+// never headings: a bash `# comment` in an example must not be classified — and deleted — as an
+// empty section.
+function fencedLineMask(lines: string[]): boolean[] {
+  let fenced = false;
+  return lines.map((line) => {
+    if (!FENCE_DELIMITER.test(line)) return fenced;
+    fenced = !fenced;
+    return true;
+  });
+}
+
+/** Index of the first non-blank line after `start`, or lines.length. */
+function nextContentLine(lines: string[], start: number): number {
+  let next = start + 1;
+  while (next < lines.length && lines[next]!.trim() === '') next++;
+  return next;
+}
+
 function dropEmptySectionsOnce(md: string): string {
   const lines = md.split('\n');
+  const inFence = fencedLineMask(lines);
   const keep = lines.map(() => true);
   for (let i = 0; i < lines.length; i++) {
-    const level = headingLevel(lines[i]);
+    const level = inFence[i] ? 0 : headingLevel(lines[i]);
     if (!level) continue;
-    let next = i + 1;
-    while (next < lines.length && lines[next]!.trim() === '') next++;
-    const nextLevel = headingLevel(lines[next]);
+    const next = nextContentLine(lines, i);
+    // A fenced line after the heading means the section has content (nextLevel 0 → not empty).
+    const nextLevel = next < lines.length && !inFence[next] ? headingLevel(lines[next]) : 0;
     const sectionIsEmpty = next >= lines.length || (nextLevel > 0 && nextLevel <= level);
     if (sectionIsEmpty) for (let k = i; k < next; k++) keep[k] = false;
   }
@@ -201,9 +227,12 @@ export function extractFromSource(md: string, sourceUrl: string): ExtractionResu
   const deMacroed = /mdn\/content/.test(sourceUrl)
     ? cleanKumaScript(stripMdnHiddenSamples(body))
     : body;
-  const tablesAsMarkdown = convertHtmlTables(sanitizeSourceMarkdown(deMacroed));
+  // Sanitization and link/section cleanup are fence-guarded: code samples legitimately contain
+  // <script>/<button>/on*=/javascript: and bare [](…) lines. sanitizePromptInjection deliberately
+  // is NOT guarded — injection text is just as live when the agent reads it inside a code block.
+  const tablesAsMarkdown = convertHtmlTables(outsideFences(deMacroed, sanitizeSourceMarkdown));
   const cleaned = sanitizePromptInjection(
-    dropEmptySections(dropEmptyLinks(tablesAsMarkdown))
+    dropEmptySections(outsideFences(tablesAsMarkdown, dropEmptyLinks))
   ).trim();
   const notes = [`captured from public Markdown/MDX source: ${sourceUrl}`];
   return {

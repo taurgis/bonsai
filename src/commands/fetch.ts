@@ -20,7 +20,7 @@ import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { detectSite } from '../sites/index.js';
-import type { SiteFetchResult } from '../sites/types.js';
+import { applySiteFetchProvenance, type SiteFetchResult } from '../sites/types.js';
 
 const CAPTURE_DEPS: CaptureDeps = {
   fetchStatic: (url) => fetchStaticHtml(url),
@@ -161,9 +161,11 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     let fetchResult: SiteFetchResult['fetchResult'];
     let extraction: SiteFetchResult['extraction'];
     let capture: Awaited<ReturnType<typeof capturePage>> | null = null;
+    let siteFetch: SiteFetchResult | null = null;
     if (siteModule?.fetchPage) {
       // Custom site modules own their fetch/extract strategy; the generic capture path is skipped.
-      ({ fetchResult, extraction } = await siteModule.fetchPage(normalizedUrl));
+      siteFetch = await siteModule.fetchPage(normalizedUrl);
+      ({ fetchResult, extraction } = siteFetch);
     } else {
       capture = await capturePage(normalizedUrl, { forceRendered: useRendered }, CAPTURE_DEPS);
       fetchResult = capture.fetchResult;
@@ -187,6 +189,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     artifact.metadata.site_module_id = siteModule?.id ?? null;
     if (capture) {
       applyCaptureMetadata(artifact, capture);
+    } else if (siteFetch?.captureMethod) {
+      applySiteFetchProvenance(artifact.metadata, siteFetch);
     } else if (useRendered) {
       artifact.metadata.capture_method = 'browser_fallback';
     }

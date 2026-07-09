@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 import { getSiteModuleById } from '../../sites/index.js';
+import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/types.js';
 import { fetchStaticHtml } from './fetcher.js';
 import { extractHtmlContent } from './extract.js';
 import { writeArtifact } from './storage.js';
@@ -209,7 +210,8 @@ function persistRefreshedArtifact(
   fetchResult: Parameters<typeof createArtifactFromFetch>[3],
   extraction: Parameters<typeof createArtifactFromFetch>[4],
   currentTime: Date,
-  options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel }
+  options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel },
+  siteFetch?: SiteFetchResult
 ): RevalidationResult {
   const refreshed = createArtifactFromFetch(
     meta.source_url,
@@ -223,6 +225,9 @@ function persistRefreshedArtifact(
     options.summaryLevel
   );
   preserveUserMetadata(meta, refreshed, options.rendered);
+  // A site-module refresh reports how it actually captured this time; that overrides the
+  // carried-over provenance, so a withdrawn .md twin can't leave a stale source_doc_url behind.
+  if (siteFetch) applySiteFetchProvenance(refreshed.metadata, siteFetch);
   // Back-fill keyword tags when the carried-over set is empty (e.g. an artifact first cached before
   // auto-tagging, or one originally stored without tags), so refreshing keeps it searchable.
   applyAutoTags(refreshed);
@@ -296,8 +301,16 @@ export async function revalidateCache(
     if (siteModule?.fetchPage) {
       // Site modules use custom fetch strategies that don't speak HTTP conditional requests
       // (no ETag/If-Modified-Since), so a full re-fetch is the only correct revalidation here.
-      const { fetchResult, extraction } = await siteModule.fetchPage(meta.source_url);
-      return persistRefreshedArtifact(dataDir, meta, fetchResult, extraction, currentTime, options);
+      const siteFetch = await siteModule.fetchPage(meta.source_url);
+      return persistRefreshedArtifact(
+        dataDir,
+        meta,
+        siteFetch.fetchResult,
+        siteFetch.extraction,
+        currentTime,
+        options,
+        siteFetch
+      );
     }
 
     const fetchResult = options.rendered

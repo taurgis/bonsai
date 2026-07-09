@@ -648,7 +648,7 @@ If you want to present a custom error message when a field fails to validate, yo
 <form>
   <label for="name">Enter username (upper and lowercase letters): </label>
   <input type="text" name="name" id="name" required pattern="[A-Za-z]+" />
-
+  <button>Submit</button>
 </form>
 ```
 

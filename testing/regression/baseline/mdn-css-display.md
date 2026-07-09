@@ -375,7 +375,7 @@ Current implementations in some browsers will remove from the [accessibility tre
 
 In some browsers, changing the `display` value of a [`<table>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table) element to `block`, `grid`, or `flex` will alter its representation in the [accessibility tree](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Accessibility/What_is_accessibility#accessibility_apis). This will cause the table to no longer be announced properly by screen reading technology.
 
-*   [Hidden content for better a11y | Go Make Things](https://gomakethings.com/hidden-content-for-better-a11y/ "External link (opens in new tab)")
+*   [Hidden content for better a11y | Go Make Things](https://gomakethings.com/articles/hidden-content-for-better-a11y/ "External link (opens in new tab)")
 *   [MDN Understanding WCAG, Guideline 1.3 explanations](https://developer.mozilla.org/en-US/docs/Web/Accessibility/Guides/Understanding_WCAG/Perceivable#guideline_1.3_%e2%80%94_create_content_that_can_be_presented_in_different_ways)
 *   [Understanding Success Criterion 1.3.1 | W3C Understanding WCAG 2.0](https://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation-programmatic.html "External link (opens in new tab)")
 
@@ -595,4 +595,4 @@ You can find more examples in the pages for each separate display type under [Gr
 
 [Learn how to contribute](https://developer.mozilla.org/en-US/docs/MDN/Community/Getting_started)
 
-This page was last modified on Apr 20, 2026 by [MDN contributors](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display/contributors.txt).
+This page was last modified on Jul 8, 2026 by [MDN contributors](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display/contributors.txt).

@@ -1,33 +1,21 @@
-Property Selection
-
-Attention!
-
-**The Open Commerce API (OCAPI) is now deprecated.** The provisions described in our [versioning and deprecation policy](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/versioninganddeprecationpolicy.html) fully apply. For all new projects and major refactoring work, use B2C Commerce API (SCAPI) as the default REST API. For additional details, refer to [Why Use SCAPI Instead of OCAPI](https://developer.salesforce.com/docs/commerce/commerce-api/guide/why-use-scapi.html).
-
 # OCAPI Property Selection
-
-Copy as Markdown
-
-View as Markdown
-
-Copy URL to Markdown
 
 Property selectors reduce the number of resource properties retrieved by the API, so you can get only those properties you care about, while reducing network bandwidth.
 
 You can specify property selectors for all resource types; to do so, you set the `select` parameter on the request. The actual selector value must be enclosed within parentheses. The following table lists the different capabilities of property selectors for different `select` parameter values:
 
-| Capability | Value of select parameter |
-| --- | --- |
-| Include properties of all levels, including complex properties. | (**) |
-| Include properties of top level, except complex properties. | (*) |
-| Include a single property. | (price) (+price) |
-| Exclude a single property. | (-price) |
-| Include the child document properties. | (variation_attributes.(**)) |
-| Return only the first document in array. Index starts with 0. | (variation_attributes[0].(**)) |
-| Return only the first 5 documents in array. Index starts with 0. | (variation_attributes[0:4].(**)) |
-| Return only the second, fourth, and sixth document in array. Index starts with 0. | (variation_attributes[1,3,5].(**)) |
-| Return only documents in array that match the filter. Filter expression syntax is ?(_boolean_expression_). Supported Operators: ==, !=, <=, >=, <, > | (variation_attributes[?(@.name==‘color’)].(**)) |
-| Combine OR (\|\|) and AND (&&) in a filter. | (variation_attributes[?(@.name==‘color’ && @.id==‘size’)].(**)) |
+| Capability                                                                                                                                                         | Value of select parameter                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Include properties of all levels, including complex properties.                                                                                                    | `(**)`                                                          |
+| Include properties of top level, except complex properties.                                                                                                        | `(*)`                                                           |
+| Include a single property.                                                                                                                                         | (price) (+price)                                                |
+| Exclude a single property.                                                                                                                                         | (-price)                                                        |
+| Include the child document properties.                                                                                                                             | (variation_attributes.(**))                                     |
+| Return only the first document in array. Index starts with 0.                                                                                                      | (variation_attributes[0].(**))                                  |
+| Return only the first 5 documents in array. Index starts with 0.                                                                                                   | (variation_attributes[0:4].(**))                                |
+| Return only the second, fourth, and sixth document in array. Index starts with 0.                                                                                  | (variation_attributes[1,3,5].(**))                              |
+| Return only documents in array that match the filter. Filter expression syntax is `?(_boolean_expression_)`. Supported Operators: `==`, `!=`, `<=`, `>=`, `<`, `>` | (variation_attributes[?(@.name=='color')].(**))                 |
+| Combine OR (\|\|) and AND (&&) in a filter.                                                                                                                        | (variation_attributes[?(@.name=='color' && @.id=='size')].(**)) |
 
 You can specify a single property name or a comma-separated list of property names enclosed by parentheses. The following example shows how you can select the `name`, `id`, and `variation_attributes` properties of the product resource instance:
 
@@ -75,6 +63,7 @@ Content-Type: application/json; charset=UTF-8
     }]
   }]
 }
+
 ```
 
 To select a child property, remember to accurately specify all of the result levels. The following example shows a filtered order search with a select that goes three levels deep to select and sort by fields on the retrieved order records.
@@ -132,24 +121,25 @@ Content-Type: application/json; charset=UTF-8
     }
   ]
 }
+
 ```
 
-## Localized and SiteSpecific Properties 
+## Localized and SiteSpecific Properties
 
-There are two types of properties, where an extra selector element is required: _Localized\_ and \_SiteSpecific_.
+There are two types of properties, where an extra selector element is required: *Localized<?>_ and _SiteSpecific<?>*.
 
-Values of _Localized_ properties depend on the locale, therefore a valid locale has to be included in the selector. An example of such a property is a product name. Whether a property is localized is typically noted in the property description.
+Values of *Localized* properties depend on the locale, therefore a valid locale has to be included in the selector. An example of such a property is a product name. Whether a property is localized is typically noted in the property description.
 
-For instance, this selector chooses all results with a certain name in the _default_ locale.
+For instance, this selector chooses all results with a certain name in the *default* locale.
 
-```text
+```
 (data[?(@.name.default=='Product+Name')].(**))
 ```
 
-_SiteSpecific_ properties are attributes where a value of the property depends on the selected site. The site-specific value is to be accessed with _default@Site._ As an example, a product’s validity dates are a site-specific date-time property.
+*SiteSpecific* properties are attributes where a value of the property depends on the selected site. The site-specific value is to be accessed with *default\@Site.* As an example, a product’s validity dates are a site-specific date-time property.
 
-This is an example of a selector that queries for results with a site-specific property being equal to a value for the site _SiteGenesis_:
+This is an example of a selector that queries for results with a site-specific property being equal to a value for the site *SiteGenesis*:
 
-```text
+```
 (data[?(@.valid_from.default@SiteGenesis=='2016-02-21T04:00:00.000Z')].(**))
 ```

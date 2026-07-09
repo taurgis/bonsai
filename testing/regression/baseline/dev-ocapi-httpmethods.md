@@ -1,22 +1,10 @@
-HTTP Methods
-
-Attention!
-
-**The Open Commerce API (OCAPI) is now deprecated.** The provisions described in our [versioning and deprecation policy](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/versioninganddeprecationpolicy.html) fully apply. For all new projects and major refactoring work, use B2C Commerce API (SCAPI) as the default REST API. For additional details, refer to [Why Use SCAPI Instead of OCAPI](https://developer.salesforce.com/docs/commerce/commerce-api/guide/why-use-scapi.html).
-
 # OCAPI HTTP Methods
-
-Copy as Markdown
-
-View as Markdown
-
-Copy URL to Markdown
 
 A key characteristic of a RESTful Web API is the explicit use of HTTP methods, as defined by RFC 2616. The Open Commerce API supports these methods, as described in the following sections.
 
-## GET 
+## GET
 
-The GET method retrieves resources on the server. The GET method is a _safe method,_ which means that it should never change the state of the server or have side effects. Consequently, a GET request never initiates transactions on the server.
+The GET method retrieves resources on the server. The GET method is a *safe method,* which means that it should never change the state of the server or have side effects. Consequently, a GET request never initiates transactions on the server.
 
 A typical GET request and its response look like this:
 
@@ -32,13 +20,14 @@ Content-Length: 67
 Content-Type: application/json; charset=UTF-8
 
 {"sku":"123","name":"foo","brand":"bar","online":true}
+
 ```
 
-This sample shows a typical GET request retrieving a `Product` resource using the `Identifier` “123”. The response has HTTP status code 200, which indicates the resource was found and is contained in response body. The response contains the “Content-Type” header, which is set to “application/json” plus the charset definition (“UTF-8”).
+This sample shows a typical GET request retrieving a `Product` resource using the `Identifier` "123". The response has HTTP status code 200, which indicates the resource was found and is contained in response body. The response contains the "Content-Type" header, which is set to "application/json" plus the charset definition ("UTF-8").
 
-## DELETE 
+## DELETE
 
-The DELETE method removes one or more resources on the server. DELETE is an _idempotent_ method, which means repeating a request always results in the same server state as making the request once. The server returns HTTP status code 204 (NO CONTENT) if the resource has been deleted or 404 (NOT FOUND) if the resource doesn’t exist (anymore).
+The DELETE method removes one or more resources on the server. DELETE is an *idempotent* method, which means repeating a request always results in the same server state as making the request once. The server returns HTTP status code 204 (NO CONTENT) if the resource has been deleted or 404 (NOT FOUND) if the resource doesn’t exist (anymore).
 
 The following example shows how to remove a resource that is addressed by an `Identifier` in the URL:
 
@@ -51,21 +40,22 @@ Accept: application/json
 RESPONSE:
 HTTP/1.1 204 NO CONTENT
 Content-Length: 0
+
 ```
 
 The request is similar to the previous GET request, except the HTTP method changed. The response status code is 204, which means the server successfully fulfilled the request but returned no content.
 
-## PUT (Dev and Sandbox Instances Only) 
+## PUT (Dev and Sandbox Instances Only)
 
-The PUT method is used to _create_, _update_, or _replace_ a resource. It’s also an _idempotent_ method. If a resource is created, the method returns a 201 status code with a _Location_ header, pointing to the created resource. Otherwise, it returns a 200 status code.
+The PUT method is used to *create*, *update*, or *replace* a resource. It’s also an *idempotent* method. If a resource is created, the method returns a 201 status code with a *Location* header, pointing to the created resource. Otherwise, it returns a 200 status code.
 
-Note
-
+:::note
 For security reasons, the HTTP PUT method is blocked from making direct calls against production or staging instances. Instead, use the workaround described in [Override HTTP Method](#override-http-method) to perform a logical PUT call via the POST method. If you make PUT calls in your development or sandbox instance, you can’t use the same code in staging or production.
+:::
 
 PUT allows you to create a resource with the identifier specified in the URL. POST, on the other hand, is used when the identifier is provided by the server.
 
-If the resource exists, PUT “cleans” the resource and then applies all the properties specified in the request document. So, unlike PATCH, PUT also touches/cleans properties that aren’t part of the request document. The PUT replace logic touches only the resource itself, not its relations to other resources.
+If the resource exists, PUT "cleans" the resource and then applies all the properties specified in the request document. So, unlike PATCH, PUT also touches/cleans properties that aren’t part of the request document. The PUT replace logic touches only the resource itself, not its relations to other resources.
 
 The example shows how to set a billing address on a basket using the PUT method:
 
@@ -106,16 +96,16 @@ Content-Type: application/json;charset=UTF-8
 }
 ```
 
-## PATCH 
+## PATCH
 
-The PATCH method allows partial resource modification by sending a delta document. The method is neither _safe_ nor _idempotent._ A PATCH document contains information describing how to modify a server resource to produce a new version; in contrast, a PUT request completely replaces the existing document.
+The PATCH method allows partial resource modification by sending a delta document. The method is neither *safe* nor *idempotent.* A PATCH document contains information describing how to modify a server resource to produce a new version; in contrast, a PUT request completely replaces the existing document.
 
 The Open Commerce API uses the PATCH method to provide partial updates. The following table compares PUT and PATCH regarding their create and update behavior:
 
-| Method | Resource doesn’t exist | Resource exists |
-| --- | --- | --- |
-| PUT | Creates a resource. | Updates the resource by completely replacing it. UUIDs and relations aren’t touched. Properties that aren’t provided in the request are lost. |
-| PATCH | Doesn’t create a resource. | Updates the resource partially. The server only updates properties that are provided in the request; other properties aren’t touched. |
+| Method | Resource doesn’t exist     | Resource exists                                                                                                                               |
+| ------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| PUT    | Creates a resource.        | Updates the resource by completely replacing it. UUIDs and relations aren’t touched. Properties that aren’t provided in the request are lost. |
+| PATCH  | Doesn’t create a resource. | Updates the resource partially. The server only updates properties that are provided in the request; other properties aren’t touched.         |
 
 The example shows how you can use a PATCH to partially update a baskets resource. The server updates only the properties in the delta document; other properties are untouched:
 
@@ -169,21 +159,22 @@ Cache-Control: max-age=0,no-cache,no-store,must-revalidate
    ],
    ...
 }
+
 ```
 
-## POST 
+## POST
 
-The POST method is neither _safe_ (because requests can affect the server state) nor _idempotent_ (because multiple requests potentially return different results).
+The POST method is neither *safe* (because requests can affect the server state) nor *idempotent* (because multiple requests potentially return different results).
 
 The Open Commerce API uses POST only for three purposes:
 
-*   Create a resource. Unlike PUT, the resource identifier is provided by the server.
-*   Override an HTTP method; see [Override HTTP method.](#override-http-method)
-*   Execute special actions that are hard to map to a RESTful request (for example, password reset requests).
+- Create a resource. Unlike PUT, the resource identifier is provided by the server.
+- Override an HTTP method; see [Override HTTP method.](#override-http-method)
+- Execute special actions that are hard to map to a RESTful request (for example, password reset requests).
 
-## HEAD 
+## HEAD
 
-The HEAD method is similar to the GET method, but returns headers only, not content (body). The headers are identical to those of the GET request. The HEAD method is a _safe method:_ it doesn’t change the state of the server.
+The HEAD method is similar to the GET method, but returns headers only, not content (body). The headers are identical to those of the GET request. The HEAD method is a *safe method:* it doesn’t change the state of the server.
 
 ```txt
 REQUEST:
@@ -195,11 +186,12 @@ RESPONSE:
 HTTP/1.1 204 NO CONTENT
 Content-Length: 67
 Content-Type: application/json; charset=UTF-8
+
 ```
 
-## OPTIONS 
+## OPTIONS
 
-The OPTIONS method lists the supported HTTP methods for the specified URL in the `Allow` header. It isn’t cache-able and returns no content. The OPTIONS method is also a _safe_ method, which means that it will never change the state of the server.
+The OPTIONS method lists the supported HTTP methods for the specified URL in the `Allow` header. It isn’t cache-able and returns no content. The OPTIONS method is also a *safe* method, which means that it will never change the state of the server.
 
 ```txt
 REQUEST:
@@ -209,9 +201,10 @@ Host: http://example.com
 RESPONSE:
 HTTP/1.1 204 NO CONTENT
 Allow: GET, HEAD, POST
+
 ```
 
-## Override HTTP Method 
+## Override HTTP Method
 
 Some web frameworks (for example, AJAX frameworks) only support the HTTP methods GET and POST. The Open Commerce API works around this limitation by supporting POST requests that can override the HTTP method. The methods DELETE, HEAD, OPTIONS, PUT and PATCH are supported override methods.
 
@@ -225,6 +218,7 @@ Accept: application/json
 
 RESPONSE:
 HTTP/1.1 204 NO CONTENT
+
 ```
 
 Another way you can override the HTTP method is to specify the B2C Commerce Digital HTTP header `x-dw-http-method-override` with the value of the overriding method in upper case. The following example shows how you can simulate a DELETE:
@@ -238,19 +232,21 @@ x-dw-http-method-override: DELETE
 
 RESPONSE:
 HTTP/1.1 204 NO CONTENT
+
 ```
 
-Note
-
+:::note
 The request parameter has precedence over the header parameter.
+:::
 
-## PATCH, POST, PUT With Empty Request Body 
+## PATCH, POST, PUT With Empty Request Body
 
-Some of the PATCH, POST, and PUT OCAPIs might not require a request body. Making these calls with empty request bodies can cause problems (i.e. HTTP 500 responses) with proxies in between. Please ensure that you provide the `Content-Length` request header with the value ‘0’.
+Some of the PATCH, POST, and PUT OCAPIs might not require a request body. Making these calls with empty request bodies can cause problems (i.e. HTTP 500 responses) with proxies in between. Please ensure that you provide the `Content-Length` request header with the value '0'.
 
 ```txt
 REQUEST:
 POST /dw/shop/v24_5/sessions HTTP/1.1
 Host: example.com
 Content-Length: 0
+
 ```

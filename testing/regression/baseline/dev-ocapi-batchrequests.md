@@ -1,16 +1,4 @@
-Batch Requests
-
-Attention!
-
-**The Open Commerce API (OCAPI) is now deprecated.** The provisions described in our [versioning and deprecation policy](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/versioninganddeprecationpolicy.html) fully apply. For all new projects and major refactoring work, use B2C Commerce API (SCAPI) as the default REST API. For additional details, refer to [Why Use SCAPI Instead of OCAPI](https://developer.salesforce.com/docs/commerce/commerce-api/guide/why-use-scapi.html).
-
 # OCAPI Batch Requests
-
-Copy as Markdown
-
-View as Markdown
-
-Copy URL to Markdown
 
 An OCAPI batch request is a multipart HTTP request that can contain up to 50 subrequests. Each subrequest (part) must operate on a single resource; subrequests that specify multiple ids (for example, `'/products/(p1,p2...)'`) are forbidden.
 
@@ -18,9 +6,9 @@ Batch requests reduce network overhead by reducing the overall amount of informa
 
 The HTTP method used for the batch request as a whole must be POST or OPTIONS. Each subrequest can specify a different HTTP method if necessary.
 
-## Batch Request Format 
+## Batch Request Format
 
-Each batch request has a main header section. In this section, you must include a `Content-Type` header that specifies a type (_multipart/mixed_) and a boundary separator that is used to delimit each subrequest. For example:
+Each batch request has a main header section. In this section, you must include a `Content-Type` header that specifies a type (*multipart/mixed*) and a boundary separator that is used to delimit each subrequest. For example:
 
 ```txt
 Content-Type: multipart/mixed; boundary=23dh3f9f4
@@ -32,23 +20,24 @@ Each subrequest, however, is conceptually a complete OCAPI request with its own 
 
 To specify the behavior of subrequests and to define the mapping between requests and responses, you must specify the following headers where appropriate:
 
-| Header name | Location | Description |
-| --- | --- | --- |
-| x-dw-http-method | request, subrequest | Specifies the HTTP method used to access the resource. |
-| x-dw-resource-path | request, subrequest | Specifies the base resource path. The value of this header is combined with value of the x-dw-resource-path-extension header to provide a complete resource path. |
-| x-dw-resource-path-extension | request, subrequest | Specifies an extension for the value of the base path, as specified by the x-dw-resource-path header. This header is optional if the base resource path already represents a valid OCAPI resource. |
-| x-dw-content-id | subrequest, subresponse | Specifies an ID of the subrequest. This header value is used to map a subrequest to a subresponse. |
-| x-dw-status-code | subresponse | Specifies the status code of a single subresponse. |
-## CORS Support 
+| Header name                    | Location                | Description                                                                                                                                                                                          |
+| ------------------------------ | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x-dw-http-method`             | request, subrequest     | Specifies the HTTP method used to access the resource.                                                                                                                                               |
+| `x-dw-resource-path`           | request, subrequest     | Specifies the base resource path. The value of this header is combined with value of the `x-dw-resource-path-extension` header to provide a complete resource path.                                  |
+| `x-dw-resource-path-extension` | request, subrequest     | Specifies an extension for the value of the base path, as specified by the `x-dw-resource-path` header. This header is optional if the base resource path already represents a valid OCAPI resource. |
+| `x-dw-content-id`              | subrequest, subresponse | Specifies an ID of the subrequest. This header value is used to map a subrequest to a subresponse.                                                                                                   |
+| `x-dw-status-code`             | subresponse             | Specifies the status code of a single subresponse.                                                                                                                                                   |
+
+## CORS Support
 
 Batch requests are supporting [CORS](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/cors.html). Allowed expose headers and origins are mentioned in OCAPI settings for each client ID. To access them, it’s mandatory to send a batch request for a specific client in a context, either of a specific site or global. There are several possibilities to pass a [client identification](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/clientapplicationidentification.html):
 
-1.  Client ID as query parameter
-2.  Client ID as _x-dw-client-id_ header
-3.  OAuth access token via _Authorization_ header
-4.  JWT via _Authorization_ header
+1. Client ID as query parameter
+2. Client ID as *x-dw-client-id* header
+3. OAuth access token via *Authorization* header
+4. JWT via *Authorization* header
 
-## Formatting of Multipart Sub Requests 
+## Formatting of Multipart Sub Requests
 
 Subrequests in a batch request body adhering to the standard defined in [Multipart Media Type](https://tools.ietf.org/html/rfc2046#section-5.1). This approach means that the header section in a Multipart subrequest has to follow directly after the Multipart boundary. The header section and the Multipart body section have to be separated by two subsequent newline characters.
 
@@ -57,7 +46,7 @@ Example 1
 Correct formatted subrequest.
 
 ```txt
-REQUEST:
+    REQUEST:
     POST /batch HTTP 1.1
     Host: example.com
     Content-Type: multipart/mixed; boundary=23dh3f9f4
@@ -77,7 +66,8 @@ Example 2
 Wrong formatted subrequest. Only one newline after header section.
 
 ```txt
-REQUEST:
+
+    REQUEST:
     POST /batch HTTP 1.1
     Host: example.com
     Content-Type: multipart/mixed; boundary=23dh3f9f4
@@ -96,7 +86,7 @@ Example 3
 Wrong formatted subrequest. Two newlines after boundary lead to an empty header section.
 
 ```txt
-REQUEST:
+    REQUEST:
     POST /batch HTTP 1.1
     Host: example.com
     Content-Type: multipart/mixed; boundary=23dh3f9f4
@@ -109,16 +99,17 @@ REQUEST:
     {"query":{"filtered_query":{"query":{"bool_query":{"must":[{"term_query":{"fields":["product_items.product_id"],"operator":"one_of","values":["S20273_100"]}},{"term_query":{"fields":["status"],"operator":"one_of","values":["new"]}}]}},"filter":{"range_filter":{"field":"creation_date","from":"2020-04-01"}}}},"select":"(total)"}\n
     --23dh3f9f4--
     ...
+
 ```
 
-## Example Batch Requests 
+## Example Batch Requests
 
 Example 1
 
 This example shows how you can access multiple resources of the same type:
 
 ```txt
-REQUEST:
+    REQUEST:
     POST /batch HTTP 1.1
     Host: example.com
     Content-Type: multipart/mixed; boundary=23dh3f9f4
@@ -154,7 +145,7 @@ Example 2
 This example shows how you can access resources of different types:
 
 ```txt
-REQUEST:
+    REQUEST:
     POST /batch HTTP 1.1
     Host: example.com
     Content-Type: multipart/mixed; boundary=23dh3f9f4
@@ -211,32 +202,34 @@ REQUEST:
       }
     }
     --23dh3f9f4--
+
 ```
 
-## Request Site Context 
+## Request Site Context
 
 The site context for each request can be defined in `x-dw-resource-path` or `x-dw-resource-path-extension`. If no site context is given in these headers, the one from the main request is taken. This implies, that the site context from the main request can be overwritten by the resource path headers.
 
-## Limitations 
+## Limitations
 
 The size of the batch request body is limited to 5 MB. The maximum number of subrequests is 50.
 
-## Exceptions 
-| Exeption name | Status code | Description |
-| --- | --- | --- |
-| IllegalContentTypeException | 400 | Thrown if the request content type isn’t multipart/mixed or specifies no boundary. |
-| IllegalQueryStringException | 400 | Thrown if the query string for the request or a subrequest is invalid. |
-| InvalidAuthorizationHeaderException | 401 | Thrown if the authorizarion header has not the format Authorization: Bearer … |
-| InvalidHttpMethodException | 400 | Thrown if the HTTP method in the request header or subrequest header is invalid. |
-| InvalidRequestBodyException | 400 | Thrown if the request body is invalid. |
-| InvalidTokenException | 401 | The token sent via Authorization: Bearer header is invalid or expired. |
-| MethodNotAllowedException | 405 | Thrown if the batch request was sent with an HTTP method other than POST or OPTIONS. |
-| MissingClientIdException | 400 | Thrown if no client identification was sent with the main request (either as client ID or authorization token). |
-| MissingHttpMethodException | 400 | Thrown if at least one subrequest has no HTTP method. |
-| MissingResourcePathException | 400 | Thrown if at least one subrequest has no resource path. |
-| QuotaExceededException | 400 | Thrown if the batch request contains more than 50 subrequests. |
-| RequestEntityTooLargeException | 400 | Thrown if the batch request body is larger than 5 MB. |
-| ResourcePathNotAllowedException | 400 | Thrown if at least one subrequest is a multiple-ID resource call. |
-| UnauthorizedOriginException | 401 | Thrown if the given origin isn’t mentioned in the OCAPI settings for the accessing client. |
-| UnknownClientIdException | 401 | Thrown if the given client identification isn’t known to the account manager. |
-| UnknownSiteIdException | 400 | Thrown if the request was sent in the context of an unknown site name. |
+## Exceptions
+
+| Exeption name                         | Status code | Description                                                                                                     |
+| ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------- |
+| `IllegalContentTypeException`         | 400         | Thrown if the request content type isn’t multipart/mixed or specifies no boundary.                              |
+| `IllegalQueryStringException`         | 400         | Thrown if the query string for the request or a subrequest is invalid.                                          |
+| `InvalidAuthorizationHeaderException` | 401         | Thrown if the authorizarion header has not the format *Authorization: Bearer ...*                               |
+| `InvalidHttpMethodException`          | 400         | Thrown if the HTTP method in the request header or subrequest header is invalid.                                |
+| `InvalidRequestBodyException`         | 400         | Thrown if the request body is invalid.                                                                          |
+| `InvalidTokenException`               | 401         | The token sent via *Authorization: Bearer* header is invalid or expired.                                        |
+| `MethodNotAllowedException`           | 405         | Thrown if the batch request was sent with an HTTP method other than POST or OPTIONS.                            |
+| `MissingClientIdException`            | 400         | Thrown if no client identification was sent with the main request (either as client ID or authorization token). |
+| `MissingHttpMethodException`          | 400         | Thrown if at least one subrequest has no HTTP method.                                                           |
+| `MissingResourcePathException`        | 400         | Thrown if at least one subrequest has no resource path.                                                         |
+| `QuotaExceededException`              | 400         | Thrown if the batch request contains more than 50 subrequests.                                                  |
+| `RequestEntityTooLargeException`      | 400         | Thrown if the batch request body is larger than 5 MB.                                                           |
+| `ResourcePathNotAllowedException`     | 400         | Thrown if at least one subrequest is a multiple-ID resource call.                                               |
+| `UnauthorizedOriginException`         | 401         | Thrown if the given origin isn’t mentioned in the OCAPI settings for the accessing client.                      |
+| `UnknownClientIdException`            | 401         | Thrown if the given client identification isn’t known to the account manager.                                   |
+| `UnknownSiteIdException`              | 400         | Thrown if the request was sent in the context of an unknown site name.                                          |
