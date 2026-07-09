@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { createHash, X509Certificate } from 'node:crypto';
 import { EnvHttpProxyAgent, type Dispatcher } from 'undici';
 
 // Order matters: undici's own EnvHttpProxyAgent (github.com/nodejs/undici lib/dispatcher/
@@ -109,4 +111,86 @@ export function getChromeProxyArgs(): string[] {
   const noProxy = firstEnv(NO_PROXY_ENV_VARS);
   if (noProxy) args.push(`--proxy-bypass-list=${toChromeBypassList(noProxy)}`);
   return args;
+}
+
+/**
+ * Caps Chrome's TLS version at 1.2 for connections made through a detected sandbox proxy, or []
+ * when no proxy is configured. Some sandbox proxies' TLS-terminating layer never responds to
+ * Chrome's default TLS 1.3 ClientHello (BoringSSL sends ECH-GREASE by default, which most tools'
+ * TLS stacks — curl/OpenSSL's included — don't add): captured via --log-net-log, Chrome sends its
+ * ClientHello, the proxy sends nothing back, and ~6s later the socket read fails with
+ * net::ERR_CONNECTION_RESET. Capping to TLS 1.2 avoids that ClientHello shape entirely. Scoped to
+ * the proxied path only (via isProxyConfigured, the same signal every other sandbox-specific flag
+ * in this module uses) so ordinary developer machines get Chrome's normal TLS 1.3 negotiation
+ * unchanged; this doesn't affect certificate verification (see getChromeSpkiArgs), only which
+ * protocol version Chrome offers.
+ */
+export function getChromeTlsCompatibilityArgs(): string[] {
+  return isProxyConfigured() ? ['--ssl-version-max=tls1.2'] : [];
+}
+
+// Order matters for the same reason as the *_PROXY lists above: read consistently so this module
+// and every caller agree on which file is "the" CA bundle. Node itself only honors
+// NODE_EXTRA_CA_CERTS; SSL_CERT_FILE and CURL_CA_BUNDLE are the conventions OpenSSL-linked tools
+// (curl, Python, etc.) use instead. A sandbox that MITMs TLS to route through its proxy sets all
+// three to the same bundle so every tool picks it up regardless of which convention it follows.
+export const CA_BUNDLE_ENV_VARS = ['NODE_EXTRA_CA_CERTS', 'SSL_CERT_FILE', 'CURL_CA_BUNDLE'];
+
+function findCaBundlePath(): string | undefined {
+  const path = firstEnv(CA_BUNDLE_ENV_VARS);
+  return path && existsSync(path) ? path : undefined;
+}
+
+function extractPemCertificates(bundle: string): string[] {
+  return bundle.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g) ?? [];
+}
+
+/**
+ * Base64-encoded SHA-256 SPKI fingerprints (RFC 7469 §2.4) for every certificate in the sandbox's
+ * discoverable CA bundle, in the exact encoding Chromium's --ignore-certificate-errors-spki-list
+ * expects — equivalent to `openssl x509 -pubkey -noout | openssl pkey -pubin -outform der |
+ * openssl dgst -sha256 -binary | openssl enc -base64` for each cert. Returns [] when no bundle is
+ * discoverable or none of its entries parse, so a missing/malformed bundle degrades to Chrome's
+ * normal (unpinned) verification rather than breaking the browser launch.
+ */
+export function getCaBundleSpkiHashes(): string[] {
+  const bundlePath = findCaBundlePath();
+  if (!bundlePath) return [];
+
+  let bundle: string;
+  try {
+    bundle = readFileSync(bundlePath, 'utf8');
+  } catch {
+    return [];
+  }
+
+  const hashes = new Set<string>();
+  for (const pem of extractPemCertificates(bundle)) {
+    try {
+      const spkiDer = new X509Certificate(pem).publicKey.export({ type: 'spki', format: 'der' });
+      hashes.add(createHash('sha256').update(spkiDer).digest('base64'));
+    } catch {
+      // Skip entries that don't parse as certificates rather than failing the whole bundle.
+    }
+  }
+  return Array.from(hashes);
+}
+
+/**
+ * Chrome CLI flag that trusts exactly the sandbox's injected CA(s), pinned by SPKI hash rather
+ * than by disabling verification. Chromium's TLS stack (the Chrome Root Store) never reads
+ * NODE_EXTRA_CA_CERTS/SSL_CERT_FILE/CURL_CA_BUNDLE the way Node/curl/Python do, so a sandbox that
+ * MITMs HTTPS through its proxy (see isProxyConfigured) makes every other tool trust the proxy's
+ * cert while Chrome's handshake with it fails with ERR_CERT_AUTHORITY_INVALID. This is scoped
+ * narrowly to the specific CA(s) discovered via the CA bundle env vars — never
+ * --ignore-certificate-errors, which would disable verification for every host, including ones
+ * that have nothing to do with the sandbox's proxy. A no-op (empty array) when no proxy is
+ * configured or no CA bundle is discoverable, so default Chrome trust is untouched on ordinary
+ * developer machines.
+ */
+export function getChromeSpkiArgs(): string[] {
+  if (!isProxyConfigured()) return [];
+  const hashes = getCaBundleSpkiHashes();
+  if (!hashes.length) return [];
+  return [`--ignore-certificate-errors-spki-list=${hashes.join(',')}`];
 }

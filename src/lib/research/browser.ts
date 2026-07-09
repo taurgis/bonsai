@@ -3,7 +3,12 @@ import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import { checkDnsSafety } from './fetcher.js';
-import { getChromeProxyArgs, isProxyConfigured } from './proxy.js';
+import {
+  getChromeProxyArgs,
+  getChromeSpkiArgs,
+  getChromeTlsCompatibilityArgs,
+  isProxyConfigured,
+} from './proxy.js';
 import { normalizeUrl } from './url.js';
 
 export interface BrowserFetchOptions {
@@ -152,6 +157,15 @@ export function buildChromeArgs(): string[] {
     // CDP navigation uses Chrome's own network stack, not Node's fetch/undici, so a sandbox
     // proxy detected via *_PROXY env vars must be passed to Chrome separately (see proxy.ts).
     ...getChromeProxyArgs(),
+    // The sandbox proxy above re-terminates TLS with its own CA, which Chrome's Chrome-Root-Store
+    // verifier doesn't trust by default (unlike Node/curl/Python, which read NODE_EXTRA_CA_CERTS/
+    // SSL_CERT_FILE/CURL_CA_BUNDLE). Pin trust to that specific CA rather than disabling
+    // verification wholesale (see proxy.ts's getChromeSpkiArgs).
+    ...getChromeSpkiArgs(),
+    // Separately from cert trust: some sandbox proxies' TLS terminator never responds to Chrome's
+    // default TLS 1.3 ClientHello and the connection is eventually reset (see proxy.ts's
+    // getChromeTlsCompatibilityArgs for how this was diagnosed).
+    ...getChromeTlsCompatibilityArgs(),
   ];
 }
 

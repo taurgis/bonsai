@@ -12,15 +12,24 @@ import {
   SANDBOX_EGRESS_ERROR_MARKER,
   type CdpPage,
 } from './browser.js';
-import { ALL_PROXY_ENV_VARS } from './proxy.js';
+import { execFileSync } from 'node:child_process';
+import { ALL_PROXY_ENV_VARS, CA_BUNDLE_ENV_VARS } from './proxy.js';
 import { hasInternetAccess } from '../../../tests/helpers/network.js';
 
 describe('buildChromeArgs (sandbox proxy CLI flags)', () => {
   const originalEnv: Record<string, string | undefined> = {};
+  const originalCaEnv: Record<string, string | undefined> = {};
 
   beforeEach(() => {
     for (const key of ALL_PROXY_ENV_VARS) {
       originalEnv[key] = process.env[key];
+      delete process.env[key];
+    }
+    // The CA bundle vars aren't proxy vars, but they gate getChromeSpkiArgs the same way, and a
+    // sandbox that sets HTTPS_PROXY typically also sets these — clear them so each test controls
+    // its own scenario instead of picking up whatever the host environment happens to have set.
+    for (const key of CA_BUNDLE_ENV_VARS) {
+      originalCaEnv[key] = process.env[key];
       delete process.env[key];
     }
   });
@@ -29,6 +38,10 @@ describe('buildChromeArgs (sandbox proxy CLI flags)', () => {
     for (const key of ALL_PROXY_ENV_VARS) {
       if (originalEnv[key] === undefined) delete process.env[key];
       else process.env[key] = originalEnv[key];
+    }
+    for (const key of CA_BUNDLE_ENV_VARS) {
+      if (originalCaEnv[key] === undefined) delete process.env[key];
+      else process.env[key] = originalCaEnv[key];
     }
   });
 
@@ -50,6 +63,79 @@ describe('buildChromeArgs (sandbox proxy CLI flags)', () => {
     process.env.NO_PROXY = 'internal.example.com';
     const args = buildChromeArgs();
     expect(args).toContain('--proxy-bypass-list=internal.example.com,*.internal.example.com');
+  });
+
+  it('has no ssl-version-max flag when no sandbox egress proxy is configured', () => {
+    const args = buildChromeArgs();
+    expect(args).not.toContain('--ssl-version-max=tls1.2');
+  });
+
+  it('caps TLS to 1.2 when a sandbox egress proxy is configured', () => {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const args = buildChromeArgs();
+    expect(args).toContain('--ssl-version-max=tls1.2');
+  });
+
+  it('has no --ignore-certificate-errors-spki-list flag when no proxy is configured', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'bonsai-ca-bundle-'));
+    try {
+      const certPath = join(dir, 'ca.pem');
+      execFileSync('openssl', [
+        'req',
+        '-x509',
+        '-newkey',
+        'rsa:2048',
+        '-nodes',
+        '-keyout',
+        join(dir, 'ca.key'),
+        '-out',
+        certPath,
+        '-days',
+        '1',
+        '-subj',
+        '/CN=bonsai-test-ca',
+      ]);
+      process.env.NODE_EXTRA_CA_CERTS = certPath;
+      const args = buildChromeArgs();
+      expect(args.some((a) => a.startsWith('--ignore-certificate-errors-spki-list='))).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('pins the SPKI hash of the discovered CA bundle when a proxy is configured', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'bonsai-ca-bundle-'));
+    try {
+      const certPath = join(dir, 'ca.pem');
+      execFileSync('openssl', [
+        'req',
+        '-x509',
+        '-newkey',
+        'rsa:2048',
+        '-nodes',
+        '-keyout',
+        join(dir, 'ca.key'),
+        '-out',
+        certPath,
+        '-days',
+        '1',
+        '-subj',
+        '/CN=bonsai-test-ca',
+      ]);
+      const pubkey = execFileSync('openssl', ['x509', '-in', certPath, '-pubkey', '-noout']);
+      const der = execFileSync('openssl', ['pkey', '-pubin', '-outform', 'der'], { input: pubkey });
+      const digest = execFileSync('openssl', ['dgst', '-sha256', '-binary'], { input: der });
+      const expectedHash = execFileSync('openssl', ['enc', '-base64', '-A'], { input: digest })
+        .toString('utf8')
+        .trim();
+
+      process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+      process.env.NODE_EXTRA_CA_CERTS = certPath;
+      const args = buildChromeArgs();
+      expect(args).toContain(`--ignore-certificate-errors-spki-list=${expectedHash}`);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 
