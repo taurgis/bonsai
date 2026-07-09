@@ -169,6 +169,10 @@ export function buildChromeArgs(): string[] {
   ];
 }
 
+// CI runners occasionally starve headless Chrome's startup (disk/CPU contention from concurrent
+// jobs), so this is generous enough to absorb that rather than a "typical" local startup time.
+const CHROME_STARTUP_TIMEOUT_MS = 20_000;
+
 async function spawnChrome(
   chromePath: string
 ): Promise<{ chromeProcess: ChildProcess; wsUrl: string }> {
@@ -180,7 +184,7 @@ async function spawnChrome(
       const timeoutId = setTimeout(() => {
         chromeProcess.kill('SIGKILL');
         reject(new Error('Timed out waiting for Chrome to start.'));
-      }, 10000);
+      }, CHROME_STARTUP_TIMEOUT_MS);
 
       const onData = (data: Buffer) => {
         output += data.toString();
@@ -462,9 +466,20 @@ export function describeNavigationFailure(errorText: string, url: string): Error
 // Chrome can emit these on first navigation in headless CI when the cert verifier reloads mid-run.
 const TRANSIENT_NAV_ERROR_CODES = ['ERR_CERT_VERIFIER_CHANGED'];
 
-function isTransientBrowserNavigationError(err: unknown): boolean {
+// Resource contention in CI (concurrent jobs competing for CPU/disk) can make Chrome itself fail
+// to come up in time, or die before its devtools websocket URL is printed. Neither reflects a
+// problem with the target page, so it's worth a fresh attempt rather than failing the whole fetch.
+const TRANSIENT_CHROME_STARTUP_MESSAGES = [
+  'Timed out waiting for Chrome to start.',
+  'Chrome exited prematurely',
+];
+
+function isTransientBrowserError(err: unknown): boolean {
   const message = err instanceof Error ? err.message : String(err);
-  return TRANSIENT_NAV_ERROR_CODES.some((code) => message.includes(code));
+  return (
+    TRANSIENT_NAV_ERROR_CODES.some((code) => message.includes(code)) ||
+    TRANSIENT_CHROME_STARTUP_MESSAGES.some((text) => message.includes(text))
+  );
 }
 
 async function fetchRenderedHtmlOnce(
@@ -560,7 +575,7 @@ export async function fetchRenderedHtml(
     try {
       return await fetchRenderedHtmlOnce(url, options);
     } catch (err) {
-      if (attempt === maxAttempts || !isTransientBrowserNavigationError(err)) throw err;
+      if (attempt === maxAttempts || !isTransientBrowserError(err)) throw err;
     }
   }
 
