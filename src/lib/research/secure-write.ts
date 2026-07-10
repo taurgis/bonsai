@@ -16,20 +16,22 @@ export interface SecureWriteResult {
  * Write an artifact to the configured write root, except when it contains a secret and the
  * target is a (potentially committed) project cache — those are redirected to the global cache.
  * Returns where it landed so the caller can warn the user and report the real path.
+ *
+ * `dryRun` still runs the secret scan and reports the real would-be destination, but skips the
+ * actual `writeArtifact` persist — so a read-only preview never gives a falsely reassuring answer
+ * about where secret-bearing content would land.
  */
 export function writeArtifactSecurely(
   roots: StoreRoots,
   key: string,
-  artifact: ResearchArtifact
+  artifact: ResearchArtifact,
+  options: { dryRun?: boolean } = {}
 ): SecureWriteResult {
   const isProjectWrite = roots.writeRoot !== roots.globalRoot;
   const secretLabel = isProjectWrite ? scanArtifactForSecret(artifact) : null;
+  const dataDir = secretLabel ? roots.globalRoot : roots.writeRoot;
 
-  if (secretLabel) {
-    writeArtifact(roots.globalRoot, key, artifact);
-    return { dataDir: roots.globalRoot, redirected: true, secretLabel };
-  }
+  if (!options.dryRun) writeArtifact(dataDir, key, artifact);
 
-  writeArtifact(roots.writeRoot, key, artifact);
-  return { dataDir: roots.writeRoot, redirected: false, secretLabel: null };
+  return { dataDir, redirected: Boolean(secretLabel), secretLabel };
 }

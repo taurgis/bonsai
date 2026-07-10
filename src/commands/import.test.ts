@@ -30,6 +30,26 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('still detects a secret and reports the redirect under --read-only (the scan is not skipped)', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('token ghp_' + 'a'.repeat(36));
+
+    const result = (await ResearchImport.run([
+      'https://example.com/import-read-only-secret-test',
+      '--stdin',
+      '--storage',
+      'project',
+      '--read-only',
+    ])) as any;
+
+    expect(result.dryRun).toBe(true);
+    expect(result.cache.redirectedToGlobal).toBe(true);
+    expect(fs.existsSync(result.cache.path)).toBe(false);
+
+    readSpy.mockRestore();
+  });
+
   it('honors BONSAI_READ_ONLY without the flag', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

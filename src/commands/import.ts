@@ -54,7 +54,6 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   };
 
   static flags = {
-    ...BaseCommand.baseFlags,
     stdin: Flags.boolean({
       description: 'read Markdown from stdin',
       default: false,
@@ -405,9 +404,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     });
 
     const dryRun = this.effectiveDryRun(false);
-    const writeResult = dryRun
-      ? { dataDir: roots.writeRoot, redirected: false, secretLabel: null }
-      : writeArtifactSecurely(roots, cacheKey, artifact);
+    const writeResult = writeArtifactSecurely(roots, cacheKey, artifact, { dryRun });
     const storagePath = getArtifactPath(writeResult.dataDir, cacheKey);
 
     if (writeResult.redirected) {

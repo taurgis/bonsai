@@ -59,7 +59,6 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   };
 
   static flags = {
-    ...BaseCommand.baseFlags,
     topic: Flags.string({
       char: 't',
       description: 'the main category/topic of the research for metadata tagging',
@@ -373,9 +372,9 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   async run(): Promise<unknown> {
     const urls = this.parsedArgv;
     const { format, ttl, 'max-age': maxAge } = this.flags;
-    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
 
     this.validateDurationFlags(ttl, maxAge);
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
 
     const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());
     const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;

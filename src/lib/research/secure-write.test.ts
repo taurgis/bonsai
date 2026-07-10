@@ -88,6 +88,27 @@ describe('writeArtifactSecurely', () => {
     expect(res.redirected).toBe(false);
     expect(res.dataDir).toBe(globalDir);
   });
+
+  it('dryRun still scans and reports the real redirect decision, but writes nothing', () => {
+    const roots = resolveStoreRoots('project', globalDir, cwd);
+    const secret = 'token ghp_' + 'a'.repeat(36);
+    const res = writeArtifactSecurely(roots, KEY_A, makeArtifact(KEY_A, secret), { dryRun: true });
+    expect(res.redirected).toBe(true);
+    expect(res.secretLabel).toBe('GitHub token');
+    expect(res.dataDir).toBe(globalDir);
+    expect(existsSync(getArtifactPath(globalDir, KEY_A))).toBe(false);
+    expect(existsSync(getArtifactPath(roots.writeRoot, KEY_A))).toBe(false);
+  });
+
+  it('dryRun on clean content reports the normal write root without writing', () => {
+    const roots = resolveStoreRoots('project', globalDir, cwd);
+    const res = writeArtifactSecurely(roots, KEY_A, makeArtifact(KEY_A, 'clean docs'), {
+      dryRun: true,
+    });
+    expect(res.redirected).toBe(false);
+    expect(res.dataDir).toBe(roots.writeRoot);
+    expect(existsSync(getArtifactPath(roots.writeRoot, KEY_A))).toBe(false);
+  });
 });
 
 describe('locateArtifact read fallback', () => {

@@ -23,9 +23,10 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   static enableJsonFlag = true;
 
   /**
-   * Shared flags every command spreads into its own `static flags` (rather than merged at parse
-   * time) so `--help` on each command lists them too. `--plan` mirrors agent-harness "plan mode"
-   * terminology; `--read-only` is the canonical name and description.
+   * Flags shared by every command. Passed as `baseFlags` to `this.parse()` in `init()` below, which
+   * is oclif's own mechanism for merging them into `this.ctor.flags` at both parse time and
+   * `--help`/manifest generation — no per-command `static flags` changes are needed to expose these.
+   * `--plan` mirrors agent-harness "plan mode" terminology; `--read-only` is the canonical name.
    */
   static baseFlags = {
     'read-only': Flags.boolean({
@@ -46,6 +47,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     await super.init();
     const { args, flags, argv } = await this.parse({
       flags: this.ctor.flags,
+      baseFlags: this.ctor.baseFlags,
       enableJsonFlag: this.ctor.enableJsonFlag,
       args: this.ctor.args,
       strict: this.ctor.strict,

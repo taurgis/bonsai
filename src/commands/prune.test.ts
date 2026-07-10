@@ -31,6 +31,18 @@ describe('prune command unit tests', () => {
     await expect(runPromise).rejects.toThrow(/--yes cannot be used while read-only mode is active/);
   });
 
+  it('reports the read-only conflict, not the generic dry-run/yes conflict, when all three flags are combined', async () => {
+    const runPromise = ResearchPrune.run([
+      '--older-than',
+      '30d',
+      '--dry-run',
+      '--yes',
+      '--read-only',
+    ]);
+    await expect(runPromise).rejects.toThrow(/--yes cannot be used while read-only mode is active/);
+    await expect(runPromise).rejects.not.toThrow(/mutually exclusive/);
+  });
+
   it('does not require --dry-run or --yes when --read-only is active (implicit preview)', async () => {
     const result = (await ResearchPrune.run(['--older-than', '30d', '--read-only'])) as any;
     expect(result.dryRun).toBe(true);

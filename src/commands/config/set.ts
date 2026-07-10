@@ -32,7 +32,6 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
   };
 
   static flags = {
-    ...ConfigSet.baseFlags,
     ...configScopeFlags({
       global: 'Write to user-level config (default).',
       local: 'Write to project-level config (.bonsai.json in cwd).',

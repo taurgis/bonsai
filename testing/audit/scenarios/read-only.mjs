@@ -83,6 +83,53 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.data?.dryRun === true, 'dryRun true');
   });
 
+  check('config (bare, no command-specific flags) accepts --read-only', () => {
+    // Regression: BaseCommand.init() must forward baseFlags to this.parse(), or a command with no
+    // static flags of its own (like the bare `config` topic command) silently rejects --read-only
+    // at runtime despite --help/the manifest advertising it.
+    const r = run(['config', '--read-only', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
+  });
+
+  check('inspect and list (minimal flags) accept --read-only as a no-op', () => {
+    const inspectRes = run(['inspect', 'https://example.com/audit-ro-inspect-noop', '--read-only', '--json']);
+    expect(inspectRes.exitCode === 1, `inspect exit ${inspectRes.exitCode}`); // cache miss, not a flag error
+    expect(parseJson(inspectRes.stdout)?.code === 'CACHE_MISS', 'inspect still parses --read-only');
+
+    const listRes = run(['list', '--read-only', '--json']);
+    expect(listRes.exitCode === 0, `list exit ${listRes.exitCode} ${listRes.stderr}`);
+  });
+
+  check('import --read-only still detects a secret and reports the redirect (scan is not skipped)', () => {
+    const ws = createWorkspace();
+    run(['config', 'set', 'storage', 'project', '--local', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const url = 'https://example.com/audit-read-only-secret';
+
+    const imported = run(['import', url, '--stdin', '--read-only', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: 'token ghp_' + 'a'.repeat(36),
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode} ${imported.stderr}`);
+    const env = parseJson(imported.stdout);
+    expect(env?.data?.dryRun === true, 'dryRun true');
+    expect(env?.data?.cache?.redirectedToGlobal === true, JSON.stringify(env?.data?.cache));
+    expect(imported.stderr.includes('GitHub token'), imported.stderr);
+  });
+
+  check('prune --dry-run --yes --read-only reports READ_ONLY_MODE, not CONFLICTING_FLAGS', () => {
+    const r = run(['prune', '--older-than', '1d', '--dry-run', '--yes', '--read-only', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'READ_ONLY_MODE', parseJson(r.stdout)?.code);
+  });
+
+  check('fetch --read-only with an invalid duration fails fast with no misleading read-only warning', () => {
+    const r = run(['https://example.com', '--read-only', '--ttl', 'garbage', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_DURATION', 'code');
+    expect(r.stderr === '', `unexpected stderr: ${r.stderr}`);
+  });
+
   check('fetch --read-only is accepted on a cache hit', () => {
     const ws = createWorkspace();
     const url = 'https://example.com/audit-read-only-fetch-hit';

@@ -33,7 +33,7 @@ Development of Bonsai happens in this repository. Keep Bonsai implementation in 
 - Keep `url` as the only required positional argument for the first command.
 - Prefer explicit flags for everything else: `--topic`, `--tags`, `--format`, `--ttl`, `--tier`, `--force`, `--json`.
 - Use kebab-case flag names.
-- Every command's `static flags` must spread `...BaseCommand.baseFlags` (see `src/base-command.ts`) so shared global flags — currently `--read-only`/`--plan` — stay available and documented in every command's own `--help`, including read-only-by-nature commands where it's a no-op.
+- `BaseCommand.baseFlags` (see `src/base-command.ts`) — currently `--read-only`/`--plan` — is merged into every command automatically via `BaseCommand.init()`'s `this.parse({ ..., baseFlags: this.ctor.baseFlags })` call; no per-command `static flags` change is needed to expose a new shared flag in `--help` or at runtime.
 - Write commands (anything that persists or deletes) must call `this.effectiveDryRun(explicitDryRun)` rather than reading their own dry-run flag directly, so global read-only/plan mode (`--read-only`/`--plan`, `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE`) is honored consistently.
 - Support `--json` for agent callers and keep logs/warnings out of stdout in JSON mode.
 - Return actionable errors with stable codes and suggestions.

@@ -24,7 +24,6 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
   ];
 
   static flags = {
-    ...ConfigList.baseFlags,
     ...configScopeFlags({
       global: 'Show user-level config only.',
       local: 'Show project-level config only.',
