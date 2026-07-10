@@ -21,7 +21,7 @@ export default function register(harness) {
   check('help fetch reveals the URL-form flags', () => {
     const r = run(['help', 'fetch']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
-    for (const flag of ['--force', '--rendered', '--format', '--dry-run']) {
+    for (const flag of ['--force', '--rendered', '--format', '--dry-run', '--read-only']) {
       expect(r.stdout.includes(flag), `missing ${flag} in fetch help`);
     }
   });

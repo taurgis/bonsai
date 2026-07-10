@@ -28,6 +28,15 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "topic": {
           "char": "t",
           "description": "the main category/topic of the research for metadata tagging",
@@ -169,6 +178,15 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "stdin": {
           "description": "read Markdown from stdin",
           "name": "stdin",
@@ -288,6 +306,15 @@
           "name": "json",
           "allowNo": false,
           "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,
@@ -328,6 +355,15 @@
           "description": "Format output as json.",
           "helpGroup": "GLOBAL",
           "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
@@ -438,6 +474,15 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "older-than": {
           "description": "prune entries older than duration (e.g. \"30d\", \"90d\")",
           "name": "older-than",
@@ -525,6 +570,15 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "tier": {
           "description": "freshness tier policy to evaluate against",
           "name": "tier",
@@ -586,6 +640,15 @@
           "name": "json",
           "allowNo": false,
           "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,
@@ -624,6 +687,15 @@
           "description": "Format output as json.",
           "helpGroup": "GLOBAL",
           "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
@@ -676,6 +748,15 @@
           "description": "Format output as json.",
           "helpGroup": "GLOBAL",
           "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
@@ -739,6 +820,15 @@
           "description": "Format output as json.",
           "helpGroup": "GLOBAL",
           "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
@@ -806,6 +896,15 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "global": {
           "char": "g",
           "description": "Remove from user-level config (default).",
@@ -843,5 +942,5 @@
       "stdoutIsPrimaryData": true
     }
   },
-  "version": "3.0.0"
+  "version": "3.1.0"
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Config, Errors } from '@oclif/core';
 import FetchCommand, { fetchFailureGuidance, describeError } from './fetch.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
@@ -297,5 +297,69 @@ describe('JSON envelope shaping', () => {
     } finally {
       spy.mockRestore();
     }
+  });
+});
+
+// Direct unit tests for BaseCommand's read-only/plan-mode gate (`readOnly` getter and
+// `effectiveDryRun`), shared by every write command. Exercised here on FetchCommand since it's
+// already imported for the envelope-shaping suite above.
+describe('read-only mode (BaseCommand)', () => {
+  async function instance(flags: Record<string, unknown> = {}) {
+    const config = await Config.load(process.cwd());
+    const cmd = new FetchCommand([], config) as any;
+    cmd.flags = flags;
+    return cmd;
+  }
+
+  const ENV_KEYS = ['BONSAI_READ_ONLY', 'BONSAI_PLAN_MODE'];
+  let savedEnv: Record<string, string | undefined>;
+
+  beforeEach(() => {
+    savedEnv = Object.fromEntries(ENV_KEYS.map((k) => [k, process.env[k]]));
+    for (const k of ENV_KEYS) delete process.env[k];
+  });
+
+  afterEach(() => {
+    for (const k of ENV_KEYS) {
+      if (savedEnv[k] === undefined) delete process.env[k];
+      else process.env[k] = savedEnv[k];
+    }
+  });
+
+  it('is false by default', async () => {
+    const cmd = await instance({ 'read-only': false });
+    expect(cmd.readOnly).toBe(false);
+  });
+
+  it('is true when the --read-only flag is set', async () => {
+    const cmd = await instance({ 'read-only': true });
+    expect(cmd.readOnly).toBe(true);
+  });
+
+  it('is true when BONSAI_READ_ONLY or BONSAI_PLAN_MODE is set, even without the flag', async () => {
+    process.env.BONSAI_READ_ONLY = '1';
+    const cmd = await instance({ 'read-only': false });
+    expect(cmd.readOnly).toBe(true);
+  });
+
+  it('effectiveDryRun ORs the explicit dry-run with readOnly and never lets the flag defeat an env-set constraint', async () => {
+    process.env.BONSAI_PLAN_MODE = 'true';
+    const cmd = await instance({ 'read-only': false });
+    expect(cmd.effectiveDryRun(false)).toBe(true);
+  });
+
+  it('effectiveDryRun warns once when read-only mode (not an explicit --dry-run) suppresses the write', async () => {
+    const cmd = await instance({ 'read-only': true });
+    const warnSpy = vi.spyOn(cmd, 'warn').mockImplementation(() => '');
+    expect(cmd.effectiveDryRun(false)).toBe(true);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy.mock.calls[0][0]).toMatch(/read-only/i);
+  });
+
+  it('effectiveDryRun does not warn when the caller already passed an explicit dry-run', async () => {
+    const cmd = await instance({ 'read-only': true });
+    const warnSpy = vi.spyOn(cmd, 'warn').mockImplementation(() => '');
+    expect(cmd.effectiveDryRun(true)).toBe(true);
+    expect(warnSpy).not.toHaveBeenCalled();
   });
 });

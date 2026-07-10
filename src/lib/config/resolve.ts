@@ -4,6 +4,25 @@ import { BUILT_IN_DEFAULTS, STORAGE_MODES, SUMMARY_LEVELS } from './schema.js';
 /** Scoped env override, following oclif's `<BIN>_*` env-var convention for this CLI. */
 export const STORAGE_ENV_VAR = 'BONSAI_STORAGE';
 export const SUMMARY_ENV_VAR = 'BONSAI_SUMMARY';
+/** Two names for the same safety switch: `PLAN_MODE` mirrors agent-harness "plan mode" terminology. */
+export const READ_ONLY_ENV_VAR = 'BONSAI_READ_ONLY';
+export const PLAN_MODE_ENV_VAR = 'BONSAI_PLAN_MODE';
+
+const BOOLEAN_TRUE_VALUES = ['1', 'true', 'yes'];
+const BOOLEAN_FALSE_VALUES = ['0', 'false', 'no'];
+
+/**
+ * Parses a boolean-ish env value. Empty/unset is `undefined` (not present); an unrecognized
+ * non-empty value is also `undefined` (invalid — see {@link invalidEnvOverrideWarnings}), so a
+ * typo never silently reads as `true`.
+ */
+export function parseEnvBoolean(raw: string | undefined): boolean | undefined {
+  const v = raw?.trim().toLowerCase();
+  if (!v) return undefined;
+  if (BOOLEAN_TRUE_VALUES.includes(v)) return true;
+  if (BOOLEAN_FALSE_VALUES.includes(v)) return false;
+  return undefined;
+}
 
 /**
  * Warnings for Bonsai env overrides that are set but hold an unrecognized value. Such a value is
@@ -25,6 +44,14 @@ export function invalidEnvOverrideWarnings(env: Record<string, string | undefine
       warnings.push(
         `Ignoring ${name}="${raw}": not one of ${valid.join(', ')}. ` +
           `Using the configured value or default instead.`
+      );
+    }
+  }
+  for (const name of [READ_ONLY_ENV_VAR, PLAN_MODE_ENV_VAR]) {
+    const raw = env[name]?.trim();
+    if (raw && parseEnvBoolean(raw) === undefined) {
+      warnings.push(
+        `Ignoring ${name}="${raw}": expected 1/true/yes or 0/false/no. Read-only mode was not toggled by this value.`
       );
     }
   }
@@ -84,5 +111,25 @@ export function resolveSummaryLevel(input: ResolveSummaryInput): SummaryLevel {
     input.projectConfig.summary ??
     input.userConfig.summary ??
     BUILT_IN_DEFAULTS.summary
+  );
+}
+
+export interface ResolveReadOnlyInput {
+  /** True when `--read-only`/`--plan` was passed on this invocation. */
+  flag: boolean;
+  env: Record<string, string | undefined>;
+}
+
+/**
+ * Resolve whether read-only (plan) mode is active. Unlike storage/summary, this is a safety gate
+ * rather than a preference: composition is OR, not override-by-precedence — if the flag or either
+ * env var says read-only, the run is read-only. There is no way to force writes back on when an
+ * ambient `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` is set, by design.
+ */
+export function resolveReadOnly(input: ResolveReadOnlyInput): boolean {
+  return Boolean(
+    input.flag ||
+    parseEnvBoolean(input.env[READ_ONLY_ENV_VAR]) ||
+    parseEnvBoolean(input.env[PLAN_MODE_ENV_VAR])
   );
 }

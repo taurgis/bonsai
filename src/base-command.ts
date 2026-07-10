@@ -1,5 +1,5 @@
-import { Command, Errors, Interfaces, toConfiguredId } from '@oclif/core';
-import { invalidEnvOverrideWarnings } from './lib/config/index.js';
+import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
+import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
 import {
   buildEnvelope,
   formatErrorForJson,
@@ -21,6 +21,21 @@ import { looksLikeSchemelessUrl } from './lib/research/url.js';
  */
 export abstract class BaseCommand<T extends typeof Command> extends Command {
   static enableJsonFlag = true;
+
+  /**
+   * Shared flags every command spreads into its own `static flags` (rather than merged at parse
+   * time) so `--help` on each command lists them too. `--plan` mirrors agent-harness "plan mode"
+   * terminology; `--read-only` is the canonical name and description.
+   */
+  static baseFlags = {
+    'read-only': Flags.boolean({
+      aliases: ['plan'],
+      default: false,
+      description:
+        'Block all filesystem writes/deletes (cache and config); network fetches still run. ' +
+        'Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.',
+    }),
+  };
 
   flags!: Interfaces.InferredFlags<T['flags']>;
   args!: Interfaces.InferredArgs<T['args']>;
@@ -54,6 +69,25 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   public override warn(input: string | Error): string | Error {
     Errors.warn(input);
     return input;
+  }
+
+  /** Whether read-only/plan mode is active for this invocation (flag OR either env var). */
+  protected get readOnly(): boolean {
+    return resolveReadOnly({ flag: Boolean(this.flags?.['read-only']), env: process.env });
+  }
+
+  /**
+   * Combines a command's own explicit dry-run intent with global read-only mode. Warns once (on
+   * stderr, so it never pollutes `--json`) when read-only mode is what's actually suppressing the
+   * write, so a skipped write is never a silent surprise to the caller.
+   */
+  protected effectiveDryRun(explicitDryRun: boolean): boolean {
+    if (this.readOnly && !explicitDryRun) {
+      this.warn(
+        'Read-only mode active (--read-only/--plan or BONSAI_READ_ONLY/BONSAI_PLAN_MODE): skipping filesystem writes.'
+      );
+    }
+    return explicitDryRun || this.readOnly;
   }
 
   /**

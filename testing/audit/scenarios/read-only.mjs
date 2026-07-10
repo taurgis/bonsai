@@ -1,0 +1,100 @@
+/**
+ * Global --read-only/--plan (BONSAI_READ_ONLY/BONSAI_PLAN_MODE) safety gate.
+ * Fetch's cache-miss persist path needs a live network fetch to exercise for real (covered by
+ * fetch.test.ts's mocked unit tests instead); this scenario sticks to the network-free write
+ * paths (import, config set, prune) plus a read-only fetch cache-hit smoke check.
+ */
+export default function register(harness, fixtures) {
+  const { check, run, expect, parseJson } = harness;
+  const { createWorkspace } = fixtures;
+
+  check('import --read-only does not write; a later status is still a cache miss', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-read-only-import';
+
+    const imported = run(['import', url, '--stdin', '--read-only', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Read-only import\n\nShould not be persisted.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode} ${imported.stderr}`);
+    const importEnv = parseJson(imported.stdout);
+    expect(importEnv?.data?.dryRun === true, 'dryRun true');
+    expect(importEnv?.data?.cache?.status === 'would_import', importEnv?.data?.cache?.status);
+
+    const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(status.stdout)?.data?.status === 'miss', 'still a cache miss after read-only import');
+  });
+
+  check('import honors BONSAI_READ_ONLY without the flag', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-env-read-only-import';
+
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Env read-only import\n',
+      env: { BONSAI_READ_ONLY: '1' },
+      keepEnv: true,
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    expect(parseJson(imported.stdout)?.data?.dryRun === true, 'dryRun true via env');
+
+    const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(status.stdout)?.data?.status === 'miss', 'still a cache miss');
+  });
+
+  check('import honors BONSAI_PLAN_MODE alias without the flag', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-plan-mode-import';
+
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Plan mode import\n',
+      env: { BONSAI_PLAN_MODE: 'true' },
+      keepEnv: true,
+    });
+    expect(parseJson(imported.stdout)?.data?.dryRun === true, 'dryRun true via BONSAI_PLAN_MODE');
+  });
+
+  check('config set --plan does not write the project file', () => {
+    const ws = createWorkspace();
+    const set = run(['config', 'set', 'storage', 'project', '--local', '--plan', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(set.exitCode === 0, `set exit ${set.exitCode}`);
+    expect(parseJson(set.stdout)?.data?.dryRun === true, 'dryRun true');
+
+    const get = run(['config', 'get', 'storage', '--local', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(get.stdout)?.data?.value === 'global', 'project file untouched, default still global');
+  });
+
+  check('prune --yes --read-only exits 2 with READ_ONLY_MODE', () => {
+    const r = run(['prune', '--older-than', '1d', '--yes', '--read-only', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'READ_ONLY_MODE', 'code');
+  });
+
+  check('prune --read-only previews without requiring --dry-run or --yes', () => {
+    const r = run(['prune', '--older-than', '1d', '--read-only', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
+    expect(parseJson(r.stdout)?.data?.dryRun === true, 'dryRun true');
+  });
+
+  check('fetch --read-only is accepted on a cache hit', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-read-only-fetch-hit';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Cached for read-only fetch\n',
+    });
+    expect(imported.exitCode === 0, `seed import exit ${imported.exitCode}`);
+
+    const r = run([url, '--read-only', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
+    expect(parseJson(r.stdout)?.data?.cache?.status === 'hit', 'cache hit');
+  });
+}

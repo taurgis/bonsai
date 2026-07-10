@@ -24,6 +24,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
   };
 
   static flags = {
+    ...ConfigUnset.baseFlags,
     ...configScopeFlags({
       global: 'Remove from user-level config (default).',
       local: 'Remove from project-level config (.bonsai.json in cwd).',
@@ -42,7 +43,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
     const scope = this.writeScope(this.flags.local);
 
-    if (this.flags['dry-run']) {
+    if (this.effectiveDryRun(this.flags['dry-run'])) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would unset ${key} (${scope})`);
       return { key, scope, dryRun: true };
     }

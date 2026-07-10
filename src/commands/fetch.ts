@@ -59,6 +59,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   };
 
   static flags = {
+    ...BaseCommand.baseFlags,
     topic: Flags.string({
       char: 't',
       description: 'the main category/topic of the research for metadata tagging',
@@ -371,7 +372,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
   async run(): Promise<unknown> {
     const urls = this.parsedArgv;
-    const { format, ttl, 'max-age': maxAge, 'dry-run': dryRun } = this.flags;
+    const { format, ttl, 'max-age': maxAge } = this.flags;
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
 
     this.validateDurationFlags(ttl, maxAge);
 

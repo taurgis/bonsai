@@ -32,6 +32,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
   };
 
   static flags = {
+    ...ConfigSet.baseFlags,
     ...configScopeFlags({
       global: 'Write to user-level config (default).',
       local: 'Write to project-level config (.bonsai.json in cwd).',
@@ -68,7 +69,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     const scope = this.writeScope(this.flags.local);
     const formatted = meta.format(parsed);
 
-    if (this.flags['dry-run']) {
+    if (this.effectiveDryRun(this.flags['dry-run'])) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
       return { key: keyArg, value: parsed, scope, dryRun: true };
     }

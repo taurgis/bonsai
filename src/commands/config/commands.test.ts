@@ -62,6 +62,23 @@ describe('config set', () => {
     expect(existsSync(projectConfig())).toBe(false);
   });
 
+  it('does not write under --read-only (alias --plan)', async () => {
+    const result = (await ConfigSet.run(['storage', 'project', '--local', '--plan'])) as any;
+    expect(result.dryRun).toBe(true);
+    expect(existsSync(projectConfig())).toBe(false);
+  });
+
+  it('does not write when BONSAI_PLAN_MODE is set, without the flag', async () => {
+    process.env.BONSAI_PLAN_MODE = '1';
+    try {
+      const result = (await ConfigSet.run(['storage', 'project', '--local'])) as any;
+      expect(result.dryRun).toBe(true);
+      expect(existsSync(projectConfig())).toBe(false);
+    } finally {
+      delete process.env.BONSAI_PLAN_MODE;
+    }
+  });
+
   it('emits the envelope under --json', async () => {
     const lines = await captureLog(() =>
       ConfigSet.run(['storage', 'project', '--local', '--json'])
@@ -179,6 +196,13 @@ describe('config unset', () => {
   it('does not write on --dry-run', async () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const result = (await ConfigUnset.run(['storage', '--local', '--dry-run'])) as any;
+    expect(result.dryRun).toBe(true);
+    expect(JSON.parse(readFileSync(projectConfig(), 'utf-8')).storage).toBe('project');
+  });
+
+  it('does not write under --read-only', async () => {
+    await ConfigSet.run(['storage', 'project', '--local']);
+    const result = (await ConfigUnset.run(['storage', '--local', '--read-only'])) as any;
     expect(result.dryRun).toBe(true);
     expect(JSON.parse(readFileSync(projectConfig(), 'utf-8')).storage).toBe('project');
   });

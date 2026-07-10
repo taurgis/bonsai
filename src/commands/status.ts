@@ -78,6 +78,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   };
 
   static flags = {
+    ...BaseCommand.baseFlags,
     tier: Flags.option({
       description: 'freshness tier policy to evaluate against',
       options: ['stable', 'standard', 'volatile'] as const,

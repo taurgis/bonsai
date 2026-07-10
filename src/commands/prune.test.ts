@@ -26,6 +26,17 @@ describe('prune command unit tests', () => {
     await expect(runPromise).rejects.toThrow(/--dry-run and --yes are mutually exclusive/);
   });
 
+  it('rejects --yes while --read-only is active', async () => {
+    const runPromise = ResearchPrune.run(['--older-than', '30d', '--yes', '--read-only']);
+    await expect(runPromise).rejects.toThrow(/--yes cannot be used while read-only mode is active/);
+  });
+
+  it('does not require --dry-run or --yes when --read-only is active (implicit preview)', async () => {
+    const result = (await ResearchPrune.run(['--older-than', '30d', '--read-only'])) as any;
+    expect(result.dryRun).toBe(true);
+    expect(result.prunedCount).toBe(0);
+  });
+
   it('performs dry-run and actual pruning successfully', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

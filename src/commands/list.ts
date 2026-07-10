@@ -47,6 +47,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   ];
 
   static flags = {
+    ...BaseCommand.baseFlags,
     topic: Flags.string({
       char: 't',
       description: 'filter by exact topic (case-insensitive)',

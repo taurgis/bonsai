@@ -36,6 +36,10 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     }),
   };
 
+  static flags = {
+    ...BaseCommand.baseFlags,
+  };
+
   static stdoutIsPrimaryData = true;
 
   async run(): Promise<unknown> {

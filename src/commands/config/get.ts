@@ -28,6 +28,7 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
   };
 
   static flags = {
+    ...ConfigGet.baseFlags,
     ...configScopeFlags({
       global: 'Read from user-level config only.',
       local: 'Read from project-level config only.',
