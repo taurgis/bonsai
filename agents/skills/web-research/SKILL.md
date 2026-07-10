@@ -4,7 +4,7 @@ description: 'Bonsai-backed official documentation and web research workflow. Us
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '3.0.0'
+  version: '3.1.0'
 ---
 
 # Web Research Skill
@@ -20,6 +20,8 @@ npx @taurgis/bonsai <command> [flags]
 ```
 
 Add `--json` when you need machine-readable output for agent callers.
+
+If you are operating under a read-only/plan-mode harness, add `--read-only` (alias `--plan`) to every Bonsai call, or export `BONSAI_READ_ONLY=1` (or `BONSAI_PLAN_MODE=1`) once for the session. Fetches still run and return content normally; nothing is written to the local cache or config until the harness leaves plan mode. `import`, `config set`/`unset`, and `prune` all honor it too — see "Read-only / Plan Mode" below.
 
 ## Required Pre-Step
 
@@ -109,6 +111,16 @@ Preview pruning before deleting:
 npx @taurgis/bonsai prune --older-than 90d --dry-run
 npx @taurgis/bonsai prune --older-than 90d --yes
 ```
+
+## Read-only / Plan Mode
+
+Bonsai supports a global `--read-only` flag (alias `--plan`), also honored via the `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` environment variables, that blocks all filesystem writes and deletes (cache persistence, config writes, `prune` deletions) while still allowing network fetches to run:
+
+- Research fetches still hit the network and return content normally; they just skip writing the result to the local cache.
+- `import` previews the write and reports `dryRun: true` instead of persisting.
+- `prune` treats `--read-only` like an implicit dry run; combining it with `--yes` is rejected.
+
+Composition is OR: once read-only mode is active (flag or either env var), there is no per-call way to force writes back on. Use this whenever the calling agent itself is confined to a read-only/plan mode, so research stays possible without violating that constraint.
 
 ## When This Does Not Apply
 
