@@ -402,7 +402,9 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       dataDir: this.config.dataDir,
       flagOverride: this.flags.storage as StorageMode | undefined,
     });
-    const writeResult = writeArtifactSecurely(roots, cacheKey, artifact);
+
+    const dryRun = this.effectiveDryRun(false);
+    const writeResult = writeArtifactSecurely(roots, cacheKey, artifact, { dryRun });
     const storagePath = getArtifactPath(writeResult.dataDir, cacheKey);
 
     if (writeResult.redirected) {
@@ -412,7 +414,11 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     }
 
     if (!this.jsonEnabled()) {
-      this.log(`Successfully imported research artifact.`);
+      this.log(
+        dryRun
+          ? `[dry-run] Would import research artifact.`
+          : `Successfully imported research artifact.`
+      );
       this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
       this.log(`${'Storage Path:'.padEnd(25)} ${storagePath}`);
     }
@@ -421,9 +427,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     return {
       schemaVersion: 1,
       command: 'import',
+      dryRun,
       cache: {
         key: cacheKey,
-        status: 'imported',
+        status: dryRun ? 'would_import' : 'imported',
         freshness: 'fresh',
         path: storagePath,
         storage: roots.mode,

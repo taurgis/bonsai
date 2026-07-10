@@ -1,5 +1,5 @@
-import { Command, Errors, Interfaces, toConfiguredId } from '@oclif/core';
-import { invalidEnvOverrideWarnings } from './lib/config/index.js';
+import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
+import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
 import {
   buildEnvelope,
   formatErrorForJson,
@@ -22,6 +22,22 @@ import { looksLikeSchemelessUrl } from './lib/research/url.js';
 export abstract class BaseCommand<T extends typeof Command> extends Command {
   static enableJsonFlag = true;
 
+  /**
+   * Flags shared by every command. Passed as `baseFlags` to `this.parse()` in `init()` below, which
+   * is oclif's own mechanism for merging them into `this.ctor.flags` at both parse time and
+   * `--help`/manifest generation — no per-command `static flags` changes are needed to expose these.
+   * `--plan` mirrors agent-harness "plan mode" terminology; `--read-only` is the canonical name.
+   */
+  static baseFlags = {
+    'read-only': Flags.boolean({
+      aliases: ['plan'],
+      default: false,
+      description:
+        'Block all filesystem writes/deletes (cache and config); network fetches still run. ' +
+        'Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.',
+    }),
+  };
+
   flags!: Interfaces.InferredFlags<T['flags']>;
   args!: Interfaces.InferredArgs<T['args']>;
 
@@ -31,6 +47,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     await super.init();
     const { args, flags, argv } = await this.parse({
       flags: this.ctor.flags,
+      baseFlags: this.ctor.baseFlags,
       enableJsonFlag: this.ctor.enableJsonFlag,
       args: this.ctor.args,
       strict: this.ctor.strict,
@@ -54,6 +71,25 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   public override warn(input: string | Error): string | Error {
     Errors.warn(input);
     return input;
+  }
+
+  /** Whether read-only/plan mode is active for this invocation (flag OR either env var). */
+  protected get readOnly(): boolean {
+    return resolveReadOnly({ flag: Boolean(this.flags?.['read-only']), env: process.env });
+  }
+
+  /**
+   * Combines a command's own explicit dry-run intent with global read-only mode. Warns once (on
+   * stderr, so it never pollutes `--json`) when read-only mode is what's actually suppressing the
+   * write, so a skipped write is never a silent surprise to the caller.
+   */
+  protected effectiveDryRun(explicitDryRun: boolean): boolean {
+    if (this.readOnly && !explicitDryRun) {
+      this.warn(
+        'Read-only mode active (--read-only/--plan or BONSAI_READ_ONLY/BONSAI_PLAN_MODE): skipping filesystem writes.'
+      );
+    }
+    return explicitDryRun || this.readOnly;
   }
 
   /**

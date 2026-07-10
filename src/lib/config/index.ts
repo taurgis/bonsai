@@ -28,13 +28,18 @@ export {
 export {
   resolveStorageMode,
   resolveSummaryLevel,
+  resolveReadOnly,
   parseEnvStorage,
   parseEnvSummary,
+  parseEnvBoolean,
   invalidEnvOverrideWarnings,
   STORAGE_ENV_VAR,
   SUMMARY_ENV_VAR,
+  READ_ONLY_ENV_VAR,
+  PLAN_MODE_ENV_VAR,
   type ResolveStorageInput,
   type ResolveSummaryInput,
+  type ResolveReadOnlyInput,
 } from './resolve.js';
 
 import { readUserConfig, readProjectConfig } from './io.js';

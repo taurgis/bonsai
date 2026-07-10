@@ -5,11 +5,15 @@ import { join } from 'node:path';
 import {
   resolveStorageMode,
   resolveSummaryLevel,
+  resolveReadOnly,
   parseEnvStorage,
   parseEnvSummary,
+  parseEnvBoolean,
   invalidEnvOverrideWarnings,
   STORAGE_ENV_VAR,
   SUMMARY_ENV_VAR,
+  READ_ONLY_ENV_VAR,
+  PLAN_MODE_ENV_VAR,
 } from './resolve.js';
 import {
   readUserConfig,
@@ -142,6 +146,69 @@ describe('invalidEnvOverrideWarnings', () => {
 
   it('warns on a wrong-case value, since matching is case-sensitive', () => {
     expect(invalidEnvOverrideWarnings({ [SUMMARY_ENV_VAR]: 'Aggressive' })).toHaveLength(1);
+  });
+});
+
+describe('parseEnvBoolean', () => {
+  it('accepts case-insensitive truthy/falsy tokens', () => {
+    expect(parseEnvBoolean('1')).toBe(true);
+    expect(parseEnvBoolean('true')).toBe(true);
+    expect(parseEnvBoolean('YES')).toBe(true);
+    expect(parseEnvBoolean('0')).toBe(false);
+    expect(parseEnvBoolean('false')).toBe(false);
+    expect(parseEnvBoolean('No')).toBe(false);
+  });
+
+  it('treats unset/empty/junk as undefined', () => {
+    expect(parseEnvBoolean(undefined)).toBeUndefined();
+    expect(parseEnvBoolean('  ')).toBeUndefined();
+    expect(parseEnvBoolean('banana')).toBeUndefined();
+  });
+});
+
+describe('resolveReadOnly', () => {
+  it('defaults to false when nothing is set', () => {
+    expect(resolveReadOnly({ flag: false, env: {} })).toBe(false);
+  });
+
+  it('is true when the flag is passed', () => {
+    expect(resolveReadOnly({ flag: true, env: {} })).toBe(true);
+  });
+
+  it('is true when BONSAI_READ_ONLY is truthy', () => {
+    expect(resolveReadOnly({ flag: false, env: { [READ_ONLY_ENV_VAR]: '1' } })).toBe(true);
+  });
+
+  it('is true when BONSAI_PLAN_MODE is truthy', () => {
+    expect(resolveReadOnly({ flag: false, env: { [PLAN_MODE_ENV_VAR]: 'true' } })).toBe(true);
+  });
+
+  it('composes as OR: an env var cannot be overridden back to false by omitting the flag', () => {
+    expect(
+      resolveReadOnly({ flag: false, env: { [READ_ONLY_ENV_VAR]: '1', [PLAN_MODE_ENV_VAR]: '0' } })
+    ).toBe(true);
+  });
+
+  it('ignores an invalid env value (treated as unset)', () => {
+    expect(resolveReadOnly({ flag: false, env: { [READ_ONLY_ENV_VAR]: 'nope' } })).toBe(false);
+  });
+});
+
+describe('invalidEnvOverrideWarnings for boolean vars', () => {
+  it('warns on a set-but-unparseable BONSAI_READ_ONLY/BONSAI_PLAN_MODE value', () => {
+    const warnings = invalidEnvOverrideWarnings({
+      [READ_ONLY_ENV_VAR]: 'nope',
+      [PLAN_MODE_ENV_VAR]: 'banana',
+    });
+    expect(warnings).toHaveLength(2);
+    expect(warnings[0]).toContain(READ_ONLY_ENV_VAR);
+    expect(warnings[1]).toContain(PLAN_MODE_ENV_VAR);
+  });
+
+  it('does not warn for valid boolean values or when unset', () => {
+    expect(
+      invalidEnvOverrideWarnings({ [READ_ONLY_ENV_VAR]: '1', [PLAN_MODE_ENV_VAR]: 'no' })
+    ).toEqual([]);
   });
 });
 

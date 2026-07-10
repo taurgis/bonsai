@@ -81,13 +81,27 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         }
       );
     }
+    // Checked before the generic --dry-run/--yes conflict below so a combination like
+    // `--dry-run --yes --read-only` reports the more specific READ_ONLY_MODE code, not
+    // CONFLICTING_FLAGS — read-only mode is the more fundamental constraint being violated.
+    if (this.readOnly && this.flags.yes) {
+      this.error(
+        '--yes cannot be used while read-only mode is active (--read-only/--plan or BONSAI_READ_ONLY/BONSAI_PLAN_MODE): mutations are disabled.',
+        {
+          exit: 2,
+          code: 'READ_ONLY_MODE',
+          suggestions: [`Preview instead: ${this.config.bin} prune --dry-run`],
+        }
+      );
+    }
     if (this.flags['dry-run'] && this.flags.yes) {
       this.error(
         '--dry-run and --yes are mutually exclusive: --dry-run previews without deleting, --yes confirms deletion. Choose one.',
         { exit: 2, code: 'CONFLICTING_FLAGS' }
       );
     }
-    if (!this.flags['dry-run'] && !this.flags.yes) {
+    // Read-only mode implicitly previews, so the usual "pick one" safety check is redundant here.
+    if (!this.readOnly && !this.flags['dry-run'] && !this.flags.yes) {
       const olderThanPart = this.flags['older-than']
         ? ` --older-than ${this.flags['older-than']}`
         : '';
@@ -184,7 +198,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     const currentTime = new Date();
 
     const filesToPrune = this.findPruneCandidates(roots.readRoots, currentTime);
-    const dryRun = this.flags['dry-run'];
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
     const count = filesToPrune.length;
 
     // Track deletions actually performed so the JSON envelope and human output agree even when an

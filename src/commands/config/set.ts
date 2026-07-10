@@ -68,7 +68,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     const scope = this.writeScope(this.flags.local);
     const formatted = meta.format(parsed);
 
-    if (this.flags['dry-run']) {
+    if (this.effectiveDryRun(this.flags['dry-run'])) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
       return { key: keyArg, value: parsed, scope, dryRun: true };
     }

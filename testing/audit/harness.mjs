@@ -70,6 +70,8 @@ export function createHarness() {
     if (!opts.keepEnv) {
       delete env.BONSAI_STORAGE;
       delete env.BONSAI_SUMMARY;
+      delete env.BONSAI_READ_ONLY;
+      delete env.BONSAI_PLAN_MODE;
     }
     Object.assign(env, opts.env ?? {});
     if (!opts.keepColorEnv) {

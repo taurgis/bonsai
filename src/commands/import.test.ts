@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import ResearchImport from './import.js';
@@ -6,6 +6,66 @@ import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
 describe('import command unit tests', () => {
   useIsolatedCache();
+
+  afterEach(() => {
+    delete process.env.BONSAI_READ_ONLY;
+    delete process.env.BONSAI_PLAN_MODE;
+  });
+
+  it('does not write to the cache under --read-only, and reports dryRun/would_import', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('## Header\nRead-only notes');
+
+    const result = (await ResearchImport.run([
+      'https://example.com/import-read-only-test',
+      '--stdin',
+      '--read-only',
+    ])) as any;
+
+    expect(result.dryRun).toBe(true);
+    expect(result.cache.status).toBe('would_import');
+    expect(fs.existsSync(result.cache.path)).toBe(false);
+
+    readSpy.mockRestore();
+  });
+
+  it('still detects a secret and reports the redirect under --read-only (the scan is not skipped)', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('token ghp_' + 'a'.repeat(36));
+
+    const result = (await ResearchImport.run([
+      'https://example.com/import-read-only-secret-test',
+      '--stdin',
+      '--storage',
+      'project',
+      '--read-only',
+    ])) as any;
+
+    expect(result.dryRun).toBe(true);
+    expect(result.cache.redirectedToGlobal).toBe(true);
+    expect(fs.existsSync(result.cache.path)).toBe(false);
+
+    readSpy.mockRestore();
+  });
+
+  it('honors BONSAI_READ_ONLY without the flag', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('## Header\nEnv read-only notes');
+
+    process.env.BONSAI_READ_ONLY = '1';
+    const result = (await ResearchImport.run([
+      'https://example.com/import-env-read-only-test',
+      '--stdin',
+    ])) as any;
+
+    expect(result.dryRun).toBe(true);
+    expect(fs.existsSync(result.cache.path)).toBe(false);
+
+    readSpy.mockRestore();
+  });
 
   it('successfully imports single-source markdown content', async () => {
     const readSpy = vi

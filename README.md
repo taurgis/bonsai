@@ -112,6 +112,7 @@ Common flags:
 * `--dry-run`: Scrape and validate without writing to cache.
 * `--allow-stale`: Serve stale cache if the remote site is offline.
 * `--rendered`: Use browser-rendered extraction for SPA pages.
+* `--read-only` (alias `--plan`): Block all filesystem writes/deletes across every command; network fetches still run. See [Read-only / plan mode](#read-only--plan-mode) below.
 * `--json`: Return structured machine-readable output.
 
 ### `import [url]`
@@ -148,7 +149,7 @@ npx @taurgis/bonsai list [flags]
 
 ### `prune`
 
-Delete old or inactive cache entries. Requires a filter (`--older-than`, `--inactive`, `--artifact-type`, or `--url`) and exactly one of `--dry-run` or `--yes` (passing both is a usage error).
+Delete old or inactive cache entries. Requires a filter (`--older-than`, `--inactive`, `--artifact-type`, or `--url`) and exactly one of `--dry-run` or `--yes` (passing both is a usage error). In [read-only mode](#read-only--plan-mode), `--yes` is rejected and the safety check is implicitly satisfied by a preview.
 
 ```bash
 npx @taurgis/bonsai prune --older-than 90d --dry-run
@@ -169,6 +170,18 @@ npx @taurgis/bonsai config set summary balanced
 ```
 
 Both keys can also be overridden per-invocation via the `BONSAI_STORAGE` and `BONSAI_SUMMARY` environment variables. Project config is stored in `.bonsai.json`; project cache files are stored under `.bonsai/research/`.
+
+### Read-only / plan mode
+
+Every command accepts a global `--read-only` flag (alias `--plan`) that blocks all filesystem writes and deletes — cache persistence, config file writes, `prune` deletions — while still allowing network fetches to run. This is for agent harnesses (Claude Code and others) that enter a read-only "plan mode": set it once and every `bonsai` invocation for the rest of that session automatically skips writes, without needing the flag on every call.
+
+```bash
+BONSAI_READ_ONLY=1 npx @taurgis/bonsai https://example.com/docs
+npx @taurgis/bonsai import https://example.com/docs --file notes.md --read-only
+npx @taurgis/bonsai prune --older-than 90d --plan
+```
+
+It can also be set via the `BONSAI_READ_ONLY` or `BONSAI_PLAN_MODE` environment variables (both are equivalent). Composition is OR, not override: read-only mode is active if *either* env var or the flag is set, and there is no way to force writes back on once one of them is — this is a safety gate, not a preference. Commands that already expose `--dry-run` (`fetch`, `prune`, `config set`/`unset`) treat it the same as an explicit `--dry-run`; `import` (which has no `--dry-run` of its own) previews the write and reports `dryRun: true` instead of persisting.
 
 ---
 
@@ -273,6 +286,7 @@ When run with `--json`, commands return a stable envelope:
 | --- | --- |
 | `BONSAI_STORAGE` | Override the default storage location per-invocation (`global` or `project`). |
 | `BONSAI_SUMMARY` | Override the summary compression level per-invocation (`conservative`, `balanced`, or `aggressive`). |
+| `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE` | Set to `1`/`true`/`yes` to enable [read-only/plan mode](#read-only--plan-mode) for every command in the session, equivalent to passing `--read-only` (`--plan`) each time. Either variable is sufficient; there is no way to override it back off from a single invocation. |
 | `NO_COLOR` | Set to any non-empty value to disable all ANSI color output. An empty `NO_COLOR` is treated as unset. |
 | `FORCE_COLOR` | Set to any value other than an empty string, `0`, or `false` to force ANSI color on, even in non-TTY environments. |
 | `TERM=dumb` | Disables ANSI color output when the terminal cannot render escape sequences. |

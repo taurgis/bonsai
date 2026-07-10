@@ -42,7 +42,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
     const scope = this.writeScope(this.flags.local);
 
-    if (this.flags['dry-run']) {
+    if (this.effectiveDryRun(this.flags['dry-run'])) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would unset ${key} (${scope})`);
       return { key, scope, dryRun: true };
     }

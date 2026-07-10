@@ -4,6 +4,25 @@ import { BUILT_IN_DEFAULTS, STORAGE_MODES, SUMMARY_LEVELS } from './schema.js';
 /** Scoped env override, following oclif's `<BIN>_*` env-var convention for this CLI. */
 export const STORAGE_ENV_VAR = 'BONSAI_STORAGE';
 export const SUMMARY_ENV_VAR = 'BONSAI_SUMMARY';
+/** Two names for the same safety switch: `PLAN_MODE` mirrors agent-harness "plan mode" terminology. */
+export const READ_ONLY_ENV_VAR = 'BONSAI_READ_ONLY';
+export const PLAN_MODE_ENV_VAR = 'BONSAI_PLAN_MODE';
+
+const BOOLEAN_TRUE_VALUES = ['1', 'true', 'yes'];
+const BOOLEAN_FALSE_VALUES = ['0', 'false', 'no'];
+
+/**
+ * Parses a boolean-ish env value. Empty/unset is `undefined` (not present); an unrecognized
+ * non-empty value is also `undefined` (invalid — see {@link invalidEnvOverrideWarnings}), so a
+ * typo never silently reads as `true`.
+ */
+export function parseEnvBoolean(raw: string | undefined): boolean | undefined {
+  const v = raw?.trim().toLowerCase();
+  if (!v) return undefined;
+  if (BOOLEAN_TRUE_VALUES.includes(v)) return true;
+  if (BOOLEAN_FALSE_VALUES.includes(v)) return false;
+  return undefined;
+}
 
 /**
  * Warnings for Bonsai env overrides that are set but hold an unrecognized value. Such a value is
@@ -12,20 +31,36 @@ export const SUMMARY_ENV_VAR = 'BONSAI_SUMMARY';
  * is visible without breaking the run. Returns one message per offending variable, or empty.
  */
 export function invalidEnvOverrideWarnings(env: Record<string, string | undefined>): string[] {
-  const checks: ReadonlyArray<[name: string, valid: readonly string[]]> = [
-    [STORAGE_ENV_VAR, STORAGE_MODES],
-    [SUMMARY_ENV_VAR, SUMMARY_LEVELS],
+  // Each check names the var, how to tell a value is invalid, and the hint to show when it is.
+  const checks: ReadonlyArray<[name: string, isValid: (raw: string) => boolean, hint: string]> = [
+    [
+      STORAGE_ENV_VAR,
+      (raw) => (STORAGE_MODES as readonly string[]).includes(raw),
+      `not one of ${STORAGE_MODES.join(', ')}. Using the configured value or default instead.`,
+    ],
+    [
+      SUMMARY_ENV_VAR,
+      (raw) => (SUMMARY_LEVELS as readonly string[]).includes(raw),
+      `not one of ${SUMMARY_LEVELS.join(', ')}. Using the configured value or default instead.`,
+    ],
+    [
+      READ_ONLY_ENV_VAR,
+      (raw) => parseEnvBoolean(raw) !== undefined,
+      'expected 1/true/yes or 0/false/no. Read-only mode was not toggled by this value.',
+    ],
+    [
+      PLAN_MODE_ENV_VAR,
+      (raw) => parseEnvBoolean(raw) !== undefined,
+      'expected 1/true/yes or 0/false/no. Read-only mode was not toggled by this value.',
+    ],
   ];
   const warnings: string[] = [];
-  for (const [name, valid] of checks) {
+  for (const [name, isValid, hint] of checks) {
     // After trim, an empty/whitespace-only value is falsy and treated as "unset" (no warning),
     // matching parseEnv*; matching is case-sensitive, so a wrong-case value is invalid and warns.
     const raw = env[name]?.trim();
-    if (raw && !valid.includes(raw)) {
-      warnings.push(
-        `Ignoring ${name}="${raw}": not one of ${valid.join(', ')}. ` +
-          `Using the configured value or default instead.`
-      );
+    if (raw && !isValid(raw)) {
+      warnings.push(`Ignoring ${name}="${raw}": ${hint}`);
     }
   }
   return warnings;
@@ -84,5 +119,25 @@ export function resolveSummaryLevel(input: ResolveSummaryInput): SummaryLevel {
     input.projectConfig.summary ??
     input.userConfig.summary ??
     BUILT_IN_DEFAULTS.summary
+  );
+}
+
+export interface ResolveReadOnlyInput {
+  /** True when `--read-only`/`--plan` was passed on this invocation. */
+  flag: boolean;
+  env: Record<string, string | undefined>;
+}
+
+/**
+ * Resolve whether read-only (plan) mode is active. Unlike storage/summary, this is a safety gate
+ * rather than a preference: composition is OR, not override-by-precedence — if the flag or either
+ * env var says read-only, the run is read-only. There is no way to force writes back on when an
+ * ambient `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` is set, by design.
+ */
+export function resolveReadOnly(input: ResolveReadOnlyInput): boolean {
+  return Boolean(
+    input.flag ||
+    parseEnvBoolean(input.env[READ_ONLY_ENV_VAR]) ||
+    parseEnvBoolean(input.env[PLAN_MODE_ENV_VAR])
   );
 }

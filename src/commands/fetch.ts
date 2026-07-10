@@ -371,9 +371,10 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
   async run(): Promise<unknown> {
     const urls = this.parsedArgv;
-    const { format, ttl, 'max-age': maxAge, 'dry-run': dryRun } = this.flags;
+    const { format, ttl, 'max-age': maxAge } = this.flags;
 
     this.validateDurationFlags(ttl, maxAge);
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
 
     const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());
     const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;
