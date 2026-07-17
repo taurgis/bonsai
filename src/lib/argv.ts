@@ -1,4 +1,4 @@
-import { buildEnvelope } from './envelope.js';
+import { buildEnvelope, formatErrorForJson } from './envelope.js';
 
 export interface NormalizationResult {
   /** The normalized argv array to set on process.argv. */
@@ -15,18 +15,24 @@ export interface NormalizationResult {
  * oclif pipeline sees one consistent command structure.
  */
 function missingUsageJsonExit(): NormalizationResult['exitWithJson'] {
+  const message = 'Missing URL or command. Run bonsai --help for usage.';
+  const code = 'MISSING_COMMAND';
+  const suggestions = ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'];
   return {
     exitCode: 2,
     envelope: buildEnvelope({
       command: 'bonsai',
       ok: false,
       exitCode: 2,
-      stderr: 'Missing URL or command. Run bonsai --help for usage.',
+      stderr: formatErrorForJson({ message, code, suggestions }),
       data: null,
+      code,
+      suggestions,
     }),
   };
 }
 
+/** Flags that consume the next argv token as a value. Keep short aliases in sync with command chars. */
 const FLAGS_WITH_VALUES = new Set([
   '--topic',
   '-t',
@@ -35,6 +41,7 @@ const FLAGS_WITH_VALUES = new Set([
   '--format',
   '--tier',
   '--ttl',
+  '-l',
   '--max-age',
   '--storage',
   '--file',
@@ -46,9 +53,8 @@ const FLAGS_WITH_VALUES = new Set([
   '--capture-method',
   '--older-than',
   '--inactive',
-  '--domain',
-  '--remote',
   '--limit',
+  '--url',
 ]);
 
 export function normalizeArgv(rawArgv: string[]): NormalizationResult {

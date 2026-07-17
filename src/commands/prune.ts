@@ -37,7 +37,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     }),
     inactive: Flags.string({
       description:
-        'prune entries inactive (unvalidated/unfetched) for duration (e.g. "14d", "30d")',
+        'prune entries whose last validation (or fetch, if never validated) is older than duration (e.g. "14d", "30d")',
     }),
     url: Flags.string({
       description:
@@ -130,8 +130,6 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   private shouldPrune(meta: any, currentTime: Date): boolean {
     const fetched = meta.fetched_at ? new Date(meta.fetched_at).getTime() : 0;
     const validated = meta.validated_at ? new Date(meta.validated_at).getTime() : 0;
-    const baseTime = Math.max(fetched, validated);
-    const ageMs = currentTime.getTime() - baseTime;
 
     if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
       return false;
@@ -141,16 +139,25 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       return false;
     }
 
+    // Content age: when the body was obtained. Imports have null fetched_at → fall back to validated_at.
+    // Distinct from --inactive so a recently revalidated but originally-old page can be pruned by age
+    // without also being treated as "inactive".
     if (this.flags['older-than']) {
+      const contentTime = fetched || validated;
+      const ageMs = currentTime.getTime() - contentTime;
       const olderThanMs = parseTtlToMs(this.flags['older-than']);
       if (ageMs < olderThanMs) {
         return false;
       }
     }
 
+    // Idle window: last validation, else last fetch. A revalidated page stays "active" even when
+    // its original fetch is older than --older-than would allow.
     if (this.flags.inactive) {
+      const activityTime = validated || fetched;
+      const idleMs = currentTime.getTime() - activityTime;
       const inactiveMs = parseTtlToMs(this.flags.inactive);
-      if (ageMs < inactiveMs) {
+      if (idleMs < inactiveMs) {
         return false;
       }
     }
@@ -228,6 +235,11 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         this.log(
           colors.green(`Successfully pruned ${prunedCount} of ${count} research cache ${noun}.`)
         );
+      }
+      // Partial unlink failure is a runtime outcome agents must see: exit 1 with the counts still
+      // in `data` so callers can tell candidates from successes without parsing stderr warnings.
+      if (count > 0 && prunedCount < count) {
+        process.exitCode = 1;
       }
     }
 

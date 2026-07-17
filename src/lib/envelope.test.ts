@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildEnvelope,
+  enrichCacheMissEnvelope,
   formatErrorForJson,
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
@@ -123,5 +124,33 @@ describe('buildEnvelope', () => {
       code: 'CACHE_MISS',
       suggestions: ['fetch it'],
     });
+  });
+});
+
+describe('enrichCacheMissEnvelope', () => {
+  it('passes through when there are no misses', () => {
+    const base = { ok: true, exitCode: 0, data: { status: 'hit' } };
+    expect(enrichCacheMissEnvelope(base, base.data, 'bonsai', () => 'x')).toBe(base);
+  });
+
+  it('marks CACHE_MISS and keeps data when any row misses', () => {
+    const data = [
+      { status: 'hit', normalizedUrl: 'https://a.example/' },
+      { status: 'miss', normalizedUrl: 'https://b.example/' },
+    ];
+    const enriched = enrichCacheMissEnvelope(
+      { ok: true, exitCode: 0, data },
+      data,
+      'bonsai',
+      (url, n) => `miss ${url} (${n})`
+    );
+    expect(enriched).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'CACHE_MISS',
+      suggestions: ['Fetch and cache it first: bonsai https://b.example/'],
+    });
+    expect(enriched.stderr).toContain('miss https://b.example/ (2)');
+    expect(enriched.data).toBe(data);
   });
 });

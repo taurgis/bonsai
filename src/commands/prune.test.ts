@@ -154,7 +154,10 @@ describe('prune command unit tests', () => {
   it('reports the actual deleted count, not the candidate count, when an unlink fails', async () => {
     // Two candidates whose files do not exist, so every unlinkSync throws and nothing is deleted.
     // The JSON envelope must report prunedCount=0 (actual) while candidateCount stays at 2, so an
-    // agent branching on prunedCount is never told a failed prune succeeded.
+    // agent branching on prunedCount is never told a failed prune succeeded. Exit code is 1 so
+    // exit-only callers also see the partial failure.
+    const prevExit = process.exitCode;
+    process.exitCode = 0;
     const candidatesSpy = vi
       .spyOn(ResearchPrune.prototype as any, 'findPruneCandidates')
       .mockReturnValue([
@@ -164,12 +167,47 @@ describe('prune command unit tests', () => {
     // Swallow the per-file failure warnings so the test output stays clean.
     const warnSpy = vi.spyOn(ResearchPrune.prototype as any, 'warn').mockImplementation(() => '');
 
-    const result = (await ResearchPrune.run(['--older-than', '0d', '--yes'])) as any;
+    try {
+      const result = (await ResearchPrune.run([
+        '--url',
+        'https://example.com/missing-prune',
+        '--yes',
+      ])) as any;
 
-    expect(result.candidateCount).toBe(2);
-    expect(result.prunedCount).toBe(0);
+      expect(result.candidateCount).toBe(2);
+      expect(result.prunedCount).toBe(0);
+      expect(process.exitCode).toBe(1);
+    } finally {
+      process.exitCode = prevExit;
+      candidatesSpy.mockRestore();
+      warnSpy.mockRestore();
+    }
+  });
 
-    candidatesSpy.mockRestore();
-    warnSpy.mockRestore();
+  it('rejects zero-length --older-than durations', async () => {
+    await expect(ResearchPrune.run(['--older-than', '0d', '--dry-run'])).rejects.toThrow(
+      /greater than zero/
+    );
+  });
+
+  it('treats --inactive as last-validation idle time, distinct from --older-than content age', () => {
+    const cmd = new ResearchPrune([], {} as any) as any;
+    cmd.flags = { 'older-than': '30d', inactive: undefined };
+    const now = new Date('2026-07-01T00:00:00.000Z');
+    // Fetched 60d ago, validated yesterday → older-than matches, inactive alone would not.
+    const meta = {
+      fetched_at: '2026-05-01T00:00:00.000Z',
+      validated_at: '2026-06-30T00:00:00.000Z',
+      artifact_type: 'source',
+    };
+    expect(cmd.shouldPrune(meta, now)).toBe(true);
+
+    cmd.flags = { 'older-than': undefined, inactive: '30d' };
+    // Validated yesterday → still active within a 30d idle window.
+    expect(cmd.shouldPrune(meta, now)).toBe(false);
+
+    cmd.flags = { 'older-than': undefined, inactive: '12h' };
+    // Validated yesterday → idle ~1d exceeds 12h.
+    expect(cmd.shouldPrune(meta, now)).toBe(true);
   });
 });

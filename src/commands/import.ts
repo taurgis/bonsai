@@ -88,6 +88,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       char: 'l',
       description: 'predicted lifespan of the data (e.g. "24h", "7d")',
     }),
+    'dry-run': Flags.boolean({
+      description: 'validate and preview the import without writing to cache',
+      default: false,
+    }),
     storage: Flags.option({
       description: 'override where this note is cached (secrets always stored globally)',
       options: ['global', 'project'] as const,
@@ -403,7 +407,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       flagOverride: this.flags.storage as StorageMode | undefined,
     });
 
-    const dryRun = this.effectiveDryRun(false);
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
     const writeResult = writeArtifactSecurely(roots, cacheKey, artifact, { dryRun });
     const storagePath = getArtifactPath(writeResult.dataDir, cacheKey);
 

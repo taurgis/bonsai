@@ -41,21 +41,13 @@ describe('url validation and normalization', () => {
     );
   });
 
-  it('rejects localhost, loopback, private, and link-local hostnames/IPs', () => {
-    expect(() => normalizeUrl('https://localhost/docs')).toThrow(/blocked local target/);
-    expect(() => normalizeUrl('https://test.localhost/docs')).toThrow(/blocked local target/);
-    expect(() => normalizeUrl('https://127.0.0.1/docs')).toThrow(/blocked local or private target/);
-    expect(() => normalizeUrl('https://10.0.0.1/docs')).toThrow(/blocked local or private target/);
-    expect(() => normalizeUrl('https://172.16.5.5/docs')).toThrow(
-      /blocked local or private target/
-    );
-    expect(() => normalizeUrl('https://192.168.1.1/docs')).toThrow(
-      /blocked local or private target/
-    );
-    expect(() => normalizeUrl('https://169.254.169.254/docs')).toThrow(
-      /blocked local or private target/
-    );
-    expect(() => normalizeUrl('https://[::1]/docs')).toThrow(/blocked local or private target/);
+  it('normalizes localhost and private hosts as cache keys (SSRF is enforced at fetch time)', () => {
+    expect(normalizeUrl('https://localhost/docs')).toBe('https://localhost/docs');
+    expect(normalizeUrl('https://test.localhost/docs')).toBe('https://test.localhost/docs');
+    expect(normalizeUrl('http://127.0.0.1/docs')).toBe('http://127.0.0.1/docs');
+    expect(normalizeUrl('https://10.0.0.1/docs')).toBe('https://10.0.0.1/docs');
+    expect(normalizeUrl('https://192.168.1.1/docs')).toBe('https://192.168.1.1/docs');
+    expect(normalizeUrl('https://[::1]/docs')).toBe('https://[::1]/docs');
   });
 });
 

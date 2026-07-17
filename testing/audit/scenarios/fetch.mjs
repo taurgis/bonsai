@@ -74,6 +74,20 @@ export default function register(harness, fixtures) {
     expectFetchJsonOk(r, parseJson(r.stdout), { format: 'detailed' });
   });
 
+  // -l is the short form of --ttl. Missing it from FLAGS_WITH_VALUES made `bonsai -l 2h <url>`
+  // resolve `-l` as a command instead of rewriting to fetch.
+  check('fetch shorthand accepts -l ttl short before URL', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run(['-l', '2h', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expectFetchJsonOk(r, parseJson(r.stdout), { ok: true });
+  });
+
+  check('fetch shorthand accepts -f format short before URL', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run(['-f', 'detailed', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expectFetchJsonOk(r, parseJson(r.stdout), { format: 'detailed' });
+  });
+
   check('fetch shorthand accepts --json before URL', () => {
     const { ws, url } = seedFetchCache();
     const r = run(['--json', url], { cwd: ws.cwd, xdg: ws.xdg });

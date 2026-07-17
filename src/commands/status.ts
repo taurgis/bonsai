@@ -1,6 +1,6 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { formatErrorForJson } from '../lib/envelope.js';
+import { enrichCacheMissEnvelope } from '../lib/envelope.js';
 import { getArtifactPath } from '../lib/research/storage.js';
 import {
   evaluateFreshness,
@@ -22,29 +22,33 @@ interface StatusResult {
   status: CacheStatus;
 }
 
+type Tier = 'stable' | 'standard' | 'volatile';
+
 function resolveFreshness(
   cached: ResearchArtifact,
   currentTime: Date,
   ttl: string | undefined,
-  maxAge: string | undefined
+  maxAge: string | undefined,
+  tier: Tier | undefined
 ): FreshnessStatus {
   const isMaxAgeExpired = maxAge ? checkMaxAgeExpired(cached, currentTime, maxAge) : false;
   return isMaxAgeExpired
     ? 'stale_expired'
-    : evaluateFreshness(cached.metadata, currentTime, ttl || cached.metadata.ttl);
+    : evaluateFreshness(cached.metadata, currentTime, ttl || cached.metadata.ttl, tier);
 }
 
 function describeCacheStatus(
   cached: ResearchArtifact | null,
   currentTime: Date,
   ttl: string | undefined,
-  maxAge: string | undefined
+  maxAge: string | undefined,
+  tier: Tier | undefined
 ): StatusResult {
   if (!cached) {
     return { status: 'miss', freshness: 'none', action: 'would_fetch' };
   }
 
-  const freshness = resolveFreshness(cached, currentTime, ttl, maxAge);
+  const freshness = resolveFreshness(cached, currentTime, ttl, maxAge, tier);
   return freshness === 'fresh'
     ? { status: 'hit', freshness, action: 'would_return_cached' }
     : { status: 'stale', freshness, action: 'would_revalidate' };
@@ -78,10 +82,12 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   };
 
   static flags = {
+    // No default: omitting --tier evaluates against the artifact's stored tier. A default of
+    // `standard` would silently re-grade stable/volatile entries and lie about planned action.
     tier: Flags.option({
-      description: 'freshness tier policy to evaluate against',
+      description:
+        "freshness tier policy to evaluate against (default: the cached entry's own tier)",
       options: ['stable', 'standard', 'volatile'] as const,
-      default: 'standard',
     })(),
     ttl: Flags.string({
       char: 'l',
@@ -96,24 +102,9 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
 
   /** Enrich cache-miss envelopes with the same CACHE_MISS code and suggestions as inspect. */
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
-    const envelope = super.toSuccessJson(data);
-    const list = Array.isArray(data) ? data : [data];
-    const misses = list.filter((d) => d && d.status === 'miss');
-    if (misses.length === 0) return envelope;
-
-    const firstMiss = misses[0];
-    const normalizedUrl = firstMiss.normalizedUrl ?? '';
-    const suggestions = misses.map(
-      (m) => `Fetch and cache it first: ${this.config.bin} ${m.normalizedUrl}`
+    return enrichCacheMissEnvelope(super.toSuccessJson(data), data, this.config.bin, (url, n) =>
+      n > 1 ? `Cache miss for ${url} and ${n - 1} other URLs` : `Cache miss for ${url}`
     );
-    const stderr = formatErrorForJson({
-      message:
-        `Cache miss for ${normalizedUrl}` +
-        (misses.length > 1 ? ` and ${misses.length - 1} other URLs` : ''),
-      code: 'CACHE_MISS',
-      suggestions,
-    });
-    return { ...envelope, ok: false, exitCode: 1, stderr, code: 'CACHE_MISS', suggestions };
   }
 
   async run(): Promise<unknown> {
@@ -131,7 +122,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const currentTime = new Date();
 
     for (const url of urls) {
-      const res = this.checkSingleStatus(url, currentTime, ttl, maxAge, urls.length > 1);
+      const res = this.checkSingleStatus(url, currentTime, ttl, maxAge, tier, urls.length > 1);
       if (res.status === 'miss') {
         hasMiss = true;
       }
@@ -150,6 +141,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     currentTime: Date,
     ttl: string | undefined,
     maxAge: string | undefined,
+    tier: Tier | undefined,
     showSeparator: boolean
   ): {
     cacheKey: string;
@@ -163,7 +155,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const { cacheKey, located, normalizedUrl, roots } = target;
     const cached = located?.artifact ?? null;
 
-    const result = describeCacheStatus(cached, currentTime, ttl, maxAge);
+    const result = describeCacheStatus(cached, currentTime, ttl, maxAge, tier);
     const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
 
     if (!this.jsonEnabled()) {

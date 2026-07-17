@@ -41,28 +41,30 @@ The crawler will block the request if the resolved IP falls within any of the fo
   * `::/128` (Unspecified)
 
 ### Common Failure Symptoms
-* **Attempting to crawl local dev servers**:
+* **Attempting to crawl local dev servers on a cache miss**:
   * *Command*: `bonsai http://localhost:8080/`
-  * *Error*: `Error: IP address "127.0.0.1" is a blocked local or private target.`
-* **Resolution**: Local resources cannot be fetched directly using the automatic crawler. To import documentation from a local dev server, compile it to Markdown first and use the `import` command:
+  * *Error*: `Error: IP address "127.0.0.1" is a blocked local or private target.` (exit `1`, code `FETCH_FAILED`)
+* **Resolution**: Localhost URLs are valid **cache keys**. Import Markdown under the local URL, then a later `bonsai http://localhost:8080/docs` serves the cached note without opening a socket. Network fetches to private/local targets remain blocked:
   ```bash
   curl -s http://localhost:8080/docs | bonsai import http://localhost:8080/docs --stdin
+  bonsai http://localhost:8080/docs   # cache hit
   ```
 
 ---
 
 ## 3. Client-Side Hydration (SPA) Limitations
 
-Bonsai stays light on CPU and memory by doing a **static HTML fetch** with Node's native fetch API, then parsing the response into a virtual DOM with `linkedom`. Speed comes at a cost: there is no browser in the loop.
+By default Bonsai does a **static HTML fetch** with Node's native fetch API, then parses the response into a virtual DOM with `linkedom`. That path does not execute client-side JavaScript.
 
 ### The Constraint
-* **No Javascript Runtime**: The crawler **does not execute client-side JavaScript**. It cannot hydrate pages, click cookie consent banners, or wait for asynchronous API calls to render content.
-* **Affected Sites**: Single-Page Applications (SPAs) built with React, Angular, Vue, Svelte, or Next.js/Nuxt.js that rely on client-side JS to render body text will return empty or incomplete content.
+* **Static path has no JS runtime**: Without `--rendered`, the crawler cannot hydrate pages, click cookie consent banners, or wait for asynchronous API calls to render content.
+* **Affected Sites**: Single-Page Applications (SPAs) built with React, Angular, Vue, Svelte, or Next.js/Nuxt.js that rely on client-side JS to render body text will return empty or incomplete content on a static fetch.
 * **Symptoms**: The scraped Markdown output contains only `<div id="app"></div>`, loading spinners, or cookie consent banners, and lists an `extraction_confidence` of `low`.
 
 ### Workarounds
-1. **Use Pre-Rendered / Server-Side Rendered (SSR) targets**: Most official documentation platforms (like Docusaurus, Nextra, or MkDocs) pre-render pages as static HTML. Target those instead of client-side-only portals.
-2. **Manual CLI Import**: If you must research a JS-rendered page, open the page in a browser, copy the main article content (or convert it locally), and import it into the CLI database:
+1. **Try `--rendered` first**: launches headless Chrome so the page hydrates before extraction (`bonsai <url> --rendered`). Requires Chrome/Chromium locally (or `CHROME_PATH`).
+2. **Use Pre-Rendered / Server-Side Rendered (SSR) targets**: Most official documentation platforms (like Docusaurus, Nextra, or MkDocs) pre-render pages as static HTML.
+3. **Manual CLI Import**: If auth/WAF blocks scraping, or `--rendered` is unavailable, copy the article and import it:
    ```bash
    bonsai import https://spa-docs.com/page --stdin < page.md
    ```
@@ -71,15 +73,15 @@ Bonsai stays light on CPU and memory by doing a **static HTML fetch** with Node'
 
 ## 4. Exit Codes & Common Errors
 
-Bonsai returns a distinct exit code for each result status, so a machine caller such as an AI agent can branch on the outcome without parsing output.
+Bonsai returns a distinct exit code for each result status, so a machine caller such as an AI agent can branch on the outcome without parsing output. Prefer the stable `code` field in `--json` envelopes over exit codes alone when multiple outcomes share an exit.
 
 ### Exit Code Directory
 
 | Exit Code | Classification | Cause | Resolution |
 | --- | --- | --- | --- |
 | **`0`** | **Success** | Command completed successfully, or a valid cache hit was returned. | No action required. |
-| **`1`** | **Runtime Failure** | A network or server failure that occurs after validation passes: DNS resolution failure, connection timeout, TLS/SSL error, an HTTP status >= 400 from the server, or a hostname that only resolves to a blocked private/local address at request time. | Check internet connection, verify the target URL, or ensure the host is public. |
-| **`2`** | **Usage Error** | Invalid input rejected before any network call: an unknown command or typo (Bonsai prints the nearest matching command when one is close), invalid flags, missing positional arguments, incorrect `--stdin`/`--file` usage, or a rejected URL (malformed, a non-`http(s)` scheme, or a literal private/local/SSRF address written in the URL itself). | Check help output using `--help`, and confirm the command name and that the URL is a public `http(s)` address. |
+| **`1`** | **Runtime / data outcome** | A network or server failure after validation (`FETCH_FAILED`), a cache miss on `status`/`inspect` (`CACHE_MISS` — `data` still present), or a partial `prune` unlink failure. | Branch on the JSON `code`. For `CACHE_MISS`, fetch/import the URL first. For network failures, check connectivity or import manually. |
+| **`2`** | **Usage Error** | Invalid input rejected before any network call: an unknown command or typo (Bonsai prints the nearest matching command when one is close), invalid flags, missing positional arguments (`MISSING_COMMAND` for bare `--json`), incorrect `--stdin`/`--file` usage, or a rejected URL (malformed or a non-`http(s)` scheme). | Check help output using `--help`, and confirm the command name and that the URL is a full `http(s)` address. |
 | **`5`** | **Offline Stale Warning** | Server is offline or unreachable, and the CLI served stale cache inside the grace window. | Revalidation failed but cache is within grace. Run with `--allow-stale` to suppress this warning and exit with `0`. |
 
 ### Troubleshooting Specific Scenarios

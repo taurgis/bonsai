@@ -72,6 +72,32 @@ export function formatErrorForJson(err: CliErrorShape): string {
 }
 
 /**
+ * Overlay CACHE_MISS onto a success envelope when any result row is a miss.
+ * Shared by `status` and `inspect` so multi-URL batches keep hit payloads while still
+ * exiting non-zero with a stable code and fetch suggestions.
+ */
+export function enrichCacheMissEnvelope(
+  envelope: Record<string, unknown>,
+  data: unknown,
+  bin: string,
+  messageFor: (normalizedUrl: string, missCount: number) => string
+): Record<string, unknown> {
+  const list = Array.isArray(data) ? data : [data];
+  const misses = list.filter((d) => d && d.status === 'miss');
+  if (misses.length === 0) return envelope;
+
+  const firstMiss = misses[0];
+  const normalizedUrl = firstMiss.normalizedUrl ?? '';
+  const suggestions = misses.map((m) => `Fetch and cache it first: ${bin} ${m.normalizedUrl}`);
+  const stderr = formatErrorForJson({
+    message: messageFor(normalizedUrl, misses.length),
+    code: 'CACHE_MISS',
+    suggestions,
+  });
+  return { ...envelope, ok: false, exitCode: 1, stderr, code: 'CACHE_MISS', suggestions };
+}
+
+/**
  * Builds the standard Bonsai CLI JSON envelope structure.
  * This is the single source of truth for the output envelope schema.
  */

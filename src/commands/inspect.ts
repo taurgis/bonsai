@@ -1,6 +1,7 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { scanCacheDirs } from '../lib/research/storage.js';
+import { enrichCacheMissEnvelope } from '../lib/envelope.js';
+import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
 
 interface SectionSummary {
@@ -38,35 +39,33 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
 
   static stdoutIsPrimaryData = true;
 
+  /** Match status: keep hit payloads when any URL misses, and surface CACHE_MISS on the envelope. */
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    return enrichCacheMissEnvelope(super.toSuccessJson(data), data, this.config.bin, (url, n) =>
+      n > 1
+        ? `No cached research found for URL: ${url} and ${n - 1} other URLs`
+        : `No cached research found for URL: ${url}`
+    );
+  }
+
   async run(): Promise<unknown> {
     const urls = this.parsedArgv;
 
     const results: any[] = [];
-    const missingUrls: string[] = [];
+    let hasMiss = false;
 
     for (const url of urls) {
       const target = this.resolveResearchTargetOrFail(url);
       if (!target.located) {
-        missingUrls.push(target.normalizedUrl);
+        hasMiss = true;
+        results.push(this.missResult(target, urls.length > 1));
         continue;
       }
       results.push(this.inspectSingleTarget(target, urls.length > 1));
     }
 
-    if (missingUrls.length > 0) {
-      const firstMissing = missingUrls[0]!;
-      const suggestions = missingUrls.map(
-        (u) => `Fetch and cache it first: ${this.config.bin} ${u}`
-      );
-      this.error(
-        `No cached research found for URL: ${firstMissing}` +
-          (missingUrls.length > 1 ? ` and ${missingUrls.length - 1} other URLs` : ''),
-        {
-          exit: 1,
-          code: 'CACHE_MISS',
-          suggestions,
-        }
-      );
+    if (hasMiss) {
+      process.exitCode = 1;
     }
 
     return urls.length === 1 ? results[0] : results;
@@ -93,8 +92,33 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     }
   }
 
+  private missResult(
+    target: { cacheKey: string; normalizedUrl: string; roots: { writeRoot: string } },
+    showSeparator: boolean
+  ): any {
+    const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
+    if (!this.jsonEnabled()) {
+      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(target.normalizedUrl)}`);
+      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(target.cacheKey)}`);
+      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      this.log(`${colors.cyan('Status:'.padEnd(25))} ${colors.red('miss')}`);
+      this.warn(`Cache miss — run: ${this.config.bin} ${target.normalizedUrl}`);
+      if (showSeparator) {
+        this.log('='.repeat(40));
+      }
+    }
+    return {
+      cacheKey: target.cacheKey,
+      cachePath: artifactPath,
+      normalizedUrl: target.normalizedUrl,
+      status: 'miss',
+      metadata: null,
+      sections: [],
+    };
+  }
+
   private inspectSingleTarget(target: any, showSeparator: boolean): any {
-    const { cacheKey, located, roots } = target;
+    const { cacheKey, located, roots, normalizedUrl } = target;
     const cached = located.artifact;
     const artifactPath = located.path;
     const sections = this.findSections(roots.readRoots, cacheKey);
@@ -114,6 +138,8 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     return {
       cacheKey,
       cachePath: artifactPath,
+      normalizedUrl,
+      status: 'hit',
       metadata: cached.metadata,
       sections,
     };

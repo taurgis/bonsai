@@ -9,6 +9,7 @@ export default function register(harness) {
     expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
     expect(env?.stderr?.includes('Did you mean list?'), 'suggestion');
     expect(env?.stderr?.includes('Code: COMMAND_NOT_FOUND'), 'code in stderr');
+    expect(env?.suggestions?.[0] === 'bonsai list', `suggestions ${env?.suggestions}`);
   });
 
   check('unknown command wat no suggestion', () => {

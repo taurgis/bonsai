@@ -65,6 +65,11 @@ describe('parseTtlToMs', () => {
     expect(() => parseTtlToMs('10s')).toThrow(/is not a valid format/);
     expect(() => parseTtlToMs('')).toThrow(/is not a valid format/);
   });
+
+  it('rejects zero-length durations', () => {
+    expect(() => parseTtlToMs('0d')).toThrow(/greater than zero/);
+    expect(() => parseTtlToMs('0h')).toThrow(/greater than zero/);
+  });
 });
 
 describe('durationFlagError', () => {
@@ -125,6 +130,15 @@ describe('evaluateFreshness', () => {
   it('treats missing timestamps as epoch-0 (always expired)', () => {
     const m = meta({ fetched_at: null, validated_at: null });
     expect(evaluateFreshness(m, base)).toBe('stale_expired');
+  });
+
+  it('honors an explicit tier override without mutating metadata', () => {
+    const m = meta({ tier: 'stable' });
+    // 10 days is fresh under stable (180d) but stale_grace under volatile (7d + 5d grace).
+    expect(evaluateFreshness(m, new Date(base.getTime() + 10 * DAY))).toBe('fresh');
+    expect(evaluateFreshness(m, new Date(base.getTime() + 10 * DAY), null, 'volatile')).toBe(
+      'stale_grace'
+    );
   });
 });
 

@@ -256,6 +256,12 @@
           "multiple": false,
           "type": "option"
         },
+        "dry-run": {
+          "description": "validate and preview the import without writing to cache",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "storage": {
           "description": "override where this note is cached (secrets always stored globally)",
           "name": "storage",
@@ -491,7 +497,7 @@
           "type": "option"
         },
         "inactive": {
-          "description": "prune entries inactive (unvalidated/unfetched) for duration (e.g. \"14d\", \"30d\")",
+          "description": "prune entries whose last validation (or fetch, if never validated) is older than duration (e.g. \"14d\", \"30d\")",
           "name": "inactive",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -580,9 +586,8 @@
           "type": "boolean"
         },
         "tier": {
-          "description": "freshness tier policy to evaluate against",
+          "description": "freshness tier policy to evaluate against (default: the cached entry's own tier)",
           "name": "tier",
-          "default": "standard",
           "hasDynamicHelp": false,
           "multiple": false,
           "options": [
@@ -942,5 +947,5 @@
       "stdoutIsPrimaryData": true
     }
   },
-  "version": "3.1.0"
+  "version": "3.2.0"
 }

@@ -62,13 +62,13 @@ export default function register(harness, fixtures) {
     });
     expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
 
-    const dryRun = run(['prune', '--older-than', '0d', '--dry-run', '--json'], {
+    const dryRun = run(['prune', '--url', url, '--dry-run', '--json'], {
       cwd: ws.cwd,
       xdg: ws.xdg,
     });
     expect(parseJson(dryRun.stdout)?.data?.candidateCount === 1, dryRun.stdout);
 
-    const pruned = run(['prune', '--older-than', '0d', '--yes', '--json'], {
+    const pruned = run(['prune', '--url', url, '--yes', '--json'], {
       cwd: ws.cwd,
       xdg: ws.xdg,
     });
@@ -80,5 +80,11 @@ export default function register(harness, fixtures) {
     const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(status.exitCode === 1, `status exit ${status.exitCode}`);
     expect(parseJson(status.stdout)?.code === 'CACHE_MISS', status.stdout);
+  });
+
+  check('prune rejects zero-length --older-than as INVALID_DURATION', () => {
+    const r = run(['prune', '--older-than', '0d', '--dry-run', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_DURATION', 'code');
   });
 }

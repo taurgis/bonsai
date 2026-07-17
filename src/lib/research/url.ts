@@ -138,7 +138,9 @@ export function normalizeUrl(input: string): string {
     throw new Error('URLs containing usernames or passwords are rejected.');
   }
 
-  validateHostname(url.hostname);
+  // Localhost / private hosts are valid cache keys (import + cache-hit lookup). SSRF protection
+  // lives in the network layer (fetcher/browser DNS checks), so a later `bonsai http://localhost/…`
+  // can serve an imported note without ever opening a socket — while a cache miss still fails safely.
 
   // Clear default ports
   if (url.protocol === 'https:' && url.port === '443') {

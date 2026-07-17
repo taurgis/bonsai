@@ -508,7 +508,11 @@ describe('CLI ergonomics and error contracts', () => {
       exitCode: 1,
       code: 'CACHE_MISS',
       suggestions: ['Fetch and cache it first: bonsai https://example.com/contract-cache-miss'],
-      data: null,
+      data: {
+        status: 'miss',
+        normalizedUrl: 'https://example.com/contract-cache-miss',
+        metadata: null,
+      },
     });
     expect(envelope.stderr).toContain('Code: CACHE_MISS');
     expect(envelope.stderr).toContain('Try this: Fetch and cache it first');

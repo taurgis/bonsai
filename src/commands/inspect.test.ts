@@ -9,9 +9,18 @@ import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 describe('inspect command unit tests', () => {
   useIsolatedCache();
 
-  it('fails to inspect uncached URL', async () => {
-    const runPromise = ResearchInspect.run(['https://example.com/not-cached-inspect']);
-    await expect(runPromise).rejects.toThrow(/No cached research found/);
+  it('reports a structured miss for an uncached URL without discarding the payload shape', async () => {
+    const prevExit = process.exitCode;
+    process.exitCode = 0;
+    try {
+      const result = (await ResearchInspect.run(['https://example.com/not-cached-inspect'])) as any;
+      expect(result.status).toBe('miss');
+      expect(result.metadata).toBeNull();
+      expect(result.normalizedUrl).toBe('https://example.com/not-cached-inspect');
+      expect(process.exitCode).toBe(1);
+    } finally {
+      process.exitCode = prevExit;
+    }
   });
 
   it('inspects cached URL successfully', async () => {
