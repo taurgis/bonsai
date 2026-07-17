@@ -250,7 +250,8 @@ describe('fetch command branch coverage', () => {
 
     const result: any = await FetchCommand.run([TEST_URL, '--dry-run']);
 
-    expect(result.cache.status).toBe('miss');
+    expect(result.dryRun).toBe(true);
+    expect(result.cache.status).toBe('would_fetch');
     expect(result.cache.freshness).toBe('none');
     // No artifact persisted to the real cache.
     expect(existsSync(getArtifactPath(await globalDataDir(), result.cache.key))).toBe(false);
