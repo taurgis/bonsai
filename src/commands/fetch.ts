@@ -357,21 +357,27 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
         try {
           results.push(await this.fetchSingleTarget(url, ctx));
         } catch (err) {
-          if (!this.jsonEnabled()) ux.action.stop('failed');
-          if (err instanceof Errors.CLIError) {
-            // Usage errors and single-URL failures still throw; batch keeps prior successes.
-            if (!batch || (err.oclif?.exit ?? 1) === 2) throw err;
-            results.push(buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err }));
-            continue;
-          }
-          if (!batch) this.emitFetchError(err, url);
-          results.push(buildFetchFailureFromCaught(this.config.bin, url, err, dryRun));
+          results.push(this.failureRowOrRethrow(url, err, dryRun, batch));
         }
       }
       return finalizeBatch(results, (r) => Boolean(r?.error));
     } finally {
       if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
     }
+  }
+
+  /**
+   * Multi-URL batches keep prior successes as failure rows; usage errors (exit 2) and
+   * single-URL failures still throw/exit.
+   */
+  private failureRowOrRethrow(url: string, err: unknown, dryRun: boolean, batch: boolean) {
+    if (!this.jsonEnabled()) ux.action.stop('failed');
+    if (err instanceof Errors.CLIError) {
+      if (!batch || (err.oclif?.exit ?? 1) === 2) throw err;
+      return buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err });
+    }
+    if (!batch) this.emitFetchError(err, url);
+    return buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
   }
 
   private async fetchSingleTarget(
