@@ -49,9 +49,10 @@ npx @taurgis/bonsai <url> [flags]
   "data": {
     "schemaVersion": 1,
     "command": "bonsai",
+    "dryRun": false,
     "cache": {
       "key": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
-      "status": "hit" | "miss" | "revalidated" | "refreshed" | "stale",
+      "status": "hit" | "miss" | "revalidated" | "refreshed" | "stale" | "would_fetch" | "would_refresh" | "would_revalidate",
       "freshness": "fresh" | "stale_grace" | "stale_expired" | "none",
       "path": "/path/to/research/cache/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
       "storage": "global" | "project",

@@ -150,7 +150,7 @@ describe('enrichCacheMissEnvelope', () => {
       code: 'CACHE_MISS',
       suggestions: ['Fetch and cache it first: bonsai https://b.example/'],
     });
-    expect(enriched.stderr).toContain('miss https://b.example/ (2)');
+    expect(enriched.stderr).toContain('miss https://b.example/ (1)');
     expect(enriched.data).toBe(data);
   });
 });

@@ -33,7 +33,8 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
   static flags = {
     'older-than': Flags.string({
-      description: 'prune entries older than duration (e.g. "30d", "90d")',
+      description:
+        'prune by content age (fetched_at, else validated_at) older than duration (e.g. "30d", "90d")',
     }),
     inactive: Flags.string({
       description:

@@ -239,6 +239,7 @@ describe('research contract tests', () => {
       data: {
         schemaVersion: 1,
         command: 'bonsai',
+        dryRun: false,
         cache: {
           key: '0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7',
           status: expect.any(String),
