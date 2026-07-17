@@ -117,9 +117,8 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     }
 
     const currentTime = new Date();
-    const batch = urls.length > 1;
     const results = urls.map((url) =>
-      this.checkSingleStatus(url, currentTime, { ttl, maxAge, tier }, batch)
+      this.checkSingleStatus(url, currentTime, { ttl, maxAge, tier })
     );
     return finalizeBatch(results, (r) => r.status === 'miss');
   }
@@ -127,8 +126,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   private checkSingleStatus(
     url: string,
     currentTime: Date,
-    policy: { ttl: string | undefined; maxAge: string | undefined; tier: Tier | undefined },
-    showSeparator: boolean
+    policy: { ttl: string | undefined; maxAge: string | undefined; tier: Tier | undefined }
   ): {
     cacheKey: string;
     cachePath: string;
@@ -145,7 +143,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
 
     if (!this.jsonEnabled()) {
-      this.logStatusTable(normalizedUrl, cacheKey, artifactPath, result, showSeparator);
+      this.logStatusTable(normalizedUrl, cacheKey, artifactPath, result);
       if (result.status === 'miss') {
         this.warn(`Cache miss — run: ${this.config.bin} ${normalizedUrl}`);
       }
@@ -165,8 +163,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     normalizedUrl: string,
     cacheKey: string,
     artifactPath: string,
-    result: StatusResult,
-    showSeparator: boolean
+    result: StatusResult
   ): void {
     const colorOf = (map: Record<string, (t: string) => string>, key: string) =>
       map[key] ?? ((t: string) => t);
@@ -198,6 +195,6 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     this.log(`${colors.cyan('Status:'.padEnd(25))} ${statusColor(result.status)}`);
     this.log(`${colors.cyan('Freshness:'.padEnd(25))} ${freshnessColor(result.freshness)}`);
     this.log(`${colors.cyan('Action:'.padEnd(25))} ${actionColor(result.action)}`);
-    if (showSeparator) this.log('-'.repeat(40));
+    if (this.parsedArgv.length > 1) this.log('-'.repeat(40));
   }
 }

@@ -204,8 +204,9 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   }
 
   /**
-   * Shared CACHE_MISS overlay for multi-URL read commands (`status`, `inspect`). Keeps hit
-   * payloads in `data` while marking the envelope non-ok with fetch suggestions.
+   * CACHE_MISS overlay for multi-URL read commands (`status`, `inspect`). Keeps hit payloads
+   * in `data` while marking the envelope non-ok — shared so the two commands do not clone the
+   * enrich/baseSuccessJson call site.
    */
   protected cacheMissSuccessJson(
     data: unknown,

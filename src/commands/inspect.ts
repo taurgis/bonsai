@@ -49,20 +49,16 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   }
 
   async run(): Promise<unknown> {
-    const urls = this.parsedArgv;
-    const batch = urls.length > 1;
-    const results = urls.map((url) => this.inspectOne(url, batch));
+    const results = this.parsedArgv.map((url) => this.inspectOne(url));
     return finalizeBatch(results, (r) => r.status === 'miss');
   }
 
-  private inspectOne(url: string, showSeparator: boolean) {
+  private inspectOne(url: string) {
     const target = this.resolveResearchTargetOrFail(url);
-    return target.located
-      ? this.hitResult(target, showSeparator)
-      : this.missResult(target, showSeparator);
+    return target.located ? this.hitResult(target) : this.missResult(target);
   }
 
-  private missResult(target: ResolvedResearchTarget, showSeparator: boolean) {
+  private missResult(target: ResolvedResearchTarget) {
     const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
     if (!this.jsonEnabled()) {
       this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(target.normalizedUrl)}`);
@@ -70,7 +66,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
       this.log(`${colors.cyan('Status:'.padEnd(25))} ${colors.red('miss')}`);
       this.warn(`Cache miss — run: ${this.config.bin} ${target.normalizedUrl}`);
-      if (showSeparator) this.log('='.repeat(40));
+      if (this.parsedArgv.length > 1) this.log('='.repeat(40));
     }
     return {
       cacheKey: target.cacheKey,
@@ -82,7 +78,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     };
   }
 
-  private hitResult(target: ResolvedResearchTarget, showSeparator: boolean) {
+  private hitResult(target: ResolvedResearchTarget) {
     const { cacheKey, located, roots, normalizedUrl } = target;
     const cached = located!.artifact;
     const artifactPath = located!.path;
@@ -93,7 +89,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
       this.logMetadata(cached.metadata);
       if (sections.length) this.logSections(sections);
-      if (showSeparator) this.log('='.repeat(40));
+      if (this.parsedArgv.length > 1) this.log('='.repeat(40));
     }
 
     return {

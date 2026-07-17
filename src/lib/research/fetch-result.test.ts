@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   buildFetchFailureResult,
   buildFetchResultData,
+  describeError,
+  fetchFailureGuidance,
   reportCacheStatus,
 } from './fetch-result.js';
 
@@ -63,17 +65,136 @@ describe('buildFetchResultData', () => {
 
 describe('buildFetchFailureResult', () => {
   it('prefers structured error fields over fallback guidance', () => {
-    const row = buildFetchFailureResult(
-      'bonsai',
-      'https://example.com',
-      { message: 'boom', code: 'FETCH_FAILED', suggestions: ['retry'] },
-      { suggestions: ['unused'], ref: 'https://docs' }
-    );
+    const row = buildFetchFailureResult({
+      bin: 'bonsai',
+      url: 'https://example.com',
+      dryRun: true,
+      err: { message: 'boom', code: 'FETCH_FAILED', suggestions: ['retry'] },
+      fallbackGuidance: { suggestions: ['unused'], ref: 'https://docs' },
+    });
+    expect(row.dryRun).toBe(true);
     expect(row.error).toMatchObject({
       code: 'FETCH_FAILED',
       message: 'boom',
       suggestions: ['retry'],
     });
     expect(row.cache).toBeNull();
+  });
+});
+
+describe('fetchFailureGuidance', () => {
+  const url = 'https://docs.example.com/page';
+
+  it('points auth/WAF blocks (401/403) at manual import', () => {
+    for (const status of ['401 Unauthorized', '403 Forbidden']) {
+      const g = fetchFailureGuidance(`Fetch failed with status ${status}`, url);
+      expect(g?.suggestions.some((s) => s.includes(`bonsai import ${url} --stdin`))).toBe(true);
+      // Must point at the published docs site, not a stale GitHub Pages host.
+      expect(g?.ref).toBe('https://bonsai.rhino-inquisitor.com/troubleshooting');
+    }
+  });
+
+  it('suggests checking the URL on a 404', () => {
+    const g = fetchFailureGuidance('Fetch failed with status 404 Not Found', url);
+    expect(g?.suggestions.join(' ')).toMatch(/correct/i);
+  });
+
+  it('suggests retry on a 5xx server error', () => {
+    const g = fetchFailureGuidance('Fetch failed with status 503 Service Unavailable', url);
+    expect(g?.suggestions.join(' ')).toMatch(/retry/i);
+  });
+
+  it('offers --rendered and import for non-HTML responses', () => {
+    const g = fetchFailureGuidance(
+      'Rejected content type "application/json". Only HTML is supported.',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toContain('--rendered');
+    expect(g?.suggestions.some((s) => s.includes('bonsai import'))).toBe(true);
+  });
+
+  it('guides DNS failures toward the hostname', () => {
+    const g = fetchFailureGuidance(
+      'DNS resolution failed for hostname "x": getaddrinfo ENOTFOUND x',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toMatch(/hostname/i);
+  });
+
+  it('explains a runtime SSRF block (hostname resolving to a private IP)', () => {
+    const g = fetchFailureGuidance(
+      'IP address "10.0.0.5" resolved for "x" is a blocked local or private target.',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toMatch(/SSRF/);
+  });
+
+  it('returns undefined for unrecognized failures (original message surfaces unchanged)', () => {
+    expect(fetchFailureGuidance('Some novel failure mode', url)).toBeUndefined();
+  });
+
+  it('points a proxy tunnel rejection at NO_PROXY/the proxy allowlist, not the destination', () => {
+    const g = fetchFailureGuidance(
+      'fetch failed: Proxy response (403) !== 200 when HTTP Tunneling',
+      url
+    );
+    expect(g?.suggestions.join(' ')).toMatch(/HTTPS_PROXY|NO_PROXY/);
+  });
+
+  it('points a Chrome sandbox-egress block at the import workaround', () => {
+    const g = fetchFailureGuidance(
+      'Chrome could not reach "developer.salesforce.com" (net::ERR_TUNNEL_CONNECTION_FAILED). ' +
+        "This looks like a sandboxed execution environment (e.g. Claude Code's remote sandbox) " +
+        'whose network egress policy is blocking this host.',
+      url
+    );
+    expect(g?.suggestions.some((s) => s.includes(`bonsai import ${url} --stdin`))).toBe(true);
+    expect(g?.ref).toBe('https://bonsai.rhino-inquisitor.com/troubleshooting');
+  });
+
+  it('gives a generic connectivity hint for an unqualified "fetch failed"', () => {
+    const g = fetchFailureGuidance('fetch failed', url);
+    expect(g?.suggestions.join(' ')).toMatch(/connect/i);
+  });
+
+  it('does not mistake a real HTTP status response for a transport-level failure', () => {
+    for (const status of ['400 Bad Request', '405 Method Not Allowed', '429 Too Many Requests']) {
+      // Uncovered status codes fall through to no guidance (same as before the generic transport
+      // pattern was added) rather than being misclassified as a network/proxy failure.
+      expect(fetchFailureGuidance(`Fetch failed with status ${status}`, url)).toBeUndefined();
+    }
+  });
+});
+
+describe('describeError', () => {
+  it('returns a bare Error message unchanged when there is no cause', () => {
+    expect(describeError(new Error('boom'))).toBe('boom');
+  });
+
+  it('joins the full cause chain, deepest last', () => {
+    const err = new TypeError('fetch failed', {
+      cause: new Error('Proxy response (403) !== 200 when HTTP Tunneling'),
+    });
+    expect(describeError(err)).toBe(
+      'fetch failed: Proxy response (403) !== 200 when HTTP Tunneling'
+    );
+  });
+
+  it('stringifies a non-Error throw', () => {
+    expect(describeError('plain string')).toBe('plain string');
+  });
+
+  it('does not hang on a self-referential cause chain', () => {
+    const err = new Error('cyclic') as Error & { cause?: unknown };
+    err.cause = err;
+    expect(describeError(err)).toBe(Array(11).fill('cyclic').join(': '));
+  });
+
+  it('does not hang on a mutually-referential cause chain', () => {
+    const a = new Error('a') as Error & { cause?: unknown };
+    const b = new Error('b') as Error & { cause?: unknown };
+    a.cause = b;
+    b.cause = a;
+    expect(describeError(a).split(': ').length).toBeLessThanOrEqual(11);
   });
 });
