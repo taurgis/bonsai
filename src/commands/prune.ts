@@ -129,9 +129,6 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   }
 
   private shouldPrune(meta: any, currentTime: Date): boolean {
-    const fetched = meta.fetched_at ? new Date(meta.fetched_at).getTime() : 0;
-    const validated = meta.validated_at ? new Date(meta.validated_at).getTime() : 0;
-
     if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
       return false;
     }
@@ -140,27 +137,18 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       return false;
     }
 
-    // Content age: when the body was obtained. Imports have null fetched_at → fall back to validated_at.
-    // Distinct from --inactive so a recently revalidated but originally-old page can be pruned by age
-    // without also being treated as "inactive".
-    if (this.flags['older-than']) {
-      const contentTime = fetched || validated;
-      const ageMs = currentTime.getTime() - contentTime;
-      const olderThanMs = parseTtlToMs(this.flags['older-than']);
-      if (ageMs < olderThanMs) {
-        return false;
-      }
+    const now = currentTime.getTime();
+    // Content age (fetched_at, else validated_at) vs idle time (validated_at, else fetched_at) are
+    // deliberately distinct so a recently revalidated but originally-old page can match --older-than
+    // without also being treated as inactive.
+    if (
+      this.flags['older-than'] &&
+      ageMs(meta, now, 'content') < parseTtlToMs(this.flags['older-than'])
+    ) {
+      return false;
     }
-
-    // Idle window: last validation, else last fetch. A revalidated page stays "active" even when
-    // its original fetch is older than --older-than would allow.
-    if (this.flags.inactive) {
-      const activityTime = validated || fetched;
-      const idleMs = currentTime.getTime() - activityTime;
-      const inactiveMs = parseTtlToMs(this.flags.inactive);
-      if (idleMs < inactiveMs) {
-        return false;
-      }
+    if (this.flags.inactive && ageMs(meta, now, 'idle') < parseTtlToMs(this.flags.inactive)) {
+      return false;
     }
 
     return true;
@@ -254,4 +242,16 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       })),
     };
   }
+}
+
+/** Age in ms for prune filters. `content` prefers fetched_at; `idle` prefers validated_at. */
+function ageMs(
+  meta: { fetched_at?: string | null; validated_at?: string | null },
+  now: number,
+  kind: 'content' | 'idle'
+): number {
+  const fetched = meta.fetched_at ? new Date(meta.fetched_at).getTime() : 0;
+  const validated = meta.validated_at ? new Date(meta.validated_at).getTime() : 0;
+  const base = kind === 'content' ? fetched || validated : validated || fetched;
+  return now - base;
 }

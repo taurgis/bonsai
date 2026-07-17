@@ -2,6 +2,7 @@ import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core'
 import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
 import {
   buildEnvelope,
+  enrichCacheMissEnvelope,
   formatErrorForJson,
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
@@ -183,14 +184,34 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     });
   }
 
-  /** Wrap a command's return value in the machine-readable envelope emitted under `--json`. */
-  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+  /**
+   * Base success envelope from `process.exitCode` (including exit 5 = served stale / ok).
+   * Subclasses that overlay batch failures must call this — not `toSuccessJson` — to avoid
+   * recursing through their own override.
+   */
+  protected baseSuccessJson(data: unknown): Record<string, unknown> {
     // ponytail: the stale-serve path signals "exit 5" by setting process.exitCode inside run()
     // (e.g. fetch's handleStaleRevalidationResult); this reads it back to mark the envelope. If that
     // signalling moves off process.exitCode, update here too. Number() normalizes Node's string codes.
     const exitCode = Number(process.exitCode ?? 0);
     // Exit 5 means "served stale" — a successful, usable result, so it reports ok.
     return this.envelope({ ok: exitCode === 0 || exitCode === 5, exitCode, stderr: '', data });
+  }
+
+  /** Wrap a command's return value in the machine-readable envelope emitted under `--json`. */
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    return this.baseSuccessJson(data);
+  }
+
+  /**
+   * Shared CACHE_MISS overlay for multi-URL read commands (`status`, `inspect`). Keeps hit
+   * payloads in `data` while marking the envelope non-ok with fetch suggestions.
+   */
+  protected cacheMissSuccessJson(
+    data: unknown,
+    messageFor: (normalizedUrl: string, missCount: number) => string
+  ): Record<string, unknown> {
+    return enrichCacheMissEnvelope(this.baseSuccessJson(data), data, this.config.bin, messageFor);
   }
 
   /** Mirror the success envelope for failures so JSON consumers get one consistent shape. */

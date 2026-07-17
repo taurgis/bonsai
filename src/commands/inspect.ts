@@ -1,8 +1,9 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { enrichCacheMissEnvelope } from '../lib/envelope.js';
+import { finalizeBatch } from '../lib/batch.js';
 import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
+import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
 
 interface SectionSummary {
   cacheKey: string;
@@ -39,9 +40,8 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
 
   static stdoutIsPrimaryData = true;
 
-  /** Match status: keep hit payloads when any URL misses, and surface CACHE_MISS on the envelope. */
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
-    return enrichCacheMissEnvelope(super.toSuccessJson(data), data, this.config.bin, (url, n) =>
+    return this.cacheMissSuccessJson(data, (url, n) =>
       n > 1
         ? `No cached research found for URL: ${url} and ${n - 1} other URLs`
         : `No cached research found for URL: ${url}`
@@ -50,25 +50,60 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
 
   async run(): Promise<unknown> {
     const urls = this.parsedArgv;
+    const batch = urls.length > 1;
+    const results = urls.map((url) => this.inspectOne(url, batch));
+    return finalizeBatch(results, (r) => r.status === 'miss');
+  }
 
-    const results: any[] = [];
-    let hasMiss = false;
+  private inspectOne(url: string, showSeparator: boolean) {
+    const target = this.resolveResearchTargetOrFail(url);
+    return target.located
+      ? this.hitResult(target, showSeparator)
+      : this.missResult(target, showSeparator);
+  }
 
-    for (const url of urls) {
-      const target = this.resolveResearchTargetOrFail(url);
-      if (!target.located) {
-        hasMiss = true;
-        results.push(this.missResult(target, urls.length > 1));
-        continue;
-      }
-      results.push(this.inspectSingleTarget(target, urls.length > 1));
+  private missResult(target: ResolvedResearchTarget, showSeparator: boolean) {
+    const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
+    if (!this.jsonEnabled()) {
+      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(target.normalizedUrl)}`);
+      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(target.cacheKey)}`);
+      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      this.log(`${colors.cyan('Status:'.padEnd(25))} ${colors.red('miss')}`);
+      this.warn(`Cache miss — run: ${this.config.bin} ${target.normalizedUrl}`);
+      if (showSeparator) this.log('='.repeat(40));
+    }
+    return {
+      cacheKey: target.cacheKey,
+      cachePath: artifactPath,
+      normalizedUrl: target.normalizedUrl,
+      status: 'miss' as const,
+      metadata: null,
+      sections: [] as SectionSummary[],
+    };
+  }
+
+  private hitResult(target: ResolvedResearchTarget, showSeparator: boolean) {
+    const { cacheKey, located, roots, normalizedUrl } = target;
+    const cached = located!.artifact;
+    const artifactPath = located!.path;
+    const sections = this.findSections(roots.readRoots, cacheKey);
+
+    if (!this.jsonEnabled()) {
+      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
+      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      this.logMetadata(cached.metadata);
+      if (sections.length) this.logSections(sections);
+      if (showSeparator) this.log('='.repeat(40));
     }
 
-    if (hasMiss) {
-      process.exitCode = 1;
-    }
-
-    return urls.length === 1 ? results[0] : results;
+    return {
+      cacheKey,
+      cachePath: artifactPath,
+      normalizedUrl,
+      status: 'hit' as const,
+      metadata: cached.metadata,
+      sections,
+    };
   }
 
   private logMetadata(metadata: Record<string, any>): void {
@@ -90,59 +125,6 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
         `${colors.cyan(s.headingPath || '')} [${colors.yellow(s.anchor || '')}] (${colors.magenta(String(s.tokenEstimate.detailed || 0))} tokens) ${colors.gray(s.cacheKey)}`
       );
     }
-  }
-
-  private missResult(
-    target: { cacheKey: string; normalizedUrl: string; roots: { writeRoot: string } },
-    showSeparator: boolean
-  ): any {
-    const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
-    if (!this.jsonEnabled()) {
-      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(target.normalizedUrl)}`);
-      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(target.cacheKey)}`);
-      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
-      this.log(`${colors.cyan('Status:'.padEnd(25))} ${colors.red('miss')}`);
-      this.warn(`Cache miss — run: ${this.config.bin} ${target.normalizedUrl}`);
-      if (showSeparator) {
-        this.log('='.repeat(40));
-      }
-    }
-    return {
-      cacheKey: target.cacheKey,
-      cachePath: artifactPath,
-      normalizedUrl: target.normalizedUrl,
-      status: 'miss',
-      metadata: null,
-      sections: [],
-    };
-  }
-
-  private inspectSingleTarget(target: any, showSeparator: boolean): any {
-    const { cacheKey, located, roots, normalizedUrl } = target;
-    const cached = located.artifact;
-    const artifactPath = located.path;
-    const sections = this.findSections(roots.readRoots, cacheKey);
-
-    if (!this.jsonEnabled()) {
-      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
-      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
-      this.logMetadata(cached.metadata);
-      if (sections.length) {
-        this.logSections(sections);
-      }
-      if (showSeparator) {
-        this.log('='.repeat(40));
-      }
-    }
-
-    return {
-      cacheKey,
-      cachePath: artifactPath,
-      normalizedUrl,
-      status: 'hit',
-      metadata: cached.metadata,
-      sections,
-    };
   }
 
   // Section children link back via parent_cache_key; list the active ones for this page (T-22).

@@ -3,8 +3,15 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
-import { formatErrorForJson } from '../lib/envelope.js';
-import { writeArtifact, getArtifactPath, type LocatedArtifact } from '../lib/research/storage.js';
+import { finalizeBatch } from '../lib/batch.js';
+import { enrichFetchFailureEnvelope } from '../lib/envelope.js';
+import {
+  buildFetchFailureResult,
+  buildFetchResultData,
+  FETCH_STATUS_LABEL,
+  reportCacheStatus,
+} from '../lib/research/fetch-result.js';
+import { writeArtifact, type LocatedArtifact } from '../lib/research/storage.js';
 import { loadStoreRoots, type StoreRoots } from '../lib/research/store-roots.js';
 import { writeArtifactSecurely } from '../lib/research/secure-write.js';
 import { loadSummaryLevel, type StorageMode, type SummaryLevel } from '../lib/config/index.js';
@@ -22,21 +29,6 @@ import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { detectSite } from '../sites/index.js';
 import { applySiteFetchProvenance, type SiteFetchResult } from '../sites/types.js';
-
-/** Remap write-implying cache statuses when dry-run/read-only skipped persistence. */
-function reportCacheStatus(status: string, dryRun: boolean): string {
-  if (!dryRun) return status;
-  switch (status) {
-    case 'miss':
-      return 'would_fetch';
-    case 'refreshed':
-      return 'would_refresh';
-    case 'revalidated':
-      return 'would_revalidate';
-    default:
-      return status;
-  }
-}
 
 const CAPTURE_DEPS: CaptureDeps = {
   fetchStatic: (url) => fetchStaticHtml(url),
@@ -216,115 +208,12 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     return applyAutoTags(artifact);
   }
 
-  private buildResultData(
-    url: string,
-    normalizedUrl: string,
-    cacheKey: string,
-    storageDir: string,
-    storageMode: StorageMode,
-    cacheStatus: any,
-    freshnessState: any,
-    format: any,
-    artifact: any,
-    content: string,
-    redirectedToGlobal: boolean,
-    dryRun: boolean
-  ): any {
-    return {
-      schemaVersion: 1,
-      command: this.config.bin,
-      dryRun,
-      cache: {
-        key: cacheKey,
-        // Preview runs must not claim a write landed. Remap statuses that imply persistence so
-        // agents reading `cache.status`/`path` cannot treat a dry-run as a durable cache update.
-        status: reportCacheStatus(cacheStatus, dryRun),
-        freshness: freshnessState,
-        path: getArtifactPath(storageDir, cacheKey),
-        storage: storageMode,
-        redirectedToGlobal,
-      },
-      source: {
-        url,
-        normalizedUrl,
-        captureMethod: artifact.metadata.capture_method,
-        extractionStatus: artifact.metadata.extraction_status,
-        extractionConfidence: artifact.metadata.extraction_confidence,
-        qualityNotes: artifact.metadata.quality_notes,
-        fetchedAt: artifact.metadata.fetched_at,
-        validatedAt: artifact.metadata.validated_at,
-        staleAfter: artifact.metadata.stale_after,
-      },
-      artifactType: artifact.metadata.artifact_type,
-      docsEngine: artifact.metadata.docs_engine,
-      docsFramework: artifact.metadata.docs_framework,
-      sourceDocUrl: artifact.metadata.source_doc_url,
-      searchProvider: artifact.metadata.search_provider,
-      format,
-      tokenEstimate:
-        format === 'compressed'
-          ? artifact.metadata.token_estimate.compressed
-          : artifact.metadata.token_estimate.detailed,
-      content,
-    };
-  }
-
-  /** Per-URL failure row for multi-URL batches — keeps prior successes in `data`. */
-  private buildFetchFailureResult(
-    url: string,
-    err: { message?: string; code?: string; suggestions?: string[]; ref?: string }
-  ): any {
-    const message = typeof err.message === 'string' ? err.message : describeError(err);
-    const code = typeof err.code === 'string' && err.code ? err.code : 'FETCH_FAILED';
-    const guidance =
-      err.suggestions?.length || err.ref
-        ? { suggestions: err.suggestions, ref: err.ref }
-        : fetchFailureGuidance(message, url);
-    return {
-      schemaVersion: 1,
-      command: this.config.bin,
-      dryRun: false,
-      error: {
-        code,
-        message,
-        suggestions: guidance?.suggestions,
-        ref: guidance?.ref,
-      },
-      cache: null,
-      source: { url, normalizedUrl: null },
-      content: null,
-    };
-  }
-
   /**
    * When a multi-URL batch has any per-URL failure, keep the result array (including hits) and
    * surface FETCH_FAILED on the envelope — same batch contract as status/inspect CACHE_MISS.
    */
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
-    const envelope = super.toSuccessJson(data);
-    const list = Array.isArray(data) ? data : [data];
-    const failures = list.filter((d) => d && d.error);
-    if (failures.length === 0) return envelope;
-
-    const first = failures[0].error;
-    const suggestions = first.suggestions?.length ? first.suggestions : undefined;
-    const stderr = formatErrorForJson({
-      message:
-        first.message +
-        (failures.length > 1 ? `\n…and ${failures.length - 1} other URL failure(s)` : ''),
-      code: first.code ?? 'FETCH_FAILED',
-      suggestions,
-      ref: first.ref,
-    });
-    return {
-      ...envelope,
-      ok: false,
-      exitCode: Number(process.exitCode ?? 1),
-      stderr,
-      code: first.code ?? 'FETCH_FAILED',
-      suggestions,
-      ref: first.ref,
-    };
+    return enrichFetchFailureEnvelope(this.baseSuccessJson(data), data);
   }
 
   // Validates the duration flags up front, exiting with code 2 on a malformed value.
@@ -474,15 +363,16 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       if (!this.jsonEnabled()) ux.action.stop('failed');
       if (err instanceof Errors.CLIError) {
         if (!batch || (err.oclif?.exit ?? 1) === 2) throw err;
-        process.exitCode = 1;
-        return this.buildFetchFailureResult(url, err);
+        return buildFetchFailureResult(this.config.bin, url, err);
       }
       if (!batch) this.emitFetchError(err, url);
-      process.exitCode = 1;
-      return this.buildFetchFailureResult(url, {
-        message: describeError(err),
-        code: 'FETCH_FAILED',
-      });
+      const message = describeError(err);
+      return buildFetchFailureResult(
+        this.config.bin,
+        url,
+        { message, code: 'FETCH_FAILED' },
+        fetchFailureGuidance(message, url)
+      );
     }
   }
 
@@ -513,7 +403,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
           )
         );
       }
-      return batch ? results : results[0];
+      return finalizeBatch(results, (r) => Boolean(r?.error));
     } finally {
       if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
     }
@@ -560,40 +450,29 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
     if (!this.jsonEnabled()) {
       const reported = reportCacheStatus(cacheStatus, dryRun);
-      const CACHE_STATUS_LABEL: Record<string, string> = {
-        hit: 'cached',
-        miss: 'done',
-        refreshed: 'refreshed',
-        revalidated: 'revalidated',
-        stale: 'served stale',
-        would_fetch: 'previewed (not cached)',
-        would_refresh: 'previewed refresh',
-        would_revalidate: 'previewed revalidate',
-      };
-      ux.action.stop(CACHE_STATUS_LABEL[reported] ?? reported);
+      ux.action.stop(FETCH_STATUS_LABEL[reported] ?? reported);
     }
 
-    const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
-    const resultData = this.buildResultData(
+    const resultData = buildFetchResultData({
+      bin: this.config.bin,
       url,
       normalizedUrl,
       cacheKey,
       storageDir,
-      roots.mode,
+      storageMode: roots.mode,
       cacheStatus,
       freshnessState,
       format,
       artifact,
-      content,
       redirectedToGlobal,
-      dryRun
-    );
+      dryRun,
+    });
 
     if (!this.jsonEnabled()) {
       if (dryRun && cacheStatus !== 'hit' && cacheStatus !== 'stale') {
         this.log('[dry-run] Preview only — cache was not written.');
       }
-      this.log(content);
+      this.log(resultData.content);
       if (showSeparator) {
         this.log('\n' + '='.repeat(40) + '\n');
       }
