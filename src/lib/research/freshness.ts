@@ -6,7 +6,7 @@ const DAY_MS = 24 * HOUR_MS;
 /** Shared unit hint for parse failures and empty-duration rejection. */
 const DURATION_FORMAT_HINT =
   `Use a whole number plus a unit: ` +
-  `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '24h', '7d', '6m'.`;
+  `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '2h', '7d', '6m'.`;
 
 export interface FreshnessPolicy {
   freshWindowMs: number;

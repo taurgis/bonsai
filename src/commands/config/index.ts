@@ -3,7 +3,7 @@ import { BaseCommand } from '../../base-command.js';
 
 export default class ConfigIndex extends BaseCommand<typeof ConfigIndex> {
   static id = 'config';
-  static summary = 'Manage research cache storage configuration (global vs project).';
+  static summary = 'Manage research cache configuration';
   static description =
     'Show config subcommands for reading and writing Bonsai research cache configuration.';
 
@@ -13,7 +13,7 @@ export default class ConfigIndex extends BaseCommand<typeof ConfigIndex> {
       command: '<%= config.bin %> <%= command.id %> get storage',
     },
     {
-      description: 'set a configuration value for the current project',
+      description: 'set project storage mode',
       command: '<%= config.bin %> <%= command.id %> set storage project --local',
     },
   ];

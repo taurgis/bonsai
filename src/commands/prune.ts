@@ -11,55 +11,53 @@ import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
 import { pruneFlagError } from '../lib/prune-flags.js';
 import { colors } from '../lib/color.js';
+import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
-  static summary = 'Clean up old or inactive research cache entries.';
+  static summary = 'Prune cached research artifacts';
   static description =
-    'Prunes cached research entries based on age, inactivity, URL glob, or artifact type to free up disk space.';
+    'Delete cached artifacts by content age, idle time, URL glob, or artifact type.';
 
   static examples = [
     {
-      description: 'perform a dry run of pruning entries older than 90 days',
-      command: '<%= config.bin %> prune --older-than 90d --dry-run',
+      description: 'preview pruning entries older than 30 days',
+      command: '<%= config.bin %> prune --older-than 30d --dry-run',
     },
     {
-      description: 'actually prune entries older than 30 days that are source scrapes',
+      description: 'prune source artifacts older than 30 days',
       command: '<%= config.bin %> prune --older-than 30d --artifact-type source --yes',
     },
     {
-      description: 'prune entries matching a URL glob pattern',
+      description: 'prune entries matching a URL glob',
       command: '<%= config.bin %> prune --url "https://react.dev/*" --yes',
     },
   ];
 
   static flags = {
     'older-than': Flags.string({
-      description:
-        'prune by content age (fetched_at, else validated_at) older than duration (e.g. "30d", "90d")',
+      description: 'content age threshold (fetched_at, else validated_at), e.g. "30d"',
     }),
     inactive: Flags.string({
-      description:
-        'prune entries whose last validation (or fetch, if never validated) is older than duration (e.g. "14d", "30d")',
+      description: 'idle time threshold (validated_at, else fetched_at), e.g. "14d"',
     }),
     url: Flags.string({
-      description:
-        'filter pruning to source URL glob pattern (case-insensitive, supports * wildcard)',
+      description: CLI_FLAG_DESCRIPTIONS.sourceUrlGlob,
     }),
     'artifact-type': Flags.option({
       // Prune operates on every cached file, so it can target any artifact type — including the
       // `section`/`index` children a page generates (e.g. to clear orphans left after a source is
       // pruned with `--artifact-type source`).
-      description: 'filter pruning to specific artifact type',
+      description: CLI_FLAG_DESCRIPTIONS.pruneArtifactType,
       options: ARTIFACT_TYPES,
     })(),
     'dry-run': Flags.boolean({
-      description: 'list files that would be deleted without actually deleting them',
+      description: 'preview files without deleting',
       default: false,
     }),
     yes: Flags.boolean({
       char: 'y',
-      description: 'confirm deletion and prune matched entries (required unless --dry-run)',
+      description: 'confirm deletion (required unless --dry-run)',
       default: false,
     }),
   };

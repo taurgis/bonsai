@@ -1,5 +1,6 @@
 import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
+import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
 import {
   buildEnvelope,
   enrichCacheMissEnvelope,
@@ -35,10 +36,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     'read-only': Flags.boolean({
       aliases: ['plan'],
       default: false,
-      description:
-        '(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches ' +
-        'still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent ' +
-        'read-only/plan modes.',
+      description: CLI_FLAG_DESCRIPTIONS.readOnly,
     }),
   };
 
@@ -119,7 +117,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       case 'UNEXPECTED_ARGUMENT':
         return [`Check usage: ${help}`];
       case 'INVALID_DURATION':
-        return ['Use a whole number plus a unit, e.g. 24h, 7d, or 6m.'];
+        return ['Use a whole number plus a unit, e.g. 2h, 7d, or 6m.'];
       default:
         return undefined;
     }
@@ -296,10 +294,9 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     const code = stableErrorCodeFrom(e);
     const message =
       typeof e?.message === 'string' ? normalizeCliErrorMessage(e.message) : undefined;
-    const suggestions =
-      e.suggestions?.length
-        ? e.suggestions
-        : BaseCommand.fallbackSuggestionsForCode(code, this.config.bin, this.envelopeCommandId());
+    const suggestions = e.suggestions?.length
+      ? e.suggestions
+      : BaseCommand.fallbackSuggestionsForCode(code, this.config.bin, this.envelopeCommandId());
     const stderr =
       message || code || suggestions?.length || e?.ref
         ? formatErrorForJson({ ...e, message, code, suggestions })

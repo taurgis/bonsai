@@ -15,17 +15,17 @@ interface SectionSummary {
 
 export default class ResearchInspect extends BaseCommand<typeof ResearchInspect> {
   static id = 'inspect';
-  static summary = 'Inspect cached research metadata for a URL.';
+  static summary = 'Inspect cached research metadata for a URL';
   static description =
-    'Inspects local storage and displays full frontmatter metadata for the URL (without printing the content body).';
+    'Show frontmatter metadata and section children for cached URLs without printing content.';
 
   static examples = [
     {
-      description: 'inspect cached research metadata for a specific URL',
+      description: 'inspect cached metadata for a URL',
       command: '<%= config.bin %> <%= command.id %> https://example.com/docs',
     },
     {
-      description: 'output the full metadata as JSON for use by other tools',
+      description: 'inspect cached metadata as JSON',
       command: '<%= config.bin %> <%= command.id %> https://example.com/docs --json',
     },
   ];
@@ -35,7 +35,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   static args = {
     url: Args.string({
       required: true,
-      description: 'the URL to inspect',
+      description: 'URL to inspect',
     }),
   };
 

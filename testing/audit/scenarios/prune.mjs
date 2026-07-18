@@ -12,13 +12,13 @@ export default function register(harness, fixtures) {
   });
 
   check('prune no --yes SAFETY_CHECK_REQUIRED', () => {
-    const r = run(['prune', '--older-than', '90d', '--json']);
+    const r = run(['prune', '--older-than', '30d', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(parseJson(r.stdout)?.code === 'SAFETY_CHECK_REQUIRED', 'code');
   });
 
   check('prune --dry-run + --yes CONFLICTING_FLAGS exit 2', () => {
-    const r = run(['prune', '--older-than', '90d', '--dry-run', '--yes', '--json']);
+    const r = run(['prune', '--older-than', '30d', '--dry-run', '--yes', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
     expect(env?.code === 'CONFLICTING_FLAGS', env?.code);
@@ -43,8 +43,8 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
   });
 
-  check('prune --dry-run --older-than 90d --json ok', () => {
-    const r = run(['prune', '--older-than', '90d', '--dry-run', '--json']);
+  check('prune --dry-run --older-than 30d --json ok', () => {
+    const r = run(['prune', '--older-than', '30d', '--dry-run', '--json']);
     const env = parseJson(r.stdout);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(env?.ok === true, 'ok false');

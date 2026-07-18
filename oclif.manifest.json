@@ -4,19 +4,19 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "the full HTTP/HTTPS URL of the web page to research",
+          "description": "HTTP(S) URL to research",
           "name": "url",
           "required": true
         }
       },
-      "description": "Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.\n\nUsually invoked via the shorthand `bonsai <url>` rather than `bonsai fetch <url>`.",
+      "description": "Fetch a URL, convert the main content to Markdown, and cache compressed and detailed variants.\n\nUsually invoked as `bonsai <url>`; run `bonsai help fetch` for URL-form flags.",
       "examples": [
         {
-          "description": "research a URL with detailed output, tagged with topic and tags",
-          "command": "<%= config.bin %> https://docs.nestjs.com/ --topic \"Backend Frameworks\" --tags \"Node\" --tags \"NestJS\" --format detailed --ttl 30d"
+          "description": "cache docs with detailed output, topic, tags, and TTL",
+          "command": "<%= config.bin %> https://docs.nestjs.com/ --topic \"Backend Frameworks\" --tags \"Node\" --tags \"NestJS\" --format detailed --ttl 7d"
         },
         {
-          "description": "research a volatile page with compressed output and short TTL, returned as JSON",
+          "description": "cache a volatile page with compressed JSON output",
           "command": "<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json"
         }
       ],
@@ -32,14 +32,14 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "topic": {
           "char": "t",
-          "description": "the main category/topic of the research for metadata tagging",
+          "description": "main research topic for metadata",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -55,7 +55,7 @@
         },
         "format": {
           "char": "f",
-          "description": "desired data density",
+          "description": "output format",
           "name": "format",
           "default": "compressed",
           "hasDynamicHelp": false,
@@ -81,39 +81,39 @@
         },
         "ttl": {
           "char": "l",
-          "description": "predicted lifespan: number + h/d/w/m/y (m = months), e.g. \"2h\", \"7d\", \"6m\"",
+          "description": "TTL duration for freshness (e.g. \"2h\", \"7d\", \"6m\")",
           "name": "ttl",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "max-age": {
-          "description": "maximum age of cache to accept (e.g., \"1d\", \"30d\")",
+          "description": "maximum cache age to accept (e.g. \"2h\", \"7d\", \"6m\")",
           "name": "max-age",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "force": {
-          "description": "force a fresh fetch, ignoring any cached entries",
+          "description": "fetch fresh content, ignoring cached entries",
           "name": "force",
           "allowNo": false,
           "type": "boolean"
         },
         "dry-run": {
-          "description": "perform validation and fetch without saving to local cache",
+          "description": "fetch and validate without writing cache",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
         },
         "allow-stale": {
-          "description": "allow serving stale cache if the remote server is unreachable",
+          "description": "serve stale cache if revalidation fails",
           "name": "allow-stale",
           "allowNo": false,
           "type": "boolean"
         },
         "rendered": {
-          "description": "force using a browser-rendered scraping path for dynamic pages",
+          "description": "use browser-rendered capture for dynamic pages",
           "name": "rendered",
           "allowNo": false,
           "type": "boolean"
@@ -138,7 +138,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": false,
-      "summary": "Fetch and cache a URL as research Markdown for LLM ingestion.",
+      "summary": "Fetch and cache URL research Markdown",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
@@ -146,27 +146,27 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "the single source URL of the page (only for single-source import)",
+          "description": "single source URL for single-source import",
           "name": "url",
           "required": false
         }
       },
-      "description": "Accepts a synthesized Markdown note via stdin or --file and registers it under the single target URL or multiple source URLs.",
+      "description": "Store supplied Markdown under one URL or a multi-source research note, using the same freshness and storage metadata as fetched pages.",
       "examples": [
         {
-          "description": "import detailed research for a single URL via stdin",
-          "command": "echo \"# My Article\" | <%= config.bin %> import https://example.com/docs --stdin"
+          "description": "import detailed research for one URL from stdin",
+          "command": "printf \"# My Article\\n\" | <%= config.bin %> import https://example.com/docs --stdin --ttl 7d"
         },
         {
-          "description": "import research synthesized from multiple source URLs",
+          "description": "import a research note synthesized from multiple source URLs",
           "command": "echo \"# Synthesized\" | <%= config.bin %> import --stdin --topic \"React docs\" --source-url https://react.dev/a --source-url https://react.dev/b"
         },
         {
-          "description": "import research from a local Markdown file",
+          "description": "import research from a Markdown file",
           "command": "<%= config.bin %> import https://example.com/docs --file path/to/notes.md"
         },
         {
-          "description": "import research from stdin using the standard file placeholder",
+          "description": "import research from stdin with the file placeholder",
           "command": "cat notes.md | <%= config.bin %> import https://example.com/docs --file -"
         }
       ],
@@ -182,7 +182,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -195,14 +195,14 @@
         },
         "file": {
           "char": "f",
-          "description": "path to a Markdown file containing research notes to import, or \"-\" for stdin",
+          "description": "Markdown file to import, or \"-\" for stdin",
           "name": "file",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "input-format": {
-          "description": "format of the input provided",
+          "description": "input content format",
           "name": "input-format",
           "default": "detailed",
           "hasDynamicHelp": false,
@@ -215,7 +215,7 @@
         },
         "topic": {
           "char": "t",
-          "description": "the main topic for this research note",
+          "description": "main topic for this research note",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -243,7 +243,7 @@
           "type": "option"
         },
         "source-url": {
-          "description": "repeated source URLs for multi-source import",
+          "description": "source URLs for multi-source import (can be repeated)",
           "name": "source-url",
           "hasDynamicHelp": false,
           "multiple": true,
@@ -251,14 +251,14 @@
         },
         "ttl": {
           "char": "l",
-          "description": "predicted lifespan of the data (e.g. \"24h\", \"7d\")",
+          "description": "TTL duration for imported note freshness (e.g. \"2h\", \"7d\", \"6m\")",
           "name": "ttl",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "dry-run": {
-          "description": "validate and preview the import without writing to cache",
+          "description": "validate import without writing cache",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
@@ -282,7 +282,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "Import agent-supplied clean Markdown notes into the local cache.",
+      "summary": "Import agent-supplied Markdown into cache",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
@@ -290,19 +290,19 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "the URL to inspect",
+          "description": "URL to inspect",
           "name": "url",
           "required": true
         }
       },
-      "description": "Inspects local storage and displays full frontmatter metadata for the URL (without printing the content body).",
+      "description": "Show frontmatter metadata and section children for cached URLs without printing content.",
       "examples": [
         {
-          "description": "inspect cached research metadata for a specific URL",
+          "description": "inspect cached metadata for a URL",
           "command": "<%= config.bin %> <%= command.id %> https://example.com/docs"
         },
         {
-          "description": "output the full metadata as JSON for use by other tools",
+          "description": "inspect cached metadata as JSON",
           "command": "<%= config.bin %> <%= command.id %> https://example.com/docs --json"
         }
       ],
@@ -318,7 +318,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -331,29 +331,29 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": false,
-      "summary": "Inspect cached research metadata for a URL.",
+      "summary": "Inspect cached research metadata for a URL",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "list": {
       "aliases": [],
       "args": {},
-      "description": "Lists cached research artifacts, including metadata details like path, source count, freshness, token estimates, and quality metrics without printing full content.",
+      "description": "List page-level cached artifacts with source URLs, topic, tags, freshness, capture method, and token estimates.",
       "examples": [
         {
-          "description": "list all cached entries",
+          "description": "list cached entries",
           "command": "<%= config.bin %> list"
         },
         {
-          "description": "list cached entries for a specific topic with JSON output",
+          "description": "list entries for a topic as JSON",
           "command": "<%= config.bin %> list --topic \"React Suspense\" --json"
         },
         {
-          "description": "list only fresh entries filtered by tags",
+          "description": "list fresh entries matching tags",
           "command": "<%= config.bin %> list --freshness fresh --tags node --tags url"
         },
         {
-          "description": "list entries matching a specific URL glob",
+          "description": "list entries matching a URL glob",
           "command": "<%= config.bin %> list --url \"https://react.dev/*\""
         }
       ],
@@ -369,14 +369,14 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "topic": {
           "char": "t",
-          "description": "filter by exact topic (case-insensitive)",
+          "description": "exact topic (case-insensitive)",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -384,21 +384,21 @@
         },
         "tags": {
           "char": "g",
-          "description": "filter by tags (must match all tags specified)",
+          "description": "tags to require (must match all)",
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,
           "type": "option"
         },
         "url": {
-          "description": "filter by source URL glob pattern (case-insensitive, supports * wildcard)",
+          "description": "source URL glob (case-insensitive, supports * wildcard)",
           "name": "url",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "freshness": {
-          "description": "filter by freshness state",
+          "description": "freshness state",
           "name": "freshness",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -410,7 +410,7 @@
           "type": "option"
         },
         "artifact-type": {
-          "description": "filter by artifact type (section children are omitted from list — use inspect to see them)",
+          "description": "artifact type; section children are omitted from list - use inspect to see them",
           "name": "artifact-type",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -422,7 +422,7 @@
           "type": "option"
         },
         "capture-method": {
-          "description": "filter by capture method",
+          "description": "capture method",
           "name": "capture-method",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -436,7 +436,7 @@
           "type": "option"
         },
         "limit": {
-          "description": "maximum number of results to return (default 50, max 100)",
+          "description": "result count (default 50, max 100)",
           "name": "limit",
           "default": 50,
           "hasDynamicHelp": false,
@@ -451,25 +451,25 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "List cached research artifacts by metadata filters.",
+      "summary": "List cached research artifacts by metadata",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
     "prune": {
       "aliases": [],
       "args": {},
-      "description": "Prunes cached research entries based on age, inactivity, URL glob, or artifact type to free up disk space.",
+      "description": "Delete cached artifacts by content age, idle time, URL glob, or artifact type.",
       "examples": [
         {
-          "description": "perform a dry run of pruning entries older than 90 days",
-          "command": "<%= config.bin %> prune --older-than 90d --dry-run"
+          "description": "preview pruning entries older than 30 days",
+          "command": "<%= config.bin %> prune --older-than 30d --dry-run"
         },
         {
-          "description": "actually prune entries older than 30 days that are source scrapes",
+          "description": "prune source artifacts older than 30 days",
           "command": "<%= config.bin %> prune --older-than 30d --artifact-type source --yes"
         },
         {
-          "description": "prune entries matching a URL glob pattern",
+          "description": "prune entries matching a URL glob",
           "command": "<%= config.bin %> prune --url \"https://react.dev/*\" --yes"
         }
       ],
@@ -485,34 +485,34 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "older-than": {
-          "description": "prune by content age (fetched_at, else validated_at) older than duration (e.g. \"30d\", \"90d\")",
+          "description": "content age threshold (fetched_at, else validated_at), e.g. \"30d\"",
           "name": "older-than",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "inactive": {
-          "description": "prune entries whose last validation (or fetch, if never validated) is older than duration (e.g. \"14d\", \"30d\")",
+          "description": "idle time threshold (validated_at, else fetched_at), e.g. \"14d\"",
           "name": "inactive",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "url": {
-          "description": "filter pruning to source URL glob pattern (case-insensitive, supports * wildcard)",
+          "description": "source URL glob (case-insensitive, supports * wildcard)",
           "name": "url",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "artifact-type": {
-          "description": "filter pruning to specific artifact type",
+          "description": "artifact type to prune, including section children",
           "name": "artifact-type",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -525,14 +525,14 @@
           "type": "option"
         },
         "dry-run": {
-          "description": "list files that would be deleted without actually deleting them",
+          "description": "preview files without deleting",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
         },
         "yes": {
           "char": "y",
-          "description": "confirm deletion and prune matched entries (required unless --dry-run)",
+          "description": "confirm deletion (required unless --dry-run)",
           "name": "yes",
           "allowNo": false,
           "type": "boolean"
@@ -545,7 +545,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "Clean up old or inactive research cache entries.",
+      "summary": "Prune cached research artifacts",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
@@ -553,19 +553,19 @@
       "aliases": [],
       "args": {
         "url": {
-          "description": "the URL to check",
+          "description": "URL to check",
           "name": "url",
           "required": true
         }
       },
-      "description": "Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the root fetch command would take.",
+      "description": "Report cache hit/miss state, freshness, and the action the URL shorthand would take.",
       "examples": [
         {
-          "description": "check if a URL is already in the cache",
+          "description": "check whether a URL is cached",
           "command": "<%= config.bin %> <%= command.id %> https://example.com/docs"
         },
         {
-          "description": "check status against a specific freshness tier and TTL",
+          "description": "evaluate status with a specific tier and TTL",
           "command": "<%= config.bin %> <%= command.id %> https://example.com/docs --tier volatile --ttl 2h"
         }
       ],
@@ -581,13 +581,13 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "tier": {
-          "description": "freshness tier policy to evaluate against (default: the cached entry's own tier)",
+          "description": "freshness tier policy to evaluate; when omitted, uses the cached entry's own tier",
           "name": "tier",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -600,14 +600,14 @@
         },
         "ttl": {
           "char": "l",
-          "description": "custom TTL duration to evaluate against (e.g. \"2h\", \"7d\")",
+          "description": "TTL duration to evaluate freshness (e.g. \"2h\", \"7d\", \"6m\")",
           "name": "ttl",
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
         },
         "max-age": {
-          "description": "maximum age of cache to accept (e.g. \"1d\", \"30d\")",
+          "description": "maximum cache age to accept (e.g. \"2h\", \"7d\", \"6m\")",
           "name": "max-age",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -621,7 +621,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": false,
-      "summary": "Check the cache status of a URL without fetching or writing.",
+      "summary": "Check cache status without fetching or writing",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
@@ -635,7 +635,7 @@
           "command": "<%= config.bin %> <%= command.id %> get storage"
         },
         {
-          "description": "set a configuration value for the current project",
+          "description": "set project storage mode",
           "command": "<%= config.bin %> <%= command.id %> set storage project --local"
         }
       ],
@@ -651,7 +651,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -664,7 +664,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "Manage research cache storage configuration (global vs project).",
+      "summary": "Manage research cache configuration",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
@@ -700,14 +700,14 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "global": {
           "char": "g",
-          "description": "Read from user-level config only.",
+          "description": "read user-level config only",
           "name": "global",
           "allowNo": false,
           "type": "boolean"
@@ -719,7 +719,7 @@
           "charAliases": [
             "p"
           ],
-          "description": "Read from project-level config only.",
+          "description": "read project-level config only",
           "name": "local",
           "allowNo": false,
           "type": "boolean"
@@ -732,7 +732,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "Get the effective value of a research configuration key.",
+      "summary": "Get a research configuration value",
       "stdoutIsPrimaryData": true
     },
     "config:list": {
@@ -761,14 +761,14 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "global": {
           "char": "g",
-          "description": "Show user-level config only.",
+          "description": "show user-level config only",
           "name": "global",
           "allowNo": false,
           "type": "boolean"
@@ -780,7 +780,7 @@
           "charAliases": [
             "p"
           ],
-          "description": "Show project-level config only.",
+          "description": "show project-level config only",
           "name": "local",
           "allowNo": false,
           "type": "boolean"
@@ -793,7 +793,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "List all research configuration keys and their effective values.",
+      "summary": "List research configuration values",
       "stdoutIsPrimaryData": true
     },
     "config:set": {
@@ -810,14 +810,14 @@
           "required": false
         }
       },
-      "description": "Persist a configuration value. Writes user-level config by default; pass --local to write the project-level config (.bonsai.json in cwd).\n\nValid keys: storage, summary. The inline form `<key>=<value>` is also accepted.",
+      "description": "Persist a configuration value. Writes user-level config by default; pass --local for project-level config (.bonsai.json in cwd).\n\nValid keys: storage, summary. The inline form `<key>=<value>` is also accepted.",
       "examples": [
         {
-          "description": "store research cache inside the current project",
+          "description": "store research cache in the current project",
           "command": "<%= config.bin %> config set storage project --local"
         },
         {
-          "description": "set the user-level default using the inline key=value form",
+          "description": "set the user-level default with key=value",
           "command": "<%= config.bin %> config set storage=global"
         }
       ],
@@ -833,14 +833,14 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "global": {
           "char": "g",
-          "description": "Write to user-level config (default).",
+          "description": "write user-level config (default)",
           "name": "global",
           "allowNo": false,
           "type": "boolean"
@@ -852,13 +852,13 @@
           "charAliases": [
             "p"
           ],
-          "description": "Write to project-level config (.bonsai.json in cwd).",
+          "description": "write project-level config (.bonsai.json in cwd)",
           "name": "local",
           "allowNo": false,
           "type": "boolean"
         },
         "dry-run": {
-          "description": "show what would be written without saving",
+          "description": "preview write without saving",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
@@ -871,7 +871,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "Set a research configuration key.",
+      "summary": "Set a research configuration key",
       "stdoutIsPrimaryData": true
     },
     "config:unset": {
@@ -906,14 +906,14 @@
           "aliases": [
             "plan"
           ],
-          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
         },
         "global": {
           "char": "g",
-          "description": "Remove from user-level config (default).",
+          "description": "remove from user-level config (default)",
           "name": "global",
           "allowNo": false,
           "type": "boolean"
@@ -925,13 +925,13 @@
           "charAliases": [
             "p"
           ],
-          "description": "Remove from project-level config (.bonsai.json in cwd).",
+          "description": "remove from project-level config (.bonsai.json in cwd)",
           "name": "local",
           "allowNo": false,
           "type": "boolean"
         },
         "dry-run": {
-          "description": "show what would be removed without saving",
+          "description": "preview removal without saving",
           "name": "dry-run",
           "allowNo": false,
           "type": "boolean"
@@ -944,7 +944,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": true,
-      "summary": "Remove a research configuration key.",
+      "summary": "Remove a research configuration key",
       "stdoutIsPrimaryData": true
     }
   },

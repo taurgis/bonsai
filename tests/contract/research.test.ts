@@ -475,7 +475,7 @@ describe('CLI ergonomics and error contracts', () => {
     const result = runContract(['prune', '--dry-run']);
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain('Must specify at least one pruning filter');
-    expect(result.stderr).toContain('older-than 90d');
+    expect(result.stderr).toContain('older-than 30d');
     expect(result.stderr).toContain('--dry-run');
   });
 
@@ -535,7 +535,7 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.exitCode).toBe(2);
     const envelope = JSON.parse(result.stdout);
     expect(envelope.code).toBe('MISSING_FILTER');
-    expect(envelope.suggestions?.[0]).toContain('prune --older-than 90d --dry-run');
+    expect(envelope.suggestions?.[0]).toContain('prune --older-than 30d --dry-run');
     expect(envelope.stderr).toContain('Try this:');
   });
 

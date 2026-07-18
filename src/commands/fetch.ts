@@ -42,19 +42,18 @@ const CAPTURE_DEPS: CaptureDeps = {
 export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   static id = 'fetch';
   static hidden = true;
-  static summary = 'Fetch and cache a URL as research Markdown for LLM ingestion.';
+  static summary = 'Fetch and cache URL research Markdown';
   static description =
-    'Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.\n\nUsually invoked via the shorthand `bonsai <url>` rather than `bonsai fetch <url>`.';
+    'Fetch a URL, convert the main content to Markdown, and cache compressed and detailed variants.\n\nUsually invoked as `bonsai <url>`; run `bonsai help fetch` for URL-form flags.';
 
   static examples = [
     {
-      description: 'research a URL with detailed output, tagged with topic and tags',
+      description: 'cache docs with detailed output, topic, tags, and TTL',
       command:
-        '<%= config.bin %> https://docs.nestjs.com/ --topic "Backend Frameworks" --tags "Node" --tags "NestJS" --format detailed --ttl 30d',
+        '<%= config.bin %> https://docs.nestjs.com/ --topic "Backend Frameworks" --tags "Node" --tags "NestJS" --format detailed --ttl 7d',
     },
     {
-      description:
-        'research a volatile page with compressed output and short TTL, returned as JSON',
+      description: 'cache a volatile page with compressed JSON output',
       command:
         '<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json',
     },
@@ -65,7 +64,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   static args = {
     url: Args.string({
       required: true,
-      description: 'the full HTTP/HTTPS URL of the web page to research',
+      description: 'HTTP(S) URL to research',
     }),
   };
 
@@ -81,7 +80,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     }),
     format: Flags.option({
       char: 'f',
-      description: 'desired data density',
+      description: CLI_FLAG_DESCRIPTIONS.format,
       options: ['compressed', 'detailed'] as const,
       default: 'compressed',
     })(),
@@ -95,22 +94,22 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       description: CLI_FLAG_DESCRIPTIONS.fetchTtl,
     }),
     'max-age': Flags.string({
-      description: 'maximum age of cache to accept (e.g., "1d", "30d")',
+      description: CLI_FLAG_DESCRIPTIONS.maxAge,
     }),
     force: Flags.boolean({
-      description: 'force a fresh fetch, ignoring any cached entries',
+      description: 'fetch fresh content, ignoring cached entries',
       default: false,
     }),
     'dry-run': Flags.boolean({
-      description: 'perform validation and fetch without saving to local cache',
+      description: 'fetch and validate without writing cache',
       default: false,
     }),
     'allow-stale': Flags.boolean({
-      description: 'allow serving stale cache if the remote server is unreachable',
+      description: 'serve stale cache if revalidation fails',
       default: false,
     }),
     rendered: Flags.boolean({
-      description: 'force using a browser-rendered scraping path for dynamic pages',
+      description: 'use browser-rendered capture for dynamic pages',
       default: false,
     }),
     storage: Flags.option({

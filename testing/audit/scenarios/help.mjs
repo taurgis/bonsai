@@ -1,6 +1,7 @@
 /** Help text and command discovery. */
 export default function register(harness) {
   const { check, run, expect } = harness;
+  const compact = (text) => text.replace(/\s+/g, ' ');
 
   check('root --help exits 0 with COMMANDS', () => {
     const r = run(['--help']);
@@ -18,6 +19,13 @@ export default function register(harness) {
     expect(/help\s+fetch/.test(r.stdout), 'root help should point at `bonsai help fetch`');
   });
 
+  check('root --help keeps fetch hidden and documents command-local short flags', () => {
+    const r = run(['--help']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(!/^\s+fetch\s+/m.test(r.stdout), 'hidden fetch should not appear in COMMANDS');
+    expect(/Short flags are command-local/i.test(r.stdout), 'missing short-flag collision note');
+  });
+
   check('help fetch reveals the URL-form flags', () => {
     const r = run(['help', 'fetch']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
@@ -27,6 +35,71 @@ export default function register(harness) {
     // --plan is an alias of --read-only; help must surface it even though oclif omits aliases
     // from the FLAGS column name.
     expect(r.stdout.includes('(alias: --plan)'), 'missing --plan alias callout');
+  });
+
+  check('help fetch examples use the URL shorthand primary UX', () => {
+    const r = run(['help', 'fetch']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('$ bonsai https://'), 'fetch examples should use URL shorthand');
+    expect(
+      !r.stdout.includes('$ bonsai fetch https://'),
+      'fetch examples should not promote hidden command form'
+    );
+  });
+
+  check('fetch import and status align TTL examples', () => {
+    for (const cmd of [
+      ['help', 'fetch'],
+      ['import', '--help'],
+      ['status', '--help'],
+    ]) {
+      const r = run(cmd);
+      expect(r.exitCode === 0, `${cmd.join(' ')} exit ${r.exitCode}`);
+      expect(
+        compact(r.stdout).includes('e.g. "2h", "7d", "6m"'),
+        `${cmd.join(' ')} has misaligned TTL examples`
+      );
+      expect(
+        !r.stdout.includes('e.g. "24h"'),
+        `${cmd.join(' ')} still mentions old 24h TTL example`
+      );
+    }
+  });
+
+  check('status --tier help documents no default', () => {
+    const r = run(['status', '--help']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(
+      compact(r.stdout).includes("when omitted, uses the cached entry's own tier"),
+      'missing tier omission note'
+    );
+    expect(
+      !/--tier[\s\S]{0,180}default:/i.test(r.stdout),
+      'status --tier should not advertise a default'
+    );
+  });
+
+  check('list and prune document artifact-type asymmetry', () => {
+    const list = run(['list', '--help']);
+    const prune = run(['prune', '--help']);
+    expect(list.exitCode === 0, `list exit ${list.exitCode}`);
+    expect(prune.exitCode === 0, `prune exit ${prune.exitCode}`);
+    expect(
+      list.stdout.includes('<options: source|research_note|index>'),
+      'list should omit section artifact type'
+    );
+    expect(
+      compact(list.stdout).includes('section children are omitted from list'),
+      'list should explain omitted sections'
+    );
+    expect(
+      prune.stdout.includes('<options: source|research_note|index|section>'),
+      'prune should include section artifact type'
+    );
+    expect(
+      compact(prune.stdout).includes('including section children'),
+      'prune should explain section support'
+    );
   });
 
   check('root -h exits 0 with COMMANDS', () => {

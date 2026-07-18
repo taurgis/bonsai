@@ -102,6 +102,6 @@ choose `compressed` or `detailed` against its budget.
 
 ### TTL
 
-A custom freshness window (`--ttl 2h`, `7d`, `30d`) that replaces the tier's
+A custom freshness window (`--ttl 2h`, `7d`, `6m`) that replaces the tier's
 fresh window. The grace window is then derived proportionally from the active
 tier. See [Caching & Freshness](/concepts/caching-and-freshness#custom-ttls).
