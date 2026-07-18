@@ -209,14 +209,14 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   }
 
   /**
-   * Success overlay for multi-URL read commands (`status`, `inspect`): row `.error` first
-   * (invalid URL in a batch), else CACHE_MISS — hit payloads always stay in `data`.
+   * Success overlay for multi-URL read commands (`status`, `inspect`). Apply CACHE_MISS first,
+   * then row `.error` so validation failures win when both appear in one batch.
    */
   protected batchReadSuccessJson(data: unknown): Record<string, unknown> {
-    const base = this.baseSuccessJson(data);
-    const withRowErrors = enrichRowErrorEnvelope(base, data);
-    if (withRowErrors !== base) return withRowErrors;
-    return enrichCacheMissEnvelope(base, data, this.config.bin);
+    return enrichRowErrorEnvelope(
+      enrichCacheMissEnvelope(this.baseSuccessJson(data), data, this.config.bin),
+      data
+    );
   }
 
   /**

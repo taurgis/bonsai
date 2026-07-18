@@ -24,9 +24,14 @@ const rawArgv = process.argv.slice(2);
 const result = normalizeArgv(rawArgv);
 const root = __dirname + '/../';
 
-if (result.exitWithJson) {
-  process.exitCode = result.exitWithJson.exitCode;
-  console.log(JSON.stringify(result.exitWithJson.envelope, null, 2));
+if (result.earlyExit) {
+  process.exitCode = result.earlyExit.exitCode;
+  if (result.earlyExit.json) {
+    console.log(JSON.stringify(result.earlyExit.envelope, null, 2));
+  } else {
+    const message = String(result.earlyExit.envelope.stderr ?? '');
+    console.error(` ›   Error: ${message.replaceAll('\n', '\n ›   ')}`);
+  }
   process.exit();
 }
 
@@ -49,8 +54,8 @@ if (jsonMeta) {
   process.exit();
 }
 
-// Only notify after the exitWithJson fast-path so the notifier never fires before
-// a JSON envelope exits. Also skip under --json so agent callers never see stderr noise.
+// Only notify after the earlyExit fast-path so the notifier never fires before
+// a usage-error envelope exits. Also skip under --json so agent callers never see stderr noise.
 if (!process.argv.includes('--json')) {
   updateNotifier({ pkg }).notify();
 }

@@ -192,18 +192,12 @@ export function enrichPrunePartialEnvelope(
   envelope: Record<string, unknown>,
   data: unknown
 ): Record<string, unknown> {
-  const d = data as { prunedCount?: number; candidateCount?: number };
-  if (
-    typeof d.prunedCount !== 'number' ||
-    typeof d.candidateCount !== 'number' ||
-    d.candidateCount <= 0 ||
-    d.prunedCount >= d.candidateCount
-  ) {
-    return envelope;
-  }
-  const failed = d.candidateCount - d.prunedCount;
+  if (!isPruneCounts(data)) return envelope;
+  if (data.candidateCount <= 0 || data.prunedCount >= data.candidateCount) return envelope;
+
+  const failed = data.candidateCount - data.prunedCount;
   const code = 'PRUNE_PARTIAL_FAILURE';
-  const message = `Failed to delete ${failed} of ${d.candidateCount} cache ${failed === 1 ? 'entry' : 'entries'}.`;
+  const message = `Failed to delete ${failed} of ${data.candidateCount} cache ${failed === 1 ? 'entry' : 'entries'}.`;
   return {
     ...envelope,
     ok: false,
@@ -213,29 +207,10 @@ export function enrichPrunePartialEnvelope(
   };
 }
 
-/** Shared MISSING_COMMAND copy for argv preflight and flag-only command_not_found. */
-export function missingCommandDetails(
-  bin: string,
-  swallowed?: { flag: string; url: string } | null
-): { message: string; code: 'MISSING_COMMAND'; suggestions: string[] } {
-  if (swallowed) {
-    return {
-      code: 'MISSING_COMMAND',
-      message: [
-        `Missing URL or command. ${swallowed.flag} consumed ${swallowed.url} as its value, so there was no URL left to fetch.`,
-        `Run ${bin} --help for usage.`,
-      ].join('\n'),
-      suggestions: [
-        `Pass the URL as the command (flags after): ${bin} ${swallowed.url}`,
-        `Or a named command: ${bin} list`,
-      ],
-    };
-  }
-  return {
-    code: 'MISSING_COMMAND',
-    message: `Missing URL or command. Run ${bin} --help for usage.`,
-    suggestions: [`Pass a URL: ${bin} https://example.com`, `Or a command: ${bin} list`],
-  };
+function isPruneCounts(data: unknown): data is { prunedCount: number; candidateCount: number } {
+  if (!data || typeof data !== 'object') return false;
+  const d = data as { prunedCount?: unknown; candidateCount?: unknown };
+  return typeof d.prunedCount === 'number' && typeof d.candidateCount === 'number';
 }
 
 /**

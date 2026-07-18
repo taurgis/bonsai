@@ -1,7 +1,7 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
-import { buildCliErrorEnvelope, missingCommandDetails } from '../../lib/envelope.js';
-import { findSwallowedUrlFlag } from '../../lib/argv.js';
+import { buildCliErrorEnvelope } from '../../lib/envelope.js';
+import { findSwallowedUrlFlag, missingCommandDetails } from '../../lib/argv.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
 /**

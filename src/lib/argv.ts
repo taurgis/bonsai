@@ -1,23 +1,49 @@
-import { buildCliErrorEnvelope, missingCommandDetails } from './envelope.js';
+import { buildCliErrorEnvelope } from './envelope.js';
 
 export interface NormalizationResult {
   /** The normalized argv array to set on process.argv. */
   argv: string[];
-  /** Optional metadata indicating the shim should exit early with a JSON envelope. */
-  exitWithJson?: {
+  /**
+   * Exit before oclif runs. Used for flag-only / bare `--json` usage errors so human and JSON
+   * callers share one path (no "leave a flag token for command_not_found" hack).
+   */
+  earlyExit?: {
     exitCode: number;
     envelope: Record<string, unknown>;
+    json: boolean;
   };
 }
 
-/**
- * Normalizes process.argv (excluding Node executable and script path) so the
- * oclif pipeline sees one consistent command structure.
- */
-function missingUsageJsonExit(): NormalizationResult['exitWithJson'] {
+/** Shared MISSING_COMMAND copy for argv preflight and flag-only command_not_found. */
+export function missingCommandDetails(
+  bin: string,
+  swallowed?: { flag: string; url: string } | null
+): { message: string; code: 'MISSING_COMMAND'; suggestions: string[] } {
+  if (swallowed) {
+    return {
+      code: 'MISSING_COMMAND',
+      message: [
+        `Missing URL or command. ${swallowed.flag} consumed ${swallowed.url} as its value, so there was no URL left to fetch.`,
+        `Run ${bin} --help for usage.`,
+      ].join('\n'),
+      suggestions: [
+        `Pass the URL as the command (flags after): ${bin} ${swallowed.url}`,
+        `Or a named command: ${bin} list`,
+      ],
+    };
+  }
+  return {
+    code: 'MISSING_COMMAND',
+    message: `Missing URL or command. Run ${bin} --help for usage.`,
+    suggestions: [`Pass a URL: ${bin} https://example.com`, `Or a command: ${bin} list`],
+  };
+}
+
+function missingUsageExit(json: boolean): NonNullable<NormalizationResult['earlyExit']> {
   const details = missingCommandDetails('bonsai');
   return {
     exitCode: 2,
+    json,
     envelope: buildCliErrorEnvelope({
       command: 'bonsai',
       message: details.message,
@@ -81,15 +107,10 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   const onlyUsageFlags =
     rawArgv.length > 0 && rawArgv.every((arg) => arg === '--json' || GLOBAL_BOOLEAN_FLAGS.has(arg));
   if (onlyUsageFlags) {
-    // JSON callers get the envelope immediately. Human flag-only argv keeps a flag token so the
-    // command_not_found hook can emit MISSING_COMMAND (same wording as bare --json).
-    if (rawArgv.includes('--json')) {
-      return {
-        argv: ['--json'],
-        exitWithJson: missingUsageJsonExit(),
-      };
-    }
-    return { argv: [rawArgv.find((arg) => GLOBAL_BOOLEAN_FLAGS.has(arg))!] };
+    return {
+      argv: rawArgv.includes('--json') ? ['--json'] : [],
+      earlyExit: missingUsageExit(rawArgv.includes('--json')),
+    };
   }
 
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but

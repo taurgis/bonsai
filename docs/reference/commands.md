@@ -178,8 +178,9 @@ npx @taurgis/bonsai status <url> [flags]
 On a `miss`, `freshness` is `none`: no entry exists, so no freshness applies. `stale_grace` and
 `stale_expired` describe an entry that exists but has aged into the grace window or past it.
 A miss exits `1` with code `CACHE_MISS` but still returns `data` (and an array when multiple URLs are passed).
-In a multi-URL batch, an invalid or scheme-less later URL becomes an `error` row (exit `1`, code
-`INVALID_URL` / `MISSING_URL_SCHEME`) while prior hit/miss rows stay in `data` — same contract as `fetch`.
+In a multi-URL batch, an invalid or scheme-less later URL becomes a sparse `error` row
+(`{ status: "error", normalizedUrl, error }`, exit `1`, code `INVALID_URL` / `MISSING_URL_SCHEME`)
+while prior hit/miss rows stay in `data` — same keep-prior-hits contract as `fetch`.
 
 ---
 

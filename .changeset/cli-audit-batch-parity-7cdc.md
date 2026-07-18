@@ -2,4 +2,4 @@
 '@taurgis/bonsai': patch
 ---
 
-Improve CLI recovery UX and contract gaps from the end-to-end audit, then collapse the implementation: shared CACHE_MISS copy, `enrichRowErrorEnvelope` for all multi-URL `.error` rows, shared `missingCommandDetails` / `cliErrorFields`, prune overlay in the envelope module, and leading `--read-only`/`--plan` relocation like `--json`.
+Improve CLI recovery UX from the end-to-end audit, then collapse incidental complexity: shared CACHE_MISS copy and sparse `urlValidationErrorRow`, composed read overlays without reference-equality branching, `earlyExit` for flag-only argv (human + JSON), `missingCommandDetails` owned by argv, and prune partial-failure shaping in the envelope module.

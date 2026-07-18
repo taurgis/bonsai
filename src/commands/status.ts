@@ -1,7 +1,6 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { finalizeBatch, isBatchReadFailure } from '../lib/batch.js';
-import { cliErrorFields } from '../lib/envelope.js';
+import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
 import { getArtifactPath } from '../lib/research/storage.js';
 import {
   evaluateFreshness,
@@ -119,15 +118,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const results = this.mapUrlsAllowingBatchErrors(
       urls,
       (url) => this.checkSingleStatus(url, currentTime, { ttl, maxAge, tier }),
-      (url, err) => ({
-        cacheKey: '',
-        cachePath: '',
-        normalizedUrl: url,
-        status: 'error',
-        freshness: 'none',
-        action: 'none',
-        error: cliErrorFields(err),
-      })
+      urlValidationErrorRow
     );
     return finalizeBatch(results, isBatchReadFailure);
   }

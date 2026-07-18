@@ -179,8 +179,6 @@ describe('status JSON envelope shaping', () => {
         {
           status: 'error',
           normalizedUrl: 'not-a-url',
-          freshness: 'none',
-          action: 'none',
           error: { code: 'INVALID_URL', message: 'Invalid URL: not-a-url' },
         },
       ]);

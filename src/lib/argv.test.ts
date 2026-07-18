@@ -8,7 +8,8 @@ describe('normalizeArgv', () => {
       input: ['--json'],
       expected: {
         argv: ['--json'],
-        exitWithJson: {
+        earlyExit: {
+          json: true,
           exitCode: 2,
           envelope: {
             schemaVersion: 1,
@@ -167,7 +168,8 @@ describe('normalizeArgv', () => {
       input: ['--json', '--json'],
       expected: {
         argv: ['--json'],
-        exitWithJson: {
+        earlyExit: {
+          json: true,
           exitCode: 2,
           envelope: {
             schemaVersion: 1,
@@ -245,10 +247,30 @@ describe('normalizeArgv', () => {
       },
     },
     {
-      name: 'lone --read-only keeps a flag token for MISSING_COMMAND (no JSON early exit)',
+      name: 'lone --read-only triggers early human MISSING_COMMAND exit',
       input: ['--read-only'],
       expected: {
-        argv: ['--read-only'],
+        argv: [],
+        earlyExit: {
+          json: false,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
+          },
+        },
       },
     },
     {
@@ -256,7 +278,8 @@ describe('normalizeArgv', () => {
       input: ['--plan', '--json'],
       expected: {
         argv: ['--json'],
-        exitWithJson: {
+        earlyExit: {
+          json: true,
           exitCode: 2,
           envelope: {
             schemaVersion: 1,
@@ -283,10 +306,10 @@ describe('normalizeArgv', () => {
     it(tc.name, () => {
       const result = normalizeArgv(tc.input);
       expect(result.argv).toEqual(tc.expected.argv);
-      if (tc.expected.exitWithJson) {
-        expect(result.exitWithJson).toEqual(tc.expected.exitWithJson);
+      if (tc.expected.earlyExit) {
+        expect(result.earlyExit).toEqual(tc.expected.earlyExit);
       } else {
-        expect(result.exitWithJson).toBeUndefined();
+        expect(result.earlyExit).toBeUndefined();
       }
     });
   }

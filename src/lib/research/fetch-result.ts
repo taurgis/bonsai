@@ -120,20 +120,13 @@ export function buildFetchFailureResult(input: {
   fallbackGuidance?: FetchFailureGuidance;
 }) {
   const { bin, url, dryRun, err, fallbackGuidance } = input;
-  const guidance =
-    err.suggestions?.length || err.ref
-      ? { suggestions: err.suggestions, ref: err.ref }
-      : fallbackGuidance;
-  const error = cliErrorFields(err, 'FETCH_FAILED');
+  // Prefer the throw site's suggestions/ref; otherwise attach fetch-specific recovery hints.
+  const shaped = err.suggestions?.length || err.ref ? err : { ...err, ...fallbackGuidance };
   return {
     schemaVersion: 1,
     command: bin,
     dryRun,
-    error: {
-      ...error,
-      suggestions: guidance?.suggestions,
-      ref: guidance?.ref,
-    },
+    error: cliErrorFields(shaped, 'FETCH_FAILED'),
     cache: null,
     source: { url, normalizedUrl: null },
     content: null,

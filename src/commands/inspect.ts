@@ -1,7 +1,6 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { finalizeBatch, isBatchReadFailure } from '../lib/batch.js';
-import { cliErrorFields } from '../lib/envelope.js';
+import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
 import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
@@ -49,15 +48,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     const results = this.mapUrlsAllowingBatchErrors(
       this.parsedArgv,
       (url) => this.inspectOne(url),
-      (url, err) => ({
-        cacheKey: '',
-        cachePath: '',
-        normalizedUrl: url,
-        status: 'error' as const,
-        metadata: null,
-        sections: [] as SectionSummary[],
-        error: cliErrorFields(err),
-      })
+      urlValidationErrorRow
     );
     return finalizeBatch(results, isBatchReadFailure);
   }
