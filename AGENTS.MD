@@ -40,6 +40,19 @@ Development of Bonsai happens in this repository. Keep Bonsai implementation in 
 - Avoid interactive prompts in agent workflows. Support `--no-input` if prompts are introduced later.
 - Generate and ship `oclif.manifest.json` before publishing.
 
+## Naming conventions
+
+Keep identifiers predictable so juniors (and agents) can scan code without guessing. ESLint enforces the TypeScript identifier rules below via `@typescript-eslint/naming-convention`.
+
+- **Variables and parameters** — `camelCase`. Good: `cacheKey`, `dataDir`. Bad: `cache_key`, `DataDir`.
+- **Functions and methods** — `camelCase`, preferably verb-led. Good: `normalizeUrl`, `writeArtifact`. Bad: `NormalizeUrl`, `write_artifact`.
+- **Types, interfaces, and classes** — `PascalCase`. Good: `ResearchArtifact`, `SiteModule`. Bad: `researchArtifact`, `site_module`.
+- **Module-level constants** — `UPPER_CASE` for true constants; `camelCase` for exported singletons/modules. Good: `TIMEOUT_MS`, `salesforceDeveloper`. Bad: `timeoutMs` for a fixed limit, `SalesforceDeveloper` for a value export.
+- **Files and directories** — `kebab-case`. Good: `base-command.ts`. Bad: `baseCommand.ts`, `base_command.ts`.
+- **CLI flags** — `kebab-case`. Good: `--read-only`. Bad: `--readOnly`, `--read_only`.
+- **Environment variables** — `BONSAI_*` in `UPPER_CASE`. Good: `BONSAI_STORAGE`. Bad: `bonsaiStorage`, `BONSAI-storage`.
+- **Artifact / frontmatter fields** — `snake_case` (schema contract with on-disk YAML). Good: `source_url`, `cache_key`. Bad: renaming those fields to `sourceUrl` in the schema.
+
 ## Storage rules
 
 - Store durable research artifacts under oclif's data directory via `this.config.dataDir`.

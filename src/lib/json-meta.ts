@@ -3,7 +3,6 @@ import { buildEnvelope } from './envelope.js';
 
 /** Strip ANSI color codes so JSON help text stays machine-stable. */
 function stripAnsi(text: string): string {
-  // eslint-disable-next-line no-control-regex
   return text.replace(/\x1b\[[0-9;]*m/g, '');
 }
 
