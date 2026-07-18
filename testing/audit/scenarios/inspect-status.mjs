@@ -125,7 +125,10 @@ export default function register(harness, fixtures) {
     expect(env?.code === 'CACHE_MISS', 'code');
     expect(Array.isArray(env?.data) && env.data.length === 2, `data ${JSON.stringify(env?.data)}`);
     expect(env?.data?.[0]?.status === 'hit', `first ${env?.data?.[0]?.status}`);
-    expect(env?.data?.[0]?.metadata?.topic !== undefined || env?.data?.[0]?.metadata, 'hit metadata');
+    expect(
+      env?.data?.[0]?.metadata?.topic !== undefined || env?.data?.[0]?.metadata,
+      'hit metadata'
+    );
     expect(env?.data?.[1]?.status === 'miss', `second ${env?.data?.[1]?.status}`);
     expect(env?.data?.[1]?.metadata === null, 'miss metadata null');
   });
@@ -229,6 +232,8 @@ export default function register(harness, fixtures) {
     expect(r.exitCode === 1, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
     expect(env?.code === 'MISSING_URL_SCHEME', env?.code);
+    expect(env?.stderr?.includes('Code: MISSING_URL_SCHEME'), env?.stderr);
+    expect(env?.suggestions?.[0]?.includes('https://example.com/other'), env?.suggestions);
     expect(env?.data?.[0]?.status === 'hit', 'first hit kept');
     expect(env?.data?.[0]?.metadata, 'hit metadata kept');
     expect(env?.data?.[1]?.error?.code === 'MISSING_URL_SCHEME', JSON.stringify(env?.data?.[1]));
