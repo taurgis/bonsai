@@ -89,6 +89,7 @@ function emitJsonError(
 ): Record<string, unknown> {
   const envelope = buildCliErrorEnvelope({ command, message, code, suggestions });
   process.exitCode = 2;
+  if (envelope.stderr) process.stderr.write(`${String(envelope.stderr)}\n`);
   console.log(JSON.stringify(envelope, null, 2));
   return envelope;
 }

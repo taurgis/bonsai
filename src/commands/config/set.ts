@@ -54,6 +54,11 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
       this.error(`Missing required argument: value for key "${keyArg}"`, {
         exit: 2,
         code: 'MISSING_ARGUMENT',
+        suggestions: [
+          meta.values
+            ? `Use one of: ${meta.values.join(', ')}`
+            : `Provide a value for ${keyArg}: ${meta.description}`,
+        ],
       });
     }
     const parsed = meta.parseValue(valueArg);
@@ -62,6 +67,9 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
       this.error(`Invalid value "${valueArg}" for "${keyArg}". ${guidance}`, {
         exit: 2,
         code: 'INVALID_VALUE',
+        suggestions: meta.values?.map(
+          (value) => `Set ${keyArg}: ${this.config.bin} config set ${keyArg} ${value}`
+        ),
       });
     }
 

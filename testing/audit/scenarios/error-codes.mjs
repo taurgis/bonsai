@@ -22,6 +22,28 @@ export default function register(harness) {
     });
   }
 
+  function expectJsonStderr(name, args, code) {
+    check(name, () => {
+      const json = run([...args, '--json']);
+      const env = parseJson(json.stdout);
+      expect(Boolean(env), `stdout is not JSON:\n${json.stdout}`);
+      expect(env?.code === code, `json code ${env?.code}`);
+      expect(json.stderr.includes(`Code: ${code}`), `process stderr missing Code: ${code}`);
+      expect(json.stderr.includes(env.stderr), `process stderr missing envelope stderr:\n${json.stderr}`);
+    });
+  }
+
+  function expectJsonSuggestions(name, args, code) {
+    check(name, () => {
+      const json = run([...args, '--json']);
+      const env = parseJson(json.stdout);
+      expect(json.exitCode !== 0, `exit ${json.exitCode}`);
+      expect(env?.code === code, `json code ${env?.code}`);
+      expect(env?.suggestions?.length > 0, `missing suggestions for ${code}: ${env?.stderr}`);
+      expect(env?.stderr?.includes('Try this:'), `stderr missing Try this for ${code}: ${env?.stderr}`);
+    });
+  }
+
   expectCodeBothModes(
     'invalid enum flag value carries INVALID_FLAG_VALUE in both modes',
     ['list', '--artifact-type', 'bogus'],
@@ -95,6 +117,42 @@ export default function register(harness) {
     expect(human.stderr.includes('Limit must be between 1 and 100.'), human.stderr);
     expect(!human.stderr.includes('Parsing --limit'), human.stderr);
   });
+
+  expectJsonStderr(
+    'oclif parse errors keep human error text on process stderr under --json',
+    ['list', '--limit', '0'],
+    'INVALID_LIMIT'
+  );
+
+  expectJsonStderr(
+    'preflight usage errors keep human error text on process stderr under --json',
+    [],
+    'MISSING_COMMAND'
+  );
+
+  expectJsonStderr(
+    'command-not-found hook keeps human error text on process stderr under --json',
+    ['lisst'],
+    'COMMAND_NOT_FOUND'
+  );
+
+  expectJsonSuggestions(
+    'missing import input has actionable suggestions under --json',
+    ['import', 'https://example.com'],
+    'MISSING_INPUT'
+  );
+
+  expectJsonSuggestions(
+    'unknown config key has actionable suggestions under --json',
+    ['config', 'get', 'storag'],
+    'UNKNOWN_KEY'
+  );
+
+  expectJsonSuggestions(
+    'invalid config value has actionable suggestions under --json',
+    ['config', 'set', 'storage', 'bogus'],
+    'INVALID_VALUE'
+  );
 
   check('list --artifact-type section is rejected; help points at inspect', () => {
     const json = run(['list', '--artifact-type', 'section', '--json']);

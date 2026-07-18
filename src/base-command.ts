@@ -105,6 +105,26 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     return err?.oclif?.exit ?? err?.exitCode ?? 1;
   }
 
+  private static fallbackSuggestionsForCode(
+    code: string | undefined,
+    bin: string,
+    command: string
+  ): string[] | undefined {
+    const help = command === bin ? `${bin} --help` : `${bin} ${command} --help`;
+    switch (code) {
+      case 'UNKNOWN_FLAG':
+      case 'INVALID_FLAG_VALUE':
+      case 'MISSING_FLAG_VALUE':
+      case 'MISSING_ARGUMENT':
+      case 'UNEXPECTED_ARGUMENT':
+        return [`Check usage: ${help}`];
+      case 'INVALID_DURATION':
+        return ['Use a whole number plus a unit, e.g. 24h, 7d, or 6m.'];
+      default:
+        return undefined;
+    }
+  }
+
   /**
    * Align the process exit code with the code reported in the JSON envelope. oclif's default
    * `catch` sets `process.exitCode = err.exitCode ?? 1`, but oclif `CLIError`s carry their code in
@@ -114,7 +134,12 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    * the shared resolver so the framework's `??` keeps it, then defer to the default behavior.
    */
   public override async catch(
-    err: Error & { oclif?: { exit?: number }; exitCode?: number; code?: string }
+    err: Error & {
+      oclif?: { exit?: number };
+      exitCode?: number;
+      code?: string;
+      suggestions?: string[];
+    }
   ) {
     // Parse failures throw before `this.parse()` sets `parsed`, which makes oclif emit a spurious
     // [UnparsedCommand] warning to stderr even under `--json`. CLIParseError subclasses carry `parse`.
@@ -128,6 +153,13 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     if (err && typeof err === 'object' && !err.code) {
       const code = stableErrorCodeFrom(err);
       if (code) err.code = code;
+    }
+    if (err && typeof err === 'object' && err.code && !err.suggestions?.length) {
+      err.suggestions = BaseCommand.fallbackSuggestionsForCode(
+        err.code,
+        this.config.bin,
+        this.envelopeCommandId()
+      );
     }
     process.exitCode = process.exitCode ?? BaseCommand.exitCodeOf(err);
     return super.catch(err);
@@ -168,9 +200,17 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    */
   protected failInvalidUrl(url: string, message: string): never {
     if (looksLikeSchemelessUrl(url)) {
-      this.error(message, { exit: 2, code: 'MISSING_URL_SCHEME' });
+      this.error(message, {
+        exit: 2,
+        code: 'MISSING_URL_SCHEME',
+        suggestions: [`Use a full URL: https://${url}`],
+      });
     }
-    this.error(`Invalid URL: ${message}`, { exit: 2, code: 'INVALID_URL' });
+    this.error(`Invalid URL: ${message}`, {
+      exit: 2,
+      code: 'INVALID_URL',
+      suggestions: ['Provide a valid http:// or https:// URL.'],
+    });
   }
 
   /** Single source of truth for the `--json` envelope shape, shared by success and error output. */
@@ -256,10 +296,15 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     const code = stableErrorCodeFrom(e);
     const message =
       typeof e?.message === 'string' ? normalizeCliErrorMessage(e.message) : undefined;
+    const suggestions =
+      e.suggestions?.length
+        ? e.suggestions
+        : BaseCommand.fallbackSuggestionsForCode(code, this.config.bin, this.envelopeCommandId());
     const stderr =
-      message || code || e?.suggestions?.length || e?.ref
-        ? formatErrorForJson({ ...e, message, code })
+      message || code || suggestions?.length || e?.ref
+        ? formatErrorForJson({ ...e, message, code, suggestions })
         : String(err);
+    if (stderr) process.stderr.write(`${stderr}\n`);
     return buildEnvelope({
       command: this.envelopeCommandId(),
       ok: false,
@@ -267,7 +312,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       stderr,
       data: null,
       code,
-      suggestions: e.suggestions?.length ? e.suggestions : undefined,
+      suggestions,
       ref: e.ref,
     });
   }

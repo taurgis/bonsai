@@ -58,7 +58,8 @@ export default function register(harness, fixtures) {
     const env = parseJson(r.stdout);
     expect(env?.code === 'FETCH_FAILED', env?.code);
     expect(r.exitCode === env?.exitCode, 'process vs envelope exit');
-    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 80)}`);
+    expect(r.stderr.includes('Code: FETCH_FAILED'), `stderr: ${r.stderr.slice(0, 120)}`);
+    expect(r.stderr.includes(env.stderr), `stderr missing envelope stderr: ${r.stderr.slice(0, 120)}`);
   });
 
   check('fetch cached URL --json clean stderr', () => {

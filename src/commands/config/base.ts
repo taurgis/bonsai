@@ -1,4 +1,4 @@
-import { Command, Flags } from '@oclif/core';
+import { Command, Flags, toConfiguredId } from '@oclif/core';
 import { BaseCommand } from '../../base-command.js';
 import { isKnownKey, suggestKey, validKeysHint } from '../../lib/config/index.js';
 import type { ConfigKey, ConfigScope } from '../../lib/config/index.js';
@@ -33,16 +33,25 @@ export abstract class ConfigCommand<T extends typeof Command> extends BaseComman
     if (!isKnownKey(keyArg)) {
       const suggestion = suggestKey(keyArg);
       const hint = suggestion ? ` Did you mean: ${suggestion}?` : '';
+      const command = this.ctor.id ? toConfiguredId(this.ctor.id, this.config) : 'config';
       this.error(`Unknown config key: "${keyArg}".${hint} Valid keys: ${validKeysHint()}.`, {
         exit: 2,
         code: 'UNKNOWN_KEY',
+        suggestions: suggestion
+          ? [`Use "${suggestion}": ${this.config.bin} ${command} ${suggestion}`]
+          : [`Use one of: ${validKeysHint()}`],
       });
     }
   }
 
   protected requireConfigKey(key: string | undefined): asserts key is ConfigKey {
     if (!key) {
-      this.error('Missing required argument: key', { exit: 2, code: 'MISSING_ARGUMENT' });
+      const command = this.ctor.id ? toConfiguredId(this.ctor.id, this.config) : 'config';
+      this.error('Missing required argument: key', {
+        exit: 2,
+        code: 'MISSING_ARGUMENT',
+        suggestions: [`Choose a key: ${this.config.bin} ${command} storage`],
+      });
     }
     this.assertKnownKey(key);
   }

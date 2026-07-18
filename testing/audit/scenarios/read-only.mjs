@@ -132,7 +132,8 @@ export default function register(harness, fixtures) {
     const r = run(['https://example.com', '--read-only', '--ttl', 'garbage', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(parseJson(r.stdout)?.code === 'INVALID_DURATION', 'code');
-    expect(r.stderr === '', `unexpected stderr: ${r.stderr}`);
+    expect(r.stderr.includes('Code: INVALID_DURATION'), `unexpected stderr: ${r.stderr}`);
+    expect(!r.stderr.includes('Read-only mode active'), `misleading read-only warning: ${r.stderr}`);
   });
 
   check('fetch --read-only is accepted on a cache hit', () => {

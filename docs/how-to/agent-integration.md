@@ -60,6 +60,49 @@ text:
 | `2` | Usage error | Invalid flags, missing arguments, bad `--stdin` usage, an unknown command or typo, or a URL missing its `http://`/`https://` scheme. | Re-check `--help`; supply a full URL with a scheme. |
 | `5` | Offline stale warning | Remote unreachable; stale cache served from inside the grace window. | Content is usable but unverified. Pass `--allow-stale` to exit `0` instead. |
 
+## Stable error code catalog
+
+When a failure has a stable `code`, agents should branch on `code` first and
+`exitCode` second. New stable codes belong in this catalog before they ship.
+Some codes are intentionally shared across commands when the recovery action is
+the same; for example, `CONFLICTING_FLAGS` always means "choose one of the
+mutually exclusive options", regardless of which flags conflicted.
+
+| Code | Exit | Meaning | Typical recovery |
+| --- | ---: | --- | --- |
+| `CACHE_MISS` | `1` | `status`/`inspect` could not find a cached artifact. | Fetch or import the URL first. |
+| `COMMAND_NOT_FOUND` | `2` | Command or topic does not exist. | Use the suggested command or run `bonsai help`. |
+| `CONFIG_DIR_UNAVAILABLE` | `1` | User-level config directory is unavailable. | Use `--local` for project config. |
+| `CONFLICTING_FLAGS` | `2` | Mutually exclusive flags or source modes were combined. | Choose exactly one mode. |
+| `EMPTY_INPUT` | `2` | Import input was empty. | Provide non-empty Markdown. |
+| `FETCH_FAILED` | `1` | Network, HTTP, extraction, DNS, proxy, or SSRF runtime failure. | Check the URL/network, retry later, or import manually. |
+| `FILE_NOT_FOUND` | `2` | Import `--file` path does not exist. | Check the path or pipe content with `--stdin`. |
+| `FILE_TOO_LARGE` | `1` | Import file exceeds the 1 MiB limit. | Split or reduce the file. |
+| `INVALID_DURATION` | `2` | Duration flag is empty, malformed, or zero. | Use a value like `24h`, `7d`, or `6m`. |
+| `INVALID_FLAG_VALUE` | `2` | Flag value is not in the allowed set, or an empty URL filter was provided. | Use one of the values shown in the error. |
+| `INVALID_LIMIT` | `2` | `--limit` is not an integer from 1 to 100. | Pick an integer in range. |
+| `INVALID_URL` | `2` for single URL, `1` for multi-URL row failure | URL could not be parsed or uses an unsupported scheme. | Provide a valid `http://` or `https://` URL. |
+| `INVALID_VALUE` | `2` | Config value is not valid for the selected key. | Use one of the listed values. |
+| `IO_ERROR` | `1` | Import failed while reading stdin or a file. | Check permissions or retry with a different input source. |
+| `META_RENDER_FAILED` | `1` | JSON help/version rendering failed before command execution. | Retry without meta flags or report a CLI bug. |
+| `MISSING_ARGUMENT` | `2` | Required command argument is absent. | Check command usage. |
+| `MISSING_COMMAND` | `2` | Invocation had no URL or command after global/meta flags were normalized. | Pass a URL or named command. |
+| `MISSING_FILTER` | `2` | `prune` was run without any pruning filter. | Add `--older-than`, `--inactive`, `--artifact-type`, or `--url`. |
+| `MISSING_FLAG_VALUE` | `2` | A flag that requires a value was provided without one. | Provide the value or remove the flag. |
+| `MISSING_INPUT` | `2` | `import` has no `--stdin` or `--file` input source. | Pipe Markdown, use `--file -`, or pass `--file notes.md`. |
+| `MISSING_STDIN` | `2` | `--stdin` was selected but no data arrived. | Pipe content or use `--file`. |
+| `MISSING_TOPIC` | `2` | Multi-source import lacks `--topic`. | Add a topic. |
+| `MISSING_URL` | `2` | Import has neither a positional URL nor `--source-url`. | Provide a source URL. |
+| `MISSING_URL_SCHEME` | `2` for single URL, `1` for multi-URL row failure | URL-like input omitted `http://` or `https://`. | Add the scheme. |
+| `NOT_A_FILE` | `2` | Import `--file` path is not a regular file. | Pass a Markdown file or pipe content. |
+| `PRUNE_PARTIAL_FAILURE` | `1` | Some prune candidates could not be deleted. | Inspect file permissions for the returned paths. |
+| `READ_ONLY_MODE` | `2` | A write-confirming flag was used while read-only/plan mode is active. | Preview instead or disable read-only mode. |
+| `SAFETY_CHECK_REQUIRED` | `2` | `prune` needs explicit `--dry-run` or `--yes`. | Preview first, then rerun with `--yes` if correct. |
+| `STDIN_TOO_LARGE` | `1` | Import stdin exceeds the 1 MiB limit. | Split or reduce the input. |
+| `UNEXPECTED_ARGUMENT` | `2` | Extra positional arguments were supplied. | Remove the extra argument or check usage. |
+| `UNKNOWN_FLAG` | `2` | Flag is not defined for the command. | Use the suggested flag or check help. |
+| `UNKNOWN_KEY` | `2` | Config key is not recognized. | Use the suggested key or one from the valid-key list. |
+
 ## A cache-first workflow
 
 Agents get the most value by fetching through Bonsai once they know the official URL:
