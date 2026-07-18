@@ -73,6 +73,30 @@ export default function register(harness, fixtures) {
 
     const list = run(['config', 'list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(list.exitCode === 0, `list exit ${list.exitCode}`);
-    expect(parseJson(list.stdout)?.data?.storage === 'project', 'project listed');
+    const entries = parseJson(list.stdout)?.data;
+    expect(
+      Array.isArray(entries) && entries.some((e) => e.key === 'storage' && e.value === 'project'),
+      'project listed'
+    );
+  });
+
+  check('config get --local unset reports configured:false under --json', () => {
+    const ws = createWorkspace();
+    const r = run(['config', 'get', 'storage', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const data = parseJson(r.stdout)?.data;
+    expect(data?.value === 'global', `value ${data?.value}`);
+    expect(data?.configured === false, `configured ${data?.configured}`);
+  });
+
+  check('config get --json --help uses nested command id', () => {
+    const r = run(['config', 'get', '--json', '--help']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.command === 'config get', `command ${env?.command}`);
+    expect(env?.data?.help?.includes('USAGE'), 'missing USAGE');
   });
 }

@@ -178,4 +178,19 @@ export default function register(harness, fixtures) {
     const inspect = run(['inspect', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(parseJson(inspect.stdout)?.data?.metadata, 'metadata present');
   });
+
+  check('inspect hit human output includes URL line', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-inspect-url-line';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Inspect URL line\n',
+    });
+    expect(imported.exitCode === 0, `import ${imported.exitCode}`);
+    const r = run(['inspect', url], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes(`URL:`), r.stdout.slice(0, 200));
+    expect(r.stdout.includes(url), r.stdout.slice(0, 300));
+  });
 }

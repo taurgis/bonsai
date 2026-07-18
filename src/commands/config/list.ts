@@ -1,11 +1,5 @@
 import { ConfigCommand, configScopeFlags } from './base.js';
-import {
-  ALL_KEYS,
-  KEY_META,
-  BUILT_IN_DEFAULTS,
-  readScopedConfig,
-  validKeysHint,
-} from '../../lib/config/index.js';
+import { formatConfigEntry, resolveConfigEntries, validKeysHint } from '../../lib/config/index.js';
 
 export default class ConfigList extends ConfigCommand<typeof ConfigList> {
   static id = 'config list';
@@ -36,22 +30,16 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
     this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
 
     const scope = this.readScope(this.flags.global, this.flags.local);
-    const scoped = readScopedConfig(scope, this.config.configDir, process.cwd());
+    const entries = resolveConfigEntries(scope, this.config.configDir, process.cwd());
 
     if (!this.jsonEnabled()) {
-      const width = Math.max(...ALL_KEYS.map((k) => k.length)) + 2;
-      for (const key of ALL_KEYS) {
-        const raw = scoped[key];
-        const formatted = raw !== undefined ? KEY_META[key].format(raw) : '(not configured)';
-        this.log(`${key.padEnd(width)}${formatted}`);
+      const width = Math.max(...entries.map((e) => e.key.length)) + 2;
+      for (const entry of entries) {
+        this.log(`${entry.key.padEnd(width)}${formatConfigEntry(entry, scope)}`);
       }
     }
 
-    const values: Record<string, unknown> = {};
-    for (const key of ALL_KEYS) {
-      const raw = scoped[key];
-      values[key] = raw !== undefined ? raw : BUILT_IN_DEFAULTS[key];
-    }
-    return values;
+    // Bare array — same shape as `list`'s data payload; no `{ entries }` wrapper.
+    return entries;
   }
 }

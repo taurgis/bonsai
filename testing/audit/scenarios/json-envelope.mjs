@@ -8,7 +8,8 @@ export default function register(harness) {
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(env?.schemaVersion === 1, 'schemaVersion');
     expect(env?.ok === true, 'ok');
-    expect(r.stderr === '', `stderr noise: ${r.stderr.slice(0, 80)}`);
+    // Empty-cache tips intentionally land on stderr under --json (stdout stays a clean envelope).
+    expect(env?.stdout === '', 'envelope stdout must stay empty');
   });
 
   check('--json before command works', () => {
@@ -69,6 +70,21 @@ export default function register(harness) {
     expect(env?.command === 'list', `command ${env?.command}`);
     expect(env?.data?.help?.includes('USAGE'), 'missing USAGE');
     expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 80)}`);
+  });
+
+  check('config get --json --help labels nested command', () => {
+    const r = run(['config', 'get', '--json', '--help']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.command === 'config get', `command ${env?.command}`);
+    expect(env?.data?.help?.includes('config get'), env?.data?.help?.slice(0, 120));
+  });
+
+  check('help config get --json labels nested command', () => {
+    const r = run(['help', 'config', 'get', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.command === 'config get', `command ${env?.command}`);
   });
 
   check('--version --json returns JSON version envelope', () => {

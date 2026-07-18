@@ -158,7 +158,7 @@ export function buildFetchFailureFromCaught(
     url,
     dryRun,
     err: { message, code: 'FETCH_FAILED' },
-    fallbackGuidance: fetchFailureGuidance(message, url),
+    fallbackGuidance: fetchFailureGuidance(message, url, bin),
   });
 }
 
@@ -188,12 +188,13 @@ export function describeError(err: unknown): string {
 // change. Resolutions mirror the published troubleshooting guide.
 export function fetchFailureGuidance(
   message: string,
-  url: string
+  url: string,
+  bin = 'bonsai'
 ): { suggestions: string[]; ref?: string } | undefined {
   const ref = 'https://bonsai.rhino-inquisitor.com/troubleshooting';
   // Name the pipe step explicitly: bare `import --stdin` blocks waiting for input, so a reader (or
   // an agent) running the hint verbatim would hang. Show the content being piped in from a file.
-  const importHint = `Open it in a browser, save the page, then import it: cat page.md | bonsai import ${url} --stdin`;
+  const importHint = `Open it in a browser, save the page, then import it: cat page.md | ${bin} import ${url} --stdin`;
 
   // 401/403: an auth wall or anti-scraping WAF. Bonsai has no authenticated-fetch path in v1.
   if (/failed with status 40[13]\b/.test(message)) {

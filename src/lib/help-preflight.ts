@@ -1,32 +1,17 @@
 import { Config } from '@oclif/core';
-import { buildEnvelope } from './envelope.js';
+import { positionalArgvTokens } from './argv.js';
+import { buildCliErrorEnvelope } from './envelope.js';
 import { buildCommandNotFoundDetails } from '../hooks/command-not-found/suggest.js';
 
-type UnknownHelpResult =
-  | {
-      exitCode: 2;
-      kind: 'human';
-      message: string;
-    }
-  | {
-      envelope: Record<string, unknown>;
-      exitCode: 2;
-      kind: 'json';
-    };
+/** Always an envelope — human and JSON share one formatted stderr (Code + Try this). */
+export type UnknownHelpResult = {
+  exitCode: 2;
+  envelope: Record<string, unknown>;
+  json: boolean;
+};
 
 function commandId(parts: readonly string[]): string {
   return parts.join(':');
-}
-
-function positionalTokens(argv: readonly string[]): string[] {
-  const tokens: string[] = [];
-  for (const arg of argv) {
-    if (arg === '--') break;
-    if (arg === '--help' || arg === '--json') continue;
-    if (arg.startsWith('-')) continue;
-    tokens.push(arg);
-  }
-  return tokens;
 }
 
 function commandPrefixLength(tokens: readonly string[], config: Config): number {
@@ -67,7 +52,7 @@ export async function tryUnknownHelpOutput(
 ): Promise<UnknownHelpResult | null> {
   if (!argv.includes('--help')) return null;
 
-  const tokens = positionalTokens(argv);
+  const tokens = positionalArgvTokens(argv);
   if (tokens.length === 0) return null;
 
   const config = await Config.load({ root });
@@ -75,24 +60,14 @@ export async function tryUnknownHelpOutput(
 
   const attemptedId = commandId(tokens);
   const details = buildCommandNotFoundDetails(attemptedId, [...argv], config);
-  if (argv.includes('--json')) {
-    return {
-      kind: 'json',
-      exitCode: 2,
-      envelope: buildEnvelope({
-        command: details.command,
-        ok: false,
-        exitCode: 2,
-        stderr: `${details.message}\nCode: ${details.code}`,
-        data: null,
-        code: details.code,
-      }),
-    };
-  }
-
   return {
-    kind: 'human',
     exitCode: 2,
-    message: `${details.message}\nCode: ${details.code}`,
+    json: argv.includes('--json'),
+    envelope: buildCliErrorEnvelope({
+      command: details.command,
+      message: details.message,
+      code: details.code,
+      suggestions: details.suggestions,
+    }),
   };
 }

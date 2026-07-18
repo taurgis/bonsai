@@ -37,6 +37,12 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'INVALID_DURATION', 'code');
   });
 
+  check('prune empty --url is INVALID_FLAG_VALUE', () => {
+    const r = run(['prune', '--url', '', '--dry-run', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
+  });
+
   check('prune --dry-run --older-than 90d --json ok', () => {
     const r = run(['prune', '--older-than', '90d', '--dry-run', '--json']);
     const env = parseJson(r.stdout);

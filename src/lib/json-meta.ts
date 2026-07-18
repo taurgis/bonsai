@@ -1,4 +1,5 @@
 import { Config, Help, toConfiguredId } from '@oclif/core';
+import { positionalArgvTokens } from './argv.js';
 import { buildEnvelope } from './envelope.js';
 
 /** Strip ANSI color codes so JSON help text stays machine-stable. */
@@ -23,23 +24,20 @@ class CaptureHelp extends Help {
   }
 }
 
-function helpSubject(argv: readonly string[]): string | undefined {
-  for (const arg of argv) {
-    if (arg === '--' || arg === '--help' || arg === 'help') continue;
-    if (arg.startsWith('-')) return;
-    return arg;
-  }
-  return undefined;
-}
-
 function envelopeCommandId(config: Config, argv: readonly string[]): string {
-  const subject = helpSubject(argv);
-  if (!subject) return config.bin;
-  const command = config.findCommand(subject);
-  if (command?.id) return toConfiguredId(command.id, config);
-  const topic = config.findTopic(subject);
+  const tokens = positionalArgvTokens(argv);
+  if (tokens.length === 0) return config.bin;
+
+  // Longest matching command id wins (`config:get` over topic `config`).
+  for (let n = tokens.length; n >= 1; n--) {
+    const id = tokens.slice(0, n).join(':');
+    const command = config.findCommand(id);
+    if (command?.id) return toConfiguredId(command.id, config);
+  }
+
+  const topic = config.findTopic(tokens[0]!);
   if (topic) return topic.name;
-  return subject;
+  return tokens[0]!;
 }
 
 /**

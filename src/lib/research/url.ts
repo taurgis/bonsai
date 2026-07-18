@@ -174,6 +174,18 @@ export function artifactMatchesUrlFilter(
 }
 
 /**
+ * Reject empty/whitespace `--url` globs on list/prune. Almost always a shell-quoting mistake;
+ * matching the empty string silently would look like "no results" instead of bad input.
+ */
+export function emptyUrlFilterError(url: string | undefined): string | undefined {
+  if (url === undefined) return undefined;
+  if (url.trim() === '') {
+    return '--url must be a non-empty glob pattern (e.g. "https://react.dev/*").';
+  }
+  return undefined;
+}
+
+/**
  * Checks if a filename matches the standard research note naming pattern.
  */
 export function isResearchFile(file: string): boolean {

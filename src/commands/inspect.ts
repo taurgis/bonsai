@@ -85,6 +85,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     const sections = this.findSections(roots.readRoots, cacheKey);
 
     if (!this.jsonEnabled()) {
+      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(normalizedUrl)}`);
       this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
       this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
       this.logMetadata(cached.metadata);

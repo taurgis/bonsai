@@ -138,7 +138,7 @@
       "pluginName": "@taurgis/bonsai",
       "pluginType": "core",
       "strict": false,
-      "summary": "An advanced, locally cached web research tool optimized for LLM ingestion.",
+      "summary": "Fetch and cache a URL as research Markdown for LLM ingestion.",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
@@ -151,7 +151,7 @@
           "required": false
         }
       },
-      "description": "Accepts a synthesized Markdown note via stdin and registers it under the single target URL or multiple source URLs.",
+      "description": "Accepts a synthesized Markdown note via stdin or --file and registers it under the single target URL or multiple source URLs.",
       "examples": [
         {
           "description": "import detailed research for a single URL via stdin",
@@ -194,6 +194,7 @@
           "type": "boolean"
         },
         "file": {
+          "char": "f",
           "description": "path to a Markdown file containing research notes to import, or \"-\" for stdin",
           "name": "file",
           "hasDynamicHelp": false,
@@ -457,7 +458,7 @@
     "prune": {
       "aliases": [],
       "args": {},
-      "description": "Prunes cached research entries based on age, inactivity, or artifact type to free up disk space.",
+      "description": "Prunes cached research entries based on age, inactivity, URL glob, or artifact type to free up disk space.",
       "examples": [
         {
           "description": "perform a dry run of pruning entries older than 90 days",

@@ -11,7 +11,7 @@ import {
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
-import { artifactMatchesUrlFilter } from '../lib/research/url.js';
+import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
@@ -150,19 +150,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   }
 
   private logListResults(finalResults: any[], totalMatched: number): void {
-    if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
-      if (this.hasActiveFilters()) {
-        this.log('No cached research entries match the given filters.');
-        this.log(
-          `\nTip: try relaxing filters, or list everything: ${colors.cyan(this.config.bin + ' list')}`
-        );
-      } else {
-        this.log('No cached research entries found.');
-        this.log(`\nTip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`);
-      }
+      this.emitEmptyListGuidance();
       return;
     }
+    if (this.jsonEnabled()) return;
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);
     finalResults.forEach((res, index) => {
       const topicStr = res.topic ? colors.cyan(res.topic) : colors.gray(NO_TOPIC_LABEL);
@@ -185,7 +177,29 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
   }
 
+  /** Empty-cache / no-match tip. Under --json, warn on stderr so the stdout envelope stays clean. */
+  private emitEmptyListGuidance(): void {
+    const filtered = this.hasActiveFilters();
+    const headline = filtered
+      ? 'No cached research entries match the given filters.'
+      : 'No cached research entries found.';
+    const tipCmd = filtered ? `${this.config.bin} list` : `${this.config.bin} <url>`;
+    const tipLead = filtered
+      ? 'try relaxing filters, or list everything: '
+      : 'populate the cache first: ';
+
+    if (this.jsonEnabled()) {
+      this.warn(`${headline} ${tipLead.charAt(0).toUpperCase()}${tipLead.slice(1)}${tipCmd}`);
+      return;
+    }
+    this.log(headline);
+    this.log(`\nTip: ${tipLead}${colors.cyan(tipCmd)}`);
+  }
+
   async run(): Promise<unknown> {
+    const urlErr = emptyUrlFilterError(this.flags.url);
+    if (urlErr) this.error(urlErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
+
     const roots = loadStoreRoots({
       configDir: this.config.configDir,
       cwd: process.cwd(),
