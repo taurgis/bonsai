@@ -6,13 +6,14 @@ import { enrichPrunePartialEnvelope } from '../lib/envelope.js';
 import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { parseTtlToMs } from '../lib/research/freshness.js';
-import { ARTIFACT_TYPES } from '../lib/research/schema.js';
+import { ARTIFACT_TYPES, type ResearchArtifactMetadata } from '../lib/research/schema.js';
 import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
 import { pruneFlagError } from '../lib/prune-flags.js';
 import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
-import { pruneWriteStatus } from '../lib/research/persist-artifact.js';
+import { pruneWriteStatus } from '../lib/write-status.js';
+import type { PruneCandidate, PruneWriteResult } from '../lib/cli-result-types.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
@@ -83,7 +84,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     if (err) this.error(err.message, { exit: 2, code: err.code, suggestions: err.suggestions });
   }
 
-  private shouldPrune(meta: any, currentTime: Date): boolean {
+  private shouldPrune(meta: ResearchArtifactMetadata, currentTime: Date): boolean {
     if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
       return false;
     }
@@ -111,9 +112,9 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
   // Prune across every read root (project + global). No cross-root dedup: each file is a distinct
   // deletion target, so a cache key present in both locations is pruned in both.
-  private findPruneCandidates(readRoots: string[], currentTime: Date): any[] {
+  private findPruneCandidates(readRoots: string[], currentTime: Date): PruneCandidate[] {
     return readRoots.flatMap((dataDir) =>
-      scanCacheDir(join(dataDir, 'research'), (artifact, filePath) => {
+      scanCacheDir(join(dataDir, 'research'), (artifact, filePath): PruneCandidate | null => {
         if (!this.shouldPrune(artifact.metadata, currentTime)) return null;
         return {
           cacheKey: artifact.metadata.cache_key,
@@ -125,7 +126,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     );
   }
 
-  private deletePruneCandidates(filesToPrune: any[]): number {
+  private deletePruneCandidates(filesToPrune: PruneCandidate[]): number {
     let prunedCount = 0;
     for (const f of filesToPrune) {
       try {
@@ -138,7 +139,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     return prunedCount;
   }
 
-  async run(): Promise<unknown> {
+  async run(): Promise<PruneWriteResult> {
     this.validatePruneFlags();
 
     const roots = loadStoreRoots({
@@ -203,7 +204,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
 /** Age in ms for prune filters. `content` prefers fetched_at; `idle` prefers validated_at. */
 function ageMs(
-  meta: { fetched_at?: string | null; validated_at?: string | null },
+  meta: Pick<ResearchArtifactMetadata, 'fetched_at' | 'validated_at'>,
   now: number,
   kind: 'content' | 'idle'
 ): number {

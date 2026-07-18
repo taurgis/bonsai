@@ -47,22 +47,3 @@ export function persistArtifact(opts: {
       : null,
   };
 }
-
-/** Cache status string for import JSON envelopes. */
-export function importCacheWriteStatus(dryRun: boolean): 'would_import' | 'imported' {
-  return dryRun ? 'would_import' : 'imported';
-}
-
-/** Config write status strings. */
-export function configWriteStatus(
-  dryRun: boolean,
-  action: 'set' | 'unset'
-): 'would_set' | 'set' | 'would_unset' | 'unset' {
-  if (action === 'set') return dryRun ? 'would_set' : 'set';
-  return dryRun ? 'would_unset' : 'unset';
-}
-
-/** Prune status strings. */
-export function pruneWriteStatus(dryRun: boolean): 'would_prune' | 'pruned' {
-  return dryRun ? 'would_prune' : 'pruned';
-}

@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { persistArtifact, importCacheWriteStatus, pruneWriteStatus } from './persist-artifact.js';
+import { persistArtifact } from './persist-artifact.js';
+import { importCacheWriteStatus, pruneWriteStatus } from '../write-status.js';
 import { resolveStoreRoots } from './store-roots.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 

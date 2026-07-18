@@ -6,13 +6,8 @@ import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
 import { formatHumanField } from '../lib/cli-presentation.js';
-
-interface SectionSummary {
-  cacheKey: string;
-  anchor: string | null;
-  headingPath: string | null;
-  tokenEstimate: { compressed: number | null; detailed: number | null };
-}
+import type { ResearchArtifactMetadata } from '../lib/research/schema.js';
+import type { InspectRow, InspectSectionRow } from '../lib/cli-result-types.js';
 
 export default class ResearchInspect extends BaseCommand<typeof ResearchInspect> {
   static id = 'inspect';
@@ -55,12 +50,12 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     return finalizeBatch(results, isBatchReadFailure);
   }
 
-  private inspectOne(url: string) {
+  private inspectOne(url: string): InspectRow {
     const target = this.resolveResearchTargetOrFail(url);
     return target.located ? this.hitResult(target) : this.missResult(target);
   }
 
-  private missResult(target: ResolvedResearchTarget) {
+  private missResult(target: ResolvedResearchTarget): InspectRow {
     const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
     if (!this.jsonEnabled()) {
       for (const line of formatCacheTargetHeader(
@@ -78,13 +73,13 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       cacheKey: target.cacheKey,
       cachePath: artifactPath,
       normalizedUrl: target.normalizedUrl,
-      status: 'miss' as const,
+      status: 'miss',
       metadata: null,
-      sections: [] as SectionSummary[],
+      sections: [],
     };
   }
 
-  private hitResult(target: ResolvedResearchTarget) {
+  private hitResult(target: ResolvedResearchTarget): InspectRow {
     const { cacheKey, located, roots, normalizedUrl } = target;
     const cached = located!.artifact;
     const artifactPath = located!.path;
@@ -104,13 +99,13 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       cacheKey,
       cachePath: artifactPath,
       normalizedUrl,
-      status: 'hit' as const,
+      status: 'hit',
       metadata: cached.metadata,
       sections,
     };
   }
 
-  private logMetadata(metadata: Record<string, any>): void {
+  private logMetadata(metadata: ResearchArtifactMetadata): void {
     this.log(colors.cyan(`--- Metadata ---`));
     for (const [key, val] of Object.entries(metadata)) {
       if (typeof val === 'object' && val !== null) {
@@ -121,7 +116,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     }
   }
 
-  private logSections(sections: SectionSummary[]): void {
+  private logSections(sections: InspectSectionRow[]): void {
     this.log(colors.cyan(`--- Sections (${sections.length}) ---`));
     for (const s of sections) {
       this.log(
@@ -131,8 +126,8 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   }
 
   // Section children link back via parent_cache_key; list the active ones for this page (T-22).
-  private findSections(readRoots: string[], parentKey: string): SectionSummary[] {
-    return scanCacheDirs<SectionSummary>(readRoots, (artifact) => {
+  private findSections(readRoots: string[], parentKey: string): InspectSectionRow[] {
+    return scanCacheDirs<InspectSectionRow>(readRoots, (artifact) => {
       const meta = artifact.metadata;
       if (meta.parent_cache_key !== parentKey || meta.status !== 'active') return null;
       return {

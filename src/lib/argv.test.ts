@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { FLAGS_WITH_VALUES, normalizeArgv, positionalArgvTokens } from './argv.js';
+import { normalizeArgv, positionalArgvTokens } from './argv.js';
+import { VALUE_TAKING_FLAG_TOKENS } from './cli-flag-manifest.js';
 
 describe('normalizeArgv', () => {
   const cases = [
@@ -362,7 +363,7 @@ describe('normalizeArgv', () => {
 
   for (const tc of cases) {
     it(tc.name, () => {
-      const result = normalizeArgv(tc.input);
+      const result = normalizeArgv(tc.input, { valueTakingFlags: VALUE_TAKING_FLAG_TOKENS });
       expect(result.argv).toEqual(tc.expected.argv);
       if (tc.expected.earlyExit) {
         expect(result.earlyExit).toEqual(tc.expected.earlyExit);
@@ -373,31 +374,26 @@ describe('normalizeArgv', () => {
   }
 });
 
-describe('FLAGS_WITH_VALUES', () => {
+describe('VALUE_TAKING_FLAG_TOKENS', () => {
   it('is derived from command metadata (includes known value-taking flags)', () => {
     // Derived at module load from command classes — assert the contract agents rely on,
     // not a hand-maintained duplicate list.
-    expect(FLAGS_WITH_VALUES.has('--topic')).toBe(true);
-    expect(FLAGS_WITH_VALUES.has('-t')).toBe(true);
-    expect(FLAGS_WITH_VALUES.has('--format')).toBe(true);
-    expect(FLAGS_WITH_VALUES.has('--file')).toBe(true);
-    expect(FLAGS_WITH_VALUES.has('-f')).toBe(true);
-    expect(FLAGS_WITH_VALUES.has('--url')).toBe(true);
-    expect(FLAGS_WITH_VALUES.has('--read-only')).toBe(false);
-    expect(FLAGS_WITH_VALUES.has('--json')).toBe(false);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--topic')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('-t')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--format')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--file')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('-f')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--url')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--read-only')).toBe(false);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--json')).toBe(false);
   });
 
   it('keeps value operands out of positional command tokens', () => {
     expect(
-      positionalArgvTokens([
-        'fetch',
-        'https://example.com',
-        '--format',
-        'detailed',
-        '--topic',
-        'Docs',
-        '--json',
-      ])
+      positionalArgvTokens(
+        ['fetch', 'https://example.com', '--format', 'detailed', '--topic', 'Docs', '--json'],
+        VALUE_TAKING_FLAG_TOKENS
+      )
     ).toEqual(['fetch', 'https://example.com']);
   });
 });

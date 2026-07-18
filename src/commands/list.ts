@@ -3,7 +3,11 @@ import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
-import { ARTIFACT_TYPES, CAPTURE_METHODS } from '../lib/research/schema.js';
+import {
+  ARTIFACT_TYPES,
+  CAPTURE_METHODS,
+  type ResearchArtifactMetadata,
+} from '../lib/research/schema.js';
 import {
   NO_TOPIC_LABEL,
   resultListHeading,
@@ -14,6 +18,7 @@ import { limitFlag } from '../lib/limit-flag.js';
 import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
+import type { ListRow } from '../lib/cli-result-types.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
 const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
@@ -77,18 +82,18 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static stdoutIsPrimaryData = true;
 
-  private matchesTopic(meta: any, topic: string | undefined): boolean {
+  private matchesTopic(meta: ResearchArtifactMetadata, topic: string | undefined): boolean {
     if (!topic) return true;
     return !!meta.topic && meta.topic.trim().toLowerCase() === topic.trim().toLowerCase();
   }
 
-  private matchesTags(meta: any, tags: string[] | undefined): boolean {
+  private matchesTags(meta: ResearchArtifactMetadata, tags: string[] | undefined): boolean {
     if (!tags || tags.length === 0) return true;
-    const metaTagsLower = (meta.tags || []).map((t: string) => t.toLowerCase());
-    return tags.every((t: string) => metaTagsLower.includes(t.toLowerCase()));
+    const metaTagsLower = meta.tags.map((t) => t.toLowerCase());
+    return tags.every((t) => metaTagsLower.includes(t.toLowerCase()));
   }
 
-  private matchesFilters(meta: any, freshness: string): boolean {
+  private matchesFilters(meta: ResearchArtifactMetadata, freshness: ListRow['freshness']): boolean {
     if (!this.matchesTopic(meta, this.flags.topic)) {
       return false;
     }
@@ -110,8 +115,8 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     return true;
   }
 
-  private scanCacheDirForList(readRoots: string[], currentTime: Date): any[] {
-    return scanCacheDirs(readRoots, (artifact, filePath) => {
+  private scanCacheDirForList(readRoots: string[], currentTime: Date): ListRow[] {
+    return scanCacheDirs(readRoots, (artifact, filePath): ListRow | null => {
       if (artifact.metadata.status !== 'active') return null;
       // Section children are sub-chunks of a page, not artifacts a user "has" — they would flood the
       // listing (one page yields dozens) and aren't in the documented source/research_note contract.
@@ -150,7 +155,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     );
   }
 
-  private logListResults(finalResults: any[], totalMatched: number): void {
+  private logListResults(finalResults: ListRow[], totalMatched: number): void {
     if (finalResults.length === 0) {
       this.emitEmptyListGuidance();
       return;
@@ -162,12 +167,12 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       const keyStr = colors.bold(res.cacheKey);
       this.log(`${index + 1}. [${topicStr}] Key: ${keyStr}`);
 
-      const freshnessColorMap: Record<string, (t: string) => string> = {
+      const freshnessColorMap: Record<ListRow['freshness'], (t: string) => string> = {
         fresh: colors.green,
         stale_grace: colors.yellow,
         stale_expired: colors.red,
       };
-      const freshnessColor = freshnessColorMap[res.freshness] || ((t: string) => t);
+      const freshnessColor = freshnessColorMap[res.freshness];
       const freshnessStr = freshnessColor(res.freshness);
 
       this.log(`   Type: ${colors.bold(res.artifactType)} | Freshness: ${freshnessStr}`);
@@ -197,7 +202,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     this.log(`\nTip: ${tipLead}${colors.cyan(tipCmd)}`);
   }
 
-  async run(): Promise<unknown> {
+  async run(): Promise<ListRow[]> {
     const urlErr = emptyUrlFilterError(this.flags.url);
     if (urlErr) this.error(urlErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
 

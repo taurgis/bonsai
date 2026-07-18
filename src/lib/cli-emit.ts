@@ -1,6 +1,6 @@
 import { buildEnvelope, buildCliErrorEnvelope } from './envelope.js';
 
-export interface JsonEmitOptions {
+export interface JsonEnvelopeParts {
   command: string;
   ok: boolean;
   exitCode: number;
@@ -11,12 +11,9 @@ export interface JsonEmitOptions {
   ref?: string;
 }
 
-/**
- * Single stdout/stderr writer for machine JSON envelopes. Used by BaseCommand.toErrorJson,
- * preflight exits in bin/cli.mjs, and the command-not-found hook so routing cannot drift.
- */
-export function emitJsonEnvelope(parts: JsonEmitOptions): Record<string, unknown> {
-  const envelope = buildEnvelope({
+/** Pure envelope builder — no I/O. */
+export function buildJsonEnvelope(parts: JsonEnvelopeParts): Record<string, unknown> {
+  return buildEnvelope({
     command: parts.command,
     ok: parts.ok,
     exitCode: parts.exitCode,
@@ -26,14 +23,29 @@ export function emitJsonEnvelope(parts: JsonEmitOptions): Record<string, unknown
     suggestions: parts.suggestions,
     ref: parts.ref,
   });
-  if (parts.stderr) process.stderr.write(`${parts.stderr}\n`);
-  // Callers that already print (oclif toErrorJson) pass printStdout: false via omit —
-  // default prints for preflight/hook paths.
-  return envelope;
 }
 
 export function printJsonEnvelope(envelope: Record<string, unknown>): void {
   console.log(JSON.stringify(envelope, null, 2));
+}
+
+/** Write stderr (if any) + stdout JSON, set exitCode, and exit. */
+export function writeJsonAndExit(envelope: Record<string, unknown>, exitCode: number): never {
+  process.exitCode = exitCode;
+  const message = String(envelope.stderr ?? '');
+  if (message) process.stderr.write(`${message}\n`);
+  printJsonEnvelope(envelope);
+  process.exit();
+}
+
+/**
+ * For BaseCommand.toErrorJson: write error lines to stderr and return the envelope object
+ * (oclif prints the return value to stdout).
+ */
+export function writeJsonErrorStderr(parts: JsonEnvelopeParts): Record<string, unknown> {
+  const envelope = buildJsonEnvelope(parts);
+  if (parts.stderr) process.stderr.write(`${parts.stderr}\n`);
+  return envelope;
 }
 
 export interface PreflightExit {
@@ -42,34 +54,31 @@ export interface PreflightExit {
   envelope: Record<string, unknown>;
 }
 
-/** Print a preflight usage/error result (JSON or human) and exit the process. */
+/** Print a preflight usage/error result (JSON or human) and exit. */
 export function exitWithPreflight(result: PreflightExit): never {
+  if (result.json) {
+    writeJsonAndExit(result.envelope, result.exitCode);
+  }
   process.exitCode = result.exitCode;
   const message = String(result.envelope.stderr ?? '');
-  if (result.json) {
-    if (message) console.error(message);
-    printJsonEnvelope(result.envelope);
-  } else if (message) {
+  if (message) {
     console.error(` ›   Error: ${message.replaceAll('\n', '\n ›   ')}`);
   }
   process.exit();
 }
 
-/** Build + emit a JSON error from the command-not-found hook (always usage exit 2). */
-export function emitCommandNotFoundJson(opts: {
+/** Command-not-found hook: always usage exit 2 with JSON envelope on stdout. */
+export function writeCommandNotFoundJsonAndExit(opts: {
   command: string;
   message: string;
   code: string;
   suggestions?: string[];
-}): Record<string, unknown> {
+}): never {
   const envelope = buildCliErrorEnvelope({
     command: opts.command,
     message: opts.message,
     code: opts.code,
     suggestions: opts.suggestions,
   });
-  process.exitCode = 2;
-  if (envelope.stderr) process.stderr.write(`${String(envelope.stderr)}\n`);
-  printJsonEnvelope(envelope);
-  return envelope;
+  writeJsonAndExit(envelope, 2);
 }

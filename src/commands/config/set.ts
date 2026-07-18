@@ -1,13 +1,10 @@
 import { Args, Flags } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import {
-  KEY_META,
-  writeUserConfig,
-  writeProjectConfig,
-  validKeysHint,
-} from '../../lib/config/index.js';
+import { KEY_META, validKeysHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
-import { configWriteStatus } from '../../lib/research/persist-artifact.js';
+import { persistConfigPatch } from '../../lib/config-persist.js';
+import { configWriteStatus } from '../../lib/write-status.js';
+import type { ConfigWriteResult } from '../../lib/cli-result-types.js';
 
 export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
   static id = 'config set';
@@ -45,7 +42,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
 
   static stdoutIsPrimaryData = true;
 
-  async run(): Promise<unknown> {
+  async run(): Promise<ConfigWriteResult> {
     const { keyArg, valueArg } = splitInlineKeyValue(this.args.key, this.args.value);
 
     this.validateConfigKeyAndScope(keyArg, this.flags.global, this.flags.local);
@@ -76,7 +73,6 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
 
     const scope = this.writeScope(this.flags.local);
     const formatted = meta.format(parsed);
-
     const dryRun = this.effectiveDryRun(this.flags['dry-run']);
     if (dryRun) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
@@ -89,24 +85,21 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
       };
     }
 
-    const patch = { [keyArg]: parsed } as Partial<ConfigValues>;
-    if (scope === 'project') {
-      writeProjectConfig(process.cwd(), patch);
-    } else {
-      const configDir = this.config.configDir;
-      if (!configDir) {
-        this.error(
-          'Could not determine user config directory. Use --local to write project config.',
-          {
-            exit: 1,
-            code: 'CONFIG_DIR_UNAVAILABLE',
-            suggestions: [
-              `Write project config instead: ${this.config.bin} config set <key> <value> --local`,
-            ],
-          }
-        );
-      }
-      writeUserConfig(configDir, patch);
+    const persisted = persistConfigPatch({
+      scope,
+      cwd: process.cwd(),
+      configDir: this.config.configDir,
+      patch: { [keyArg]: parsed } as Partial<ConfigValues>,
+      action: 'set',
+      bin: this.config.bin,
+      key: keyArg,
+    });
+    if (!persisted.ok) {
+      this.error(persisted.message, {
+        exit: 1,
+        code: persisted.code,
+        suggestions: persisted.suggestions,
+      });
     }
 
     if (!this.jsonEnabled()) this.log(`Set ${keyArg} = ${formatted} (${scope})`);
