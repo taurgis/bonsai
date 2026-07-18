@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runContract } from './runner.ts';
@@ -19,6 +19,33 @@ function contractWorkspace(prefix: string): string {
 }
 
 describe('research contract tests', () => {
+  it('shipped manifest includes aligned filters and inherited base flags', () => {
+    const manifest = JSON.parse(
+      readFileSync(new URL('../../oclif.manifest.json', import.meta.url), 'utf-8')
+    );
+
+    expect(manifest.commands.list.flags.url.description).toBe(
+      manifest.commands.prune.flags.url.description
+    );
+    expect(manifest.commands.list.flags['artifact-type'].options).toEqual([
+      'source',
+      'research_note',
+      'index',
+    ]);
+    expect(manifest.commands.prune.flags['artifact-type'].options).toEqual([
+      'source',
+      'research_note',
+      'index',
+      'section',
+    ]);
+
+    for (const id of ['config:get', 'config:list', 'config:set', 'config:unset']) {
+      expect(manifest.commands[id].flags.json.type).toBe('boolean');
+      expect(manifest.commands[id].flags['read-only'].type).toBe('boolean');
+      expect(manifest.commands[id].flags['read-only'].aliases).toContain('plan');
+    }
+  });
+
   it('bonsai --help exits 0 and lists top-level commands', () => {
     const result = runContract(['--help']);
     expect(result.exitCode).toBe(0);

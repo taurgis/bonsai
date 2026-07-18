@@ -195,13 +195,22 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
  */
 export function positionalArgvTokens(argv: readonly string[]): string[] {
   const tokens: string[] = [];
-  for (const arg of argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
     if (arg === '--') break;
     if (arg === '--help' || arg === '--json') continue;
-    if (arg.startsWith('-')) continue;
+    if (arg.startsWith('-')) {
+      if (valueFlagConsumesNextToken(arg)) i++;
+      continue;
+    }
     tokens.push(arg);
   }
   return tokens;
+}
+
+function valueFlagConsumesNextToken(arg: string): boolean {
+  if (arg.includes('=')) return false;
+  return FLAGS_WITH_VALUES.has(arg);
 }
 
 function looksLikeUrl(arg: string): boolean {

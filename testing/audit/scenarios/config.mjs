@@ -82,6 +82,16 @@ export default function register(harness, fixtures) {
     );
   });
 
+  check('config list --json data is a bare entries array', () => {
+    const ws = createWorkspace();
+    const r = run(['config', 'list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(Array.isArray(env?.data), 'config list data should be an array like list data');
+    expect(!Object.hasOwn(env?.data ?? {}, 'entries'), 'config list data should not wrap entries');
+    expect(env?.data?.some((entry) => entry.key === 'storage'), 'missing storage entry');
+  });
+
   check('config set/unset dry-run JSON exposes would_* status and skips writes', () => {
     const ws = createWorkspace();
     const set = run(['config', 'set', 'storage', 'project', '--local', '--dry-run', '--json'], {

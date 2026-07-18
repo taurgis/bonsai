@@ -95,6 +95,34 @@ export default function register(harness, fixtures) {
     expect(parseJson(status.stdout)?.code === 'CACHE_MISS', status.stdout);
   });
 
+  check('import then prune filters by source URL glob', () => {
+    const ws = createWorkspace();
+    const matchingUrl = 'https://example.com/audit-prune-url-align-hit';
+    const otherUrl = 'https://example.com/audit-prune-url-align-other';
+    for (const [url, topic] of [
+      [matchingUrl, 'Prune URL Align Hit'],
+      [otherUrl, 'Prune URL Align Other'],
+    ]) {
+      const imported = run(['import', url, '--stdin', '--topic', topic, '--json'], {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        input: `# ${topic}\n\nPrune URL filter fixture.\n`,
+      });
+      expect(imported.exitCode === 0, `import ${url} exit ${imported.exitCode}`);
+    }
+
+    const dryRun = run(
+      ['prune', '--url', 'https://example.com/audit-prune-url-align-hit*', '--dry-run', '--json'],
+      {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+      }
+    );
+    const files = parseJson(dryRun.stdout)?.data?.files;
+    expect(dryRun.exitCode === 0, `prune exit ${dryRun.exitCode}`);
+    expect(files?.length === 1, `expected one prune candidate, got ${files?.length}`);
+  });
+
   check('prune rejects zero-length --older-than as INVALID_DURATION', () => {
     const r = run(['prune', '--older-than', '0d', '--dry-run', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

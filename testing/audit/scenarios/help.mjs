@@ -102,6 +102,33 @@ export default function register(harness) {
     );
   });
 
+  check('list and prune share URL glob help semantics', () => {
+    const list = run(['list', '--help']);
+    const prune = run(['prune', '--help']);
+    const sharedCopy = 'source URL glob (case-insensitive, supports * wildcard)';
+    expect(list.exitCode === 0, `list exit ${list.exitCode}`);
+    expect(prune.exitCode === 0, `prune exit ${prune.exitCode}`);
+    expect(compact(list.stdout).includes(sharedCopy), 'list --url copy drifted');
+    expect(compact(prune.stdout).includes(sharedCopy), 'prune --url copy drifted');
+  });
+
+  check('config subcommand help includes inherited json and read-only flags', () => {
+    for (const cmd of [
+      ['config', 'get', '--help'],
+      ['config', 'list', '--help'],
+      ['config', 'set', '--help'],
+      ['config', 'unset', '--help'],
+    ]) {
+      const r = run(cmd);
+      const label = cmd.slice(0, -1).join(' ');
+      expect(r.exitCode === 0, `${label} exit ${r.exitCode}`);
+      expect(r.stdout.includes('--read-only'), `${label} missing inherited --read-only`);
+      expect(r.stdout.includes('(alias: --plan)'), `${label} missing --plan alias callout`);
+      expect(r.stdout.includes('GLOBAL FLAGS'), `${label} missing global flags section`);
+      expect(r.stdout.includes('--json'), `${label} missing inherited --json`);
+    }
+  });
+
   check('root -h exits 0 with COMMANDS', () => {
     const r = run(['-h']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
