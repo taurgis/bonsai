@@ -219,10 +219,61 @@ describe('normalizeArgv', () => {
       },
     },
     {
-      name: 'input containing only flags should not trigger fetch shorthand',
+      name: 'input containing only flags early-exits as MISSING_COMMAND',
       input: ['--topic', 'Docs'],
       expected: {
-        argv: ['--topic', 'Docs'],
+        argv: [],
+        earlyExit: {
+          json: false,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
+          },
+        },
+      },
+    },
+    {
+      name: 'value flag that swallows a URL early-exits with a targeted tip',
+      input: ['--tags', 'https://example.com/docs', '--json'],
+      expected: {
+        argv: ['--json'],
+        earlyExit: {
+          json: true,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. --tags consumed https://example.com/docs as its value, so there was no URL left to fetch.\n' +
+              'Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass the URL as the command (flags after): bonsai https://example.com/docs\n' +
+              '* Or a named command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: [
+              'Pass the URL as the command (flags after): bonsai https://example.com/docs',
+              'Or a named command: bonsai list',
+            ],
+          },
+        },
       },
     },
     {
@@ -298,6 +349,13 @@ describe('normalizeArgv', () => {
             suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
           },
         },
+      },
+    },
+    {
+      name: '--version is a root meta action and must not early-exit',
+      input: ['--version', '--json'],
+      expected: {
+        argv: ['--version', '--json'],
       },
     },
   ];

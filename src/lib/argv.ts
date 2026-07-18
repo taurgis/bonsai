@@ -14,7 +14,7 @@ export interface NormalizationResult {
   };
 }
 
-/** Shared MISSING_COMMAND copy for argv preflight and flag-only command_not_found. */
+/** Shared MISSING_COMMAND copy for flag-only argv preflight. */
 export function missingCommandDetails(
   bin: string,
   swallowed?: { flag: string; url: string } | null
@@ -36,20 +36,6 @@ export function missingCommandDetails(
     code: 'MISSING_COMMAND',
     message: `Missing URL or command. Run ${bin} --help for usage.`,
     suggestions: [`Pass a URL: ${bin} https://example.com`, `Or a command: ${bin} list`],
-  };
-}
-
-function missingUsageExit(json: boolean): NonNullable<NormalizationResult['earlyExit']> {
-  const details = missingCommandDetails('bonsai');
-  return {
-    exitCode: 2,
-    json,
-    envelope: buildCliErrorEnvelope({
-      command: 'bonsai',
-      message: details.message,
-      code: details.code,
-      suggestions: details.suggestions,
-    }),
   };
 }
 
@@ -103,16 +89,46 @@ export function findSwallowedUrlFlag(
   return null;
 }
 
-export function normalizeArgv(rawArgv: string[]): NormalizationResult {
-  const onlyUsageFlags =
-    rawArgv.length > 0 && rawArgv.every((arg) => arg === '--json' || GLOBAL_BOOLEAN_FLAGS.has(arg));
-  if (onlyUsageFlags) {
-    return {
-      argv: rawArgv.includes('--json') ? ['--json'] : [],
-      earlyExit: missingUsageExit(rawArgv.includes('--json')),
-    };
-  }
+function missingUsageExit(
+  json: boolean,
+  argv: readonly string[]
+): NonNullable<NormalizationResult['earlyExit']> {
+  const details = missingCommandDetails('bonsai', findSwallowedUrlFlag(argv));
+  return {
+    exitCode: 2,
+    json,
+    envelope: buildCliErrorEnvelope({
+      command: 'bonsai',
+      message: details.message,
+      code: details.code,
+      suggestions: details.suggestions,
+    }),
+  };
+}
 
+/**
+ * Index of the first positional command/URL token, skipping flags (and value-flag operands)
+ * plus root meta tokens that never name a command (`--help`, `--json`, globals).
+ */
+function firstPositionalIndex(argv: readonly string[]): number {
+  for (let i = 0; i < argv.length; i++) {
+    const token = argv[i]!;
+    if (token === '--help' || token === '--json' || GLOBAL_BOOLEAN_FLAGS.has(token)) continue;
+    if (token.startsWith('-')) {
+      if (FLAGS_WITH_VALUES.has(token)) i++;
+      continue;
+    }
+    return i;
+  }
+  return -1;
+}
+
+/** True when argv selects a command, URL, or root `--version` action (not flag-only usage). */
+function hasCommandToken(argv: readonly string[]): boolean {
+  return argv.includes('--version') || firstPositionalIndex(argv) !== -1;
+}
+
+export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but
   // `bonsai --json list` is otherwise parsed as an unknown command named
   // "--json". Collect every --json, append one copy after the command/URL, and
@@ -142,19 +158,7 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   // forms like `javascript:` or `data:` so fetch can reject unsupported protocols instead of oclif
   // reporting a misleading "command not found". If the invocation begins with a flag, allow common
   // flag-before-argument usage such as `bonsai --format detailed https://example.com`.
-  let firstNonFlagArgIndex = -1;
-  for (let i = 0; i < core.length; i++) {
-    const token = core[i]!;
-    if (token.startsWith('-')) {
-      if (FLAGS_WITH_VALUES.has(token)) {
-        i++; // skip the value
-      }
-      continue;
-    }
-    firstNonFlagArgIndex = i;
-    break;
-  }
-
+  const firstNonFlagArgIndex = firstPositionalIndex(core);
   const rootFetchShape = firstNonFlagArgIndex !== -1 && looksLikeUrl(core[firstNonFlagArgIndex]!);
   if (rootFetchShape) {
     const url = core[firstNonFlagArgIndex]!;
@@ -169,6 +173,16 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   if (helpRequested) core.push('--help');
   core.push(...relocatedGlobals);
   if (jsonMode) core.push('--json');
+
+  // Flag-only argv (`--json`, `--read-only`, `--tags https://…`) never resolves a command.
+  // Exit here so command_not_found does not special-case dash-prefixed ids.
+  // Empty argv and `--help`/`--version` stay with oclif.
+  if (!helpRequested && core.length > 0 && !hasCommandToken(core)) {
+    return {
+      argv: jsonMode ? ['--json'] : [],
+      earlyExit: missingUsageExit(jsonMode, rawArgv),
+    };
+  }
 
   return { argv: core };
 }

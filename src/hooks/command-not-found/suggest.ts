@@ -1,7 +1,6 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
 import { buildCliErrorEnvelope } from '../../lib/envelope.js';
-import { findSwallowedUrlFlag, missingCommandDetails } from '../../lib/argv.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
 /**
@@ -85,7 +84,7 @@ function isJsonMode(argv: string[] | undefined): boolean {
 function emitJsonError(
   command: string,
   message: string,
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT' | 'MISSING_COMMAND',
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT',
   suggestions?: string[]
 ): Record<string, unknown> {
   const envelope = buildCliErrorEnvelope({ command, message, code, suggestions });
@@ -99,7 +98,7 @@ export function buildCommandNotFoundDetails(
   argv: string[] | undefined,
   config: Interfaces.Config
 ): {
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT' | 'MISSING_COMMAND';
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT';
   command: string;
   jsonMode: boolean;
   message: string;
@@ -109,24 +108,10 @@ export function buildCommandNotFoundDetails(
   // (`fetch`, plugin internals). Root `--help` hides them; typo recovery should not.
   const commandIds = config.commandIDs;
 
-  // Flag-only argv (`bonsai --read-only`, `bonsai --tags https://…`) reaches command_not_found
-  // with the flag as the "command". That is missing usage, not an unknown command name.
-  if (id.startsWith('-')) {
-    // Prefer process.argv: oclif's hook argv may omit the flag token that became `id`.
-    const swallowed = findSwallowedUrlFlag(process.argv.slice(2)) ?? findSwallowedUrlFlag(argv);
-    const details = missingCommandDetails(config.bin, swallowed);
-    return {
-      code: details.code,
-      command: config.bin,
-      jsonMode: isJsonMode(argv),
-      message: details.message,
-      suggestions: details.suggestions,
-    };
-  }
-
   // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
   // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which
   // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
+  // Flag-only argv never reaches here — normalizeArgv early-exits those as MISSING_COMMAND.
   const bareUrl = bareUrlInput(id);
   if (bareUrl) {
     const suggestion = `${config.bin} https://${bareUrl}`;
