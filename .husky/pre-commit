@@ -7,16 +7,13 @@ pnpm lint-staged
 # Defaults to staged files only (see scripts/check-line-counts.ts).
 node scripts/check-line-counts.ts
 
-# Staged-only fallow gate: pipe the index diff so complexity/dead-code/dupes
-# are scoped to what is being committed (same staged-only idea as lint-staged
-# and line-counts), not the whole branch vs upstream. --gate new-only ignores
-# inherited findings. --max-crap 500 lifts CRAP here because it exceeds the
-# highest CRAP a function within the cyclomatic<=20 limit can reach
-# (20^2+20=420), so the fast commit gate relies on cyclomatic/cognitive and
-# never on estimated CRAP.
-if git diff --cached --name-only --diff-filter=ACMR | grep -qE '\.(ts|tsx|js|jsx|mjs|cjs)$'; then
-  git diff --cached | pnpm exec fallow audit --diff-stdin --gate new-only --max-crap 500 --format human
-fi
+# Block newly introduced complexity (cyclomatic/cognitive), dead code, and
+# duplication. --gate new-only ignores pre-existing findings so the team can
+# ratchet down. CRAP needs fresh coverage (see .fallowrc.jsonc + the pre-push
+# coverage gate); --max-crap 500 lifts it here because it exceeds the highest
+# CRAP a function within the cyclomatic<=20 limit can reach (20^2+20=420), so the
+# fast commit gate relies on cyclomatic/cognitive and never on estimated CRAP.
+pnpm exec fallow audit --gate new-only --max-crap 500 --format human
 
 # Keep the graphify knowledge graph (graphify-out/, tracked) current with the
 # code being committed — AST-only, zero API cost. Runs last so an aborted commit
