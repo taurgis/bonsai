@@ -34,9 +34,13 @@ logs/
 .vscode/
 .DS_Store
 
-# Nexus-installed agent instruction files
-.agents/
-.claude/
+# Nexus-installed agent instruction files (skills may be committed)
+.agents/*
+!.agents/skills/
+!.agents/skills/**
+.claude/*
+!.claude/skills/
+!.claude/skills/**
 .cursor/
 .github/agents/
 .github/instructions/
