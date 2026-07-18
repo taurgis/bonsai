@@ -4,6 +4,7 @@ import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib
 import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
+import { formatHumanField, formatHumanFields } from '../lib/cli-presentation.js';
 
 interface SectionSummary {
   cacheKey: string;
@@ -61,10 +62,14 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   private missResult(target: ResolvedResearchTarget) {
     const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
     if (!this.jsonEnabled()) {
-      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(target.normalizedUrl)}`);
-      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(target.cacheKey)}`);
-      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
-      this.log(`${colors.cyan('Status:'.padEnd(25))} ${colors.red('miss')}`);
+      for (const line of formatHumanFields([
+        ['URL', colors.bold(target.normalizedUrl)],
+        ['Cache Key', colors.bold(target.cacheKey)],
+        ['Cache Path', colors.gray(artifactPath)],
+        ['Status', colors.red('miss')],
+      ])) {
+        this.log(line);
+      }
       this.warn(`Cache miss — run: ${this.config.bin} ${target.normalizedUrl}`);
       if (this.parsedArgv.length > 1) this.log('='.repeat(40));
     }
@@ -85,9 +90,13 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     const sections = this.findSections(roots.readRoots, cacheKey);
 
     if (!this.jsonEnabled()) {
-      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(normalizedUrl)}`);
-      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
-      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      for (const line of formatHumanFields([
+        ['URL', colors.bold(normalizedUrl)],
+        ['Cache Key', colors.bold(cacheKey)],
+        ['Cache Path', colors.gray(artifactPath)],
+      ])) {
+        this.log(line);
+      }
       this.logMetadata(cached.metadata);
       if (sections.length) this.logSections(sections);
       if (this.parsedArgv.length > 1) this.log('='.repeat(40));
@@ -106,11 +115,10 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   private logMetadata(metadata: Record<string, any>): void {
     this.log(colors.cyan(`--- Metadata ---`));
     for (const [key, val] of Object.entries(metadata)) {
-      const paddedKey = colors.cyan((key + ':').padEnd(Math.max(25, key.length + 2)));
       if (typeof val === 'object' && val !== null) {
-        this.log(`${paddedKey} ${colors.bold(JSON.stringify(val))}`);
+        this.log(formatHumanField(key, colors.bold(JSON.stringify(val))));
       } else {
-        this.log(`${paddedKey} ${colors.bold(String(val))}`);
+        this.log(formatHumanField(key, colors.bold(String(val))));
       }
     }
   }

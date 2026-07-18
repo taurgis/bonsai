@@ -9,6 +9,7 @@ import {
 } from '../lib/research/freshness.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
 import { colors } from '../lib/color.js';
+import { CLI_FLAG_DESCRIPTIONS, formatHumanFields } from '../lib/cli-presentation.js';
 
 type CacheStatus = 'hit' | 'miss' | 'stale';
 // 'none' means no cache entry exists for the URL, so no freshness applies — distinct from
@@ -85,13 +86,12 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     // No default: omitting --tier evaluates against the artifact's stored tier. A default of
     // `standard` would silently re-grade stable/volatile entries and lie about planned action.
     tier: Flags.option({
-      description:
-        "freshness tier policy to evaluate against (default: the cached entry's own tier)",
+      description: CLI_FLAG_DESCRIPTIONS.statusFreshnessTierPolicy,
       options: ['stable', 'standard', 'volatile'] as const,
     })(),
     ttl: Flags.string({
       char: 'l',
-      description: 'custom TTL duration to evaluate against (e.g. "2h", "7d")',
+      description: CLI_FLAG_DESCRIPTIONS.statusTtl,
     }),
     'max-age': Flags.string({
       description: 'maximum age of cache to accept (e.g. "1d", "30d")',
@@ -189,12 +189,16 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
       result.action
     );
 
-    this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(normalizedUrl)}`);
-    this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
-    this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
-    this.log(`${colors.cyan('Status:'.padEnd(25))} ${statusColor(result.status)}`);
-    this.log(`${colors.cyan('Freshness:'.padEnd(25))} ${freshnessColor(result.freshness)}`);
-    this.log(`${colors.cyan('Action:'.padEnd(25))} ${actionColor(result.action)}`);
+    for (const line of formatHumanFields([
+      ['URL', colors.bold(normalizedUrl)],
+      ['Cache Key', colors.bold(cacheKey)],
+      ['Cache Path', colors.gray(artifactPath)],
+      ['Status', statusColor(result.status)],
+      ['Freshness', freshnessColor(result.freshness)],
+      ['Action', actionColor(result.action)],
+    ])) {
+      this.log(line);
+    }
     if (this.parsedArgv.length > 1) this.log('='.repeat(40));
   }
 }
