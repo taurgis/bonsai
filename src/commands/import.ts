@@ -59,6 +59,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       default: false,
     }),
     file: Flags.string({
+      char: 'f',
       description: 'path to a Markdown file containing research notes to import, or "-" for stdin',
     }),
     'input-format': Flags.option({

@@ -194,6 +194,7 @@
           "type": "boolean"
         },
         "file": {
+          "char": "f",
           "description": "path to a Markdown file containing research notes to import, or \"-\" for stdin",
           "name": "file",
           "hasDynamicHelp": false,

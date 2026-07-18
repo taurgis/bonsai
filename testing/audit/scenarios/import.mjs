@@ -115,6 +115,17 @@ export default function register(harness, fixtures) {
     expect(env?.data?.content?.includes('stdin placeholder'), 'content');
   });
 
+  check('import -f short form reads a file', () => {
+    const ws = createWorkspace();
+    const file = writeNote(ws.cwd, 'short.md', '# Short flag\n\nVia -f.\n');
+    const r = run(['import', 'https://example.com/import-f-short', '-f', file, '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.data?.cache?.status === 'imported', 'imported');
+  });
+
   check('import from file in workspace', () => {
     const ws = createWorkspace();
     const file = writeNote(ws.cwd, 'notes.md', '# File import\n\nFrom audit fixture.\n');

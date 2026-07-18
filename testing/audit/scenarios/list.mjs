@@ -25,6 +25,12 @@ export default function register(harness, fixtures) {
     expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 80)}`);
   });
 
+  check('list empty --url is INVALID_FLAG_VALUE', () => {
+    const r = run(['list', '--url', '', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
+  });
+
   check('list human empty cache message', () => {
     const r = run(['list']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);

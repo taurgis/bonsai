@@ -11,6 +11,7 @@ import {
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
+import { emptyUrlFilterError } from '../lib/url-filter-flag.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
 
@@ -195,6 +196,9 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   }
 
   async run(): Promise<unknown> {
+    const urlErr = emptyUrlFilterError(this.flags.url);
+    if (urlErr) this.error(urlErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
+
     const roots = loadStoreRoots({
       configDir: this.config.configDir,
       cwd: process.cwd(),

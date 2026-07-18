@@ -220,7 +220,11 @@ describe('config unset', () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const result = (await ConfigUnset.run(['storage', '--local'])) as any;
     expect(result).toMatchObject({ key: 'storage', scope: 'project', dryRun: false });
-    expect((await ConfigGet.run(['storage'])) as any).toEqual({ key: 'storage', value: 'global' });
+    expect((await ConfigGet.run(['storage'])) as any).toEqual({
+      key: 'storage',
+      value: 'global',
+      configured: true,
+    });
   });
 
   it('does not write on --dry-run', async () => {

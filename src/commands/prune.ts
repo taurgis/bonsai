@@ -8,6 +8,7 @@ import { parseTtlToMs, durationFlagError } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES } from '../lib/research/schema.js';
 import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
+import { emptyUrlFilterError } from '../lib/url-filter-flag.js';
 import { colors } from '../lib/color.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
@@ -65,24 +66,36 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static stdoutIsPrimaryData = true;
 
   private validatePruneFlags(): void {
+    const urlErr = emptyUrlFilterError(this.flags.url);
+    if (urlErr) this.error(urlErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
+    this.assertPruneHasFilter();
+    this.assertPruneMutationSafety();
+    this.assertPruneDurations();
+  }
+
+  private assertPruneHasFilter(): void {
     if (
-      !this.flags['older-than'] &&
-      !this.flags.inactive &&
-      !this.flags['artifact-type'] &&
-      !this.flags.url
+      this.flags['older-than'] ||
+      this.flags.inactive ||
+      this.flags['artifact-type'] ||
+      this.flags.url !== undefined
     ) {
-      this.error(
-        'Must specify at least one pruning filter: --older-than, --inactive, --artifact-type, or --url.',
-        {
-          exit: 2,
-          code: 'MISSING_FILTER',
-          suggestions: [
-            `Preview age-based pruning: ${this.config.bin} prune --older-than 90d --dry-run`,
-          ],
-        }
-      );
+      return;
     }
-    // Checked before the generic --dry-run/--yes conflict below so a combination like
+    this.error(
+      'Must specify at least one pruning filter: --older-than, --inactive, --artifact-type, or --url.',
+      {
+        exit: 2,
+        code: 'MISSING_FILTER',
+        suggestions: [
+          `Preview age-based pruning: ${this.config.bin} prune --older-than 90d --dry-run`,
+        ],
+      }
+    );
+  }
+
+  private assertPruneMutationSafety(): void {
+    // Checked before the generic --dry-run/--yes conflict so a combination like
     // `--dry-run --yes --read-only` reports the more specific READ_ONLY_MODE code, not
     // CONFLICTING_FLAGS — read-only mode is the more fundamental constraint being violated.
     if (this.readOnly && this.flags.yes) {
@@ -118,6 +131,9 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         }
       );
     }
+  }
+
+  private assertPruneDurations(): void {
     // Validate durations up front: scanCacheDir swallows per-file errors, so a malformed
     // --older-than/--inactive would otherwise be silently ignored and report "0 entries".
     for (const msg of [
