@@ -24,6 +24,9 @@ export default function register(harness) {
     for (const flag of ['--force', '--rendered', '--format', '--dry-run', '--read-only']) {
       expect(r.stdout.includes(flag), `missing ${flag} in fetch help`);
     }
+    // --plan is an alias of --read-only; help must surface it even though oclif omits aliases
+    // from the FLAGS column name.
+    expect(r.stdout.includes('(alias: --plan)'), 'missing --plan alias callout');
   });
 
   check('root -h exits 0 with COMMANDS', () => {

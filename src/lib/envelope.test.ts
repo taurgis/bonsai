@@ -57,6 +57,14 @@ describe('normalizeCliErrorMessage', () => {
     expect(normalizeCliErrorMessage('bad\nSee more help with --help')).toBe('bad');
     expect(normalizeCliErrorMessage('bad')).toBe('bad');
   });
+
+  it('unwraps oclif Parsing --flag wrappers', () => {
+    expect(
+      normalizeCliErrorMessage(
+        'Parsing --limit \n\tLimit must be between 1 and 100.\nSee more help with --help'
+      )
+    ).toBe('Limit must be between 1 and 100.');
+  });
 });
 
 describe('formatErrorForJson', () => {

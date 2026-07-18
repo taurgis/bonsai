@@ -7,6 +7,7 @@ import {
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
 } from './lib/envelope.js';
+import { enrichParseError } from './lib/parse-error-ux.js';
 import {
   resolveResearchTarget,
   type ResolveResearchTargetOptions,
@@ -34,8 +35,9 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       aliases: ['plan'],
       default: false,
       description:
-        'Block all filesystem writes/deletes (cache and config); network fetches still run. ' +
-        'Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.',
+        '(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches ' +
+        'still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent ' +
+        'read-only/plan modes.',
     }),
   };
 
@@ -111,11 +113,22 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    * the shared resolver so the framework's `??` keeps it, then defer to the default behavior.
    */
   public override async catch(
-    err: Error & { oclif?: { exit?: number }; exitCode?: number; code?: string }
+    err: Error & {
+      oclif?: { exit?: number };
+      exitCode?: number;
+      code?: string;
+      suggestions?: string[];
+      flags?: string[];
+      parse?: { input?: { flags?: Record<string, unknown> } };
+    }
   ) {
     // Parse failures throw before `this.parse()` sets `parsed`, which makes oclif emit a spurious
     // [UnparsedCommand] warning to stderr even under `--json`. CLIParseError subclasses carry `parse`.
     if (err && typeof err === 'object' && 'parse' in err) this.parsed = true;
+    // Clean oclif parse wrappers and attach typo tips before pretty-print / JSON formatting.
+    if (err && typeof err === 'object' && typeof err.message === 'string') {
+      enrichParseError(err);
+    }
     // Attach the stable code to the error itself so oclif's human pretty-print renders the same
     // `Code:` line that `--json` already reports via stableErrorCodeFrom. Without this, built-in
     // oclif parse errors (invalid enum value, missing arg, unknown flag) printed a code under

@@ -64,7 +64,8 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       options: ['fresh', 'stale_grace', 'stale_expired'] as const,
     })(),
     'artifact-type': Flags.option({
-      description: 'filter by artifact type',
+      description:
+        'filter by artifact type (section children are omitted from list — use inspect to see them)',
       options: LISTABLE_ARTIFACT_TYPES,
     })(),
     'capture-method': Flags.option({

@@ -86,6 +86,8 @@ describe('import command unit tests', () => {
     expect(result.cache.freshness).toBe('fresh');
     expect(result.source.url).toBe('https://example.com/import-test');
     expect(result.source.normalizedUrl).toBe('https://example.com/import-test');
+    expect(result.sourceUrls).toEqual(['https://example.com/import-test']);
+    expect(result.artifactType).toBe('source');
     expect(result.content).toBe('## Header\nMy detailed notes');
 
     readSpy.mockRestore();
@@ -112,7 +114,11 @@ describe('import command unit tests', () => {
     expect(result).toBeDefined();
     expect(result.schemaVersion).toBe(1);
     expect(result.cache.status).toBe('imported');
-    expect(result.source.normalizedUrl).toBe('');
+    expect(result.artifactType).toBe('research_note');
+    expect(result.topic).toBe('Multi Import Topic');
+    expect(result.sourceUrls).toEqual(['https://example.com/a', 'https://example.com/b']);
+    expect(result.source.url).toBeNull();
+    expect(result.source.normalizedUrl).toBeNull();
     expect(result.content).toBe('Compressed contents');
 
     readSpy.mockRestore();

@@ -32,7 +32,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -182,7 +182,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -318,7 +318,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -369,7 +369,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -410,7 +410,7 @@
           "type": "option"
         },
         "artifact-type": {
-          "description": "filter by artifact type",
+          "description": "filter by artifact type (section children are omitted from list — use inspect to see them)",
           "name": "artifact-type",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -485,7 +485,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -581,7 +581,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -651,7 +651,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -700,7 +700,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -761,7 +761,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -833,7 +833,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
@@ -906,7 +906,7 @@
           "aliases": [
             "plan"
           ],
-          "description": "Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
+          "description": "(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.",
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"

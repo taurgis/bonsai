@@ -59,4 +59,57 @@ export default function register(harness) {
     ['list', 'foo', 'bar', 'baz'],
     'UNEXPECTED_ARGUMENT'
   );
+
+  check('unknown flag typo suggests nearest flag in both modes', () => {
+    const human = run(['list', '--topc']);
+    expect(human.exitCode === 2, `human exit ${human.exitCode}`);
+    expect(human.stderr.includes('Did you mean --topic?'), human.stderr);
+    expect(human.stderr.includes('Code: UNKNOWN_FLAG'), human.stderr);
+
+    const json = run(['list', '--josn', '--json']);
+    // `--josn` is the typo; a trailing `--json` still enables the envelope. The unknown flag is --josn.
+    const env = parseJson(json.stdout);
+    expect(json.exitCode === 2, `json exit ${json.exitCode}`);
+    expect(env?.code === 'UNKNOWN_FLAG', env?.code);
+    expect(env?.stderr?.includes('Did you mean --json?'), env?.stderr);
+    expect(env?.suggestions?.includes('--json'), `suggestions ${env?.suggestions}`);
+  });
+
+  check('fetch flag typo suggests --format', () => {
+    const json = run(['https://example.com', '--fotmat', 'detailed', '--json']);
+    const env = parseJson(json.stdout);
+    expect(json.exitCode === 2, `exit ${json.exitCode}`);
+    expect(env?.code === 'UNKNOWN_FLAG', env?.code);
+    expect(env?.stderr?.includes('Did you mean --format?'), env?.stderr);
+  });
+
+  check('invalid limit message is unwrapped (no Parsing --limit wrapper)', () => {
+    const json = run(['list', '--limit', '0', '--json']);
+    const env = parseJson(json.stdout);
+    expect(json.exitCode === 2, `exit ${json.exitCode}`);
+    expect(env?.code === 'INVALID_LIMIT', env?.code);
+    expect(env?.stderr?.startsWith('Limit must be between 1 and 100.'), env?.stderr);
+    expect(!env?.stderr?.includes('Parsing --limit'), env?.stderr);
+
+    const human = run(['list', '--limit', '0']);
+    expect(human.stderr.includes('Limit must be between 1 and 100.'), human.stderr);
+    expect(!human.stderr.includes('Parsing --limit'), human.stderr);
+  });
+
+  check('list --artifact-type section tips inspect', () => {
+    const json = run(['list', '--artifact-type', 'section', '--json']);
+    const env = parseJson(json.stdout);
+    expect(json.exitCode === 2, `exit ${json.exitCode}`);
+    expect(env?.code === 'INVALID_FLAG_VALUE', env?.code);
+    expect(env?.stderr?.includes('Section artifacts are omitted from list'), env?.stderr);
+    expect(env?.suggestions?.some((s) => s.includes('inspect')), `suggestions ${env?.suggestions}`);
+  });
+
+  check('truncated freshness value suggests stale_* options', () => {
+    const json = run(['list', '--freshness', 'stale', '--json']);
+    const env = parseJson(json.stdout);
+    expect(json.exitCode === 2, `exit ${json.exitCode}`);
+    expect(env?.code === 'INVALID_FLAG_VALUE', env?.code);
+    expect(env?.stderr?.includes('Did you mean stale_grace or stale_expired?'), env?.stderr);
+  });
 }

@@ -105,7 +105,13 @@ export function buildCommandNotFoundDetails(
   suggestions?: string[];
 } {
   const hiddenIds = new Set(config.commands.filter((c) => c.hidden).map((c) => c.id));
-  const visibleIds = config.commandIDs.filter((commandId) => !hiddenIds.has(commandId));
+  // `fetch` is hidden so the root command list stays focused on the URL shorthand, but it remains a
+  // supported entry point (`bonsai fetch <url>`, `bonsai help fetch`). Include it in typo matching so
+  // `fetsh`/`fetchh` get a correction instead of a dead-end COMMAND_NOT_FOUND (clig.dev).
+  const suggestableHidden = new Set(['fetch']);
+  const visibleIds = config.commandIDs.filter(
+    (commandId) => !hiddenIds.has(commandId) || suggestableHidden.has(commandId)
+  );
 
   // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
   // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which
@@ -151,10 +157,18 @@ export function buildCommandNotFoundDetails(
   // is the floor, and a concrete "Did you mean …?" correction — when we have one — goes below it.
   const lines = [`${attempted} is not a ${config.bin} command.`];
   lines.push(`Run ${config.bin} help for a list of available commands.`);
-  const suggestions = suggestion
+  let suggestions = suggestion
     ? [`${config.bin} ${toConfiguredId(suggestion, config)}`]
     : undefined;
-  if (suggestion) lines.push(`Did you mean ${toConfiguredId(suggestion, config)}?`);
+  if (suggestion) {
+    const displaySuggestion = toConfiguredId(suggestion, config);
+    lines.push(`Did you mean ${displaySuggestion}?`);
+    // fetch is usually invoked as a bare URL; steer typos toward that headline form too.
+    if (suggestion === 'fetch') {
+      lines.push(`Or pass a URL directly: ${config.bin} https://example.com`);
+      suggestions = [`${config.bin} https://example.com`, `${config.bin} help fetch`];
+    }
+  }
 
   return {
     code: 'COMMAND_NOT_FOUND',
