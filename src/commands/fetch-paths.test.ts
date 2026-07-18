@@ -260,6 +260,20 @@ describe('fetch command branch coverage', () => {
     expect(leftover).toHaveLength(0);
   });
 
+  it('--dry-run still reports a secret redirect decision without writing either cache', async () => {
+    const secretMarkdown = 'token ghp_' + 'a'.repeat(36) + '\n\n' + LONG_MARKDOWN;
+    mocks.capturePage.mockResolvedValue(fakeCapture(secretMarkdown));
+
+    const result: any = await FetchCommand.run([TEST_URL, '--storage', 'project', '--dry-run']);
+
+    expect(result.dryRun).toBe(true);
+    expect(result.cache.status).toBe('would_fetch');
+    expect(result.cache.redirectedToGlobal).toBe(true);
+    expect(result.cache.path).toBe(getArtifactPath(await globalDataDir(), result.cache.key));
+    expect(existsSync(getArtifactPath(await globalDataDir(), result.cache.key))).toBe(false);
+    expect(existsSync(getArtifactPath(join(iso.cwd, '.bonsai'), result.cache.key))).toBe(false);
+  });
+
   it('--force: ignores a fresh cache entry and refetches (lookup disabled)', async () => {
     seedCachedArtifact(await globalDataDir(), new Date());
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));

@@ -421,7 +421,9 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
     if (writeResult.redirected) {
       this.warn(
-        `Detected ${writeResult.secretLabel} in the imported content; stored in the global cache instead of the project to avoid committing secrets.`
+        dryRun
+          ? `Detected ${writeResult.secretLabel} in the imported content; would store in the global cache instead of the project to avoid committing secrets.`
+          : `Detected ${writeResult.secretLabel} in the imported content; stored in the global cache instead of the project to avoid committing secrets.`
       );
     }
 

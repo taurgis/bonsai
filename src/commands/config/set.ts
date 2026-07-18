@@ -70,7 +70,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
 
     if (this.effectiveDryRun(this.flags['dry-run'])) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
-      return { key: keyArg, value: parsed, scope, dryRun: true };
+      return { key: keyArg, value: parsed, scope, dryRun: true, status: 'would_set' };
     }
 
     const patch = { [keyArg]: parsed } as Partial<ConfigValues>;
@@ -94,7 +94,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     }
 
     if (!this.jsonEnabled()) this.log(`Set ${keyArg} = ${formatted} (${scope})`);
-    return { key: keyArg, value: parsed, scope, dryRun: false };
+    return { key: keyArg, value: parsed, scope, dryRun: false, status: 'set' };
   }
 }
 

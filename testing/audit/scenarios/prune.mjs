@@ -48,6 +48,9 @@ export default function register(harness, fixtures) {
     const env = parseJson(r.stdout);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(env?.ok === true, 'ok false');
+    expect(env?.data?.dryRun === true, 'dryRun');
+    expect(env?.data?.status === 'would_prune', `status ${env?.data?.status}`);
+    expect(env?.data?.wouldPruneCount === env?.data?.candidateCount, 'wouldPruneCount');
   });
 
   check('prune --dry-run zero matches gives clean human message (no dangling colon)', () => {
@@ -73,6 +76,8 @@ export default function register(harness, fixtures) {
       xdg: ws.xdg,
     });
     expect(parseJson(dryRun.stdout)?.data?.candidateCount === 1, dryRun.stdout);
+    expect(parseJson(dryRun.stdout)?.data?.status === 'would_prune', dryRun.stdout);
+    expect(parseJson(dryRun.stdout)?.data?.wouldPruneCount === 1, dryRun.stdout);
 
     const pruned = run(['prune', '--url', url, '--yes', '--json'], {
       cwd: ws.cwd,
@@ -81,6 +86,8 @@ export default function register(harness, fixtures) {
     const env = parseJson(pruned.stdout);
     expect(pruned.exitCode === 0, `exit ${pruned.exitCode}`);
     expect(env?.data?.candidateCount === 1, `candidates ${env?.data?.candidateCount}`);
+    expect(env?.data?.status === 'pruned', `status ${env?.data?.status}`);
+    expect(env?.data?.wouldPruneCount === 0, `would ${env?.data?.wouldPruneCount}`);
     expect(env?.data?.prunedCount === 1, `pruned ${env?.data?.prunedCount}`);
 
     const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });

@@ -65,7 +65,9 @@ export default function register(harness, fixtures) {
       xdg: ws.xdg,
     });
     expect(set.exitCode === 0, `set exit ${set.exitCode}`);
-    expect(parseJson(set.stdout)?.data?.scope === 'project', 'project scope');
+    const setData = parseJson(set.stdout)?.data;
+    expect(setData?.scope === 'project', 'project scope');
+    expect(setData?.status === 'set', `status ${setData?.status}`);
 
     const get = run(['config', 'get', 'storage', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(get.exitCode === 0, `get exit ${get.exitCode}`);
@@ -78,6 +80,45 @@ export default function register(harness, fixtures) {
       Array.isArray(entries) && entries.some((e) => e.key === 'storage' && e.value === 'project'),
       'project listed'
     );
+  });
+
+  check('config set/unset dry-run JSON exposes would_* status and skips writes', () => {
+    const ws = createWorkspace();
+    const set = run(['config', 'set', 'storage', 'project', '--local', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const setData = parseJson(set.stdout)?.data;
+    expect(set.exitCode === 0, `set exit ${set.exitCode}`);
+    expect(setData?.dryRun === true, 'set dryRun');
+    expect(setData?.status === 'would_set', `set status ${setData?.status}`);
+
+    const stillDefault = run(['config', 'get', 'storage', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(stillDefault.stdout)?.data?.configured === false, 'set dry-run skipped write');
+
+    const seed = run(['config', 'set', 'storage', 'project', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(seed.exitCode === 0, `seed exit ${seed.exitCode}`);
+
+    const unset = run(['config', 'unset', 'storage', '--local', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const unsetData = parseJson(unset.stdout)?.data;
+    expect(unset.exitCode === 0, `unset exit ${unset.exitCode}`);
+    expect(unsetData?.dryRun === true, 'unset dryRun');
+    expect(unsetData?.status === 'would_unset', `unset status ${unsetData?.status}`);
+
+    const stillConfigured = run(['config', 'get', 'storage', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(stillConfigured.stdout)?.data?.configured === true, 'unset dry-run skipped write');
   });
 
   check('config get --local unset reports configured:false under --json', () => {
