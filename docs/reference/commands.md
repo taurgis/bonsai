@@ -373,9 +373,10 @@ npx @taurgis/bonsai config unset storage --local
 
 ### JSON shapes
 
-`config get --json` returns `{ key, value, configured }`. `configured` is `false` when the
-requested scope (`--global` / `--local`) does not set the key — `value` is still the built-in
-default so agents can apply it without a second lookup.
+`config get --json` returns `{ key, value, configured }`. `configured` is `false` when nothing
+beyond the built-in default pins the key: for `--global`/`--local` that means the file omits it;
+for the effective (no-scope) view it means no project file, user file, or valid `BONSAI_*` env
+override set it. `value` is still the usable default/resolved value so agents need no second lookup.
 
 `config list --json` returns an array of `{ key, value, configured }` entries with the same
 semantics per key (same array-as-`data` shape as `list`).

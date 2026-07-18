@@ -1,11 +1,5 @@
 import { ConfigCommand, configScopeFlags } from './base.js';
-import {
-  ALL_KEYS,
-  formatConfigEntry,
-  readScopedConfig,
-  resolveConfigEntry,
-  validKeysHint,
-} from '../../lib/config/index.js';
+import { formatConfigEntry, resolveConfigEntries, validKeysHint } from '../../lib/config/index.js';
 
 export default class ConfigList extends ConfigCommand<typeof ConfigList> {
   static id = 'config list';
@@ -36,13 +30,12 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
     this.assertScopeFlagsExclusive(this.flags.global, this.flags.local);
 
     const scope = this.readScope(this.flags.global, this.flags.local);
-    const scoped = readScopedConfig(scope, this.config.configDir, process.cwd());
-    const entries = ALL_KEYS.map((key) => resolveConfigEntry(key, scoped));
+    const entries = resolveConfigEntries(scope, this.config.configDir, process.cwd());
 
     if (!this.jsonEnabled()) {
-      const width = Math.max(...ALL_KEYS.map((k) => k.length)) + 2;
+      const width = Math.max(...entries.map((e) => e.key.length)) + 2;
       for (const entry of entries) {
-        this.log(`${entry.key.padEnd(width)}${formatConfigEntry(entry)}`);
+        this.log(`${entry.key.padEnd(width)}${formatConfigEntry(entry, scope)}`);
       }
     }
 

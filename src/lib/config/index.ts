@@ -43,8 +43,14 @@ export {
 } from './resolve.js';
 
 import { readUserConfig, readProjectConfig } from './io.js';
-import { resolveStorageMode, resolveSummaryLevel } from './resolve.js';
 import {
+  parseEnvStorage,
+  parseEnvSummary,
+  resolveStorageMode,
+  resolveSummaryLevel,
+} from './resolve.js';
+import {
+  ALL_KEYS,
   BUILT_IN_DEFAULTS,
   KEY_META,
   type ConfigKey,
@@ -102,8 +108,8 @@ export type ConfigScope = 'global' | 'local' | 'effective';
 
 /**
  * The config values for a requested scope: the user file (`global`), the project file (`local`),
- * or the fully merged result (`effective`). Shared by `config get` and `config list` so the
- * scope-selection lives in one place.
+ * or the fully merged result (`effective`). Shared by write paths and callers that only need the
+ * raw scoped blob (not configured metadata).
  */
 export function readScopedConfig(
   scope: ConfigScope,
@@ -123,20 +129,79 @@ export interface ConfigEntry {
 }
 
 /**
- * Resolve a single key from a scoped read. Unset keys fall back to the built-in default while
- * `configured: false` tells agents the value is not pinned in that scope.
+ * Whether any non-default layer pins `key`. For `--global`/`--local`, that is the file itself.
+ * For effective, project file, user file, or a valid BONSAI_* env override counts — so a bare
+ * default never reports `configured: true` just because `effectiveConfig` always fills values.
  */
-export function resolveConfigEntry(key: ConfigKey, scoped: Partial<ConfigValues>): ConfigEntry {
-  const raw = scoped[key];
-  return {
-    key,
-    value: (raw !== undefined ? raw : BUILT_IN_DEFAULTS[key]) as ResolvedConfig[ConfigKey],
-    configured: raw !== undefined,
-  };
+function isKeyConfigured(
+  key: ConfigKey,
+  scope: ConfigScope,
+  project: ConfigValues,
+  user: ConfigValues,
+  env: Record<string, string | undefined>
+): boolean {
+  if (scope === 'global') return key in user;
+  if (scope === 'local') return key in project;
+  if (key in project || key in user) return true;
+  if (key === 'storage') return parseEnvStorage(env) !== undefined;
+  if (key === 'summary') return parseEnvSummary(env) !== undefined;
+  return false;
 }
 
-/** Human display for a resolved entry (`value` or `value (not configured)`). */
-export function formatConfigEntry(entry: ConfigEntry): string {
+function buildEntry(
+  key: ConfigKey,
+  scope: ConfigScope,
+  project: ConfigValues,
+  user: ConfigValues,
+  env: Record<string, string | undefined>
+): ConfigEntry {
+  const configured = isKeyConfigured(key, scope, project, user, env);
+  if (key === 'storage') {
+    const value =
+      scope === 'effective'
+        ? resolveStorageMode({ env, projectConfig: project, userConfig: user })
+        : ((scope === 'global' ? user : project).storage ?? BUILT_IN_DEFAULTS.storage);
+    return { key, value, configured };
+  }
+  const value =
+    scope === 'effective'
+      ? resolveSummaryLevel({ env, projectConfig: project, userConfig: user })
+      : ((scope === 'global' ? user : project).summary ?? BUILT_IN_DEFAULTS.summary);
+  return { key, value, configured };
+}
+
+/** Resolve a single key; same semantics as {@link resolveConfigEntries}. */
+export function resolveConfigEntry(
+  key: ConfigKey,
+  scope: ConfigScope,
+  configDir: string | undefined,
+  cwd: string,
+  env: Record<string, string | undefined> = process.env
+): ConfigEntry {
+  return buildEntry(key, scope, readProjectConfig(cwd), readUserConfig(configDir), env);
+}
+
+/**
+ * Resolve every config key for a scope. Unset keys fall back to the built-in default while
+ * `configured: false` tells agents the value is not pinned beyond that default.
+ */
+export function resolveConfigEntries(
+  scope: ConfigScope,
+  configDir: string | undefined,
+  cwd: string,
+  env: Record<string, string | undefined> = process.env
+): ConfigEntry[] {
+  const project = readProjectConfig(cwd);
+  const user = readUserConfig(configDir);
+  return ALL_KEYS.map((key) => buildEntry(key, scope, project, user, env));
+}
+
+/**
+ * Human display for a resolved entry. Effective scope always has a usable value, so the
+ * "(not configured)" suffix is reserved for `--global`/`--local` reads where absence matters.
+ */
+export function formatConfigEntry(entry: ConfigEntry, scope: ConfigScope = 'local'): string {
   const formatted = KEY_META[entry.key].format(entry.value);
-  return entry.configured ? formatted : `${formatted} (not configured)`;
+  if (scope === 'effective' || entry.configured) return formatted;
+  return `${formatted} (not configured)`;
 }

@@ -1,4 +1,5 @@
 import { emptyUrlFilterError } from './research/url.js';
+import { durationFlagError } from './research/freshness.js';
 
 /**
  * Pure prune-flag policy. Returns a usage/safety error descriptor, or null when flags are valid.
@@ -26,8 +27,6 @@ export interface PruneFlagInput {
   yes: boolean;
   readOnly: boolean;
   bin: string;
-  /** Duration parse errors from freshness.durationFlagError, if any. */
-  durationErrors: Array<string | null | undefined>;
 }
 
 function missingFilterError(input: PruneFlagInput): PruneFlagError | null {
@@ -76,10 +75,11 @@ function mutationSafetyError(input: PruneFlagInput): PruneFlagError | null {
   return null;
 }
 
-function firstDurationError(
-  durationErrors: PruneFlagInput['durationErrors']
-): PruneFlagError | null {
-  for (const msg of durationErrors) {
+function durationError(input: PruneFlagInput): PruneFlagError | null {
+  for (const msg of [
+    durationFlagError('--older-than', input.olderThan),
+    durationFlagError('--inactive', input.inactive),
+  ]) {
     if (msg) return { message: msg, code: 'INVALID_DURATION' };
   }
   return null;
@@ -89,9 +89,5 @@ export function pruneFlagError(input: PruneFlagInput): PruneFlagError | null {
   const urlErr = emptyUrlFilterError(input.url);
   if (urlErr) return { message: urlErr, code: 'INVALID_FLAG_VALUE' };
 
-  return (
-    missingFilterError(input) ??
-    mutationSafetyError(input) ??
-    firstDurationError(input.durationErrors)
-  );
+  return missingFilterError(input) ?? mutationSafetyError(input) ?? durationError(input);
 }

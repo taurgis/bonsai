@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
 import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
-import { parseTtlToMs, durationFlagError } from '../lib/research/freshness.js';
+import { parseTtlToMs } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES } from '../lib/research/schema.js';
 import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
@@ -75,10 +75,6 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       yes: this.flags.yes,
       readOnly: this.readOnly,
       bin: this.config.bin,
-      durationErrors: [
-        durationFlagError('--older-than', this.flags['older-than']),
-        durationFlagError('--inactive', this.flags.inactive),
-      ],
     });
     if (err) this.error(err.message, { exit: 2, code: err.code, suggestions: err.suggestions });
   }

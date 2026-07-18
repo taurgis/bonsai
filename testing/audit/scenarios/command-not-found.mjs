@@ -26,6 +26,7 @@ export default function register(harness) {
     expect(r.stderr.includes('config gett is not a bonsai command.'), r.stderr);
     expect(r.stderr.includes('Did you mean config get?'), r.stderr);
     expect(r.stderr.includes('Code: COMMAND_NOT_FOUND'), r.stderr);
+    expect(r.stderr.includes('Try this: bonsai config get'), r.stderr);
   });
 
   check('unknown topic subcommand without close match does not suggest topic root', () => {

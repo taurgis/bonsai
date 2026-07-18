@@ -3,17 +3,12 @@ import { positionalArgvTokens } from './argv.js';
 import { buildCliErrorEnvelope } from './envelope.js';
 import { buildCommandNotFoundDetails } from '../hooks/command-not-found/suggest.js';
 
-type UnknownHelpResult =
-  | {
-      exitCode: 2;
-      kind: 'human';
-      message: string;
-    }
-  | {
-      envelope: Record<string, unknown>;
-      exitCode: 2;
-      kind: 'json';
-    };
+/** Always an envelope — human and JSON share one formatted stderr (Code + Try this). */
+export type UnknownHelpResult = {
+  exitCode: 2;
+  envelope: Record<string, unknown>;
+  json: boolean;
+};
 
 function commandId(parts: readonly string[]): string {
   return parts.join(':');
@@ -65,22 +60,14 @@ export async function tryUnknownHelpOutput(
 
   const attemptedId = commandId(tokens);
   const details = buildCommandNotFoundDetails(attemptedId, [...argv], config);
-  if (argv.includes('--json')) {
-    return {
-      kind: 'json',
-      exitCode: 2,
-      envelope: buildCliErrorEnvelope({
-        command: details.command,
-        message: details.message,
-        code: details.code,
-        suggestions: details.suggestions,
-      }),
-    };
-  }
-
   return {
-    kind: 'human',
     exitCode: 2,
-    message: `${details.message}\nCode: ${details.code}`,
+    json: argv.includes('--json'),
+    envelope: buildCliErrorEnvelope({
+      command: details.command,
+      message: details.message,
+      code: details.code,
+      suggestions: details.suggestions,
+    }),
   };
 }

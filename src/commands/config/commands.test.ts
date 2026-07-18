@@ -110,7 +110,7 @@ describe('config set', () => {
 describe('config get', () => {
   it('returns the built-in default effective value', async () => {
     const result = (await ConfigGet.run(['storage'])) as any;
-    expect(result).toEqual({ key: 'storage', value: 'global', configured: true });
+    expect(result).toEqual({ key: 'storage', value: 'global', configured: false });
   });
 
   it('reads the project value with --local after a set', async () => {
@@ -144,7 +144,7 @@ describe('config get', () => {
     const lines = await captureLog(() => ConfigGet.run(['storage', '--json']));
     const envelope = JSON.parse(lines.join('\n').trim());
     expect(envelope).toMatchObject({ schemaVersion: 1, command: 'config get', ok: true });
-    expect(envelope.data).toMatchObject({ key: 'storage', value: 'global', configured: true });
+    expect(envelope.data).toMatchObject({ key: 'storage', value: 'global', configured: false });
   });
 
   it('reports configured:false for an unset scoped key under --json', async () => {
@@ -156,14 +156,20 @@ describe('config get', () => {
       configured: false,
     });
   });
+
+  it('reports configured:true on effective after a project set', async () => {
+    await ConfigSet.run(['storage', 'project', '--local']);
+    const result = (await ConfigGet.run(['storage'])) as any;
+    expect(result).toEqual({ key: 'storage', value: 'project', configured: true });
+  });
 });
 
 describe('config list', () => {
   it('returns the effective values as an entries array', async () => {
     const result = (await ConfigList.run([])) as any;
     expect(result).toEqual([
-      { key: 'storage', value: 'global', configured: true },
-      { key: 'summary', value: 'conservative', configured: true },
+      { key: 'storage', value: 'global', configured: false },
+      { key: 'summary', value: 'conservative', configured: false },
     ]);
   });
 
@@ -203,7 +209,7 @@ describe('config list', () => {
     });
     expect(envelope.data).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ key: 'storage', value: 'global', configured: true }),
+        expect.objectContaining({ key: 'storage', value: 'global', configured: false }),
       ])
     );
   });
@@ -221,7 +227,7 @@ describe('config unset', () => {
     expect((await ConfigGet.run(['storage'])) as any).toEqual({
       key: 'storage',
       value: 'global',
-      configured: true,
+      configured: false,
     });
   });
 

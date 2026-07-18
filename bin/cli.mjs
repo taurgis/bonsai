@@ -33,10 +33,11 @@ if (result.exitWithJson) {
 const unknownHelp = await tryUnknownHelpOutput(result.argv, root);
 if (unknownHelp) {
   process.exitCode = unknownHelp.exitCode;
-  if (unknownHelp.kind === 'json') {
+  if (unknownHelp.json) {
     console.log(JSON.stringify(unknownHelp.envelope, null, 2));
   } else {
-    console.error(` ›   Error: ${unknownHelp.message.replaceAll('\n', '\n ›   ')}`);
+    const message = String(unknownHelp.envelope.stderr ?? '');
+    console.error(` ›   Error: ${message.replaceAll('\n', '\n ›   ')}`);
   }
   process.exit();
 }

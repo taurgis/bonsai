@@ -1,11 +1,6 @@
 import { Args } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import {
-  formatConfigEntry,
-  readScopedConfig,
-  resolveConfigEntry,
-  validKeysHint,
-} from '../../lib/config/index.js';
+import { formatConfigEntry, resolveConfigEntry, validKeysHint } from '../../lib/config/index.js';
 
 export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
   static id = 'config get';
@@ -41,12 +36,9 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
     this.validateConfigKeyAndScope(key, this.flags.global, this.flags.local);
 
     const scope = this.readScope(this.flags.global, this.flags.local);
-    const entry = resolveConfigEntry(
-      key,
-      readScopedConfig(scope, this.config.configDir, process.cwd())
-    );
+    const entry = resolveConfigEntry(key, scope, this.config.configDir, process.cwd());
 
-    if (!this.jsonEnabled()) this.log(formatConfigEntry(entry));
+    if (!this.jsonEnabled()) this.log(formatConfigEntry(entry, scope));
     return entry;
   }
 }

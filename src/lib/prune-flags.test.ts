@@ -6,7 +6,6 @@ const base = {
   yes: false,
   readOnly: false,
   bin: 'bonsai',
-  durationErrors: [undefined, undefined],
 };
 
 describe('pruneFlagError', () => {
@@ -35,14 +34,9 @@ describe('pruneFlagError', () => {
   });
 
   it('surfaces duration parse errors', () => {
-    expect(
-      pruneFlagError({
-        ...base,
-        olderThan: '5z',
-        dryRun: true,
-        durationErrors: ['Invalid --older-than', undefined],
-      })?.code
-    ).toBe('INVALID_DURATION');
+    expect(pruneFlagError({ ...base, olderThan: '5z', dryRun: true })?.code).toBe(
+      'INVALID_DURATION'
+    );
   });
 
   it('accepts a valid dry-run', () => {
