@@ -3,34 +3,44 @@ import { buildCliErrorEnvelope } from './envelope.js';
 export interface NormalizationResult {
   /** The normalized argv array to set on process.argv. */
   argv: string[];
-  /** Optional metadata indicating the shim should exit early with a JSON envelope. */
-  exitWithJson?: {
+  /**
+   * Exit before oclif runs. Used for flag-only / bare `--json` usage errors so human and JSON
+   * callers share one path (no "leave a flag token for command_not_found" hack).
+   */
+  earlyExit?: {
     exitCode: number;
     envelope: Record<string, unknown>;
+    json: boolean;
   };
 }
 
-/**
- * Normalizes process.argv (excluding Node executable and script path) so the
- * oclif pipeline sees one consistent command structure.
- */
-function missingUsageJsonExit(): NormalizationResult['exitWithJson'] {
-  const message = 'Missing URL or command. Run bonsai --help for usage.';
-  const code = 'MISSING_COMMAND';
-  const suggestions = ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'];
+/** Shared MISSING_COMMAND copy for flag-only argv preflight. */
+export function missingCommandDetails(
+  bin: string,
+  swallowed?: { flag: string; url: string } | null
+): { message: string; code: 'MISSING_COMMAND'; suggestions: string[] } {
+  if (swallowed) {
+    return {
+      code: 'MISSING_COMMAND',
+      message: [
+        `Missing URL or command. ${swallowed.flag} consumed ${swallowed.url} as its value, so there was no URL left to fetch.`,
+        `Run ${bin} --help for usage.`,
+      ].join('\n'),
+      suggestions: [
+        `Pass the URL as the command (flags after): ${bin} ${swallowed.url}`,
+        `Or a named command: ${bin} list`,
+      ],
+    };
+  }
   return {
-    exitCode: 2,
-    envelope: buildCliErrorEnvelope({
-      command: 'bonsai',
-      message,
-      code,
-      suggestions,
-    }),
+    code: 'MISSING_COMMAND',
+    message: `Missing URL or command. Run ${bin} --help for usage.`,
+    suggestions: [`Pass a URL: ${bin} https://example.com`, `Or a command: ${bin} list`],
   };
 }
 
 /** Flags that consume the next argv token as a value. Keep short aliases in sync with command chars. */
-const FLAGS_WITH_VALUES = new Set([
+export const FLAGS_WITH_VALUES = new Set([
   '--topic',
   '-t',
   '--tags',
@@ -54,16 +64,71 @@ const FLAGS_WITH_VALUES = new Set([
   '--url',
 ]);
 
-export function normalizeArgv(rawArgv: string[]): NormalizationResult {
-  const onlyJsonFlags = rawArgv.length > 0 && rawArgv.every((arg) => arg === '--json');
-  if (onlyJsonFlags) {
-    return {
-      // bin/cli.mjs exits before applying argv when exitWithJson is set.
-      argv: ['--json'],
-      exitWithJson: missingUsageJsonExit(),
-    };
-  }
+/**
+ * Boolean flags registered on every command via BaseCommand.baseFlags. oclif only merges those after
+ * it picks a command, so `bonsai --read-only list` would otherwise treat `--read-only` as the
+ * command id. Strip and re-append them after the command/URL, same pattern as `--json`.
+ */
+export const GLOBAL_BOOLEAN_FLAGS = new Set(['--read-only', '--plan']);
 
+/**
+ * When a value-taking flag is the only "command" and its value looks like a URL, the user almost
+ * certainly put the URL where the flag value belongs (e.g. `bonsai --tags https://example.com`).
+ */
+export function findSwallowedUrlFlag(
+  argv: readonly string[] | undefined
+): { flag: string; url: string } | null {
+  if (!argv?.length) return null;
+  for (let i = 0; i < argv.length - 1; i++) {
+    const flag = argv[i]!;
+    if (!FLAGS_WITH_VALUES.has(flag)) continue;
+    const value = argv[i + 1]!;
+    if (value.startsWith('-')) continue;
+    if (looksLikeUrl(value)) return { flag, url: value };
+  }
+  return null;
+}
+
+function missingUsageExit(
+  json: boolean,
+  argv: readonly string[]
+): NonNullable<NormalizationResult['earlyExit']> {
+  const details = missingCommandDetails('bonsai', findSwallowedUrlFlag(argv));
+  return {
+    exitCode: 2,
+    json,
+    envelope: buildCliErrorEnvelope({
+      command: 'bonsai',
+      message: details.message,
+      code: details.code,
+      suggestions: details.suggestions,
+    }),
+  };
+}
+
+/**
+ * Index of the first positional command/URL token, skipping flags (and value-flag operands)
+ * plus root meta tokens that never name a command (`--help`, `--json`, globals).
+ */
+function firstPositionalIndex(argv: readonly string[]): number {
+  for (let i = 0; i < argv.length; i++) {
+    const token = argv[i]!;
+    if (token === '--help' || token === '--json' || GLOBAL_BOOLEAN_FLAGS.has(token)) continue;
+    if (token.startsWith('-')) {
+      if (FLAGS_WITH_VALUES.has(token)) i++;
+      continue;
+    }
+    return i;
+  }
+  return -1;
+}
+
+/** True when argv selects a command, URL, or root `--version` action (not flag-only usage). */
+function hasCommandToken(argv: readonly string[]): boolean {
+  return argv.includes('--version') || firstPositionalIndex(argv) !== -1;
+}
+
+export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but
   // `bonsai --json list` is otherwise parsed as an unknown command named
   // "--json". Collect every --json, append one copy after the command/URL, and
@@ -81,23 +146,19 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   const helpRequested = tokens.includes('--help');
   let core = tokens.filter((arg) => arg !== '--help');
 
+  // Relocate base boolean flags so they survive command resolution (see GLOBAL_BOOLEAN_FLAGS).
+  const relocatedGlobals: string[] = [];
+  core = core.filter((arg) => {
+    if (!GLOBAL_BOOLEAN_FLAGS.has(arg)) return true;
+    if (!relocatedGlobals.includes(arg)) relocatedGlobals.push(arg);
+    return false;
+  });
+
   // Treat URL-shaped tokens as the `fetch` shorthand. Match both `https://...` and scheme-only
   // forms like `javascript:` or `data:` so fetch can reject unsupported protocols instead of oclif
   // reporting a misleading "command not found". If the invocation begins with a flag, allow common
   // flag-before-argument usage such as `bonsai --format detailed https://example.com`.
-  let firstNonFlagArgIndex = -1;
-  for (let i = 0; i < core.length; i++) {
-    const token = core[i]!;
-    if (token.startsWith('-')) {
-      if (FLAGS_WITH_VALUES.has(token)) {
-        i++; // skip the value
-      }
-      continue;
-    }
-    firstNonFlagArgIndex = i;
-    break;
-  }
-
+  const firstNonFlagArgIndex = firstPositionalIndex(core);
   const rootFetchShape = firstNonFlagArgIndex !== -1 && looksLikeUrl(core[firstNonFlagArgIndex]!);
   if (rootFetchShape) {
     const url = core[firstNonFlagArgIndex]!;
@@ -110,7 +171,18 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   }
 
   if (helpRequested) core.push('--help');
+  core.push(...relocatedGlobals);
   if (jsonMode) core.push('--json');
+
+  // Flag-only argv (`--json`, `--read-only`, `--tags https://…`) never resolves a command.
+  // Exit here so command_not_found does not special-case dash-prefixed ids.
+  // Empty argv and `--help`/`--version` stay with oclif.
+  if (!helpRequested && core.length > 0 && !hasCommandToken(core)) {
+    return {
+      argv: jsonMode ? ['--json'] : [],
+      earlyExit: missingUsageExit(jsonMode, rawArgv),
+    };
+  }
 
   return { argv: core };
 }

@@ -1,6 +1,6 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { finalizeBatch } from '../lib/batch.js';
+import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
 import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
@@ -41,16 +41,16 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   static stdoutIsPrimaryData = true;
 
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
-    return this.cacheMissSuccessJson(data, (url, n) =>
-      n > 1
-        ? `No cached research found for URL: ${url} and ${n - 1} other URLs`
-        : `No cached research found for URL: ${url}`
-    );
+    return this.batchReadSuccessJson(data);
   }
 
   async run(): Promise<unknown> {
-    const results = this.parsedArgv.map((url) => this.inspectOne(url));
-    return finalizeBatch(results, (r) => r.status === 'miss');
+    const results = this.mapUrlsAllowingBatchErrors(
+      this.parsedArgv,
+      (url) => this.inspectOne(url),
+      urlValidationErrorRow
+    );
+    return finalizeBatch(results, isBatchReadFailure);
   }
 
   private inspectOne(url: string) {

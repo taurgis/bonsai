@@ -193,4 +193,51 @@ export default function register(harness, fixtures) {
     expect(r.stdout.includes(`URL:`), r.stdout.slice(0, 200));
     expect(r.stdout.includes(url), r.stdout.slice(0, 300));
   });
+
+  // Multi-URL status/inspect must keep prior hits when a later URL fails validation — same batch
+  // contract as fetch (exit 1 + error row), not abort with data:null / exit 2.
+  check('status multi-URL keeps hit when later URL is invalid', () => {
+    const ws = createWorkspace();
+    const hitUrl = 'https://example.com/audit-status-batch-invalid';
+    const imported = run(['import', hitUrl, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Status batch invalid\n',
+    });
+    expect(imported.exitCode === 0, `import ${imported.exitCode}`);
+
+    const r = run(['status', hitUrl, 'not-a-url', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_URL', env?.code);
+    expect(Array.isArray(env?.data) && env.data.length === 2, `data ${JSON.stringify(env?.data)}`);
+    expect(env?.data?.[0]?.status === 'hit', `first ${env?.data?.[0]?.status}`);
+    expect(env?.data?.[1]?.error?.code === 'INVALID_URL', JSON.stringify(env?.data?.[1]));
+  });
+
+  check('inspect multi-URL keeps hit when later URL is scheme-less', () => {
+    const ws = createWorkspace();
+    const hitUrl = 'https://example.com/audit-inspect-batch-scheme';
+    const imported = run(['import', hitUrl, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Inspect batch scheme\n',
+    });
+    expect(imported.exitCode === 0, `import ${imported.exitCode}`);
+
+    const r = run(['inspect', hitUrl, 'example.com/other', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'MISSING_URL_SCHEME', env?.code);
+    expect(env?.data?.[0]?.status === 'hit', 'first hit kept');
+    expect(env?.data?.[0]?.metadata, 'hit metadata kept');
+    expect(env?.data?.[1]?.error?.code === 'MISSING_URL_SCHEME', JSON.stringify(env?.data?.[1]));
+  });
+
+  check('status and inspect CACHE_MISS messages match', () => {
+    const status = parseJson(run(['status', CACHE_MISS_URL, '--json']).stdout);
+    const inspect = parseJson(run(['inspect', CACHE_MISS_URL, '--json']).stdout);
+    expect(status?.stderr?.startsWith('Cache miss for '), status?.stderr);
+    expect(inspect?.stderr?.startsWith('Cache miss for '), inspect?.stderr);
+  });
 }

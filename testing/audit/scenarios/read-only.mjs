@@ -144,4 +144,28 @@ export default function register(harness, fixtures) {
     expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
     expect(parseJson(r.stdout)?.data?.cache?.status === 'hit', 'cache hit');
   });
+
+  // oclif only merges baseFlags after command resolution, so leading --plan/--read-only must be
+  // relocated by argv normalization (same pattern as leading --json).
+  check('leading --plan before list is honored', () => {
+    const ws = createWorkspace();
+    const r = run(['--plan', 'list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+    expect(parseJson(r.stdout)?.ok === true, 'ok');
+    expect(parseJson(r.stdout)?.command === 'list', 'command');
+  });
+
+  check('leading --read-only before import does not write', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-leading-read-only-import';
+    const imported = run(['--read-only', 'import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Leading read-only\n',
+    });
+    expect(imported.exitCode === 0, `exit ${imported.exitCode}`);
+    expect(parseJson(imported.stdout)?.data?.dryRun === true, 'dryRun');
+    const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(status.stdout)?.data?.status === 'miss', 'still miss');
+  });
 }

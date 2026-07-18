@@ -163,4 +163,34 @@ describe('status JSON envelope shaping', () => {
     expect(envelope).toMatchObject({ ok: true, exitCode: 0, stderr: '' });
     expect(envelope.code).toBeUndefined();
   });
+
+  it('prefers INVALID_URL overlay over CACHE_MISS when a batch row has an error', async () => {
+    const cmd = await instance();
+    const prev = process.exitCode;
+    process.exitCode = 1;
+    try {
+      const envelope = cmd.toSuccessJson([
+        {
+          status: 'hit',
+          normalizedUrl: 'https://example.com/cached',
+          freshness: 'fresh',
+          action: 'would_return_cached',
+        },
+        {
+          status: 'error',
+          normalizedUrl: 'not-a-url',
+          error: { code: 'INVALID_URL', message: 'Invalid URL: not-a-url' },
+        },
+      ]);
+      expect(envelope).toMatchObject({
+        ok: false,
+        exitCode: 1,
+        code: 'INVALID_URL',
+      });
+      expect(envelope.stderr).toContain('INVALID_URL');
+      expect(Array.isArray(envelope.data)).toBe(true);
+    } finally {
+      process.exitCode = prev;
+    }
+  });
 });

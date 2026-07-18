@@ -3,7 +3,7 @@ import {
   buildEnvelope,
   enrichBatchFailureEnvelope,
   enrichCacheMissEnvelope,
-  enrichFetchFailureEnvelope,
+  enrichRowErrorEnvelope,
   formatErrorForJson,
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
@@ -130,7 +130,7 @@ describe('buildEnvelope', () => {
 describe('enrichBatchFailureEnvelope / enrichCacheMissEnvelope', () => {
   it('passes through when there are no failures', () => {
     const base = { ok: true, exitCode: 0, data: { status: 'hit' } };
-    expect(enrichCacheMissEnvelope(base, base.data, 'bonsai', () => 'x')).toBe(base);
+    expect(enrichCacheMissEnvelope(base, base.data, 'bonsai')).toBe(base);
   });
 
   it('marks CACHE_MISS and keeps data when any row misses', () => {
@@ -138,28 +138,23 @@ describe('enrichBatchFailureEnvelope / enrichCacheMissEnvelope', () => {
       { status: 'hit', normalizedUrl: 'https://a.example/' },
       { status: 'miss', normalizedUrl: 'https://b.example/' },
     ];
-    const enriched = enrichCacheMissEnvelope(
-      { ok: true, exitCode: 0, data },
-      data,
-      'bonsai',
-      (url, n) => `miss ${url} (${n})`
-    );
+    const enriched = enrichCacheMissEnvelope({ ok: true, exitCode: 0, data }, data, 'bonsai');
     expect(enriched).toMatchObject({
       ok: false,
       exitCode: 1,
       code: 'CACHE_MISS',
       suggestions: ['Fetch and cache it first: bonsai https://b.example/'],
     });
-    expect(enriched.stderr).toContain('miss https://b.example/ (1)');
+    expect(enriched.stderr).toContain('Cache miss for https://b.example/');
     expect(enriched.data).toBe(data);
   });
 
-  it('supports FETCH_FAILED overlays from per-row error objects', () => {
+  it('supports row-error overlays from per-row error objects', () => {
     const data = [
       { cache: { status: 'hit' } },
       { error: { code: 'FETCH_FAILED', message: 'dns', suggestions: ['retry'] } },
     ];
-    const enriched = enrichFetchFailureEnvelope({ ok: true, exitCode: 0, data }, data);
+    const enriched = enrichRowErrorEnvelope({ ok: true, exitCode: 0, data }, data);
     expect(enriched).toMatchObject({
       ok: false,
       exitCode: 1,

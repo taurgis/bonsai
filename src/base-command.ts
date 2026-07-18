@@ -3,6 +3,7 @@ import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.
 import {
   buildEnvelope,
   enrichCacheMissEnvelope,
+  enrichRowErrorEnvelope,
   formatErrorForJson,
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
@@ -208,15 +209,37 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   }
 
   /**
-   * CACHE_MISS overlay for multi-URL read commands (`status`, `inspect`). Keeps hit payloads
-   * in `data` while marking the envelope non-ok — shared so the two commands do not clone the
-   * enrich/baseSuccessJson call site.
+   * Success overlay for multi-URL read commands (`status`, `inspect`). Apply CACHE_MISS first,
+   * then row `.error` so validation failures win when both appear in one batch.
    */
-  protected cacheMissSuccessJson(
-    data: unknown,
-    messageFor: (normalizedUrl: string, missCount: number) => string
-  ): Record<string, unknown> {
-    return enrichCacheMissEnvelope(this.baseSuccessJson(data), data, this.config.bin, messageFor);
+  protected batchReadSuccessJson(data: unknown): Record<string, unknown> {
+    return enrichRowErrorEnvelope(
+      enrichCacheMissEnvelope(this.baseSuccessJson(data), data, this.config.bin),
+      data
+    );
+  }
+
+  /**
+   * Map each URL through `fn`. In a multi-URL batch, per-URL CLIErrors become failure rows so
+   * prior hits are kept — matching fetch's INVALID_URL / MISSING_URL_SCHEME batch contract.
+   */
+  protected mapUrlsAllowingBatchErrors<T, F>(
+    urls: string[],
+    fn: (url: string) => T,
+    failureRow: (url: string, err: InstanceType<typeof Errors.CLIError>) => F
+  ): Array<T | F> {
+    const batch = urls.length > 1;
+    const results: Array<T | F> = [];
+    for (const url of urls) {
+      try {
+        results.push(fn(url));
+      } catch (err) {
+        if (!batch || !(err instanceof Errors.CLIError)) throw err;
+        if (!this.jsonEnabled()) this.warn(err.message);
+        results.push(failureRow(url, err));
+      }
+    }
+    return results;
   }
 
   /** Mirror the success envelope for failures so JSON consumers get one consistent shape. */

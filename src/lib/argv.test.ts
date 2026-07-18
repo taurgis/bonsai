@@ -8,7 +8,8 @@ describe('normalizeArgv', () => {
       input: ['--json'],
       expected: {
         argv: ['--json'],
-        exitWithJson: {
+        earlyExit: {
+          json: true,
           exitCode: 2,
           envelope: {
             schemaVersion: 1,
@@ -167,7 +168,8 @@ describe('normalizeArgv', () => {
       input: ['--json', '--json'],
       expected: {
         argv: ['--json'],
-        exitWithJson: {
+        earlyExit: {
+          json: true,
           exitCode: 2,
           envelope: {
             schemaVersion: 1,
@@ -217,10 +219,143 @@ describe('normalizeArgv', () => {
       },
     },
     {
-      name: 'input containing only flags should not trigger fetch shorthand',
+      name: 'input containing only flags early-exits as MISSING_COMMAND',
       input: ['--topic', 'Docs'],
       expected: {
-        argv: ['--topic', 'Docs'],
+        argv: [],
+        earlyExit: {
+          json: false,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
+          },
+        },
+      },
+    },
+    {
+      name: 'value flag that swallows a URL early-exits with a targeted tip',
+      input: ['--tags', 'https://example.com/docs', '--json'],
+      expected: {
+        argv: ['--json'],
+        earlyExit: {
+          json: true,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. --tags consumed https://example.com/docs as its value, so there was no URL left to fetch.\n' +
+              'Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass the URL as the command (flags after): bonsai https://example.com/docs\n' +
+              '* Or a named command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: [
+              'Pass the URL as the command (flags after): bonsai https://example.com/docs',
+              'Or a named command: bonsai list',
+            ],
+          },
+        },
+      },
+    },
+    {
+      name: 'leading --read-only before a command relocates after the command',
+      input: ['--read-only', 'list'],
+      expected: {
+        argv: ['list', '--read-only'],
+      },
+    },
+    {
+      name: 'leading --plan before a command relocates after the command',
+      input: ['--plan', 'list', '--json'],
+      expected: {
+        argv: ['list', '--plan', '--json'],
+      },
+    },
+    {
+      name: 'leading --plan before a URL relocates onto fetch',
+      input: ['--plan', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '--plan'],
+      },
+    },
+    {
+      name: 'lone --read-only triggers early human MISSING_COMMAND exit',
+      input: ['--read-only'],
+      expected: {
+        argv: [],
+        earlyExit: {
+          json: false,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
+          },
+        },
+      },
+    },
+    {
+      name: 'lone --plan --json triggers early JSON MISSING_COMMAND exit',
+      input: ['--plan', '--json'],
+      expected: {
+        argv: ['--json'],
+        earlyExit: {
+          json: true,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
+          },
+        },
+      },
+    },
+    {
+      name: '--version is a root meta action and must not early-exit',
+      input: ['--version', '--json'],
+      expected: {
+        argv: ['--version', '--json'],
       },
     },
   ];
@@ -229,10 +364,10 @@ describe('normalizeArgv', () => {
     it(tc.name, () => {
       const result = normalizeArgv(tc.input);
       expect(result.argv).toEqual(tc.expected.argv);
-      if (tc.expected.exitWithJson) {
-        expect(result.exitWithJson).toEqual(tc.expected.exitWithJson);
+      if (tc.expected.earlyExit) {
+        expect(result.earlyExit).toEqual(tc.expected.earlyExit);
       } else {
-        expect(result.exitWithJson).toBeUndefined();
+        expect(result.earlyExit).toBeUndefined();
       }
     });
   }

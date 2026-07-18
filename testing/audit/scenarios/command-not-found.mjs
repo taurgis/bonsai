@@ -80,4 +80,22 @@ export default function register(harness) {
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(r.stderr.includes('https://example.com'), r.stderr.slice(0, 200));
   });
+
+  check('lone --read-only is MISSING_COMMAND not COMMAND_NOT_FOUND', () => {
+    const r = run(['--read-only', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'MISSING_COMMAND', env?.code);
+    expect(env?.command === 'bonsai', env?.command);
+    expect(!env?.stderr?.includes('is not a bonsai command'), env?.stderr);
+  });
+
+  check('value flag that swallows the URL explains MISSING_COMMAND', () => {
+    const r = run(['--tags', 'https://example.com/docs', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'MISSING_COMMAND', env?.code);
+    expect(env?.stderr?.includes('consumed https://example.com/docs'), env?.stderr);
+    expect(env?.suggestions?.[0]?.includes('https://example.com/docs'), env?.suggestions);
+  });
 }

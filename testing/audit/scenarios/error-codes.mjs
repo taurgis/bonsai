@@ -114,4 +114,23 @@ export default function register(harness) {
     expect(env?.code === 'INVALID_FLAG_VALUE', env?.code);
     expect(env?.stderr?.includes('Did you mean stale_grace or stale_expired?'), env?.stderr);
   });
+
+  check('empty --ttl is INVALID_DURATION in both modes', () => {
+    const json = run(['status', 'https://example.com', '--ttl', '', '--json']);
+    const env = parseJson(json.stdout);
+    expect(json.exitCode === 2, `exit ${json.exitCode}`);
+    expect(env?.code === 'INVALID_DURATION', env?.code);
+    expect(env?.stderr?.includes('must not be empty'), env?.stderr);
+
+    const human = run(['status', 'https://example.com', '--ttl', '']);
+    expect(human.exitCode === 2, `human exit ${human.exitCode}`);
+    expect(human.stderr.includes('Code: INVALID_DURATION'), human.stderr);
+  });
+
+  check('empty --older-than is INVALID_DURATION not MISSING_FILTER', () => {
+    const json = run(['prune', '--older-than', '', '--dry-run', '--json']);
+    const env = parseJson(json.stdout);
+    expect(json.exitCode === 2, `exit ${json.exitCode}`);
+    expect(env?.code === 'INVALID_DURATION', env?.code);
+  });
 }

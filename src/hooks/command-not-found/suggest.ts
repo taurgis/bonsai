@@ -78,7 +78,7 @@ function bareUrlInput(id: string): string | null {
 }
 
 function isJsonMode(argv: string[] | undefined): boolean {
-  return argv?.includes('--json') ?? false;
+  return (argv?.includes('--json') ?? false) || process.argv.includes('--json');
 }
 
 function emitJsonError(
@@ -111,6 +111,7 @@ export function buildCommandNotFoundDetails(
   // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
   // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which
   // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
+  // Flag-only argv never reaches here — normalizeArgv early-exits those as MISSING_COMMAND.
   const bareUrl = bareUrlInput(id);
   if (bareUrl) {
     const suggestion = `${config.bin} https://${bareUrl}`;

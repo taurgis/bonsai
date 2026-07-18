@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
 import { finalizeBatch } from '../lib/batch.js';
-import { enrichFetchFailureEnvelope } from '../lib/envelope.js';
+import { enrichRowErrorEnvelope } from '../lib/envelope.js';
 import {
   buildFetchFailureFromCaught,
   buildFetchFailureResult,
@@ -215,7 +215,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
    * surface FETCH_FAILED on the envelope — same batch contract as status/inspect CACHE_MISS.
    */
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
-    return enrichFetchFailureEnvelope(this.baseSuccessJson(data), data);
+    return enrichRowErrorEnvelope(this.baseSuccessJson(data), data);
   }
 
   // Validates fetch flags up front, exiting with code 2 on a malformed or contradictory value.
@@ -383,7 +383,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
    * so every error that reaches here is per-URL — including INVALID_URL / MISSING_URL_SCHEME.
    */
   private failureRowOrRethrow(url: string, err: unknown, dryRun: boolean, batch: boolean) {
-    if (!this.jsonEnabled()) ux.action.stop('failed');
+    // Invalid URLs fail before ux.action.start; stopping a never-started spinner prints noise.
+    if (!this.jsonEnabled() && ux.action.running) ux.action.stop('failed');
     if (!batch) {
       if (err instanceof Errors.CLIError) throw err;
       this.emitFetchError(err, url);

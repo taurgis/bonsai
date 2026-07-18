@@ -15,6 +15,18 @@ const pkg = req('../package.json');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/** Print a preflight usage envelope (JSON or human) and exit. */
+function exitWithEnvelope(result) {
+  process.exitCode = result.exitCode;
+  if (result.json) {
+    console.log(JSON.stringify(result.envelope, null, 2));
+  } else {
+    const message = String(result.envelope.stderr ?? '');
+    console.error(` ›   Error: ${message.replaceAll('\n', '\n ›   ')}`);
+  }
+  process.exit();
+}
+
 // Normalize argv so the whole oclif pipeline sees one consistent command. oclif's
 // error handler re-reads process.argv (not the args passed to execute) when it renders
 // help on a parse error, so rewriting only the execute() args leaves the help renderer
@@ -24,22 +36,13 @@ const rawArgv = process.argv.slice(2);
 const result = normalizeArgv(rawArgv);
 const root = __dirname + '/../';
 
-if (result.exitWithJson) {
-  process.exitCode = result.exitWithJson.exitCode;
-  console.log(JSON.stringify(result.exitWithJson.envelope, null, 2));
-  process.exit();
+if (result.earlyExit) {
+  exitWithEnvelope(result.earlyExit);
 }
 
 const unknownHelp = await tryUnknownHelpOutput(result.argv, root);
 if (unknownHelp) {
-  process.exitCode = unknownHelp.exitCode;
-  if (unknownHelp.json) {
-    console.log(JSON.stringify(unknownHelp.envelope, null, 2));
-  } else {
-    const message = String(unknownHelp.envelope.stderr ?? '');
-    console.error(` ›   Error: ${message.replaceAll('\n', '\n ›   ')}`);
-  }
-  process.exit();
+  exitWithEnvelope(unknownHelp);
 }
 
 const jsonMeta = await tryJsonMetaOutput(result.argv, root);
@@ -49,8 +52,8 @@ if (jsonMeta) {
   process.exit();
 }
 
-// Only notify after the exitWithJson fast-path so the notifier never fires before
-// a JSON envelope exits. Also skip under --json so agent callers never see stderr noise.
+// Only notify after the earlyExit fast-path so the notifier never fires before
+// a usage-error envelope exits. Also skip under --json so agent callers never see stderr noise.
 if (!process.argv.includes('--json')) {
   updateNotifier({ pkg }).notify();
 }

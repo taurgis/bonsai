@@ -39,6 +39,10 @@ describe('pruneFlagError', () => {
     );
   });
 
+  it('rejects empty --older-than as INVALID_DURATION not MISSING_FILTER', () => {
+    expect(pruneFlagError({ ...base, olderThan: '', dryRun: true })?.code).toBe('INVALID_DURATION');
+  });
+
   it('accepts a valid dry-run', () => {
     expect(pruneFlagError({ ...base, olderThan: '30d', dryRun: true })).toBeNull();
   });

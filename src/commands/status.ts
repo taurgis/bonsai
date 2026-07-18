@@ -1,6 +1,6 @@
 import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { finalizeBatch } from '../lib/batch.js';
+import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
 import { getArtifactPath } from '../lib/research/storage.js';
 import {
   evaluateFreshness,
@@ -101,9 +101,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   static stdoutIsPrimaryData = true;
 
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
-    return this.cacheMissSuccessJson(data, (url, n) =>
-      n > 1 ? `Cache miss for ${url} and ${n - 1} other URLs` : `Cache miss for ${url}`
-    );
+    return this.batchReadSuccessJson(data);
   }
 
   async run(): Promise<unknown> {
@@ -117,10 +115,12 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     }
 
     const currentTime = new Date();
-    const results = urls.map((url) =>
-      this.checkSingleStatus(url, currentTime, { ttl, maxAge, tier })
+    const results = this.mapUrlsAllowingBatchErrors(
+      urls,
+      (url) => this.checkSingleStatus(url, currentTime, { ttl, maxAge, tier }),
+      urlValidationErrorRow
     );
-    return finalizeBatch(results, (r) => r.status === 'miss');
+    return finalizeBatch(results, isBatchReadFailure);
   }
 
   private checkSingleStatus(

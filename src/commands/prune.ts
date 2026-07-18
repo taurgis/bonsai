@@ -2,6 +2,7 @@ import { Flags } from '@oclif/core';
 import { unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
+import { enrichPrunePartialEnvelope } from '../lib/envelope.js';
 import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { parseTtlToMs } from '../lib/research/freshness.js';
@@ -64,6 +65,10 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   };
 
   static stdoutIsPrimaryData = true;
+
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    return enrichPrunePartialEnvelope(this.baseSuccessJson(data), data);
+  }
 
   private validatePruneFlags(): void {
     const err = pruneFlagError({

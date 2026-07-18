@@ -1,5 +1,5 @@
 import type { StorageMode } from '../config/index.js';
-import type { CliErrorShape } from '../envelope.js';
+import { cliErrorFields, type CliErrorShape } from '../envelope.js';
 import { SANDBOX_EGRESS_ERROR_MARKER } from './browser.js';
 import { PROXY_TUNNEL_REJECTION_PATTERN } from './proxy.js';
 import { getArtifactPath } from './storage.js';
@@ -120,22 +120,13 @@ export function buildFetchFailureResult(input: {
   fallbackGuidance?: FetchFailureGuidance;
 }) {
   const { bin, url, dryRun, err, fallbackGuidance } = input;
-  const message = typeof err.message === 'string' ? err.message : String(err);
-  const code = typeof err.code === 'string' && err.code ? err.code : 'FETCH_FAILED';
-  const guidance =
-    err.suggestions?.length || err.ref
-      ? { suggestions: err.suggestions, ref: err.ref }
-      : fallbackGuidance;
+  // Prefer the throw site's suggestions/ref; otherwise attach fetch-specific recovery hints.
+  const shaped = err.suggestions?.length || err.ref ? err : { ...err, ...fallbackGuidance };
   return {
     schemaVersion: 1,
     command: bin,
     dryRun,
-    error: {
-      code,
-      message,
-      suggestions: guidance?.suggestions,
-      ref: guidance?.ref,
-    },
+    error: cliErrorFields(shaped, 'FETCH_FAILED'),
     cache: null,
     source: { url, normalizedUrl: null },
     content: null,

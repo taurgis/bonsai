@@ -155,6 +155,17 @@ describe('import command unit tests', () => {
     await expect(runPromise).rejects.toThrow(/Multi-source import requires the --topic flag/);
   });
 
+  it('fails if multi-source topic is only whitespace', async () => {
+    const runPromise = ResearchImport.run([
+      '--stdin',
+      '--source-url',
+      'https://example.com/a',
+      '--topic',
+      '   ',
+    ]);
+    await expect(runPromise).rejects.toThrow(/Multi-source import requires the --topic flag/);
+  });
+
   it('successfully imports markdown content from a file', async () => {
     const existsSpy = vi
       .spyOn(ResearchImport.prototype as any, 'fsExistsSync')
