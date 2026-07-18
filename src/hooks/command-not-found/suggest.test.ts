@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import hook from './suggest.js';
 
-// Minimal stand-in for the oclif Config the hook reads: the visible/hidden command split, the
-// command id list, the bin name, and the topic separator that toConfiguredId uses for display.
+// Minimal stand-in for the oclif Config the hook reads: command ids (including hidden `fetch`),
+// the bin name, and the topic separator that toConfiguredId uses for display.
 const fakeConfig = {
   bin: 'bonsai',
   topicSeparator: ' ',
@@ -245,11 +245,19 @@ describe('command_not_found hook', () => {
     }
   );
 
-  it('never suggests a hidden command', async () => {
-    // 'fetcj' is one edit from the hidden 'fetch'; the hook must skip it rather than surface a
-    // command the help output intentionally hides. No visible command is within the threshold of
-    // 'fetcj', so it must offer no correction at all (not just avoid naming 'fetch').
+  it('suggests the documented fetch entry point for fetch typos', async () => {
+    // fetch is hidden from the root command list but remains invokable (`bonsai fetch` /
+    // `bonsai help fetch`). Typos must still get a correction.
     const msg = await runHook('fetcj');
+    expect(msg).toContain('Did you mean fetch?');
+
+    const envelope = await runJsonHook('fetsh');
+    expect(envelope.stderr).toContain('Did you mean fetch?');
+    expect(envelope.suggestions).toEqual(['bonsai fetch']);
+  });
+
+  it('offers no correction when nothing is within the fuzzy threshold', async () => {
+    const msg = await runHook('zzzhidden');
     expect(msg).not.toContain('Did you mean');
   });
 });

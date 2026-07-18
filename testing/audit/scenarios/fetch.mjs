@@ -138,6 +138,41 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[1]?.error?.code === 'FETCH_FAILED', `second ${JSON.stringify(env?.data?.[1])}`);
   });
 
+  check('fetch multi-URL keeps hit data when a later URL is invalid', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url, 'not-a-url', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_URL', env?.code);
+    expect(Array.isArray(env?.data) && env.data.length === 2, `data ${JSON.stringify(env?.data)}`);
+    expect(env?.data?.[0]?.cache?.status === 'hit', `first ${env?.data?.[0]?.cache?.status}`);
+    expect(env?.data?.[0]?.content, 'first content kept');
+    expect(env?.data?.[1]?.error?.code === 'INVALID_URL', `second ${JSON.stringify(env?.data?.[1])}`);
+  });
+
+  check('fetch multi-URL scheme-less later URL is MISSING_URL_SCHEME with prior hit', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url, 'example.com/other', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'MISSING_URL_SCHEME', env?.code);
+    expect(env?.data?.[0]?.cache?.status === 'hit', 'first hit kept');
+    expect(env?.data?.[1]?.error?.code === 'MISSING_URL_SCHEME', JSON.stringify(env?.data?.[1]));
+  });
+
+  check('fetch multi-URL human mode warns the failure reason', () => {
+    const { ws, url } = seedFetchCache();
+    const bad = 'https://this-domain-definitely-does-not-exist-xyz123.invalid';
+    const r = run([url, bad], { cwd: ws.cwd, xdg: ws.xdg, timeout: 60000 });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('Deterministic fetch command fixture'), 'hit content');
+    expect(r.stderr.includes('failed'), r.stderr);
+    expect(
+      r.stderr.includes('DNS') || r.stderr.includes('ENOTFOUND') || r.stderr.includes('Fetch failed'),
+      `reason: ${r.stderr.slice(0, 200)}`
+    );
+  });
+
   check('fetch --force --allow-stale is CONFLICTING_FLAGS', () => {
     const r = run(['https://example.com', '--force', '--allow-stale', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

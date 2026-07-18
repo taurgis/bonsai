@@ -7,6 +7,7 @@ import {
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
 } from './lib/envelope.js';
+import { enrichParseError } from './lib/parse-error-ux.js';
 import {
   resolveResearchTarget,
   type ResolveResearchTargetOptions,
@@ -34,8 +35,9 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       aliases: ['plan'],
       default: false,
       description:
-        'Block all filesystem writes/deletes (cache and config); network fetches still run. ' +
-        'Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent read-only/plan modes.',
+        '(alias: --plan) Block all filesystem writes/deletes (cache and config); network fetches ' +
+        'still run. Also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE — enable for agent ' +
+        'read-only/plan modes.',
     }),
   };
 
@@ -116,6 +118,8 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     // Parse failures throw before `this.parse()` sets `parsed`, which makes oclif emit a spurious
     // [UnparsedCommand] warning to stderr even under `--json`. CLIParseError subclasses carry `parse`.
     if (err && typeof err === 'object' && 'parse' in err) this.parsed = true;
+    // Unwrap / fuzzy tips are no-ops when not applicable (including non-Error throws with no message).
+    enrichParseError(err);
     // Attach the stable code to the error itself so oclif's human pretty-print renders the same
     // `Code:` line that `--json` already reports via stableErrorCodeFrom. Without this, built-in
     // oclif parse errors (invalid enum value, missing arg, unknown flag) printed a code under

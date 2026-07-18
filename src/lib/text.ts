@@ -90,3 +90,14 @@ export function closestMatch(
   }
   return bestDistance <= maxDistance ? best : null;
 }
+
+/**
+ * Plausible option-value corrections: edit-distance first, then prefix matches for truncated enums
+ * (`stale` → `stale_grace` / `stale_expired`) where Levenshtein alone is too far.
+ */
+export function closestOptionValues(input: string, options: readonly string[]): string[] {
+  const edit = closestMatch(input, options, maxFuzzyDistance(input));
+  if (edit) return [edit];
+  // Exact equals already won via closestMatch; prefix covers truncated enums (stale → stale_*).
+  return options.filter((option) => option.startsWith(`${input}_`));
+}

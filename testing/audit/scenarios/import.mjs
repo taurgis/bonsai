@@ -156,6 +156,53 @@ export default function register(harness, fixtures) {
       extraArgs: ['--input-format', 'compressed'],
     });
   });
+
+  check('import multi-source --json exposes sourceUrls topic and null primary url', () => {
+    const r = run(
+      [
+        'import',
+        '--stdin',
+        '--topic',
+        'Audit Multi',
+        '--source-url',
+        'https://example.com/a',
+        '--source-url',
+        'https://example.com/b',
+        '--json',
+      ],
+      { input: '# Multi\n\nSynthesized.\n' }
+    );
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(env?.data?.artifactType === 'research_note', env?.data?.artifactType);
+    expect(env?.data?.topic === 'Audit Multi', env?.data?.topic);
+    expect(
+      Array.isArray(env?.data?.sourceUrls) && env.data.sourceUrls.length === 2,
+      JSON.stringify(env?.data?.sourceUrls)
+    );
+    expect(env?.data?.source?.url === null, `url ${env?.data?.source?.url}`);
+    expect(env?.data?.source?.normalizedUrl === null, `normalized ${env?.data?.source?.normalizedUrl}`);
+  });
+
+  check('import multi-source human mode shows topic tip', () => {
+    const r = run(
+      [
+        'import',
+        '--stdin',
+        '--topic',
+        'Audit Multi Human',
+        '--source-url',
+        'https://example.com/ha',
+        '--source-url',
+        'https://example.com/hb',
+      ],
+      { input: '# Multi\n' }
+    );
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('Topic:'), r.stdout);
+    expect(r.stdout.includes('Audit Multi Human'), r.stdout);
+    expect(r.stdout.includes('list --topic'), r.stdout);
+  });
 }
 
 function expectImportSanitizes(harness, { url, input, extraArgs = [] }) {

@@ -379,17 +379,22 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   }
 
   /**
-   * Multi-URL batches keep prior successes as failure rows; usage errors (exit 2) and
-   * single-URL failures still throw/exit.
+   * Multi-URL batches keep prior successes as failure rows. Flag validation runs before this loop,
+   * so every error that reaches here is per-URL — including INVALID_URL / MISSING_URL_SCHEME.
    */
   private failureRowOrRethrow(url: string, err: unknown, dryRun: boolean, batch: boolean) {
     if (!this.jsonEnabled()) ux.action.stop('failed');
-    if (err instanceof Errors.CLIError) {
-      if (!batch || (err.oclif?.exit ?? 1) === 2) throw err;
-      return buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err });
+    if (!batch) {
+      if (err instanceof Errors.CLIError) throw err;
+      this.emitFetchError(err, url);
     }
-    if (!batch) this.emitFetchError(err, url);
-    return buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
+    const row =
+      err instanceof Errors.CLIError
+        ? buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err })
+        : buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
+    // Human batches only get the spinner "failed" label unless we echo the reason.
+    if (!this.jsonEnabled()) this.warn(row.error.message);
+    return row;
   }
 
   private async fetchSingleTarget(

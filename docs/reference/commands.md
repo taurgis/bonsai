@@ -120,9 +120,12 @@ Localhost and other private hosts are accepted as **cache keys** for import. Net
     "storage": "global" | "project",
     "redirectedToGlobal": false
   },
+  "artifactType": "source" | "research_note",
+  "topic": "React Suspense" | null,
+  "sourceUrls": ["https://example.com"],
   "source": {
-    "url": "https://example.com",
-    "normalizedUrl": "https://example.com/",
+    "url": "https://example.com" | null,
+    "normalizedUrl": "https://example.com/" | null,
     "captureMethod": "agent_supplied",
     "extractionStatus": "agent_supplied",
     "extractionConfidence": "high",
@@ -136,6 +139,10 @@ Localhost and other private hosts are accepted as **cache keys** for import. Net
   "content": "Imported markdown body..."
 }
 ```
+
+For multi-source imports (`--source-url` repeated, no positional URL), `source.url` and
+`source.normalizedUrl` are `null`. Use `sourceUrls` and `topic` (required for multi-source) to find
+the note again with `list --topic "…"`.
 
 ---
 

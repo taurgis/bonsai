@@ -13,15 +13,15 @@ import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
  */
 function findSuggestion(
   segments: string[],
-  visibleIds: string[]
+  commandIds: string[]
 ): { suggestion: string | null; commandSegments: number } {
   for (let n = segments.length; n >= 1; n--) {
     const attempted = segments.slice(0, n).join(':');
-    const suggestion = closestMatch(attempted, visibleIds, maxFuzzyDistance(attempted));
+    const suggestion = closestMatch(attempted, commandIds, maxFuzzyDistance(attempted));
     if (
       suggestion === attempted &&
       n < segments.length &&
-      visibleIds.some((id) => id.startsWith(`${attempted}:`))
+      commandIds.some((id) => id.startsWith(`${attempted}:`))
     ) {
       continue;
     }
@@ -43,13 +43,13 @@ function topicChainLength(segments: string[], config: Interfaces.Config): number
 
 function exactZeroArgCommandPrefix(
   segments: string[],
-  visibleIds: string[],
+  commandIds: string[],
   config: Interfaces.Config
 ): { commandId: string; extra: string } | null {
   for (let n = segments.length - 1; n >= 1; n--) {
     const candidate = segments.slice(0, n).join(':');
-    if (!visibleIds.includes(candidate)) continue;
-    if (visibleIds.some((id) => id.startsWith(`${candidate}:`))) continue;
+    if (!commandIds.includes(candidate)) continue;
+    if (commandIds.some((id) => id.startsWith(`${candidate}:`))) continue;
 
     const command = config.commands.find((entry) => entry.id === candidate);
     const args = Object.keys(
@@ -104,8 +104,9 @@ export function buildCommandNotFoundDetails(
   message: string;
   suggestions?: string[];
 } {
-  const hiddenIds = new Set(config.commands.filter((c) => c.hidden).map((c) => c.id));
-  const visibleIds = config.commandIDs.filter((commandId) => !hiddenIds.has(commandId));
+  // Match against every loaded command id — including hidden ones that stay invokable
+  // (`fetch`, plugin internals). Root `--help` hides them; typo recovery should not.
+  const commandIds = config.commandIDs;
 
   // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
   // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which
@@ -127,7 +128,7 @@ export function buildCommandNotFoundDetails(
   }
 
   const segments = id.split(':');
-  const unexpected = exactZeroArgCommandPrefix(segments, visibleIds, config);
+  const unexpected = exactZeroArgCommandPrefix(segments, commandIds, config);
   if (unexpected) {
     const command = toConfiguredId(unexpected.commandId, config);
     return {
@@ -141,7 +142,7 @@ export function buildCommandNotFoundDetails(
     };
   }
 
-  const { suggestion, commandSegments } = findSuggestion(segments, visibleIds);
+  const { suggestion, commandSegments } = findSuggestion(segments, commandIds);
   // Show only the segments that name the command, never the positional args oclif folded into the id
   // (which would otherwise glue the arg on and turn `://` into ` //`).
   const displaySegments = commandSegments || topicChainLength(segments, config);

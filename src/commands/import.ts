@@ -183,7 +183,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       });
     }
     if (this.flags.stdin && this.flags.file) {
-      this.error('Cannot specify both --stdin and --file <path>. Choose one.', {
+      this.error('Cannot specify both --stdin and --file. Choose one input source.', {
         exit: 2,
         code: 'CONFLICTING_FLAGS',
       });
@@ -427,6 +427,11 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       );
       this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
       this.log(`${'Storage Path:'.padEnd(25)} ${storagePath}`);
+      if (!hasSingle) {
+        this.log(`${'Topic:'.padEnd(25)} ${this.flags.topic}`);
+        this.log(`${'Source URLs:'.padEnd(25)} ${sourceUrls.join(', ')}`);
+        this.log(`\nTip: find it again with ${this.config.bin} list --topic "${this.flags.topic}"`);
+      }
     }
 
     const inputFormat = this.flags['input-format'];
@@ -442,9 +447,13 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         storage: roots.mode,
         redirectedToGlobal: writeResult.redirected,
       },
+      artifactType: artifact.metadata.artifact_type,
+      topic: artifact.metadata.topic,
+      sourceUrls,
       source: {
-        url: hasSingle ? this.args.url! : '',
-        normalizedUrl: singleNormalizedUrl,
+        // Multi-source notes have no single primary URL — expose null plus sourceUrls above.
+        url: hasSingle ? this.args.url! : null,
+        normalizedUrl: hasSingle ? singleNormalizedUrl : null,
         captureMethod: 'agent_supplied',
         extractionStatus: 'agent_supplied',
         extractionConfidence: 'high',

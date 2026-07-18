@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   closestMatch,
+  closestOptionValues,
   levenshtein,
   maxFuzzyDistance,
   pluralize,
@@ -96,5 +97,18 @@ describe('closestMatch', () => {
 
   it('returns null for an empty candidate list', () => {
     expect(closestMatch('status', [], 3)).toBeNull();
+  });
+});
+
+describe('closestOptionValues', () => {
+  it('prefers edit-distance matches', () => {
+    expect(closestOptionValues('fres', ['fresh', 'stale_grace'])).toEqual(['fresh']);
+  });
+
+  it('falls back to prefix matches for truncated enums', () => {
+    expect(closestOptionValues('stale', ['fresh', 'stale_grace', 'stale_expired'])).toEqual([
+      'stale_grace',
+      'stale_expired',
+    ]);
   });
 });

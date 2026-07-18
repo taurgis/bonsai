@@ -33,8 +33,16 @@ export function stableErrorCodeFrom(err: unknown): string | undefined {
   return undefined;
 }
 
-/** Strip oclif's generic help suffix from JSON stderr — agents already have structured codes. */
+/** oclif wraps custom flag parse failures as `Parsing --name \n\t…\nSee more help with --help`. */
+const PARSING_WRAPPER = /^Parsing --\S+ \n\t([\s\S]*?)(?:\nSee more help with --help)?$/;
+
+/**
+ * Strip oclif's generic help suffix and the `Parsing --flag` wrapper so agents and humans see the
+ * actionable message we threw (e.g. `Limit must be between 1 and 100.`) instead of the wrapper.
+ */
 export function normalizeCliErrorMessage(message: string): string {
+  const wrapped = message.match(PARSING_WRAPPER);
+  if (wrapped?.[1]) return wrapped[1];
   const suffix = '\nSee more help with --help';
   return message.endsWith(suffix) ? message.slice(0, -suffix.length) : message;
 }
