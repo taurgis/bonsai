@@ -67,18 +67,21 @@ export function exitWithPreflight(result: PreflightExit): never {
   process.exit();
 }
 
-/** Command-not-found hook: always usage exit 2 with JSON envelope on stdout. */
-export function writeCommandNotFoundJsonAndExit(opts: {
+/** Command-not-found hook: print JSON error, set exitCode 2, return envelope (no process.exit). */
+export function writeCommandNotFoundJson(opts: {
   command: string;
   message: string;
   code: string;
   suggestions?: string[];
-}): never {
+}): Record<string, unknown> {
   const envelope = buildCliErrorEnvelope({
     command: opts.command,
     message: opts.message,
     code: opts.code,
     suggestions: opts.suggestions,
   });
-  writeJsonAndExit(envelope, 2);
+  process.exitCode = 2;
+  if (envelope.stderr) process.stderr.write(`${String(envelope.stderr)}\n`);
+  printJsonEnvelope(envelope);
+  return envelope;
 }

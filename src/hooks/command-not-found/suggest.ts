@@ -1,6 +1,6 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
-import { writeCommandNotFoundJsonAndExit } from '../../lib/cli-emit.js';
+import { writeCommandNotFoundJson } from '../../lib/cli-emit.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
 /**
@@ -164,7 +164,7 @@ export function buildCommandNotFoundDetails(
 const hook: Hook<'command_not_found'> = async function (opts) {
   const details = buildCommandNotFoundDetails(opts.id, opts.argv, opts.config);
   if (details.jsonMode) {
-    return writeCommandNotFoundJsonAndExit({
+    return writeCommandNotFoundJson({
       command: details.command,
       message: details.message,
       code: details.code,
