@@ -575,24 +575,22 @@
       "includePrerelease": false
     },
     "thermo-nuclear-code-quality-review": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
+      "source": "cursor/plugins",
       "sourceType": "github",
-      "computedHash": "991d5d2e6abb88d72b3d313631c79ec94fd65b3ef9050e994545854027432494",
+      "computedHash": "336d309513dfbb761f2ef853f57d6da2733f7ffcd2428168f18b996db12e0d5c",
       "agents": [
         "github-copilot",
         "claude-code",
+        "codex",
         "cursor",
-        "antigravity",
-        "codex"
+        "antigravity"
       ],
-      "repoPath": "skills/thermo-nuclear-code-quality-review/SKILL.md",
+      "repoPath": "cursor-team-kit/skills/thermo-nuclear-code-quality-review/SKILL.md",
       "installPath": ".agents/skills/thermo-nuclear-code-quality-review",
-      "installHash": "e6c7f47de42b75eac61e510b8656cce04199fe503305479b17f1ce7db8d19788",
-      "sourceHash": "991d5d2e6abb88d72b3d313631c79ec94fd65b3ef9050e994545854027432494",
+      "installHash": "9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476",
+      "sourceHash": "336d309513dfbb761f2ef853f57d6da2733f7ffcd2428168f18b996db12e0d5c",
       "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
+      "includePrerelease": false
     },
     "to-spec": {
       "source": "mattpocock/skills",
