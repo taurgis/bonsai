@@ -155,6 +155,24 @@
       "versionPolicy": "minor",
       "includePrerelease": false
     },
+    "diagnosing-bugs": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "bc9a014648365a1ac7ec2326330cab50d6fd77ebbda2370de7d2aef2c36704e8",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "antigravity"
+      ],
+      "repoPath": "skills/engineering/diagnosing-bugs/SKILL.md",
+      "installPath": ".agents/skills/diagnosing-bugs",
+      "installHash": "fd6c99466b7ba43be624e6e66ed6d7af2796ded7218f24c83820823977819e22",
+      "sourceHash": "bc9a014648365a1ac7ec2326330cab50d6fd77ebbda2370de7d2aef2c36704e8",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
     "domain-modeling": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -266,6 +284,24 @@
       "versionPolicy": "minor",
       "includePrerelease": false
     },
+    "handoff": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "dc50c1b830e6de2b1afce24f49906a8029e8684c6a44ebb3c0d52cb921158438",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "antigravity"
+      ],
+      "repoPath": "skills/productivity/handoff/SKILL.md",
+      "installPath": ".agents/skills/handoff",
+      "installHash": "ad03e8d4ea3cbbff66420eb7ba3cc375b5cbe1821a2449b53e863256cf5b5cde",
+      "sourceHash": "dc50c1b830e6de2b1afce24f49906a8029e8684c6a44ebb3c0d52cb921158438",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
     "human-prose-editing": {
       "source": "Forward-Services-NV/forward-nexus-projects",
       "sourceType": "github",
@@ -301,6 +337,24 @@
       "installPath": ".agents/skills/implement",
       "installHash": "2139cfedf24791adbc839aaab6019cff158af1e28bfead020ec6e0ce01b3e74d",
       "sourceHash": "ce2cae1881c560ab75504edd8fd4c00ac4bdbd34475e29eeb6faac8aea9459ea",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "improve-codebase-architecture": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "940d69594a628748c306d80f0ac6f7c9076f361b6c398ce4f59b0d64b74ddf33",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "antigravity"
+      ],
+      "repoPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "installPath": ".agents/skills/improve-codebase-architecture",
+      "installHash": "66e8a50c83c3c724fcfe0769701b665c56cec220cc4f49cc1aee8bdfc07de94a",
+      "sourceHash": "940d69594a628748c306d80f0ac6f7c9076f361b6c398ce4f59b0d64b74ddf33",
       "versionPolicy": "minor",
       "includePrerelease": false
     },
@@ -519,6 +573,24 @@
       "versionPolicy": "minor",
       "includePrerelease": false
     },
+    "resolving-merge-conflicts": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "8553d18ad01bc46d2cffe1cefbaf029099a21177122d4419a0437a949a168a04",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "antigravity"
+      ],
+      "repoPath": "skills/engineering/resolving-merge-conflicts/SKILL.md",
+      "installPath": ".agents/skills/resolving-merge-conflicts",
+      "installHash": "28aad6f8b1b7025abc8892fa8890f68fe1533499b28a565f416b159131d22fad",
+      "sourceHash": "8553d18ad01bc46d2cffe1cefbaf029099a21177122d4419a0437a949a168a04",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
     "setup-matt-pocock-skills": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -571,6 +643,24 @@
       "installPath": ".agents/skills/tdd",
       "installHash": "81eca2a5b53a63f481c0849be7a663a8cd43d5cf53f32b644ec0a2f50cf91aa2",
       "sourceHash": "dcd706725fc5ab3e3e9de4b4dd645de9be66c1428fd4aa511afb77b40d93462f",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "teach": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "ec4a81bc1bb72676fa24e58e0c86fc7722d3ecfeb1ec44b1baaada96eba89534",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "antigravity"
+      ],
+      "repoPath": "skills/productivity/teach/SKILL.md",
+      "installPath": ".agents/skills/teach",
+      "installHash": "68999bb1a241384b2f921f3321d779b7d05eb6089077b70d88cee2aee3d75ccc",
+      "sourceHash": "ec4a81bc1bb72676fa24e58e0c86fc7722d3ecfeb1ec44b1baaada96eba89534",
       "versionPolicy": "minor",
       "includePrerelease": false
     },
@@ -628,6 +718,24 @@
       "versionPolicy": "minor",
       "includePrerelease": false
     },
+    "triage": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "4e91c682f906023f2d05fcc109199ff8a8417637401e7d46404ec4bb5f69341a",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "antigravity"
+      ],
+      "repoPath": "skills/engineering/triage/SKILL.md",
+      "installPath": ".agents/skills/triage",
+      "installHash": "7c923b6a677cfe689500721f08307e2a4c46797ff169dc55ef6c34a431a0d533",
+      "sourceHash": "4e91c682f906023f2d05fcc109199ff8a8417637401e7d46404ec4bb5f69341a",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
     "wayfinder": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -666,6 +774,24 @@
       "includePrerelease": false,
       "sourceVersion": "3.1.0",
       "installVersion": "3.1.0"
+    },
+    "writing-great-skills": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "c9716788d88120a792f8638c9efe06d21ac41281c796c3734f3914995487ef81",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "antigravity"
+      ],
+      "repoPath": "skills/productivity/writing-great-skills/SKILL.md",
+      "installPath": ".agents/skills/writing-great-skills",
+      "installHash": "4deb21855fb4deeeb1b8217b041faff003fd0c915d24a22f636851c520bc9c5c",
+      "sourceHash": "c9716788d88120a792f8638c9efe06d21ac41281c796c3734f3914995487ef81",
+      "versionPolicy": "minor",
+      "includePrerelease": false
     }
   },
   "instructions": {
