@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { runContract } from './runner.ts';
 import { hasInternetAccess } from '../helpers/network.ts';
 
@@ -9,6 +12,10 @@ function expectMirroredErrorStderr(
 ) {
   expect(result.stderr).toContain(`Code: ${code}`);
   expect(result.stderr).toContain(envelope.stderr);
+}
+
+function contractWorkspace(prefix: string): string {
+  return mkdtempSync(join(tmpdir(), prefix));
 }
 
 describe('research contract tests', () => {
@@ -475,7 +482,7 @@ describe('CLI ergonomics and error contracts', () => {
     const result = runContract(['prune', '--dry-run']);
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain('Must specify at least one pruning filter');
-    expect(result.stderr).toContain('older-than 90d');
+    expect(result.stderr).toContain('older-than 30d');
     expect(result.stderr).toContain('--dry-run');
   });
 
@@ -530,12 +537,54 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stderr).toBe('');
   });
 
+  it('inspect multi-url JSON keeps hit data when another row fails validation', () => {
+    const cwd = contractWorkspace('bonsai-contract-inspect-batch-');
+    const hitUrl = 'https://example.com/contract-inspect-batch-hit';
+    const imported = runContract(
+      ['import', hitUrl, '--stdin', '--topic', 'Inspect contract batch', '--json'],
+      {
+        cwd,
+        env: { BONSAI_STORAGE: 'project' },
+        input: '# Inspect batch hit\n\nCached contract row.\n',
+        raw: true,
+      }
+    );
+    expect(imported.exitCode).toBe(0);
+
+    const result = runContract(['inspect', hitUrl, 'not-a-url', '--json'], {
+      cwd,
+      env: { BONSAI_STORAGE: 'project' },
+      raw: true,
+    });
+    expect(result.exitCode).toBe(1);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'INVALID_URL',
+      data: [
+        {
+          status: 'hit',
+          normalizedUrl: hitUrl,
+          metadata: { topic: 'Inspect contract batch' },
+        },
+        {
+          status: 'error',
+          normalizedUrl: 'not-a-url',
+          error: { code: 'INVALID_URL' },
+        },
+      ],
+    });
+    expect(envelope.stderr).toContain('Code: INVALID_URL');
+    expect(result.stderr).toBe('');
+  });
+
   it('prune JSON usage error includes suggestions in the envelope', () => {
     const result = runContract(['prune', '--json'], { raw: true });
     expect(result.exitCode).toBe(2);
     const envelope = JSON.parse(result.stdout);
     expect(envelope.code).toBe('MISSING_FILTER');
-    expect(envelope.suggestions?.[0]).toContain('prune --older-than 90d --dry-run');
+    expect(envelope.suggestions?.[0]).toContain('prune --older-than 30d --dry-run');
     expect(envelope.stderr).toContain('Try this:');
   });
 
