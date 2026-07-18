@@ -1,4 +1,7 @@
+import { BaseCommand } from '../base-command.js';
+import { commands } from '../commands.js';
 import { buildCliErrorEnvelope } from './envelope.js';
+import { valueTakingFlagTokensFromCommands } from './value-flags.js';
 
 export interface NormalizationResult {
   /** The normalized argv array to set on process.argv. */
@@ -39,30 +42,11 @@ export function missingCommandDetails(
   };
 }
 
-/** Flags that consume the next argv token as a value. Keep short aliases in sync with command chars. */
-export const FLAGS_WITH_VALUES = new Set([
-  '--topic',
-  '-t',
-  '--tags',
-  '-g',
-  '--format',
-  '--tier',
-  '--ttl',
-  '-l',
-  '--max-age',
-  '--storage',
-  '--file',
-  '-f',
-  '--input-format',
-  '--source-url',
-  '--freshness',
-  '--artifact-type',
-  '--capture-method',
-  '--older-than',
-  '--inactive',
-  '--limit',
-  '--url',
-]);
+/**
+ * Flags that consume the next argv token as a value. Derived from command class metadata so
+ * adding a value-taking flag cannot silently break URL/help/json argv normalization.
+ */
+export const FLAGS_WITH_VALUES = valueTakingFlagTokensFromCommands(commands, BaseCommand.baseFlags);
 
 /**
  * Boolean flags registered on every command via BaseCommand.baseFlags. oclif only merges those after

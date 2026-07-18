@@ -1,10 +1,11 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
+import { batchSeparator, cacheMissHint, formatCacheTargetHeader } from '../lib/cache-view.js';
 import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
-import { formatHumanField, formatHumanFields } from '../lib/cli-presentation.js';
+import { formatHumanField } from '../lib/cli-presentation.js';
 
 interface SectionSummary {
   cacheKey: string;
@@ -62,16 +63,16 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   private missResult(target: ResolvedResearchTarget) {
     const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
     if (!this.jsonEnabled()) {
-      for (const line of formatHumanFields([
-        ['URL', colors.bold(target.normalizedUrl)],
-        ['Cache Key', colors.bold(target.cacheKey)],
-        ['Cache Path', colors.gray(artifactPath)],
-        ['Status', colors.red('miss')],
-      ])) {
+      for (const line of formatCacheTargetHeader(
+        target,
+        [['Status', colors.red('miss')]],
+        artifactPath
+      )) {
         this.log(line);
       }
-      this.warn(`Cache miss — run: ${this.config.bin} ${target.normalizedUrl}`);
-      if (this.parsedArgv.length > 1) this.log('='.repeat(40));
+      this.warn(cacheMissHint(this.config.bin, target.normalizedUrl));
+      const sep = batchSeparator(this.parsedArgv.length > 1);
+      if (sep) this.log(sep);
     }
     return {
       cacheKey: target.cacheKey,
@@ -90,16 +91,13 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
     const sections = this.findSections(roots.readRoots, cacheKey);
 
     if (!this.jsonEnabled()) {
-      for (const line of formatHumanFields([
-        ['URL', colors.bold(normalizedUrl)],
-        ['Cache Key', colors.bold(cacheKey)],
-        ['Cache Path', colors.gray(artifactPath)],
-      ])) {
+      for (const line of formatCacheTargetHeader(target, [], artifactPath)) {
         this.log(line);
       }
       this.logMetadata(cached.metadata);
       if (sections.length) this.logSections(sections);
-      if (this.parsedArgv.length > 1) this.log('='.repeat(40));
+      const sep = batchSeparator(this.parsedArgv.length > 1);
+      if (sep) this.log(sep);
     }
 
     return {

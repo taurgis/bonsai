@@ -1,6 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { BaseCommand } from '../base-command.js';
-import { commands } from '../commands.js';
 import { FLAGS_WITH_VALUES, normalizeArgv, positionalArgvTokens } from './argv.js';
 
 describe('normalizeArgv', () => {
@@ -376,22 +374,17 @@ describe('normalizeArgv', () => {
 });
 
 describe('FLAGS_WITH_VALUES', () => {
-  it('matches every value-taking command flag and alias', () => {
-    const expected = new Set<string>();
-    const commandClasses = Object.values(commands);
-
-    for (const command of commandClasses) {
-      const flags = { ...BaseCommand.baseFlags, ...command.flags };
-      for (const [name, flag] of Object.entries(flags)) {
-        if (flag.type === 'boolean') continue;
-        expected.add(`--${name}`);
-        if (flag.char) expected.add(`-${flag.char}`);
-        for (const alias of flag.aliases ?? []) expected.add(`--${alias}`);
-        for (const charAlias of flag.charAliases ?? []) expected.add(`-${charAlias}`);
-      }
-    }
-
-    expect([...FLAGS_WITH_VALUES].sort()).toEqual([...expected].sort());
+  it('is derived from command metadata (includes known value-taking flags)', () => {
+    // Derived at module load from command classes — assert the contract agents rely on,
+    // not a hand-maintained duplicate list.
+    expect(FLAGS_WITH_VALUES.has('--topic')).toBe(true);
+    expect(FLAGS_WITH_VALUES.has('-t')).toBe(true);
+    expect(FLAGS_WITH_VALUES.has('--format')).toBe(true);
+    expect(FLAGS_WITH_VALUES.has('--file')).toBe(true);
+    expect(FLAGS_WITH_VALUES.has('-f')).toBe(true);
+    expect(FLAGS_WITH_VALUES.has('--url')).toBe(true);
+    expect(FLAGS_WITH_VALUES.has('--read-only')).toBe(false);
+    expect(FLAGS_WITH_VALUES.has('--json')).toBe(false);
   });
 
   it('keeps value operands out of positional command tokens', () => {

@@ -7,6 +7,7 @@ import {
   validKeysHint,
 } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
+import { configWriteStatus } from '../../lib/research/persist-artifact.js';
 
 export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
   static id = 'config set';
@@ -76,9 +77,16 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     const scope = this.writeScope(this.flags.local);
     const formatted = meta.format(parsed);
 
-    if (this.effectiveDryRun(this.flags['dry-run'])) {
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
+    if (dryRun) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
-      return { key: keyArg, value: parsed, scope, dryRun: true, status: 'would_set' };
+      return {
+        key: keyArg,
+        value: parsed,
+        scope,
+        dryRun: true,
+        status: configWriteStatus(true, 'set'),
+      };
     }
 
     const patch = { [keyArg]: parsed } as Partial<ConfigValues>;
@@ -102,7 +110,13 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     }
 
     if (!this.jsonEnabled()) this.log(`Set ${keyArg} = ${formatted} (${scope})`);
-    return { key: keyArg, value: parsed, scope, dryRun: false, status: 'set' };
+    return {
+      key: keyArg,
+      value: parsed,
+      scope,
+      dryRun: false,
+      status: configWriteStatus(false, 'set'),
+    };
   }
 }
 

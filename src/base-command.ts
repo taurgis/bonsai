@@ -1,14 +1,9 @@
 import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
-import {
-  buildEnvelope,
-  enrichCacheMissEnvelope,
-  enrichRowErrorEnvelope,
-  formatErrorForJson,
-  normalizeCliErrorMessage,
-  stableErrorCodeFrom,
-} from './lib/envelope.js';
+import { enrichErrorForDisplay, exitCodeOf, prepareCliError } from './lib/cli-error-policy.js';
+import { emitJsonEnvelope } from './lib/cli-emit.js';
+import { buildEnvelope, enrichCacheMissEnvelope, enrichRowErrorEnvelope } from './lib/envelope.js';
 import { enrichParseError } from './lib/parse-error-ux.js';
 import {
   resolveResearchTarget,
@@ -95,35 +90,6 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   }
 
   /**
-   * The exit code an error maps to. oclif `CLIError`s carry it in `err.oclif.exit`; other errors may
-   * expose `err.exitCode`. Defined once so the process exit code (`catch`) and the JSON envelope
-   * (`toErrorJson`) can never disagree — a mismatch between these two was itself the bug this fixes.
-   */
-  private static exitCodeOf(err: { oclif?: { exit?: number }; exitCode?: number }): number {
-    return err?.oclif?.exit ?? err?.exitCode ?? 1;
-  }
-
-  private static fallbackSuggestionsForCode(
-    code: string | undefined,
-    bin: string,
-    command: string
-  ): string[] | undefined {
-    const help = command === bin ? `${bin} --help` : `${bin} ${command} --help`;
-    switch (code) {
-      case 'UNKNOWN_FLAG':
-      case 'INVALID_FLAG_VALUE':
-      case 'MISSING_FLAG_VALUE':
-      case 'MISSING_ARGUMENT':
-      case 'UNEXPECTED_ARGUMENT':
-        return [`Check usage: ${help}`];
-      case 'INVALID_DURATION':
-        return ['Use a whole number plus a unit, e.g. 2h, 7d, or 6m.'];
-      default:
-        return undefined;
-    }
-  }
-
-  /**
    * Align the process exit code with the code reported in the JSON envelope. oclif's default
    * `catch` sets `process.exitCode = err.exitCode ?? 1`, but oclif `CLIError`s carry their code in
    * `err.oclif.exit` (never `err.exitCode`), so a usage error (`this.error(msg, { exit: 2 })`) would
@@ -144,22 +110,8 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     if (err && typeof err === 'object' && 'parse' in err) this.parsed = true;
     // Unwrap / fuzzy tips are no-ops when not applicable (including non-Error throws with no message).
     enrichParseError(err);
-    // Attach the stable code to the error itself so oclif's human pretty-print renders the same
-    // `Code:` line that `--json` already reports via stableErrorCodeFrom. Without this, built-in
-    // oclif parse errors (invalid enum value, missing arg, unknown flag) printed a code under
-    // --json but not for humans — the two output modes disagreed on whether an error had a code.
-    if (err && typeof err === 'object' && !err.code) {
-      const code = stableErrorCodeFrom(err);
-      if (code) err.code = code;
-    }
-    if (err && typeof err === 'object' && err.code && !err.suggestions?.length) {
-      err.suggestions = BaseCommand.fallbackSuggestionsForCode(
-        err.code,
-        this.config.bin,
-        this.envelopeCommandId()
-      );
-    }
-    process.exitCode = process.exitCode ?? BaseCommand.exitCodeOf(err);
+    enrichErrorForDisplay(err, { bin: this.config.bin, command: this.envelopeCommandId() });
+    process.exitCode = process.exitCode ?? exitCodeOf(err);
     return super.catch(err);
   }
 
@@ -282,35 +234,20 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
 
   /** Mirror the success envelope for failures so JSON consumers get one consistent shape. */
   protected override toErrorJson(err: unknown): Record<string, unknown> {
-    const e = err as {
-      oclif?: { exit?: number };
-      exitCode?: number;
-      message?: string;
-      code?: string;
-      suggestions?: string[];
-      ref?: string;
-    };
-    const exitCode = BaseCommand.exitCodeOf(e);
-    const code = stableErrorCodeFrom(e);
-    const message =
-      typeof e?.message === 'string' ? normalizeCliErrorMessage(e.message) : undefined;
-    const suggestions = e.suggestions?.length
-      ? e.suggestions
-      : BaseCommand.fallbackSuggestionsForCode(code, this.config.bin, this.envelopeCommandId());
-    const stderr =
-      message || code || suggestions?.length || e?.ref
-        ? formatErrorForJson({ ...e, message, code, suggestions })
-        : String(err);
-    if (stderr) process.stderr.write(`${stderr}\n`);
-    return buildEnvelope({
+    const prepared = prepareCliError(err, {
+      bin: this.config.bin,
+      command: this.envelopeCommandId(),
+    });
+    // oclif prints the returned object to stdout; we only own stderr here.
+    return emitJsonEnvelope({
       command: this.envelopeCommandId(),
       ok: false,
-      exitCode,
-      stderr,
+      exitCode: prepared.exitCode,
+      stderr: prepared.stderr,
       data: null,
-      code,
-      suggestions,
-      ref: e.ref,
+      code: prepared.code,
+      suggestions: prepared.suggestions,
+      ref: prepared.ref,
     });
   }
 }

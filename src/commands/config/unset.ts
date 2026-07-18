@@ -2,6 +2,7 @@ import { Args, Flags } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
 import { writeUserConfig, writeProjectConfig, validKeysHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
+import { configWriteStatus } from '../../lib/research/persist-artifact.js';
 
 export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
   static id = 'config unset';
@@ -42,9 +43,10 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
     const scope = this.writeScope(this.flags.local);
 
-    if (this.effectiveDryRun(this.flags['dry-run'])) {
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
+    if (dryRun) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would unset ${key} (${scope})`);
-      return { key, scope, dryRun: true, status: 'would_unset' };
+      return { key, scope, dryRun: true, status: configWriteStatus(true, 'unset') };
     }
 
     const patch = { [key]: undefined } as Partial<ConfigValues>;
@@ -68,6 +70,6 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
     }
 
     if (!this.jsonEnabled()) this.log(`Unset ${key} (${scope})`);
-    return { key, scope, dryRun: false, status: 'unset' };
+    return { key, scope, dryRun: false, status: configWriteStatus(false, 'unset') };
   }
 }

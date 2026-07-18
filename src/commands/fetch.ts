@@ -14,9 +14,9 @@ import {
   fetchFailureGuidance,
   reportCacheStatus,
 } from '../lib/research/fetch-result.js';
-import { writeArtifact, type LocatedArtifact } from '../lib/research/storage.js';
+import { type LocatedArtifact } from '../lib/research/storage.js';
 import { loadStoreRoots, type StoreRoots } from '../lib/research/store-roots.js';
-import { writeArtifactSecurely } from '../lib/research/secure-write.js';
+import { persistArtifact } from '../lib/research/persist-artifact.js';
 import { loadSummaryLevel, type StorageMode, type SummaryLevel } from '../lib/config/index.js';
 import {
   evaluateFreshness,
@@ -322,23 +322,16 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     cacheKey: string,
     artifact: any
   ): { dir: string; redirectedToGlobal: boolean } {
-    if (tmpDir) {
-      const result = writeArtifactSecurely(roots, cacheKey, artifact, { dryRun: true });
-      if (result.redirected) {
-        this.warn(
-          `Detected ${result.secretLabel} in the page content; would store in the global cache instead of the project to avoid committing secrets.`
-        );
-      }
-      writeArtifact(tmpDir, cacheKey, artifact);
-      // Report the real would-be location, not the throwaway dir that is about to be deleted.
-      return { dir: result.dataDir, redirectedToGlobal: result.redirected };
-    }
-    const result = writeArtifactSecurely(roots, cacheKey, artifact);
-    if (result.redirected) {
-      this.warn(
-        `Detected ${result.secretLabel} in the page content; stored in the global cache instead of the project to avoid committing secrets.`
-      );
-    }
+    const result = persistArtifact({
+      roots,
+      cacheKey,
+      artifact,
+      dryRun: Boolean(tmpDir),
+      kind: 'fetch',
+      scratchDir: tmpDir,
+    });
+    if (result.redirectWarning) this.warn(result.redirectWarning);
+    // Report the real would-be location, not the throwaway dir that is about to be deleted.
     return { dir: result.dataDir, redirectedToGlobal: result.redirected };
   }
 

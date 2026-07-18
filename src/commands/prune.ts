@@ -12,6 +12,7 @@ import { artifactMatchesUrlFilter } from '../lib/research/url.js';
 import { pruneFlagError } from '../lib/prune-flags.js';
 import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
+import { pruneWriteStatus } from '../lib/research/persist-artifact.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
@@ -188,7 +189,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
     return {
       dryRun,
-      status: dryRun ? 'would_prune' : 'pruned',
+      status: pruneWriteStatus(dryRun),
       wouldPruneCount: dryRun ? count : 0,
       prunedCount,
       candidateCount: count,

@@ -7,7 +7,7 @@ import { normalizeUrl } from '../lib/research/url.js';
 import { deriveCacheKey } from '../lib/research/cache-key.js';
 import { getArtifactPath } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
-import { writeArtifactSecurely } from '../lib/research/secure-write.js';
+import { importCacheWriteStatus, persistArtifact } from '../lib/research/persist-artifact.js';
 import { loadSummaryLevel, type StorageMode } from '../lib/config/index.js';
 import { durationFlagError, getPolicy } from '../lib/research/freshness.js';
 import { buildCompressed } from '../lib/research/compress.js';
@@ -470,15 +470,17 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     });
 
     const dryRun = this.effectiveDryRun(this.flags['dry-run']);
-    const writeResult = writeArtifactSecurely(roots, cacheKey, artifact, { dryRun });
+    const writeResult = persistArtifact({
+      roots,
+      cacheKey,
+      artifact,
+      dryRun,
+      kind: 'import',
+    });
     const storagePath = getArtifactPath(writeResult.dataDir, cacheKey);
 
-    if (writeResult.redirected) {
-      this.warn(
-        dryRun
-          ? `Detected ${writeResult.secretLabel} in the imported content; would store in the global cache instead of the project to avoid committing secrets.`
-          : `Detected ${writeResult.secretLabel} in the imported content; stored in the global cache instead of the project to avoid committing secrets.`
-      );
+    if (writeResult.redirectWarning) {
+      this.warn(writeResult.redirectWarning);
     }
 
     if (!this.jsonEnabled()) {
@@ -504,7 +506,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       dryRun,
       cache: {
         key: cacheKey,
-        status: dryRun ? 'would_import' : 'imported',
+        status: importCacheWriteStatus(dryRun),
         freshness: 'fresh',
         path: storagePath,
         storage: roots.mode,
