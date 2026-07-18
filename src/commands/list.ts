@@ -138,11 +138,29 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
   }
 
+  private hasActiveFilters(): boolean {
+    return Boolean(
+      this.flags.topic ||
+      (this.flags.tags && this.flags.tags.length > 0) ||
+      this.flags.freshness ||
+      this.flags['artifact-type'] ||
+      this.flags['capture-method'] ||
+      this.flags.url
+    );
+  }
+
   private logListResults(finalResults: any[], totalMatched: number): void {
     if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
-      this.log('No cached research entries found matching filters.');
-      this.log(`\nTip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`);
+      if (this.hasActiveFilters()) {
+        this.log('No cached research entries match the given filters.');
+        this.log(
+          `\nTip: try relaxing filters, or list everything: ${colors.cyan(this.config.bin + ' list')}`
+        );
+      } else {
+        this.log('No cached research entries found.');
+        this.log(`\nTip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`);
+      }
       return;
     }
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);

@@ -1,7 +1,9 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { scanCacheDirs } from '../lib/research/storage.js';
+import { finalizeBatch } from '../lib/batch.js';
+import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
+import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
 
 interface SectionSummary {
   cacheKey: string;
@@ -38,38 +40,66 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
 
   static stdoutIsPrimaryData = true;
 
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    return this.cacheMissSuccessJson(data, (url, n) =>
+      n > 1
+        ? `No cached research found for URL: ${url} and ${n - 1} other URLs`
+        : `No cached research found for URL: ${url}`
+    );
+  }
+
   async run(): Promise<unknown> {
-    const urls = this.parsedArgv;
+    const results = this.parsedArgv.map((url) => this.inspectOne(url));
+    return finalizeBatch(results, (r) => r.status === 'miss');
+  }
 
-    const results: any[] = [];
-    const missingUrls: string[] = [];
+  private inspectOne(url: string) {
+    const target = this.resolveResearchTargetOrFail(url);
+    return target.located ? this.hitResult(target) : this.missResult(target);
+  }
 
-    for (const url of urls) {
-      const target = this.resolveResearchTargetOrFail(url);
-      if (!target.located) {
-        missingUrls.push(target.normalizedUrl);
-        continue;
-      }
-      results.push(this.inspectSingleTarget(target, urls.length > 1));
+  private missResult(target: ResolvedResearchTarget) {
+    const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
+    if (!this.jsonEnabled()) {
+      this.log(`${colors.cyan('URL:'.padEnd(25))} ${colors.bold(target.normalizedUrl)}`);
+      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(target.cacheKey)}`);
+      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      this.log(`${colors.cyan('Status:'.padEnd(25))} ${colors.red('miss')}`);
+      this.warn(`Cache miss — run: ${this.config.bin} ${target.normalizedUrl}`);
+      if (this.parsedArgv.length > 1) this.log('='.repeat(40));
+    }
+    return {
+      cacheKey: target.cacheKey,
+      cachePath: artifactPath,
+      normalizedUrl: target.normalizedUrl,
+      status: 'miss' as const,
+      metadata: null,
+      sections: [] as SectionSummary[],
+    };
+  }
+
+  private hitResult(target: ResolvedResearchTarget) {
+    const { cacheKey, located, roots, normalizedUrl } = target;
+    const cached = located!.artifact;
+    const artifactPath = located!.path;
+    const sections = this.findSections(roots.readRoots, cacheKey);
+
+    if (!this.jsonEnabled()) {
+      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
+      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
+      this.logMetadata(cached.metadata);
+      if (sections.length) this.logSections(sections);
+      if (this.parsedArgv.length > 1) this.log('='.repeat(40));
     }
 
-    if (missingUrls.length > 0) {
-      const firstMissing = missingUrls[0]!;
-      const suggestions = missingUrls.map(
-        (u) => `Fetch and cache it first: ${this.config.bin} ${u}`
-      );
-      this.error(
-        `No cached research found for URL: ${firstMissing}` +
-          (missingUrls.length > 1 ? ` and ${missingUrls.length - 1} other URLs` : ''),
-        {
-          exit: 1,
-          code: 'CACHE_MISS',
-          suggestions,
-        }
-      );
-    }
-
-    return urls.length === 1 ? results[0] : results;
+    return {
+      cacheKey,
+      cachePath: artifactPath,
+      normalizedUrl,
+      status: 'hit' as const,
+      metadata: cached.metadata,
+      sections,
+    };
   }
 
   private logMetadata(metadata: Record<string, any>): void {
@@ -91,32 +121,6 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
         `${colors.cyan(s.headingPath || '')} [${colors.yellow(s.anchor || '')}] (${colors.magenta(String(s.tokenEstimate.detailed || 0))} tokens) ${colors.gray(s.cacheKey)}`
       );
     }
-  }
-
-  private inspectSingleTarget(target: any, showSeparator: boolean): any {
-    const { cacheKey, located, roots } = target;
-    const cached = located.artifact;
-    const artifactPath = located.path;
-    const sections = this.findSections(roots.readRoots, cacheKey);
-
-    if (!this.jsonEnabled()) {
-      this.log(`${colors.cyan('Cache Key:'.padEnd(25))} ${colors.bold(cacheKey)}`);
-      this.log(`${colors.cyan('Cache Path:'.padEnd(25))} ${colors.gray(artifactPath)}`);
-      this.logMetadata(cached.metadata);
-      if (sections.length) {
-        this.logSections(sections);
-      }
-      if (showSeparator) {
-        this.log('='.repeat(40));
-      }
-    }
-
-    return {
-      cacheKey,
-      cachePath: artifactPath,
-      metadata: cached.metadata,
-      sections,
-    };
   }
 
   // Section children link back via parent_cache_key; list the active ones for this page (T-22).

@@ -34,6 +34,7 @@ npx @taurgis/bonsai <url> [flags]
 | `--allow-stale` | — | boolean | `false` | Allow serving stale entries if remote server is offline. |
 | `--rendered` | — | boolean | `false` | Force browser-rendered extraction for pages that require client-side JavaScript (e.g. SPA docs). |
 | `--storage` | — | choice | (configured) | Override cache location for this run: `global` or `project`. Secret-bearing pages are always stored globally. |
+| `--read-only` | — | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
 | `--json` | — | boolean | `false` | Format command response as machine-readable JSON. |
 
 ### JSON Output Envelope Schema
@@ -48,9 +49,10 @@ npx @taurgis/bonsai <url> [flags]
   "data": {
     "schemaVersion": 1,
     "command": "bonsai",
+    "dryRun": false,
     "cache": {
       "key": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
-      "status": "hit" | "miss" | "revalidated" | "refreshed" | "stale",
+      "status": "hit" | "miss" | "revalidated" | "refreshed" | "stale" | "would_fetch" | "would_refresh" | "would_revalidate",
       "freshness": "fresh" | "stale_grace" | "stale_expired" | "none",
       "path": "/path/to/research/cache/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
       "storage": "global" | "project",
@@ -95,19 +97,24 @@ npx @taurgis/bonsai import [url] [flags]
 * `[url]`: Optional string. The target URL (only for single-source import). Must omit if `--source-url` is used.
 
 ### Command-Line Flags
-* `--stdin`: Required. Indicates content is piped via standard input.
+* `--stdin` **or** `--file <path>`: Exactly one input source is required. `--file -` reads stdin (same as `--stdin`).
+* `--dry-run`: Validate and preview the import without writing (also implied by global `--read-only` / `--plan`).
 * `--source-url`: Repeated string. Source URLs representing a multi-source synthesis.
 * `--input-format`: choice (`detailed` or `compressed`). Defaults to `detailed`.
 * `--topic`: string. Categorized topic. **Required** for multi-source import.
 * `--tags`, `--tier`, `--ttl`: Metadata options mapped to cache rules.
 * `--storage`: choice (`global` or `project`). Override the configured cache location for this import. Notes containing secrets are always stored globally and never written to a project cache.
+* `--read-only` / `--plan`: Block the write; reports `dryRun: true` and `cache.status: "would_import"`.
+
+Localhost and other private hosts are accepted as **cache keys** for import. Network fetches to those hosts remain blocked by the SSRF guard.
 
 ### JSON Output envelope `data` block
 ```json
 {
+  "dryRun": false,
   "cache": {
     "key": "sha256-import-hash...",
-    "status": "imported",
+    "status": "imported" | "would_import",
     "freshness": "fresh",
     "path": "/path/to/cache.md",
     "storage": "global" | "project",
@@ -141,11 +148,20 @@ Inspect cache state and planning outcomes without performing fetches or writes.
 npx @taurgis/bonsai status <url> [flags]
 ```
 
+### Command-Line Flags
+| Flag | Short | Type | Default | Description |
+| --- | --- | --- | --- | --- |
+| `--tier` | — | choice | (artifact's tier) | Evaluate freshness as if the entry used this tier. |
+| `--ttl` | `-l` | duration | — | Evaluate freshness against this TTL override. |
+| `--max-age` | — | duration | — | Treat the entry as expired when older than this age. |
+| `--json` | — | boolean | `false` | Machine-readable envelope. |
+
 ### JSON Output envelope `data` block
 ```json
 {
   "cacheKey": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
   "cachePath": "/path/to/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
+  "normalizedUrl": "https://example.com/",
   "status": "hit" | "miss" | "stale",
   "freshness": "fresh" | "stale_grace" | "stale_expired" | "none",
   "action": "would_fetch" | "would_revalidate" | "would_return_cached"
@@ -154,6 +170,7 @@ npx @taurgis/bonsai status <url> [flags]
 
 On a `miss`, `freshness` is `none`: no entry exists, so no freshness applies. `stale_grace` and
 `stale_expired` describe an entry that exists but has aged into the grace window or past it.
+A miss exits `1` with code `CACHE_MISS` but still returns `data` (and an array when multiple URLs are passed).
 
 ---
 
@@ -171,6 +188,8 @@ npx @taurgis/bonsai inspect <url>
 {
   "cacheKey": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
   "cachePath": "/path/to/0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7.md",
+  "normalizedUrl": "https://example.com/",
+  "status": "hit" | "miss",
   "metadata": {
     "schema_version": 1,
     "artifact_type": "source",
@@ -187,9 +206,20 @@ npx @taurgis/bonsai inspect <url>
     "validated_at": "2026-06-24T07:33:20.519Z",
     "stale_after": "2026-07-24T07:33:20.519Z",
     "status": "active"
-  }
+  },
+  "sections": [
+    {
+      "cacheKey": "…",
+      "anchor": "intro",
+      "headingPath": "Intro > Overview",
+      "tokenEstimate": { "compressed": 12, "detailed": 40 }
+    }
+  ]
 }
 ```
+
+On a miss, `metadata` is `null`, `sections` is `[]`, and the command exits `1` with `CACHE_MISS`
+while still returning `data` (including hit rows in a multi-URL batch).
 
 ---
 
@@ -218,6 +248,7 @@ flood the listing — find them with `inspect` (which lists a page's sections).
 | `--freshness` | — | choice | — | Filter by freshness: `fresh`, `stale_grace`, or `stale_expired`. |
 | `--artifact-type` | — | choice | — | Filter by type: `source`, `research_note`, or `index`. (Section children are never listed, so `section` is not offered here.) |
 | `--capture-method` | — | choice | — | Filter by capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`. |
+| `--url` | — | glob | — | Keep entries whose source URL matches a case-insensitive glob (supports `*`). |
 | `--limit` | — | integer | `50` | Cap the result count (1–100). |
 | `--json` | — | boolean | `false` | Return the machine-readable envelope. |
 
@@ -270,15 +301,18 @@ Two guardrails make accidental deletion hard:
 ### Command-Line Flags
 | Flag | Short | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `--older-than` | — | duration | — | Prune entries older than this age, e.g. `30d`, `90d`. |
-| `--inactive` | — | duration | — | Prune entries not validated or fetched within this window, e.g. `14d`. |
+| `--older-than` | — | duration | — | Prune by **content age** (`fetched_at`, falling back to `validated_at`), e.g. `30d`. Zero durations are rejected. |
+| `--inactive` | — | duration | — | Prune by **idle time** since last validation (`validated_at`, falling back to `fetched_at`), e.g. `14d`. |
 | `--artifact-type` | — | choice | — | Limit pruning to `source`, `research_note`, `index`, or `section`. |
 | `--url` | — | glob | — | Limit pruning to source URLs matching a case-insensitive glob (supports `*`). |
 | `--dry-run` | — | boolean | `false` | List what would be deleted, delete nothing. Mutually exclusive with `--yes`. |
-| `--yes` | `-y` | boolean | `false` | Confirm deletion. Required for a real prune. |
+| `--yes` | `-y` | boolean | `false` | Confirm deletion. Required for a real prune (rejected under `--read-only`). |
+| `--read-only` / `--plan` | — | boolean | `false` | Implicit preview; mutations disabled. |
 | `--json` | — | boolean | `false` | Return the machine-readable envelope. |
 
-Age is measured from the more recent of `validated_at` and `fetched_at`.
+`--older-than` and `--inactive` are distinct: a recently revalidated but originally-old page can match
+`--older-than` while still failing `--inactive`. When some unlinks fail, `prunedCount` reports actual
+deletes and the process exits `1`.
 
 ### JSON Output envelope `data` block
 ```json

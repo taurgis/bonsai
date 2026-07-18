@@ -84,15 +84,17 @@ function isJsonMode(argv: string[] | undefined): boolean {
 function emitJsonError(
   command: string,
   message: string,
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT'
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT',
+  suggestions?: string[]
 ): Record<string, unknown> {
   const envelope = buildEnvelope({
     command,
     ok: false,
     exitCode: 2,
-    stderr: formatErrorForJson({ message, code }),
+    stderr: formatErrorForJson({ message, code, suggestions }),
     data: null,
     code,
+    suggestions: suggestions?.length ? suggestions : undefined,
   });
   process.exitCode = 2;
   console.log(JSON.stringify(envelope, null, 2));
@@ -108,6 +110,7 @@ export function buildCommandNotFoundDetails(
   command: string;
   jsonMode: boolean;
   message: string;
+  suggestions?: string[];
 } {
   const hiddenIds = new Set(config.commands.filter((c) => c.hidden).map((c) => c.id));
   const visibleIds = config.commandIDs.filter((commandId) => !hiddenIds.has(commandId));
@@ -117,6 +120,7 @@ export function buildCommandNotFoundDetails(
   // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
   const bareUrl = bareUrlInput(id);
   if (bareUrl) {
+    const suggestion = `${config.bin} https://${bareUrl}`;
     return {
       code: 'MISSING_URL_SCHEME',
       command: bareUrl,
@@ -124,8 +128,9 @@ export function buildCommandNotFoundDetails(
       message: [
         `${bareUrl} is not a ${config.bin} command.`,
         `Run ${config.bin} help for a list of available commands.`,
-        `Did you mean ${config.bin} https://${bareUrl}? URLs need an http:// or https:// scheme.`,
+        `Did you mean ${suggestion}? URLs need an http:// or https:// scheme.`,
       ].join('\n'),
+      suggestions: [suggestion],
     };
   }
 
@@ -154,6 +159,9 @@ export function buildCommandNotFoundDetails(
   // is the floor, and a concrete "Did you mean …?" correction — when we have one — goes below it.
   const lines = [`${attempted} is not a ${config.bin} command.`];
   lines.push(`Run ${config.bin} help for a list of available commands.`);
+  const suggestions = suggestion
+    ? [`${config.bin} ${toConfiguredId(suggestion, config)}`]
+    : undefined;
   if (suggestion) lines.push(`Did you mean ${toConfiguredId(suggestion, config)}?`);
 
   return {
@@ -161,6 +169,7 @@ export function buildCommandNotFoundDetails(
     command: attempted,
     jsonMode: isJsonMode(argv),
     message: lines.join('\n'),
+    suggestions,
   };
 }
 
@@ -172,8 +181,16 @@ export function buildCommandNotFoundDetails(
  */
 const hook: Hook<'command_not_found'> = async function (opts) {
   const details = buildCommandNotFoundDetails(opts.id, opts.argv, opts.config);
-  if (details.jsonMode) return emitJsonError(details.command, details.message, details.code);
-  this.error(details.message, { exit: 2, code: details.code });
+  if (details.jsonMode) {
+    return emitJsonError(details.command, details.message, details.code, details.suggestions);
+  }
+  // Hook context typings omit `suggestions` even though CLIError accepts them; cast keeps the
+  // human pretty-print "Try this:" lines aligned with the JSON envelope.
+  this.error(details.message, {
+    exit: 2,
+    code: details.code,
+    suggestions: details.suggestions,
+  } as { exit: number; code: string; suggestions?: string[] });
 };
 
 export default hook;

@@ -61,27 +61,6 @@ export function isSafeIp(ip: string): boolean {
   return false;
 }
 
-/**
- * Validates a hostname to ensure it is not blocked (e.g. localhost or literal private IP).
- */
-export function validateHostname(hostname: string): void {
-  const lower = hostname.toLowerCase().trim();
-  if (lower === 'localhost' || lower.endsWith('.localhost')) {
-    throw new Error(`Hostname "${hostname}" is a blocked local target.`);
-  }
-
-  let ipToCheck = lower;
-  if (ipToCheck.startsWith('[') && ipToCheck.endsWith(']')) {
-    ipToCheck = ipToCheck.slice(1, -1);
-  }
-
-  if (isIP(ipToCheck) !== 0) {
-    if (!isSafeIp(ipToCheck)) {
-      throw new Error(`IP address "${ipToCheck}" is a blocked local or private target.`);
-    }
-  }
-}
-
 // Dot-separated, non-empty labels: a real domain (`docs.nestjs.com`) or IPv4 (`192.168.1.1`). The
 // URL parser also accepts a leading-dot filename (`.env`) or relative path (`./x`) as a "host", whose
 // suggestion would be a nonsense `https://.env`; requiring well-formed labels rejects those. Anchored
@@ -138,7 +117,9 @@ export function normalizeUrl(input: string): string {
     throw new Error('URLs containing usernames or passwords are rejected.');
   }
 
-  validateHostname(url.hostname);
+  // Localhost / private hosts are valid cache keys (import + cache-hit lookup). SSRF protection
+  // lives in the network layer (fetcher/browser DNS checks), so a later `bonsai http://localhost/…`
+  // can serve an imported note without ever opening a socket — while a cache miss still fails safely.
 
   // Clear default ports
   if (url.protocol === 'https:' && url.port === '443') {

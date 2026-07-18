@@ -74,6 +74,20 @@ export default function register(harness, fixtures) {
     expectFetchJsonOk(r, parseJson(r.stdout), { format: 'detailed' });
   });
 
+  // -l is the short form of --ttl. Missing it from FLAGS_WITH_VALUES made `bonsai -l 2h <url>`
+  // resolve `-l` as a command instead of rewriting to fetch.
+  check('fetch shorthand accepts -l ttl short before URL', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run(['-l', '2h', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expectFetchJsonOk(r, parseJson(r.stdout), { ok: true });
+  });
+
+  check('fetch shorthand accepts -f format short before URL', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run(['-f', 'detailed', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expectFetchJsonOk(r, parseJson(r.stdout), { format: 'detailed' });
+  });
+
   check('fetch shorthand accepts --json before URL', () => {
     const { ws, url } = seedFetchCache();
     const r = run(['--json', url], { cwd: ws.cwd, xdg: ws.xdg });
@@ -85,6 +99,43 @@ export default function register(harness, fixtures) {
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(r.stderr.includes('Nonexistent flag'), r.stderr);
     expect(!/\n\s+at /.test(r.stderr), 'stack trace');
+  });
+
+  check('fetch --dry-run reports dryRun and would_* without claiming a durable write', () => {
+    const { ws, url } = seedFetchCache();
+    // Force a miss path: unique URL that is not seeded.
+    const missUrl = 'https://example.com/audit-fetch-dry-run-miss';
+    const r = run([missUrl, '--dry-run', '--json'], { cwd: ws.cwd, xdg: ws.xdg, timeout: 60000 });
+    // Network may succeed (would_fetch) or fail (FETCH_FAILED); either way dry-run must not claim imported/hit.
+    const env = parseJson(r.stdout);
+    if (r.exitCode === 0) {
+      expect(env?.data?.dryRun === true, 'dryRun');
+      expect(env?.data?.cache?.status === 'would_fetch', `status ${env?.data?.cache?.status}`);
+      const status = run(['status', missUrl, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+      expect(parseJson(status.stdout)?.data?.status === 'miss', 'still miss after dry-run');
+    } else {
+      expect(env?.code === 'FETCH_FAILED', env?.code);
+    }
+
+    // Cached hit under dry-run stays a hit and still reports dryRun.
+    const hit = run([url, '--dry-run', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(hit.exitCode === 0, `hit exit ${hit.exitCode}`);
+    const hitEnv = parseJson(hit.stdout);
+    expect(hitEnv?.data?.dryRun === true, 'hit dryRun');
+    expect(hitEnv?.data?.cache?.status === 'hit', hitEnv?.data?.cache?.status);
+  });
+
+  check('fetch multi-URL keeps hit data when a later URL fails', () => {
+    const { ws, url } = seedFetchCache();
+    const bad = 'https://this-domain-definitely-does-not-exist-xyz123.invalid';
+    const r = run([url, bad, '--json'], { cwd: ws.cwd, xdg: ws.xdg, timeout: 60000 });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'FETCH_FAILED', env?.code);
+    expect(Array.isArray(env?.data) && env.data.length === 2, `data ${JSON.stringify(env?.data)}`);
+    expect(env?.data?.[0]?.cache?.status === 'hit', `first ${env?.data?.[0]?.cache?.status}`);
+    expect(env?.data?.[0]?.content, 'first content kept');
+    expect(env?.data?.[1]?.error?.code === 'FETCH_FAILED', `second ${JSON.stringify(env?.data?.[1])}`);
   });
 
   if (networkEnabled()) {

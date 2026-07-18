@@ -3,7 +3,18 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
-import { writeArtifact, getArtifactPath, type LocatedArtifact } from '../lib/research/storage.js';
+import { finalizeBatch } from '../lib/batch.js';
+import { enrichFetchFailureEnvelope } from '../lib/envelope.js';
+import {
+  buildFetchFailureFromCaught,
+  buildFetchFailureResult,
+  buildFetchResultData,
+  describeError,
+  FETCH_STATUS_LABEL,
+  fetchFailureGuidance,
+  reportCacheStatus,
+} from '../lib/research/fetch-result.js';
+import { writeArtifact, type LocatedArtifact } from '../lib/research/storage.js';
 import { loadStoreRoots, type StoreRoots } from '../lib/research/store-roots.js';
 import { writeArtifactSecurely } from '../lib/research/secure-write.js';
 import { loadSummaryLevel, type StorageMode, type SummaryLevel } from '../lib/config/index.js';
@@ -14,8 +25,7 @@ import {
 } from '../lib/research/freshness.js';
 import { revalidateCache, createArtifactFromFetch } from '../lib/research/revalidate.js';
 import { fetchStaticHtml, fetchText } from '../lib/research/fetcher.js';
-import { PROXY_TUNNEL_REJECTION_PATTERN } from '../lib/research/proxy.js';
-import { fetchRenderedHtml, SANDBOX_EGRESS_ERROR_MARKER } from '../lib/research/browser.js';
+import { fetchRenderedHtml } from '../lib/research/browser.js';
 import { capturePage, type CaptureDeps } from '../lib/research/capture.js';
 import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
@@ -200,53 +210,12 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     return applyAutoTags(artifact);
   }
 
-  private buildResultData(
-    url: string,
-    normalizedUrl: string,
-    cacheKey: string,
-    storageDir: string,
-    storageMode: StorageMode,
-    cacheStatus: any,
-    freshnessState: any,
-    format: any,
-    artifact: any,
-    content: string,
-    redirectedToGlobal: boolean
-  ): any {
-    return {
-      schemaVersion: 1,
-      command: this.config.bin,
-      cache: {
-        key: cacheKey,
-        status: cacheStatus,
-        freshness: freshnessState,
-        path: getArtifactPath(storageDir, cacheKey),
-        storage: storageMode,
-        redirectedToGlobal,
-      },
-      source: {
-        url,
-        normalizedUrl,
-        captureMethod: artifact.metadata.capture_method,
-        extractionStatus: artifact.metadata.extraction_status,
-        extractionConfidence: artifact.metadata.extraction_confidence,
-        qualityNotes: artifact.metadata.quality_notes,
-        fetchedAt: artifact.metadata.fetched_at,
-        validatedAt: artifact.metadata.validated_at,
-        staleAfter: artifact.metadata.stale_after,
-      },
-      artifactType: artifact.metadata.artifact_type,
-      docsEngine: artifact.metadata.docs_engine,
-      docsFramework: artifact.metadata.docs_framework,
-      sourceDocUrl: artifact.metadata.source_doc_url,
-      searchProvider: artifact.metadata.search_provider,
-      format,
-      tokenEstimate:
-        format === 'compressed'
-          ? artifact.metadata.token_estimate.compressed
-          : artifact.metadata.token_estimate.detailed,
-      content,
-    };
+  /**
+   * When a multi-URL batch has any per-URL failure, keep the result array (including hits) and
+   * surface FETCH_FAILED on the envelope — same batch contract as status/inspect CACHE_MISS.
+   */
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    return enrichFetchFailureEnvelope(this.baseSuccessJson(data), data);
   }
 
   // Validates the duration flags up front, exiting with code 2 on a malformed value.
@@ -371,7 +340,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
   async run(): Promise<unknown> {
     const urls = this.parsedArgv;
-    const { format, ttl, 'max-age': maxAge } = this.flags;
+    const { ttl, 'max-age': maxAge } = this.flags;
 
     this.validateDurationFlags(ttl, maxAge);
     const dryRun = this.effectiveDryRun(this.flags['dry-run']);
@@ -379,49 +348,49 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());
     const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;
     const currentTime = new Date();
+    const batch = urls.length > 1;
+    const ctx = { currentTime, tmpDir, summaryLevel, dryRun };
 
-    const results: any[] = [];
     try {
+      const results = [];
       for (const url of urls) {
-        results.push(
-          await this.fetchSingleTarget(
-            url,
-            currentTime,
-            tmpDir,
-            summaryLevel,
-            format,
-            urls.length > 1
-          )
-        );
+        try {
+          results.push(await this.fetchSingleTarget(url, ctx));
+        } catch (err) {
+          results.push(this.failureRowOrRethrow(url, err, dryRun, batch));
+        }
       }
-
-      return urls.length === 1 ? results[0] : results;
-    } catch (err) {
-      if (!this.jsonEnabled()) {
-        ux.action.stop('failed');
-      }
-      if (err instanceof Errors.CLIError) throw err;
-      // Stale-serve (exit 5) signals via process.exitCode and never throws, so it bypasses this
-      // path; only genuine fetch/extract failures land here and get classified guidance. Use the
-      // normalized URL in hints so the copy-paste command is canonical (and never echoes raw,
-      // unsanitized user input back to the terminal).
-      const failedUrl = urls[results.length] || urls[0] || '';
-      this.emitFetchError(err, failedUrl);
+      return finalizeBatch(results, (r) => Boolean(r?.error));
     } finally {
-      if (tmpDir) {
-        rmSync(tmpDir, { recursive: true, force: true });
-      }
+      if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
     }
+  }
+
+  /**
+   * Multi-URL batches keep prior successes as failure rows; usage errors (exit 2) and
+   * single-URL failures still throw/exit.
+   */
+  private failureRowOrRethrow(url: string, err: unknown, dryRun: boolean, batch: boolean) {
+    if (!this.jsonEnabled()) ux.action.stop('failed');
+    if (err instanceof Errors.CLIError) {
+      if (!batch || (err.oclif?.exit ?? 1) === 2) throw err;
+      return buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err });
+    }
+    if (!batch) this.emitFetchError(err, url);
+    return buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
   }
 
   private async fetchSingleTarget(
     url: string,
-    currentTime: Date,
-    tmpDir: string | null,
-    summaryLevel: SummaryLevel,
-    format: 'compressed' | 'detailed',
-    showSeparator: boolean
+    ctx: {
+      currentTime: Date;
+      tmpDir: string | null;
+      summaryLevel: SummaryLevel;
+      dryRun: boolean;
+    }
   ): Promise<any> {
+    const { currentTime, tmpDir, summaryLevel, dryRun } = ctx;
+    const format = this.flags.format;
     const target = this.resolveResearchTargetOrFail(url, {
       flagOverride: this.flags.storage as StorageMode | undefined,
       lookup: !this.flags.force,
@@ -453,150 +422,37 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     );
 
     if (!this.jsonEnabled()) {
-      const CACHE_STATUS_LABEL: Record<string, string> = {
-        hit: 'cached',
-        miss: 'done',
-        refreshed: 'refreshed',
-        revalidated: 'revalidated',
-        stale: 'served stale',
-      };
-      ux.action.stop(CACHE_STATUS_LABEL[cacheStatus] ?? cacheStatus);
+      const reported = reportCacheStatus(cacheStatus, dryRun);
+      ux.action.stop(FETCH_STATUS_LABEL[reported] ?? reported);
     }
 
-    const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
-    const resultData = this.buildResultData(
+    const resultData = buildFetchResultData({
+      bin: this.config.bin,
       url,
       normalizedUrl,
       cacheKey,
       storageDir,
-      roots.mode,
+      storageMode: roots.mode,
       cacheStatus,
       freshnessState,
       format,
       artifact,
-      content,
-      redirectedToGlobal
-    );
+      redirectedToGlobal,
+      dryRun,
+    });
 
     if (!this.jsonEnabled()) {
-      this.log(content);
-      if (showSeparator) {
+      if (dryRun && cacheStatus !== 'hit' && cacheStatus !== 'stale') {
+        this.log('[dry-run] Preview only — cache was not written.');
+      }
+      this.log(resultData.content);
+      if (this.parsedArgv.length > 1) {
         this.log('\n' + '='.repeat(40) + '\n');
       }
     }
 
     return resultData;
   }
-}
-
-// How many `.cause` levels to walk. Real undici/Node transport errors nest at most 1-2 deep;
-// the cap exists so a self-referential or cyclic `.cause` chain (Error.cause is an arbitrary,
-// unvalidated property — nothing prevents `e.cause = e`, whether from a bug in this codebase or
-// a dependency) can't hang the process, rather than being a limit expected to matter in practice.
-const MAX_CAUSE_DEPTH = 10;
-
-// Walks an Error's `.cause` chain and joins every message, deepest last. Node/undici's fetch
-// throws a generic `TypeError: fetch failed` for transport-level failures, with the actionable
-// detail (e.g. a proxy's tunnel rejection) nested one or two `.cause` levels down.
-export function describeError(err: unknown): string {
-  if (!(err instanceof Error)) return String(err);
-  const parts = [err.message];
-  let cause: unknown = err.cause;
-  for (let depth = 0; depth < MAX_CAUSE_DEPTH && cause instanceof Error; depth++) {
-    parts.push(cause.message);
-    cause = cause.cause;
-  }
-  return parts.join(': ');
-}
-
-// Maps a runtime fetch failure to recovery steps keyed off its message. Returns undefined for
-// unrecognized failures, which then surface with their original message and no extra hint. The
-// patterns match the thrown text in fetcher.ts/browser.ts; keep them in sync if those messages
-// change. Resolutions mirror the published troubleshooting guide.
-export function fetchFailureGuidance(
-  message: string,
-  url: string
-): { suggestions: string[]; ref?: string } | undefined {
-  const ref = 'https://bonsai.rhino-inquisitor.com/troubleshooting';
-  // Name the pipe step explicitly: bare `import --stdin` blocks waiting for input, so a reader (or
-  // an agent) running the hint verbatim would hang. Show the content being piped in from a file.
-  const importHint = `Open it in a browser, save the page, then import it: cat page.md | bonsai import ${url} --stdin`;
-
-  // 401/403: an auth wall or anti-scraping WAF. Bonsai has no authenticated-fetch path in v1.
-  if (/failed with status 40[13]\b/.test(message)) {
-    return {
-      suggestions: ['The page requires authentication or blocks automated requests.', importHint],
-      ref,
-    };
-  }
-  if (/failed with status 404\b/.test(message)) {
-    return { suggestions: ['Check the URL is correct and the page still exists.'] };
-  }
-  if (/failed with status 5\d\d\b/.test(message)) {
-    return {
-      suggestions: ['The server returned an error. Retry later or verify the host is healthy.'],
-    };
-  }
-  // Server returned a non-HTML body (JSON, binary, or no Content-Type at all). Scope the opener to
-  // the real failure: --rendered does produce HTML, so "only scrapes HTML" would read as misleading.
-  if (/Rejected content type|does not look like HTML/.test(message)) {
-    return {
-      suggestions: [
-        'The server returned a non-HTML response (e.g. JSON or binary).',
-        'If the page is rendered by client-side JavaScript, retry with --rendered.',
-        importHint,
-      ],
-      ref,
-    };
-  }
-  if (/DNS resolution failed/.test(message)) {
-    return {
-      suggestions: ['Check the hostname is spelled correctly and resolves on a public network.'],
-    };
-  }
-  // Chrome's own network stack hit a proxy-enforced sandbox egress block (browser.ts's
-  // describeNavigationFailure already explains the cause and the fix); only a workaround and the
-  // docs ref are added here.
-  if (message.includes(SANDBOX_EGRESS_ERROR_MARKER)) {
-    return { suggestions: [importHint], ref };
-  }
-  // A configured proxy (HTTPS_PROXY/HTTP_PROXY) refused to tunnel to this host — distinct from
-  // the destination's own 401/403 above, which is the site itself rejecting the request. Shared
-  // with fetcher.ts's retry-fallback check so the two stay in sync by construction.
-  if (PROXY_TUNNEL_REJECTION_PATTERN.test(message)) {
-    return {
-      suggestions: [
-        "The configured proxy (HTTPS_PROXY/HTTP_PROXY) won't reach this host. Check its allowlist, or add the host to NO_PROXY to bypass the proxy for it.",
-        importHint,
-      ],
-      ref,
-    };
-  }
-  // The connection failed before any HTTP response was received — network-down, DNS, TLS, or a
-  // proxy issue not specifically matched above. Node/undici's fetch reports all of these as a
-  // generic "fetch failed" TypeError with no further suffix; the negative lookahead keeps this
-  // from also matching assertOk's "Fetch failed with status NNN ..." (a real HTTP response was
-  // received in that case, so it isn't a transport failure at all).
-  if (/^fetch failed\b(?!\s+with status)/i.test(message)) {
-    return {
-      suggestions: [
-        'The connection failed before a response was received. Check network connectivity and any HTTPS_PROXY/HTTP_PROXY/NO_PROXY settings.',
-        importHint,
-      ],
-      ref,
-    };
-  }
-  // A hostname that only resolves to a private/local IP at request time (literal private addresses
-  // are rejected earlier with exit 2). Blocked to prevent SSRF; only public hosts can be fetched.
-  if (/blocked local or private target/.test(message)) {
-    return {
-      suggestions: [
-        'The hostname resolves to a private or local address, which is blocked to prevent SSRF. Only public http(s) hosts can be fetched.',
-      ],
-      ref,
-    };
-  }
-  return undefined;
 }
 
 // Copies Phase 2 capability provenance from a capture outcome onto the artifact metadata.

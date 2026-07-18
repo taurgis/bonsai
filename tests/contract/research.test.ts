@@ -239,6 +239,7 @@ describe('research contract tests', () => {
       data: {
         schemaVersion: 1,
         command: 'bonsai',
+        dryRun: false,
         cache: {
           key: '0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7',
           status: expect.any(String),
@@ -508,7 +509,11 @@ describe('CLI ergonomics and error contracts', () => {
       exitCode: 1,
       code: 'CACHE_MISS',
       suggestions: ['Fetch and cache it first: bonsai https://example.com/contract-cache-miss'],
-      data: null,
+      data: {
+        status: 'miss',
+        normalizedUrl: 'https://example.com/contract-cache-miss',
+        metadata: null,
+      },
     });
     expect(envelope.stderr).toContain('Code: CACHE_MISS');
     expect(envelope.stderr).toContain('Try this: Fetch and cache it first');

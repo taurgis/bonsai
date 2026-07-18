@@ -61,8 +61,9 @@ curl -s http://localhost:8080/docs | \
 ```
 
 Because the cache key matches the URL, a later `bonsai http://localhost:8080/docs`
-serves your imported copy. Input is capped at 1 MiB, and empty input is rejected
-so a failed upstream step can't cache a blank note.
+serves your imported copy as a cache hit (no network call). A cache *miss* on the
+same URL still fails the SSRF guard — import first. Input is capped at 1 MiB, and
+empty input is rejected so a failed upstream step can't cache a blank note.
 
 ## Confirm it landed
 

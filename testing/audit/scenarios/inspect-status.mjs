@@ -108,8 +108,8 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[1]?.status === 'miss', `second ${env?.data?.[1]?.status}`);
   });
 
-  // Multi-URL inspect aborts with CACHE_MISS when any URL is uncached, naming how many others missed.
-  check('inspect multi-URL partial miss exit 1 CACHE_MISS', () => {
+  // Multi-URL inspect keeps hit payloads when any URL misses — same batch contract as status.
+  check('inspect multi-URL partial miss exit 1 CACHE_MISS keeps hit data', () => {
     const ws = createWorkspace();
     const hitUrl = 'https://example.com/audit-multi-inspect-hit';
     const imported = run(['import', hitUrl, '--stdin'], {
@@ -121,7 +121,45 @@ export default function register(harness, fixtures) {
 
     const r = run(['inspect', hitUrl, CACHE_MISS_URL, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(r.exitCode === 1, `exit ${r.exitCode}`);
-    expect(parseJson(r.stdout)?.code === 'CACHE_MISS', 'code');
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CACHE_MISS', 'code');
+    expect(Array.isArray(env?.data) && env.data.length === 2, `data ${JSON.stringify(env?.data)}`);
+    expect(env?.data?.[0]?.status === 'hit', `first ${env?.data?.[0]?.status}`);
+    expect(env?.data?.[0]?.metadata?.topic !== undefined || env?.data?.[0]?.metadata, 'hit metadata');
+    expect(env?.data?.[1]?.status === 'miss', `second ${env?.data?.[1]?.status}`);
+    expect(env?.data?.[1]?.metadata === null, 'miss metadata null');
+  });
+
+  check('inspect single miss JSON keeps miss data payload', () => {
+    const r = run(['inspect', CACHE_MISS_URL, '--json']);
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CACHE_MISS', env?.code);
+    expect(env?.data?.status === 'miss', JSON.stringify(env?.data));
+    expect(env?.data?.metadata === null, 'metadata null');
+  });
+
+  // Localhost is a valid cache key for import/status/inspect/fetch-hit; SSRF only blocks network.
+  check('localhost import then status hit and fetch cache hit', () => {
+    const ws = createWorkspace();
+    const url = 'http://localhost:8080/audit-local-docs';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Local Dev Docs\n\nImported from a local server.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    expect(parseJson(imported.stdout)?.data?.cache?.status === 'imported', 'imported');
+
+    const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(status.exitCode === 0, `status exit ${status.exitCode}`);
+    expect(parseJson(status.stdout)?.data?.status === 'hit', 'status hit');
+
+    const fetched = run([url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(fetched.exitCode === 0, `fetch exit ${fetched.exitCode} ${fetched.stderr}`);
+    const env = parseJson(fetched.stdout);
+    expect(env?.data?.cache?.status === 'hit', `cache ${env?.data?.cache?.status}`);
+    expect(env?.data?.content?.includes('Imported from a local server'), 'content');
   });
 
   check('import then status and inspect hit (shared workspace)', () => {

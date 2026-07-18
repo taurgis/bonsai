@@ -33,11 +33,12 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
   static flags = {
     'older-than': Flags.string({
-      description: 'prune entries older than duration (e.g. "30d", "90d")',
+      description:
+        'prune by content age (fetched_at, else validated_at) older than duration (e.g. "30d", "90d")',
     }),
     inactive: Flags.string({
       description:
-        'prune entries inactive (unvalidated/unfetched) for duration (e.g. "14d", "30d")',
+        'prune entries whose last validation (or fetch, if never validated) is older than duration (e.g. "14d", "30d")',
     }),
     url: Flags.string({
       description:
@@ -128,11 +129,6 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   }
 
   private shouldPrune(meta: any, currentTime: Date): boolean {
-    const fetched = meta.fetched_at ? new Date(meta.fetched_at).getTime() : 0;
-    const validated = meta.validated_at ? new Date(meta.validated_at).getTime() : 0;
-    const baseTime = Math.max(fetched, validated);
-    const ageMs = currentTime.getTime() - baseTime;
-
     if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
       return false;
     }
@@ -141,18 +137,18 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       return false;
     }
 
-    if (this.flags['older-than']) {
-      const olderThanMs = parseTtlToMs(this.flags['older-than']);
-      if (ageMs < olderThanMs) {
-        return false;
-      }
+    const now = currentTime.getTime();
+    // Content age (fetched_at, else validated_at) vs idle time (validated_at, else fetched_at) are
+    // deliberately distinct so a recently revalidated but originally-old page can match --older-than
+    // without also being treated as inactive.
+    if (
+      this.flags['older-than'] &&
+      ageMs(meta, now, 'content') < parseTtlToMs(this.flags['older-than'])
+    ) {
+      return false;
     }
-
-    if (this.flags.inactive) {
-      const inactiveMs = parseTtlToMs(this.flags.inactive);
-      if (ageMs < inactiveMs) {
-        return false;
-      }
+    if (this.flags.inactive && ageMs(meta, now, 'idle') < parseTtlToMs(this.flags.inactive)) {
+      return false;
     }
 
     return true;
@@ -229,6 +225,11 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
           colors.green(`Successfully pruned ${prunedCount} of ${count} research cache ${noun}.`)
         );
       }
+      // Partial unlink failure is a runtime outcome agents must see: exit 1 with the counts still
+      // in `data` so callers can tell candidates from successes without parsing stderr warnings.
+      if (count > 0 && prunedCount < count) {
+        process.exitCode = 1;
+      }
     }
 
     return {
@@ -241,4 +242,16 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       })),
     };
   }
+}
+
+/** Age in ms for prune filters. `content` prefers fetched_at; `idle` prefers validated_at. */
+function ageMs(
+  meta: { fetched_at?: string | null; validated_at?: string | null },
+  now: number,
+  kind: 'content' | 'idle'
+): number {
+  const fetched = meta.fetched_at ? new Date(meta.fetched_at).getTime() : 0;
+  const validated = meta.validated_at ? new Date(meta.validated_at).getTime() : 0;
+  const base = kind === 'content' ? fetched || validated : validated || fetched;
+  return now - base;
 }

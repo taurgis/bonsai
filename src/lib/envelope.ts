@@ -71,6 +71,96 @@ export function formatErrorForJson(err: CliErrorShape): string {
   return lines.join('\n');
 }
 
+type CacheMissRow = { status?: string; normalizedUrl?: string };
+
+/**
+ * Overlay a batch failure onto a success envelope while keeping per-row `data`.
+ * Shared by multi-URL status/inspect (CACHE_MISS) and fetch (FETCH_FAILED).
+ */
+export function enrichBatchFailureEnvelope<T>(
+  envelope: Record<string, unknown>,
+  data: unknown,
+  opts: {
+    /** Return a failure payload for failing rows, or a falsy value to skip. */
+    pick: (row: unknown) => T | null | undefined | false;
+    code: string | ((first: T, failures: T[]) => string);
+    message: (first: T, failures: T[]) => string;
+    suggestions?: (failures: T[]) => string[] | undefined;
+    ref?: (first: T) => string | undefined;
+    exitCode?: number;
+  }
+): Record<string, unknown> {
+  const list = Array.isArray(data) ? data : [data];
+  const failures = list.map(opts.pick).filter(Boolean) as T[];
+  if (failures.length === 0) return envelope;
+
+  const first = failures[0]!;
+  const code = typeof opts.code === 'function' ? opts.code(first, failures) : opts.code;
+  const suggestions = opts.suggestions?.(failures);
+  const ref = opts.ref?.(first);
+  const stderr = formatErrorForJson({
+    message: opts.message(first, failures),
+    code,
+    suggestions,
+    ref,
+  });
+  return {
+    ...envelope,
+    ok: false,
+    exitCode: opts.exitCode ?? 1,
+    stderr,
+    code,
+    suggestions,
+    ref,
+  };
+}
+
+/**
+ * CACHE_MISS convenience over {@link enrichBatchFailureEnvelope}.
+ * Rows with `status === 'miss'` keep their payloads; the envelope reports the miss.
+ */
+export function enrichCacheMissEnvelope(
+  envelope: Record<string, unknown>,
+  data: unknown,
+  bin: string,
+  messageFor: (normalizedUrl: string, missCount: number) => string
+): Record<string, unknown> {
+  return enrichBatchFailureEnvelope<CacheMissRow>(envelope, data, {
+    pick: (row) => {
+      const r = row as CacheMissRow | null | undefined;
+      return r?.status === 'miss' ? r : null;
+    },
+    code: 'CACHE_MISS',
+    exitCode: 1,
+    message: (first, failures) => messageFor(first.normalizedUrl ?? '', failures.length),
+    suggestions: (failures) =>
+      failures.map((m) => `Fetch and cache it first: ${bin} ${m.normalizedUrl}`),
+  });
+}
+
+/**
+ * FETCH_FAILED convenience over {@link enrichBatchFailureEnvelope}.
+ * Multi-URL fetch keeps prior successes in `data` and surfaces the first row error on the envelope.
+ */
+export function enrichFetchFailureEnvelope(
+  envelope: Record<string, unknown>,
+  data: unknown
+): Record<string, unknown> {
+  return enrichBatchFailureEnvelope<CliErrorShape>(envelope, data, {
+    pick: (row) => {
+      if (!row || typeof row !== 'object') return null;
+      return (row as { error?: CliErrorShape }).error ?? null;
+    },
+    code: (first) => first.code ?? 'FETCH_FAILED',
+    message: (first, failures) =>
+      (first.message ?? '') +
+      (failures.length > 1 ? `\n…and ${failures.length - 1} other URL failure(s)` : ''),
+    suggestions: (failures) => failures[0]?.suggestions,
+    ref: (first) => first.ref,
+    exitCode: 1,
+  });
+}
+
 /**
  * Builds the standard Bonsai CLI JSON envelope structure.
  * This is the single source of truth for the output envelope schema.

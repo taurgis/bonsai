@@ -40,6 +40,47 @@ describe('status command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('honors explicit --tier when evaluating freshness, and omits it by default', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Stable notes');
+
+    const imported = (await ResearchImport.run([
+      'https://example.com/cached-status-tier',
+      '--stdin',
+      '--tier',
+      'stable',
+    ])) as any;
+
+    // Backdate the stored timestamps so the entry is ~10 days old: fresh under stable (180d),
+    // but stale_grace under an explicit volatile evaluation (7d fresh + 5d grace).
+    const { readFileSync, writeFileSync } = await import('node:fs');
+    const raw = readFileSync(imported.cache.path, 'utf8');
+    const aged = new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString();
+    writeFileSync(
+      imported.cache.path,
+      raw
+        .replace(/validated_at: .*/, `validated_at: ${aged}`)
+        .replace(/fetched_at: .*/, `fetched_at: ${aged}`)
+        .replace(/stale_after: .*/, `stale_after: ${aged}`)
+    );
+
+    const baseline = (await ResearchStatus.run(['https://example.com/cached-status-tier'])) as any;
+    expect(baseline.status).toBe('hit');
+    expect(baseline.freshness).toBe('fresh');
+
+    const planned = (await ResearchStatus.run([
+      'https://example.com/cached-status-tier',
+      '--tier',
+      'volatile',
+    ])) as any;
+    expect(planned.status).toBe('stale');
+    expect(planned.freshness).toBe('stale_grace');
+    expect(planned.action).toBe('would_revalidate');
+
+    readSpy.mockRestore();
+  });
+
   it('rejects an invalid URL with exit 2', async () => {
     await expect(ResearchStatus.run(['not a url'])).rejects.toThrow(/Invalid URL: Could not parse/);
   });

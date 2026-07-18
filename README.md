@@ -181,7 +181,7 @@ npx @taurgis/bonsai import https://example.com/docs --file notes.md --read-only
 npx @taurgis/bonsai prune --older-than 90d --plan
 ```
 
-It can also be set via the `BONSAI_READ_ONLY` or `BONSAI_PLAN_MODE` environment variables (both are equivalent). Composition is OR, not override: read-only mode is active if *either* env var or the flag is set, and there is no way to force writes back on once one of them is — this is a safety gate, not a preference. Commands that already expose `--dry-run` (`fetch`, `prune`, `config set`/`unset`) treat it the same as an explicit `--dry-run`; `import` (which has no `--dry-run` of its own) previews the write and reports `dryRun: true` instead of persisting.
+It can also be set via the `BONSAI_READ_ONLY` or `BONSAI_PLAN_MODE` environment variables (both are equivalent). Composition is OR, not override: read-only mode is active if *either* env var or the flag is set, and there is no way to force writes back on once one of them is — this is a safety gate, not a preference. Commands that expose `--dry-run` (`fetch`, `import`, `prune`, `config set`/`unset`) treat global read-only the same as an explicit `--dry-run` and report `dryRun: true` (with `would_*` cache statuses where applicable) instead of persisting.
 
 ---
 

@@ -95,6 +95,7 @@ describe('command_not_found hook', () => {
     });
     expect(envelope.stderr).toContain('Did you mean list?');
     expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
+    expect(envelope.suggestions).toEqual(['bonsai list']);
   });
 
   it('renders topic ids with the configured separator', async () => {

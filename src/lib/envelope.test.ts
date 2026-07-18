@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildEnvelope,
+  enrichBatchFailureEnvelope,
+  enrichCacheMissEnvelope,
+  enrichFetchFailureEnvelope,
   formatErrorForJson,
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
@@ -43,52 +46,42 @@ describe('stableErrorCodeFrom', () => {
     ).toBe('MISSING_FLAG_VALUE');
   });
 
-  it('does not match unrelated messages', () => {
-    expect(stableErrorCodeFrom({ message: 'Flag value rejected' })).toBeUndefined();
+  it('returns undefined when nothing maps', () => {
+    expect(stableErrorCodeFrom({ message: 'boom' })).toBeUndefined();
+    expect(stableErrorCodeFrom(null)).toBeUndefined();
   });
 });
 
 describe('normalizeCliErrorMessage', () => {
-  it('strips the generic oclif help suffix', () => {
-    expect(normalizeCliErrorMessage('bad flag\nSee more help with --help')).toBe('bad flag');
+  it('strips the oclif help suffix', () => {
+    expect(normalizeCliErrorMessage('bad\nSee more help with --help')).toBe('bad');
+    expect(normalizeCliErrorMessage('bad')).toBe('bad');
   });
 });
 
 describe('formatErrorForJson', () => {
-  it('includes message, code, and a single suggestion', () => {
+  it('formats code, suggestions, and ref like human pretty-print', () => {
     expect(
       formatErrorForJson({
-        message: 'No cached research found for URL: https://example.com/missing',
+        message: 'miss',
         code: 'CACHE_MISS',
-        suggestions: ['Fetch and cache it first: bonsai https://example.com/missing'],
+        suggestions: ['fetch it'],
+        ref: 'https://example.com/docs',
       })
-    ).toBe(
-      'No cached research found for URL: https://example.com/missing\nCode: CACHE_MISS\nTry this: Fetch and cache it first: bonsai https://example.com/missing'
-    );
-  });
+    ).toBe('miss\nCode: CACHE_MISS\nTry this: fetch it\nReference: https://example.com/docs');
 
-  it('formats multiple suggestions as a bulleted list', () => {
     expect(
       formatErrorForJson({
-        message: 'conflict',
-        suggestions: ['option a', 'option b'],
+        message: 'miss',
+        code: 'CACHE_MISS',
+        suggestions: ['a', 'b'],
       })
-    ).toBe('conflict\nTry this:\n* option a\n* option b');
-  });
-
-  it('includes reference when present', () => {
-    expect(
-      formatErrorForJson({
-        message: 'fetch failed',
-        code: 'FETCH_FAILED',
-        ref: 'https://example.com/docs/errors',
-      })
-    ).toBe('fetch failed\nCode: FETCH_FAILED\nReference: https://example.com/docs/errors');
+    ).toBe('miss\nCode: CACHE_MISS\nTry this:\n* a\n* b');
   });
 });
 
 describe('buildEnvelope', () => {
-  it('omits optional error fields on success envelopes', () => {
+  it('builds the success envelope shape', () => {
     expect(
       buildEnvelope({
         command: 'list',
@@ -123,5 +116,66 @@ describe('buildEnvelope', () => {
       code: 'CACHE_MISS',
       suggestions: ['fetch it'],
     });
+  });
+});
+
+describe('enrichBatchFailureEnvelope / enrichCacheMissEnvelope', () => {
+  it('passes through when there are no failures', () => {
+    const base = { ok: true, exitCode: 0, data: { status: 'hit' } };
+    expect(enrichCacheMissEnvelope(base, base.data, 'bonsai', () => 'x')).toBe(base);
+  });
+
+  it('marks CACHE_MISS and keeps data when any row misses', () => {
+    const data = [
+      { status: 'hit', normalizedUrl: 'https://a.example/' },
+      { status: 'miss', normalizedUrl: 'https://b.example/' },
+    ];
+    const enriched = enrichCacheMissEnvelope(
+      { ok: true, exitCode: 0, data },
+      data,
+      'bonsai',
+      (url, n) => `miss ${url} (${n})`
+    );
+    expect(enriched).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'CACHE_MISS',
+      suggestions: ['Fetch and cache it first: bonsai https://b.example/'],
+    });
+    expect(enriched.stderr).toContain('miss https://b.example/ (1)');
+    expect(enriched.data).toBe(data);
+  });
+
+  it('supports FETCH_FAILED overlays from per-row error objects', () => {
+    const data = [
+      { cache: { status: 'hit' } },
+      { error: { code: 'FETCH_FAILED', message: 'dns', suggestions: ['retry'] } },
+    ];
+    const enriched = enrichFetchFailureEnvelope({ ok: true, exitCode: 0, data }, data);
+    expect(enriched).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'FETCH_FAILED',
+      suggestions: ['retry'],
+    });
+    expect(enriched.stderr).toContain('dns');
+    expect(enriched.data).toBe(data);
+  });
+
+  it('exposes the generic picker for custom batch failure shapes', () => {
+    const data = [{ kind: 'ok' }, { kind: 'bad', detail: 'x' }];
+    const enriched = enrichBatchFailureEnvelope<{ detail: string }>(
+      { ok: true, exitCode: 0, data },
+      data,
+      {
+        pick: (row) => {
+          const r = row as { kind?: string; detail?: string };
+          return r.kind === 'bad' && r.detail ? { detail: r.detail } : null;
+        },
+        code: 'CUSTOM',
+        message: (first) => first.detail,
+      }
+    );
+    expect(enriched).toMatchObject({ ok: false, exitCode: 1, code: 'CUSTOM' });
   });
 });

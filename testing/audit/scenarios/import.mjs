@@ -87,6 +87,23 @@ export default function register(harness, fixtures) {
     expect(env?.data?.cache?.status === 'imported', JSON.stringify(env?.data?.cache));
   });
 
+  check('import --dry-run previews without writing', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/import-dry-run';
+    const r = run(['import', url, '--stdin', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Dry Run Import\n\nShould not persist.\n',
+    });
+    const env = parseJson(r.stdout);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(env?.data?.dryRun === true, 'dryRun');
+    expect(env?.data?.cache?.status === 'would_import', env?.data?.cache?.status);
+
+    const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(status.stdout)?.data?.status === 'miss', 'still miss after dry-run');
+  });
+
   check('import --file - reads stdin --json', () => {
     const r = run(['import', 'https://example.com/import-file-dash', '--file', '-', '--json'], {
       input: '# Dash\n\nContent from stdin placeholder.\n',

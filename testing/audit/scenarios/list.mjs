@@ -26,9 +26,32 @@ export default function register(harness, fixtures) {
   });
 
   check('list human empty cache message', () => {
-    const r = run(['list', '--topic', '__bonsai_audit_empty_topic__']);
+    const r = run(['list']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
-    expect(r.stdout.includes('No cached'), r.stdout.slice(0, 200));
+    expect(r.stdout.includes('No cached research entries found.'), r.stdout.slice(0, 200));
+    expect(r.stdout.includes('populate the cache first'), r.stdout);
+  });
+
+  check('list no-match filter tip does not say populate when cache has entries', () => {
+    const ws = createWorkspace();
+    const imported = run(
+      ['import', 'https://example.com/audit-list-nomatch', '--stdin', '--topic', 'Present', '--json'],
+      {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        input: '# Present\n\nCached.\n',
+      }
+    );
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['list', '--topic', '__bonsai_audit_empty_topic__'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('match the given filters'), r.stdout.slice(0, 240));
+    expect(!r.stdout.includes('populate the cache first'), r.stdout);
+    expect(r.stdout.includes('relaxing filters'), r.stdout);
   });
 
   check('import then list filters by topic and tag', () => {

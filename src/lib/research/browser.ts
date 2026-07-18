@@ -425,8 +425,8 @@ const PROXY_BLOCKED_CHROME_NET_ERRORS = [
   'ERR_SOCKS_CONNECTION_FAILED',
 ];
 
-// Shared substring fetch.ts's fetchFailureGuidance matches on to attach suggestions/ref to this
-// error, without duplicating the message text it needs to match against.
+// Shared substring fetch-result.ts's fetchFailureGuidance matches on to attach suggestions/ref to
+// this error, without duplicating the message text it needs to match against.
 export const SANDBOX_EGRESS_ERROR_MARKER = 'sandboxed execution environment';
 
 /**

@@ -26,6 +26,11 @@ export function parseTtlToMs(ttl: string): number {
   const val = parseInt(match[1] || '', 10);
   const unit = match[2] || '';
 
+  // Zero-length durations would match every entry (age >= 0) and turn prune filters into a wipe.
+  if (val === 0) {
+    throw new Error(`Duration "${ttl}" must be greater than zero.`);
+  }
+
   switch (unit) {
     case 'h':
       return val * HOUR_MS;
@@ -91,17 +96,23 @@ export function getPolicy(
 
 /**
  * Evaluates the freshness status of a cached artifact.
+ * `ttlOverride` / `tierOverride` let status (and similar read-only checks) evaluate "what if"
+ * policies without mutating the stored metadata. When omitted, the artifact's own tier/TTL win.
  */
 export function evaluateFreshness(
   meta: ResearchArtifactMetadata,
   currentTime: Date,
-  ttlOverride?: string | null
+  ttlOverride?: string | null,
+  tierOverride?: 'stable' | 'standard' | 'volatile' | null
 ): 'fresh' | 'stale_grace' | 'stale_expired' {
   const fetched = meta.fetched_at ? new Date(meta.fetched_at).getTime() : 0;
   const validated = meta.validated_at ? new Date(meta.validated_at).getTime() : 0;
   const baseTime = Math.max(fetched, validated);
 
-  const { freshWindowMs, graceWindowMs } = getPolicy(meta.tier, ttlOverride || meta.ttl);
+  const { freshWindowMs, graceWindowMs } = getPolicy(
+    tierOverride ?? meta.tier,
+    ttlOverride || meta.ttl
+  );
   const ageMs = currentTime.getTime() - baseTime;
 
   if (ageMs <= freshWindowMs) {

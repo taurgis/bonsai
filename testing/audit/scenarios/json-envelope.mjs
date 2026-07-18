@@ -28,7 +28,10 @@ export default function register(harness) {
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
     expect(env?.ok === false, 'ok false');
+    expect(env?.code === 'MISSING_COMMAND', `code ${env?.code}`);
     expect(env?.stderr?.includes('Missing URL or command'), env?.stderr);
+    expect(env?.stderr?.includes('Code: MISSING_COMMAND'), env?.stderr);
+    expect(Array.isArray(env?.suggestions) && env.suggestions.length > 0, 'suggestions');
   });
 
   check('unknown flag --json carries UNKNOWN_FLAG code exit 2', () => {

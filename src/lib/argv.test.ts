@@ -16,8 +16,15 @@ describe('normalizeArgv', () => {
             ok: false,
             exitCode: 2,
             stdout: '',
-            stderr: 'Missing URL or command. Run bonsai --help for usage.',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
             data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
           },
         },
       },
@@ -41,6 +48,20 @@ describe('normalizeArgv', () => {
       input: ['--format', 'detailed', 'https://example.com'],
       expected: {
         argv: ['fetch', 'https://example.com', '--format', 'detailed'],
+      },
+    },
+    {
+      name: 'URL shorthand should allow -l ttl short before the URL',
+      input: ['-l', '2h', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '-l', '2h'],
+      },
+    },
+    {
+      name: 'URL shorthand should allow -f format short before the URL',
+      input: ['-f', 'detailed', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '-f', 'detailed'],
       },
     },
     {
@@ -154,8 +175,15 @@ describe('normalizeArgv', () => {
             ok: false,
             exitCode: 2,
             stdout: '',
-            stderr: 'Missing URL or command. Run bonsai --help for usage.',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
             data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
           },
         },
       },
@@ -169,16 +197,16 @@ describe('normalizeArgv', () => {
     },
     {
       name: 'URL argument after a command should not become fetch shorthand',
-      input: ['search', 'https://example.com'],
+      input: ['status', 'https://example.com'],
       expected: {
-        argv: ['search', 'https://example.com'],
+        argv: ['status', 'https://example.com'],
       },
     },
     {
       name: 'command with flags and URL argument should not become fetch shorthand',
-      input: ['--topic', 'Docs', 'search', 'https://example.com'],
+      input: ['--topic', 'Docs', 'list'],
       expected: {
-        argv: ['--topic', 'Docs', 'search', 'https://example.com'],
+        argv: ['--topic', 'Docs', 'list'],
       },
     },
     {
