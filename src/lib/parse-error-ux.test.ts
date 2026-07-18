@@ -40,7 +40,8 @@ describe('enrichParseError', () => {
   });
 
   it('no-ops for non-Error throws without a message string', () => {
-    expect(() => enrichParseError('Forced string throw' as unknown as Error)).not.toThrow();
-    expect(() => enrichParseError({} as Error)).not.toThrow();
+    expect(() => enrichParseError('Forced string throw')).not.toThrow();
+    expect(() => enrichParseError({})).not.toThrow();
+    expect(() => enrichParseError(null)).not.toThrow();
   });
 });

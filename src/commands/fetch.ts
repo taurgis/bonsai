@@ -393,7 +393,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
         ? buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err })
         : buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
     // Human batches only get the spinner "failed" label unless we echo the reason.
-    if (!this.jsonEnabled() && row.error?.message) this.warn(row.error.message);
+    if (!this.jsonEnabled()) this.warn(row.error.message);
     return row;
   }
 

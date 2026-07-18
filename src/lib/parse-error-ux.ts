@@ -3,7 +3,8 @@ import { closestMatch, closestOptionValues, maxFuzzyDistance } from './text.js';
 
 type FlagMeta = { aliases?: string[]; char?: string };
 
-type EnrichableError = Error & {
+/** oclif parse errors we can enrich — duck-typed after a runtime guard. */
+type EnrichableError = {
   message: string;
   suggestions?: string[];
   flags?: string[];
@@ -13,10 +14,10 @@ type EnrichableError = Error & {
 /** FlagInvalidOptionError body after {@link normalizeCliErrorMessage}. */
 const EXPECTED_OPTION = /^Expected --([^=]+)=(\S+) to be one of: (.+)$/;
 
-function appendSuggestions(err: EnrichableError, lines: string[], suggestions: string[]): void {
-  if (lines.length === 0) return;
-  err.message = [err.message, ...lines].join('\n');
-  err.suggestions = [...(err.suggestions ?? []), ...suggestions];
+function asEnrichable(err: unknown): EnrichableError | null {
+  if (!err || typeof err !== 'object') return null;
+  if (typeof (err as { message?: unknown }).message !== 'string') return null;
+  return err as EnrichableError;
 }
 
 function suggestableFlagNames(err: EnrichableError): string[] {
@@ -28,53 +29,56 @@ function suggestableFlagNames(err: EnrichableError): string[] {
     for (const alias of flag.aliases ?? []) names.push(`--${alias}`);
     if (flag.char) names.push(`-${flag.char}`);
   }
+  // enableJsonFlag is framework-level — it may be absent from parse.input.flags.
   if (!names.includes('--json')) names.push('--json');
   return names;
 }
 
-function enrichUnknownFlags(err: EnrichableError): void {
-  if (!err.flags?.length) return;
-  const candidates = suggestableFlagNames(err);
-  if (candidates.length === 0) return;
-
+function collectTips(err: EnrichableError): { lines: string[]; suggestions: string[] } {
   const lines: string[] = [];
   const suggestions: string[] = [];
-  for (const bad of err.flags) {
-    const match = closestMatch(bad, candidates, maxFuzzyDistance(bad.replace(/^-*/, '')));
-    if (!match || match === bad) continue;
-    lines.push(`Did you mean ${match}?`);
-    suggestions.push(match);
+
+  if (err.flags?.length) {
+    const candidates = suggestableFlagNames(err);
+    for (const bad of err.flags) {
+      const match = closestMatch(bad, candidates, maxFuzzyDistance(bad.replace(/^-*/, '')));
+      if (!match || match === bad) continue;
+      lines.push(`Did you mean ${match}?`);
+      suggestions.push(match);
+    }
   }
-  appendSuggestions(err, lines, suggestions);
-}
 
-function enrichInvalidOption(err: EnrichableError): void {
-  const match = err.message.match(EXPECTED_OPTION);
-  if (!match) return;
-  const [, flagName, input, optionsCsv] = match;
-  if (!flagName || !input || !optionsCsv) return;
+  const option = err.message.match(EXPECTED_OPTION);
+  if (option) {
+    const [, flagName, input, optionsCsv] = option;
+    if (flagName && input && optionsCsv) {
+      const options = optionsCsv
+        .split(', ')
+        .map((part) => part.trim())
+        .filter(Boolean);
+      const values = closestOptionValues(input, options);
+      if (values.length > 0) {
+        lines.push(`Did you mean ${values.join(' or ')}?`);
+        suggestions.push(...values.map((value) => `--${flagName} ${value}`));
+      }
+    }
+  }
 
-  const options = optionsCsv
-    .split(', ')
-    .map((part) => part.trim())
-    .filter(Boolean);
-  const values = closestOptionValues(input, options);
-  if (values.length === 0) return;
-
-  appendSuggestions(
-    err,
-    [`Did you mean ${values.join(' or ')}?`],
-    values.map((value) => `--${flagName} ${value}`)
-  );
+  return { lines, suggestions };
 }
 
 /**
  * Improve oclif parse-time errors in place: unwrap wrapper text, then suggest flag/option typos.
- * No-op for non-Error throws (e.g. a bare string) — those have no `message` to enrich.
+ * Accepts `unknown` because `catch` can receive non-Error throws (bare strings, etc.).
  */
-export function enrichParseError(err: EnrichableError): void {
-  if (typeof err?.message !== 'string') return;
-  err.message = normalizeCliErrorMessage(err.message);
-  enrichUnknownFlags(err);
-  enrichInvalidOption(err);
+export function enrichParseError(err: unknown): void {
+  const enrichable = asEnrichable(err);
+  if (!enrichable) return;
+
+  enrichable.message = normalizeCliErrorMessage(enrichable.message);
+  const { lines, suggestions } = collectTips(enrichable);
+  if (lines.length === 0) return;
+
+  enrichable.message = [enrichable.message, ...lines].join('\n');
+  enrichable.suggestions = [...(enrichable.suggestions ?? []), ...suggestions];
 }

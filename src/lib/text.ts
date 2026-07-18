@@ -98,5 +98,6 @@ export function closestMatch(
 export function closestOptionValues(input: string, options: readonly string[]): string[] {
   const edit = closestMatch(input, options, maxFuzzyDistance(input));
   if (edit) return [edit];
-  return options.filter((option) => option === input || option.startsWith(`${input}_`));
+  // Exact equals already won via closestMatch; prefix covers truncated enums (stale → stale_*).
+  return options.filter((option) => option.startsWith(`${input}_`));
 }

@@ -256,7 +256,7 @@ describe('command_not_found hook', () => {
     expect(envelope.suggestions).toEqual(['bonsai fetch']);
   });
 
-  it('does not suggest unrelated hidden commands that are not fetch', async () => {
+  it('offers no correction when nothing is within the fuzzy threshold', async () => {
     const msg = await runHook('zzzhidden');
     expect(msg).not.toContain('Did you mean');
   });
