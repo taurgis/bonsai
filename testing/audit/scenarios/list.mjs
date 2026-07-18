@@ -111,6 +111,31 @@ export default function register(harness, fixtures) {
     );
   });
 
+  check('list --json limit truncation warns on stderr only', () => {
+    const ws = createWorkspace();
+    for (const url of [
+      'https://example.com/audit-list-limit-one',
+      'https://example.com/audit-list-limit-two',
+    ]) {
+      const imported = run(['import', url, '--stdin', '--topic', 'Audit Limit', '--json'], {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        input: '# Audit Limit\n\nList truncation fixture.\n',
+      });
+      expect(imported.exitCode === 0, `import ${url} exit ${imported.exitCode}`);
+    }
+
+    const listed = run(['list', '--topic', 'Audit Limit', '--limit', '1', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const env = parseJson(listed.stdout);
+    expect(listed.exitCode === 0, `list exit ${listed.exitCode}`);
+    expect(env?.data?.length === 1, `data length ${env?.data?.length}`);
+    expect(env?.stdout === '', 'stdout field remains clean');
+    expect(listed.stderr.includes('2 entries matched; returning the first 1'), listed.stderr);
+  });
+
   check('import then list filters by source URL glob', () => {
     const ws = createWorkspace();
     const matchingUrl = 'https://example.com/audit-list-url-align-hit';

@@ -118,6 +118,7 @@ Bonsai supports a global `--read-only` flag (alias `--plan`), also honored via t
 
 - Research fetches still hit the network and return content normally; they just skip writing the result to the local cache.
 - `import` previews the write and reports `dryRun: true` instead of persisting.
+- `config set` / `config unset` preview the write and report `would_set` / `would_unset`.
 - `prune` treats `--read-only` like an implicit dry run; combining it with `--yes` is rejected.
 
 Composition is OR: once read-only mode is active (flag or either env var), there is no per-call way to force writes back on. Use this whenever the calling agent itself is confined to a read-only/plan mode, so research stays possible without violating that constraint.

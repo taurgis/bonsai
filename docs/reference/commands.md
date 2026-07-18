@@ -136,6 +136,7 @@ bonsai import [url] [flags]
 - `--read-only` / `--plan`: Block the write; reports `dryRun: true` and `cache.status: "would_import"`.
 
 Localhost and other private hosts are accepted as **cache keys** for import. Network fetches to those hosts remain blocked by the SSRF guard.
+Import stdin and file inputs are capped at 1 MiB. Oversized stdin exits `1` with `STDIN_TOO_LARGE`; oversized files exit `1` with `FILE_TOO_LARGE`. A directory passed to `--file` exits `2` with `NOT_A_FILE`.
 
 ### JSON Output envelope `data` block
 
@@ -410,6 +411,9 @@ only the credential _type_ is named.
 # Store this project's research cache inside the repo
 bonsai config set storage project --local
 
+# Equivalent inline assignment form
+bonsai config set storage=project --local
+
 # Set the user-wide default
 bonsai config set storage global
 
@@ -432,11 +436,17 @@ override set it. `value` is still the usable default/resolved value so agents ne
 `config list --json` returns an array of `{ key, value, configured }` entries with the same
 semantics per key (same array-as-`data` shape as `list`).
 
+`config set --json` returns `{ key, value, scope, dryRun, status }`, where `status` is `"set"` or
+`"would_set"`. `config unset --json` returns `{ key, scope, dryRun, status }`, where `status` is
+`"unset"` or `"would_unset"`. `--dry-run`, `--read-only`/`--plan`, `BONSAI_READ_ONLY`, and
+`BONSAI_PLAN_MODE` all set `dryRun: true` and skip the config write.
+
 ### Flags
 
 - `--global` / `-g`: target the user-level config file (default for `set`/`unset`).
 - `--local` / `--project` / `-p`: target the project-level config file (`.bonsai.json`).
 - `--dry-run`: (`set`/`unset`) show the change without writing.
+- `--read-only` / `--plan`: inherited global flag; (`set`/`unset`) preview without writing.
 - `--json`: machine-readable envelope.
 
 ### Configuration keys

@@ -46,6 +46,15 @@ export default function register(harness, fixtures) {
     expect(r.exitCode === env?.exitCode, 'process vs envelope exit');
   });
 
+  check('fetch --json invalid max-age INVALID_DURATION names max-age', () => {
+    const r = run(['https://example.com', '--max-age', '5z', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_DURATION', env?.code);
+    expect(env?.stderr?.includes('--max-age'), env?.stderr);
+    expect(r.exitCode === env?.exitCode, 'process vs envelope exit');
+  });
+
   check('fetch invalid tier --json exit 2', () => {
     const r = run(['https://example.com', '--tier', 'bogus', '--json']);
     const env = parseJson(r.stdout);

@@ -50,6 +50,35 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'FILE_NOT_FOUND', 'code');
   });
 
+  check('import directory path --json NOT_A_FILE', () => {
+    const ws = createWorkspace();
+    const r = run(['import', 'https://example.com/not-a-file', '--file', ws.cwd, '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'NOT_A_FILE', 'code');
+  });
+
+  check('import oversized file --json FILE_TOO_LARGE', () => {
+    const ws = createWorkspace();
+    const file = writeNote(ws.cwd, 'large.md', 'x'.repeat(1024 * 1024 + 1));
+    const r = run(['import', 'https://example.com/large-file', '--file', file, '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'FILE_TOO_LARGE', 'code');
+  });
+
+  check('import oversized stdin --json STDIN_TOO_LARGE', () => {
+    const r = run(['import', 'https://example.com/large-stdin', '--stdin', '--json'], {
+      input: 'x'.repeat(1024 * 1024 + 1),
+    });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'STDIN_TOO_LARGE', 'code');
+  });
+
   check('import url+source-url --json CONFLICTING_FLAGS', () => {
     const r = run(
       ['import', 'https://a.com', '--source-url', 'https://b.com', '--stdin', '--json'],
