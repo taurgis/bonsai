@@ -166,3 +166,13 @@ module in the same change. **When you uncover an end-to-end flow (happy or unhap
 does not yet cover, add it** to the relevant scenario module (or add a new module and register it).
 Run `pnpm audit:cli` and confirm it is green before finishing. Under `--json`, warnings and human
 messages go to **stderr**; machine output stays on stdout — assert accordingly.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues (via `gh`). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context layout — root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.
