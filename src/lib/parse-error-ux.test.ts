@@ -38,4 +38,9 @@ describe('enrichParseError', () => {
     enrichParseError(err);
     expect(err.message).toBe('Limit must be between 1 and 100.');
   });
+
+  it('no-ops for non-Error throws without a message string', () => {
+    expect(() => enrichParseError('Forced string throw' as unknown as Error)).not.toThrow();
+    expect(() => enrichParseError({} as Error)).not.toThrow();
+  });
 });

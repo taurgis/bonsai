@@ -70,8 +70,10 @@ function enrichInvalidOption(err: EnrichableError): void {
 
 /**
  * Improve oclif parse-time errors in place: unwrap wrapper text, then suggest flag/option typos.
+ * No-op for non-Error throws (e.g. a bare string) — those have no `message` to enrich.
  */
 export function enrichParseError(err: EnrichableError): void {
+  if (typeof err?.message !== 'string') return;
   err.message = normalizeCliErrorMessage(err.message);
   enrichUnknownFlags(err);
   enrichInvalidOption(err);
