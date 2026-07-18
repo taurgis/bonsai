@@ -48,6 +48,20 @@ The `data` block differs per command. See the [Command Reference](/reference/com
 for each command's schema. `cache.status`, `cache.freshness`, and
 `source.extractionConfidence` are the fields agents most often branch on.
 
+## Read-only / plan mode
+
+Use `--read-only` (alias `--plan`), `BONSAI_READ_ONLY=1`, or `BONSAI_PLAN_MODE=1` when an agent
+must avoid filesystem mutations. The mode is global and compositional: once active for a process,
+there is no per-command flag to force writes back on.
+
+- Fetch still performs network reads and returns content, but cache misses/refreshes are previewed
+  without persisting artifacts.
+- `import` reports `dryRun: true` and `cache.status: "would_import"`.
+- `config set` / `config unset` report `dryRun: true` with `status: "would_set"` /
+  `"would_unset"` and leave config files unchanged.
+- `prune` treats read-only as an implicit dry run; combining read-only mode with `--yes` exits `2`
+  with `READ_ONLY_MODE`.
+
 ## Exit codes
 
 Every command returns a distinct exit code so callers can react without parsing

@@ -82,6 +82,25 @@ export default function register(harness, fixtures) {
     );
   });
 
+  check('config set accepts inline key=value form', () => {
+    const ws = createWorkspace();
+    const set = run(['config', 'set', 'summary=balanced', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const setData = parseJson(set.stdout)?.data;
+    expect(set.exitCode === 0, `set exit ${set.exitCode}`);
+    expect(setData?.key === 'summary', `key ${setData?.key}`);
+    expect(setData?.value === 'balanced', `value ${setData?.value}`);
+    expect(setData?.status === 'set', `status ${setData?.status}`);
+
+    const get = run(['config', 'get', 'summary', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(get.stdout)?.data?.value === 'balanced', 'inline form persisted');
+  });
+
   check('config list --json data is a bare entries array', () => {
     const ws = createWorkspace();
     const r = run(['config', 'list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });

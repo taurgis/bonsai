@@ -101,3 +101,11 @@ Bonsai returns a distinct exit code for each result status, so a machine caller 
   bonsai https://example.com
   bonsai status https://docs.nestjs.com
   ```
+
+#### Scenario D: Import input is rejected
+* **Cause**: `import` accepts exactly one input source (`--stdin`, `--file <path>`, or `--file -`) and caps stdin/file content at 1 MiB. Directories passed to `--file` are rejected with `NOT_A_FILE`; oversized stdin/files exit `1` with `STDIN_TOO_LARGE` or `FILE_TOO_LARGE`.
+* **Resolution**: Pass a real Markdown file, pipe content with `--stdin`, or split large notes into smaller imports.
+
+#### Scenario E: Read-only / plan mode previewed a write
+* **Cause**: `--read-only`, `--plan`, `BONSAI_READ_ONLY`, or `BONSAI_PLAN_MODE` blocks cache/config writes and prune deletes. `import` returns `would_import`; `config set` / `config unset` return `would_set` / `would_unset`; `prune --yes` exits `2` with `READ_ONLY_MODE`.
+* **Resolution**: Treat the result as a preview, or rerun outside read-only mode when a real write/delete is intended.

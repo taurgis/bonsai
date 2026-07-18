@@ -73,6 +73,49 @@ export default function register(harness, fixtures) {
     expect(parseJson(get.stdout)?.data?.value === 'global', 'project file untouched, default still global');
   });
 
+  check('config set/unset honor read-only env vars without writing', () => {
+    const ws = createWorkspace();
+    const plannedSet = run(['config', 'set', 'storage', 'project', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      env: { BONSAI_READ_ONLY: '1' },
+      keepEnv: true,
+    });
+    const plannedSetData = parseJson(plannedSet.stdout)?.data;
+    expect(plannedSet.exitCode === 0, `set exit ${plannedSet.exitCode}`);
+    expect(plannedSetData?.dryRun === true, 'set dryRun via BONSAI_READ_ONLY');
+    expect(plannedSetData?.status === 'would_set', `set status ${plannedSetData?.status}`);
+
+    const stillDefault = run(['config', 'get', 'storage', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(stillDefault.stdout)?.data?.configured === false, 'read-only set skipped write');
+
+    const seed = run(['config', 'set', 'storage', 'project', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(seed.exitCode === 0, `seed exit ${seed.exitCode}`);
+
+    const plannedUnset = run(['config', 'unset', 'storage', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      env: { BONSAI_PLAN_MODE: '1' },
+      keepEnv: true,
+    });
+    const plannedUnsetData = parseJson(plannedUnset.stdout)?.data;
+    expect(plannedUnset.exitCode === 0, `unset exit ${plannedUnset.exitCode}`);
+    expect(plannedUnsetData?.dryRun === true, 'unset dryRun via BONSAI_PLAN_MODE');
+    expect(plannedUnsetData?.status === 'would_unset', `unset status ${plannedUnsetData?.status}`);
+
+    const stillConfigured = run(['config', 'get', 'storage', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(stillConfigured.stdout)?.data?.configured === true, 'read-only unset skipped write');
+  });
+
   check('prune --yes --read-only exits 2 with READ_ONLY_MODE', () => {
     const r = run(['prune', '--older-than', '1d', '--yes', '--read-only', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

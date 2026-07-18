@@ -29,7 +29,7 @@ metadata:
 - **Browse cached entries**: Use `npx @taurgis/bonsai list` when you need to see what is already cached by topic, tags, or freshness.
 - If Bonsai is configured for project storage and `.bonsai/research/` is not ignored by git, treat those cache artifacts as intentional shared project files. It is OK to check them in, and agents must not delete them as incidental generated output without an explicit request.
 - Re-running on a recent topic is cheap — research the topic rather than skipping it to "save" a fetch.
-- If you are operating under a read-only/plan-mode harness, add `--read-only` (alias `--plan`) to Bonsai calls, or rely on `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` if the harness sets it — fetches still run, but nothing is persisted to the local cache or config.
+- If you are operating under a read-only/plan-mode harness, add `--read-only` (alias `--plan`) to Bonsai calls, or rely on `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` if the harness sets it — fetches still run, but nothing is persisted to the local cache or config; `config set` / `config unset` preview with `would_set` / `would_unset`.
 
 ## Working with Salesforce Sites
 

@@ -82,6 +82,14 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'INVALID_DURATION', 'code');
   });
 
+  check('status invalid max-age INVALID_DURATION names max-age', () => {
+    const r = run(['status', 'https://example.com', '--max-age', '5z', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_DURATION', env?.code);
+    expect(env?.stderr?.includes('--max-age'), env?.stderr);
+  });
+
   check('status missing url exit 2', () => {
     const r = run(['status', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
