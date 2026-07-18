@@ -15,6 +15,7 @@ import { sanitizePromptInjection } from '../lib/research/prompt-injection.js';
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { estimateTokens } from '../lib/research/token-estimate.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from '../lib/research/schema.js';
+import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 
 export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   static id = 'import';
@@ -69,15 +70,15 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     })(),
     topic: Flags.string({
       char: 't',
-      description: 'the main topic for this research note',
+      description: CLI_FLAG_DESCRIPTIONS.importTopic,
     }),
     tags: Flags.string({
       char: 'g',
-      description: 'taxonomic tags (can be repeated)',
+      description: CLI_FLAG_DESCRIPTIONS.importTags,
       multiple: true,
     }),
     tier: Flags.option({
-      description: 'freshness tier policy',
+      description: CLI_FLAG_DESCRIPTIONS.freshnessTierPolicy,
       options: ['stable', 'standard', 'volatile'] as const,
       default: 'standard',
     })(),
@@ -87,14 +88,14 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     }),
     ttl: Flags.string({
       char: 'l',
-      description: 'predicted lifespan of the data (e.g. "24h", "7d")',
+      description: CLI_FLAG_DESCRIPTIONS.importTtl,
     }),
     'dry-run': Flags.boolean({
       description: 'validate and preview the import without writing to cache',
       default: false,
     }),
     storage: Flags.option({
-      description: 'override where this note is cached (secrets always stored globally)',
+      description: CLI_FLAG_DESCRIPTIONS.importStorage,
       options: ['global', 'project'] as const,
     })(),
   };

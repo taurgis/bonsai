@@ -31,6 +31,7 @@ import { persistSectionArtifacts } from '../lib/research/docs/section-artifacts.
 import { applyAutoTags } from '../lib/research/keywords.js';
 import { detectSite } from '../sites/index.js';
 import { applySiteFetchProvenance, type SiteFetchResult } from '../sites/types.js';
+import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 
 const CAPTURE_DEPS: CaptureDeps = {
   fetchStatic: (url) => fetchStaticHtml(url),
@@ -71,11 +72,11 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   static flags = {
     topic: Flags.string({
       char: 't',
-      description: 'the main category/topic of the research for metadata tagging',
+      description: CLI_FLAG_DESCRIPTIONS.fetchTopic,
     }),
     tags: Flags.string({
       char: 'g',
-      description: 'taxonomic tags for this research (can be repeated)',
+      description: CLI_FLAG_DESCRIPTIONS.fetchTags,
       multiple: true,
     }),
     format: Flags.option({
@@ -85,13 +86,13 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       default: 'compressed',
     })(),
     tier: Flags.option({
-      description: 'freshness tier policy',
+      description: CLI_FLAG_DESCRIPTIONS.freshnessTierPolicy,
       options: ['stable', 'standard', 'volatile'] as const,
       default: 'standard',
     })(),
     ttl: Flags.string({
       char: 'l',
-      description: 'predicted lifespan: number + h/d/w/m/y (m = months), e.g. "2h", "7d", "6m"',
+      description: CLI_FLAG_DESCRIPTIONS.fetchTtl,
     }),
     'max-age': Flags.string({
       description: 'maximum age of cache to accept (e.g., "1d", "30d")',
@@ -113,7 +114,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       default: false,
     }),
     storage: Flags.option({
-      description: 'override where this result is cached (secrets always stored globally)',
+      description: CLI_FLAG_DESCRIPTIONS.fetchStorage,
       options: ['global', 'project'] as const,
     })(),
   };

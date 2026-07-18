@@ -13,6 +13,7 @@ import {
 import { limitFlag } from '../lib/limit-flag.js';
 import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
+import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
 const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
@@ -49,11 +50,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static flags = {
     topic: Flags.string({
       char: 't',
-      description: 'filter by exact topic (case-insensitive)',
+      description: CLI_FLAG_DESCRIPTIONS.filterTopic,
     }),
     tags: Flags.string({
       char: 'g',
-      description: 'filter by tags (must match all tags specified)',
+      description: CLI_FLAG_DESCRIPTIONS.filterTags,
       multiple: true,
     }),
     url: Flags.string({
