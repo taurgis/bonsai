@@ -3,7 +3,7 @@ import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.
 import {
   buildEnvelope,
   enrichCacheMissEnvelope,
-  enrichFetchFailureEnvelope,
+  enrichRowErrorEnvelope,
   formatErrorForJson,
   normalizeCliErrorMessage,
   stableErrorCodeFrom,
@@ -209,18 +209,14 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   }
 
   /**
-   * Success overlay for multi-URL read commands (`status`, `inspect`). URL validation failures
-   * in a batch keep prior hits (same contract as fetch) and take precedence over CACHE_MISS;
-   * otherwise miss rows get the CACHE_MISS code while hit payloads stay in `data`.
+   * Success overlay for multi-URL read commands (`status`, `inspect`): row `.error` first
+   * (invalid URL in a batch), else CACHE_MISS — hit payloads always stay in `data`.
    */
-  protected cacheMissSuccessJson(
-    data: unknown,
-    messageFor: (normalizedUrl: string, missCount: number) => string
-  ): Record<string, unknown> {
+  protected batchReadSuccessJson(data: unknown): Record<string, unknown> {
     const base = this.baseSuccessJson(data);
-    const withUrlErrors = enrichFetchFailureEnvelope(base, data);
-    if (withUrlErrors !== base) return withUrlErrors;
-    return enrichCacheMissEnvelope(base, data, this.config.bin, messageFor);
+    const withRowErrors = enrichRowErrorEnvelope(base, data);
+    if (withRowErrors !== base) return withRowErrors;
+    return enrichCacheMissEnvelope(base, data, this.config.bin);
   }
 
   /**

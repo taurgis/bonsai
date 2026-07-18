@@ -3,6 +3,11 @@ import type { ResearchArtifactMetadata } from './schema.js';
 const HOUR_MS = 3600 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 
+/** Shared unit hint for parse failures and empty-duration rejection. */
+const DURATION_FORMAT_HINT =
+  `Use a whole number plus a unit: ` +
+  `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '24h', '7d', '6m'.`;
+
 export interface FreshnessPolicy {
   freshWindowMs: number;
   graceWindowMs: number;
@@ -18,10 +23,7 @@ export function parseTtlToMs(ttl: string): number {
     // Deliberately does not start with "Invalid": durationFlagError wraps this as
     // "Invalid <flag>: <message>", and a leading "Invalid" here produced a "Invalid --ttl:
     // Invalid TTL format" stutter.
-    throw new Error(
-      `Duration "${ttl}" is not a valid format. Use a whole number plus a unit: ` +
-        `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '24h', '7d', '6m'.`
-    );
+    throw new Error(`Duration "${ttl}" is not a valid format. ${DURATION_FORMAT_HINT}`);
   }
   const val = parseInt(match[1] || '', 10);
   const unit = match[2] || '';
@@ -58,10 +60,7 @@ export function durationFlagError(flag: string, value: string | undefined): stri
   // silently mean "no override" (unlike a truly omitted flag).
   if (value === undefined) return null;
   if (value.trim() === '') {
-    return (
-      `Invalid ${flag}: Duration must not be empty. Use a whole number plus a unit: ` +
-      `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '24h', '7d', '6m'.`
-    );
+    return `Invalid ${flag}: Duration must not be empty. ${DURATION_FORMAT_HINT}`;
   }
   try {
     parseTtlToMs(value);

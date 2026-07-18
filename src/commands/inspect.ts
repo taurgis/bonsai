@@ -1,6 +1,7 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
-import { finalizeBatch } from '../lib/batch.js';
+import { finalizeBatch, isBatchReadFailure } from '../lib/batch.js';
+import { cliErrorFields } from '../lib/envelope.js';
 import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
@@ -41,10 +42,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   static stdoutIsPrimaryData = true;
 
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
-    // Same wording as status so agents matching on CACHE_MISS stderr stay consistent.
-    return this.cacheMissSuccessJson(data, (url, n) =>
-      n > 1 ? `Cache miss for ${url} and ${n - 1} other URLs` : `Cache miss for ${url}`
-    );
+    return this.batchReadSuccessJson(data);
   }
 
   async run(): Promise<unknown> {
@@ -58,14 +56,10 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
         status: 'error' as const,
         metadata: null,
         sections: [] as SectionSummary[],
-        error: {
-          code: typeof err.code === 'string' && err.code ? err.code : 'INVALID_URL',
-          message: err.message,
-          suggestions: err.suggestions,
-        },
+        error: cliErrorFields(err),
       })
     );
-    return finalizeBatch(results, (r) => r.status === 'miss' || r.status === 'error');
+    return finalizeBatch(results, isBatchReadFailure);
   }
 
   private inspectOne(url: string) {

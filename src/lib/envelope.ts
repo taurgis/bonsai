@@ -81,9 +81,22 @@ export function formatErrorForJson(err: CliErrorShape): string {
 
 type CacheMissRow = { status?: string; normalizedUrl?: string };
 
+/** Stable CLIError fields for batch failure rows (status/inspect/fetch). */
+export function cliErrorFields(
+  err: { code?: string; message?: string; suggestions?: string[]; ref?: string },
+  fallbackCode = 'INVALID_URL'
+): { code: string; message: string; suggestions?: string[]; ref?: string } {
+  return {
+    code: typeof err.code === 'string' && err.code ? err.code : fallbackCode,
+    message: typeof err.message === 'string' ? err.message : String(err),
+    suggestions: err.suggestions,
+    ref: err.ref,
+  };
+}
+
 /**
  * Overlay a batch failure onto a success envelope while keeping per-row `data`.
- * Shared by multi-URL status/inspect (CACHE_MISS) and fetch (FETCH_FAILED).
+ * Shared by multi-URL status/inspect (CACHE_MISS) and fetch/row errors.
  */
 export function enrichBatchFailureEnvelope<T>(
   envelope: Record<string, unknown>,
@@ -124,14 +137,12 @@ export function enrichBatchFailureEnvelope<T>(
 }
 
 /**
- * CACHE_MISS convenience over {@link enrichBatchFailureEnvelope}.
- * Rows with `status === 'miss'` keep their payloads; the envelope reports the miss.
+ * CACHE_MISS overlay. Message wording is fixed so status/inspect cannot drift.
  */
 export function enrichCacheMissEnvelope(
   envelope: Record<string, unknown>,
   data: unknown,
-  bin: string,
-  messageFor: (normalizedUrl: string, missCount: number) => string
+  bin: string
 ): Record<string, unknown> {
   return enrichBatchFailureEnvelope<CacheMissRow>(envelope, data, {
     pick: (row) => {
@@ -140,17 +151,22 @@ export function enrichCacheMissEnvelope(
     },
     code: 'CACHE_MISS',
     exitCode: 1,
-    message: (first, failures) => messageFor(first.normalizedUrl ?? '', failures.length),
+    message: (first, failures) => {
+      const url = first.normalizedUrl ?? '';
+      return failures.length > 1
+        ? `Cache miss for ${url} and ${failures.length - 1} other URLs`
+        : `Cache miss for ${url}`;
+    },
     suggestions: (failures) =>
       failures.map((m) => `Fetch and cache it first: ${bin} ${m.normalizedUrl}`),
   });
 }
 
 /**
- * FETCH_FAILED convenience over {@link enrichBatchFailureEnvelope}.
- * Multi-URL fetch keeps prior successes in `data` and surfaces the first row error on the envelope.
+ * Per-row `.error` overlay for multi-URL batches (fetch, status, inspect).
+ * Keeps prior successes in `data` and surfaces the first row's code/message.
  */
-export function enrichFetchFailureEnvelope(
+export function enrichRowErrorEnvelope(
   envelope: Record<string, unknown>,
   data: unknown
 ): Record<string, unknown> {
@@ -167,6 +183,59 @@ export function enrichFetchFailureEnvelope(
     ref: (first) => first.ref,
     exitCode: 1,
   });
+}
+
+/**
+ * Partial prune unlink failure: candidates remain in `data`, envelope reports the stable code.
+ */
+export function enrichPrunePartialEnvelope(
+  envelope: Record<string, unknown>,
+  data: unknown
+): Record<string, unknown> {
+  const d = data as { prunedCount?: number; candidateCount?: number };
+  if (
+    typeof d.prunedCount !== 'number' ||
+    typeof d.candidateCount !== 'number' ||
+    d.candidateCount <= 0 ||
+    d.prunedCount >= d.candidateCount
+  ) {
+    return envelope;
+  }
+  const failed = d.candidateCount - d.prunedCount;
+  const code = 'PRUNE_PARTIAL_FAILURE';
+  const message = `Failed to delete ${failed} of ${d.candidateCount} cache ${failed === 1 ? 'entry' : 'entries'}.`;
+  return {
+    ...envelope,
+    ok: false,
+    exitCode: 1,
+    code,
+    stderr: formatErrorForJson({ message, code }),
+  };
+}
+
+/** Shared MISSING_COMMAND copy for argv preflight and flag-only command_not_found. */
+export function missingCommandDetails(
+  bin: string,
+  swallowed?: { flag: string; url: string } | null
+): { message: string; code: 'MISSING_COMMAND'; suggestions: string[] } {
+  if (swallowed) {
+    return {
+      code: 'MISSING_COMMAND',
+      message: [
+        `Missing URL or command. ${swallowed.flag} consumed ${swallowed.url} as its value, so there was no URL left to fetch.`,
+        `Run ${bin} --help for usage.`,
+      ].join('\n'),
+      suggestions: [
+        `Pass the URL as the command (flags after): ${bin} ${swallowed.url}`,
+        `Or a named command: ${bin} list`,
+      ],
+    };
+  }
+  return {
+    code: 'MISSING_COMMAND',
+    message: `Missing URL or command. Run ${bin} --help for usage.`,
+    suggestions: [`Pass a URL: ${bin} https://example.com`, `Or a command: ${bin} list`],
+  };
 }
 
 /**

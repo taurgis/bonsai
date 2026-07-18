@@ -1,6 +1,6 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
-import { buildCliErrorEnvelope } from '../../lib/envelope.js';
+import { buildCliErrorEnvelope, missingCommandDetails } from '../../lib/envelope.js';
 import { findSwallowedUrlFlag } from '../../lib/argv.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
@@ -114,24 +114,13 @@ export function buildCommandNotFoundDetails(
   if (id.startsWith('-')) {
     // Prefer process.argv: oclif's hook argv may omit the flag token that became `id`.
     const swallowed = findSwallowedUrlFlag(process.argv.slice(2)) ?? findSwallowedUrlFlag(argv);
-    const suggestions = swallowed
-      ? [
-          `Pass the URL as the command (flags after): ${config.bin} ${swallowed.url}`,
-          `Or a named command: ${config.bin} list`,
-        ]
-      : [`Pass a URL: ${config.bin} https://example.com`, `Or a command: ${config.bin} list`];
-    const message = swallowed
-      ? [
-          `Missing URL or command. ${swallowed.flag} consumed ${swallowed.url} as its value, so there was no URL left to fetch.`,
-          `Run ${config.bin} --help for usage.`,
-        ].join('\n')
-      : `Missing URL or command. Run ${config.bin} --help for usage.`;
+    const details = missingCommandDetails(config.bin, swallowed);
     return {
-      code: 'MISSING_COMMAND',
+      code: details.code,
       command: config.bin,
       jsonMode: isJsonMode(argv),
-      message,
-      suggestions,
+      message: details.message,
+      suggestions: details.suggestions,
     };
   }
 

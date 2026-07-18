@@ -1,4 +1,4 @@
-import { buildCliErrorEnvelope } from './envelope.js';
+import { buildCliErrorEnvelope, missingCommandDetails } from './envelope.js';
 
 export interface NormalizationResult {
   /** The normalized argv array to set on process.argv. */
@@ -15,16 +15,14 @@ export interface NormalizationResult {
  * oclif pipeline sees one consistent command structure.
  */
 function missingUsageJsonExit(): NormalizationResult['exitWithJson'] {
-  const message = 'Missing URL or command. Run bonsai --help for usage.';
-  const code = 'MISSING_COMMAND';
-  const suggestions = ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'];
+  const details = missingCommandDetails('bonsai');
   return {
     exitCode: 2,
     envelope: buildCliErrorEnvelope({
       command: 'bonsai',
-      message,
-      code,
-      suggestions,
+      message: details.message,
+      code: details.code,
+      suggestions: details.suggestions,
     }),
   };
 }

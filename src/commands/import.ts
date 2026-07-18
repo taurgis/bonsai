@@ -171,7 +171,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         { exit: 2, code: 'MISSING_URL' }
       );
     }
-    if (hasMulti && !this.flags.topic?.trim()) {
+    if (hasMulti && !this.resolvedTopic()) {
       this.error('Multi-source import requires the --topic flag.', {
         exit: 2,
         code: 'MISSING_TOPIC',
@@ -293,6 +293,12 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     this.error('No input source specified.', { exit: 2, code: 'MISSING_INPUT' });
   }
 
+  /** Trimmed --topic, or null when absent/whitespace-only. */
+  private resolvedTopic(): string | null {
+    const topic = this.flags.topic?.trim();
+    return topic || null;
+  }
+
   private deriveImportCacheKey(
     hasSingle: boolean,
     singleNormalizedUrl: string,
@@ -301,8 +307,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     if (hasSingle) {
       return deriveCacheKey(singleNormalizedUrl);
     }
-    const normalizedTopic = this.flags.topic!.trim().toLowerCase();
-    const combinedString = [normalizedTopic, ...sourceUrls].join('|');
+    const combinedString = [this.resolvedTopic()!.toLowerCase(), ...sourceUrls].join('|');
     return createHash('sha256').update(combinedString).digest('hex');
   }
 
@@ -337,7 +342,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       source_urls: sourceUrls,
       normalized_url: singleNormalizedUrl,
       cache_key: cacheKey,
-      topic: this.flags.topic?.trim() || null,
+      topic: this.resolvedTopic(),
       tags: this.flags.tags || [],
       format_available: ['compressed', 'detailed'],
       tier,
@@ -373,7 +378,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     // keyword without forcing manual tagging. Explicit --tags always win (handled in applyAutoTags).
     return applyAutoTags({
       metadata,
-      summary: `Synthesized research for ${hasSingle ? singleNormalizedUrl : this.flags.topic!.trim()}`,
+      summary: `Synthesized research for ${hasSingle ? singleNormalizedUrl : this.resolvedTopic()}`,
       compressed,
       detailed,
       provenance: `Imported via agent-supplied research at ${currentTime.toISOString()}`,
@@ -429,7 +434,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
       this.log(`${'Storage Path:'.padEnd(25)} ${storagePath}`);
       if (!hasSingle) {
-        const topic = this.flags.topic!.trim();
+        const topic = this.resolvedTopic()!;
         this.log(`${'Topic:'.padEnd(25)} ${topic}`);
         this.log(`${'Source URLs:'.padEnd(25)} ${sourceUrls.join(', ')}`);
         this.log(`\nTip: find it again with ${this.config.bin} list --topic "${topic}"`);

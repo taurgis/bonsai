@@ -6,3 +6,8 @@ export function finalizeBatch<T>(results: T[], isFailure: (row: T) => boolean): 
   if (results.some(isFailure)) process.exitCode = 1;
   return results.length === 1 ? results[0]! : results;
 }
+
+/** status/inspect batch rows: a miss or a validation error row is a failure outcome. */
+export function isBatchReadFailure(row: { status: string }): boolean {
+  return row.status === 'miss' || row.status === 'error';
+}
