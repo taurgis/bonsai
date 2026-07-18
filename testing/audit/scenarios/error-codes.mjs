@@ -96,13 +96,15 @@ export default function register(harness) {
     expect(!human.stderr.includes('Parsing --limit'), human.stderr);
   });
 
-  check('list --artifact-type section tips inspect', () => {
+  check('list --artifact-type section is rejected; help points at inspect', () => {
     const json = run(['list', '--artifact-type', 'section', '--json']);
     const env = parseJson(json.stdout);
     expect(json.exitCode === 2, `exit ${json.exitCode}`);
     expect(env?.code === 'INVALID_FLAG_VALUE', env?.code);
-    expect(env?.stderr?.includes('Section artifacts are omitted from list'), env?.stderr);
-    expect(env?.suggestions?.some((s) => s.includes('inspect')), `suggestions ${env?.suggestions}`);
+    expect(env?.stderr?.includes('one of: source, research_note, index'), env?.stderr);
+    // Policy lives in the flag description, not a special-case tip — keep that discoverable.
+    const help = run(['list', '--help']);
+    expect(help.stdout.includes('use inspect to see them'), help.stdout);
   });
 
   check('truncated freshness value suggests stale_* options', () => {

@@ -113,14 +113,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    * the shared resolver so the framework's `??` keeps it, then defer to the default behavior.
    */
   public override async catch(
-    err: Error & {
-      oclif?: { exit?: number };
-      exitCode?: number;
-      code?: string;
-      suggestions?: string[];
-      flags?: string[];
-      parse?: { input?: { flags?: Record<string, unknown> } };
-    }
+    err: Error & { oclif?: { exit?: number }; exitCode?: number; code?: string }
   ) {
     // Parse failures throw before `this.parse()` sets `parsed`, which makes oclif emit a spurious
     // [UnparsedCommand] warning to stderr even under `--json`. CLIParseError subclasses carry `parse`.

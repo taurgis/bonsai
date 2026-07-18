@@ -12,14 +12,13 @@ export default function register(harness) {
     expect(env?.suggestions?.[0] === 'bonsai list', `suggestions ${env?.suggestions}`);
   });
 
-  check('fetch typo suggests URL shorthand and help fetch', () => {
+  check('fetch typo suggests fetch', () => {
     const r = run(['fetsh', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
     expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
     expect(env?.stderr?.includes('Did you mean fetch?'), env?.stderr);
-    expect(env?.stderr?.includes('Or pass a URL directly'), env?.stderr);
-    expect(env?.suggestions?.[0] === 'bonsai https://example.com', `suggestions ${env?.suggestions}`);
+    expect(env?.suggestions?.[0] === 'bonsai fetch', `suggestions ${env?.suggestions}`);
   });
 
   check('unknown command wat no suggestion', () => {

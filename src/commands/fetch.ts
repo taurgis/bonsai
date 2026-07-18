@@ -379,25 +379,22 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   }
 
   /**
-   * Multi-URL batches keep prior successes as failure rows; command-level usage errors (exit 2
-   * flag/arg problems that never reach this loop) still throw. Per-URL normalization failures
-   * (`INVALID_URL` / `MISSING_URL_SCHEME`) stay as rows so a bad URL later in the list does not
-   * wipe earlier hits from the `--json` envelope — same contract as network `FETCH_FAILED`.
+   * Multi-URL batches keep prior successes as failure rows. Flag validation runs before this loop,
+   * so every error that reaches here is per-URL — including INVALID_URL / MISSING_URL_SCHEME.
    */
   private failureRowOrRethrow(url: string, err: unknown, dryRun: boolean, batch: boolean) {
     if (!this.jsonEnabled()) ux.action.stop('failed');
-    if (err instanceof Errors.CLIError) {
-      const code = typeof err.code === 'string' ? err.code : undefined;
-      const perUrl =
-        code === 'INVALID_URL' || code === 'MISSING_URL_SCHEME' || (err.oclif?.exit ?? 1) !== 2;
-      if (!batch || !perUrl) throw err;
-      // Human batches only get the spinner "failed" label unless we echo the reason.
-      if (!this.jsonEnabled() && err.message) this.warn(err.message);
-      return buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err });
+    if (!batch) {
+      if (err instanceof Errors.CLIError) throw err;
+      this.emitFetchError(err, url);
     }
-    if (!batch) this.emitFetchError(err, url);
-    const row = buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
-    if (!this.jsonEnabled() && row.error?.message) this.warn(row.error.message);
+    const row =
+      err instanceof Errors.CLIError
+        ? buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err })
+        : buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
+    // Human batches only get the spinner "failed" label unless we echo the reason.
+    const message = err instanceof Errors.CLIError ? err.message : row.error?.message;
+    if (!this.jsonEnabled() && message) this.warn(message);
     return row;
   }
 

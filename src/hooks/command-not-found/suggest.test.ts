@@ -247,18 +247,16 @@ describe('command_not_found hook', () => {
 
   it('suggests the documented fetch entry point for fetch typos', async () => {
     // fetch is hidden from the root command list but remains invokable (`bonsai fetch` /
-    // `bonsai help fetch`). Typos must still get a correction pointing at the URL shorthand.
+    // `bonsai help fetch`). Typos must still get a correction.
     const msg = await runHook('fetcj');
     expect(msg).toContain('Did you mean fetch?');
-    expect(msg).toContain('Or pass a URL directly: bonsai https://example.com');
 
     const envelope = await runJsonHook('fetsh');
     expect(envelope.stderr).toContain('Did you mean fetch?');
-    expect(envelope.suggestions).toEqual(['bonsai https://example.com', 'bonsai help fetch']);
+    expect(envelope.suggestions).toEqual(['bonsai fetch']);
   });
 
   it('does not suggest unrelated hidden commands that are not fetch', async () => {
-    // Guard: only the documented fetch entry point is allowlisted among hidden commands.
     const msg = await runHook('zzzhidden');
     expect(msg).not.toContain('Did you mean');
   });
