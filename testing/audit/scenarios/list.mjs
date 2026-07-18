@@ -110,4 +110,31 @@ export default function register(harness, fixtures) {
       url
     );
   });
+
+  check('import then list filters by source URL glob', () => {
+    const ws = createWorkspace();
+    const matchingUrl = 'https://example.com/audit-list-url-align-hit';
+    const otherUrl = 'https://example.com/audit-list-url-align-other';
+    for (const [url, topic] of [
+      [matchingUrl, 'URL Align Hit'],
+      [otherUrl, 'URL Align Other'],
+    ]) {
+      const imported = run(['import', url, '--stdin', '--topic', topic, '--json'], {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        input: `# ${topic}\n\nList URL filter fixture.\n`,
+      });
+      expect(imported.exitCode === 0, `import ${url} exit ${imported.exitCode}`);
+    }
+
+    const listed = run(['list', '--url', 'https://example.com/audit-list-url-align-hit*', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const entries = parseJson(listed.stdout)?.data;
+    expect(listed.exitCode === 0, `list exit ${listed.exitCode}`);
+    expect(Array.isArray(entries), 'list data array');
+    expect(entries.length === 1, `expected one URL match, got ${entries?.length}`);
+    expect(entries[0]?.sourceUrls?.includes(matchingUrl), `sourceUrls ${entries[0]?.sourceUrls}`);
+  });
 }
