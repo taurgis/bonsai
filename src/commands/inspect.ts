@@ -41,16 +41,31 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   static stdoutIsPrimaryData = true;
 
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    // Same wording as status so agents matching on CACHE_MISS stderr stay consistent.
     return this.cacheMissSuccessJson(data, (url, n) =>
-      n > 1
-        ? `No cached research found for URL: ${url} and ${n - 1} other URLs`
-        : `No cached research found for URL: ${url}`
+      n > 1 ? `Cache miss for ${url} and ${n - 1} other URLs` : `Cache miss for ${url}`
     );
   }
 
   async run(): Promise<unknown> {
-    const results = this.parsedArgv.map((url) => this.inspectOne(url));
-    return finalizeBatch(results, (r) => r.status === 'miss');
+    const results = this.mapUrlsAllowingBatchErrors(
+      this.parsedArgv,
+      (url) => this.inspectOne(url),
+      (url, err) => ({
+        cacheKey: '',
+        cachePath: '',
+        normalizedUrl: url,
+        status: 'error' as const,
+        metadata: null,
+        sections: [] as SectionSummary[],
+        error: {
+          code: typeof err.code === 'string' && err.code ? err.code : 'INVALID_URL',
+          message: err.message,
+          suggestions: err.suggestions,
+        },
+      })
+    );
+    return finalizeBatch(results, (r) => r.status === 'miss' || r.status === 'error');
   }
 
   private inspectOne(url: string) {

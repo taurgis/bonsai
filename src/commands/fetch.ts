@@ -383,7 +383,8 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
    * so every error that reaches here is per-URL — including INVALID_URL / MISSING_URL_SCHEME.
    */
   private failureRowOrRethrow(url: string, err: unknown, dryRun: boolean, batch: boolean) {
-    if (!this.jsonEnabled()) ux.action.stop('failed');
+    // Invalid URLs fail before ux.action.start; stopping a never-started spinner prints noise.
+    if (!this.jsonEnabled() && ux.action.running) ux.action.stop('failed');
     if (!batch) {
       if (err instanceof Errors.CLIError) throw err;
       this.emitFetchError(err, url);

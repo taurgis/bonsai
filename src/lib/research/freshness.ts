@@ -54,7 +54,15 @@ export function parseTtlToMs(ttl: string): number {
  * reports the same parse failure while naming the exact flag the user passed.
  */
 export function durationFlagError(flag: string, value: string | undefined): string | null {
-  if (!value) return null;
+  // Absent is fine; empty/whitespace is almost always a shell-quoting mistake and must not
+  // silently mean "no override" (unlike a truly omitted flag).
+  if (value === undefined) return null;
+  if (value.trim() === '') {
+    return (
+      `Invalid ${flag}: Duration must not be empty. Use a whole number plus a unit: ` +
+      `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '24h', '7d', '6m'.`
+    );
+  }
   try {
     parseTtlToMs(value);
     return null;

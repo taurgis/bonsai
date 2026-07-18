@@ -2,6 +2,7 @@ import { Flags } from '@oclif/core';
 import { unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseCommand } from '../base-command.js';
+import { formatErrorForJson } from '../lib/envelope.js';
 import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { parseTtlToMs } from '../lib/research/freshness.js';
@@ -64,6 +65,29 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   };
 
   static stdoutIsPrimaryData = true;
+
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    const envelope = this.baseSuccessJson(data);
+    const d = data as { prunedCount?: number; candidateCount?: number };
+    if (
+      typeof d.prunedCount !== 'number' ||
+      typeof d.candidateCount !== 'number' ||
+      d.candidateCount <= 0 ||
+      d.prunedCount >= d.candidateCount
+    ) {
+      return envelope;
+    }
+    const failed = d.candidateCount - d.prunedCount;
+    const code = 'PRUNE_PARTIAL_FAILURE';
+    const message = `Failed to delete ${failed} of ${d.candidateCount} cache ${failed === 1 ? 'entry' : 'entries'}.`;
+    return {
+      ...envelope,
+      ok: false,
+      exitCode: 1,
+      code,
+      stderr: formatErrorForJson({ message, code }),
+    };
+  }
 
   private validatePruneFlags(): void {
     const err = pruneFlagError({

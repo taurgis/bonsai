@@ -30,7 +30,14 @@ export interface PruneFlagInput {
 }
 
 function missingFilterError(input: PruneFlagInput): PruneFlagError | null {
-  if (input.olderThan || input.inactive || input.artifactType || input.url !== undefined) {
+  // Treat an explicitly passed empty string as "filter was attempted" so `--older-than ''`
+  // is not misreported as MISSING_FILTER (durationError rejects it as INVALID_DURATION).
+  if (
+    input.olderThan !== undefined ||
+    input.inactive !== undefined ||
+    input.artifactType !== undefined ||
+    input.url !== undefined
+  ) {
     return null;
   }
   return {
@@ -89,5 +96,6 @@ export function pruneFlagError(input: PruneFlagInput): PruneFlagError | null {
   const urlErr = emptyUrlFilterError(input.url);
   if (urlErr) return { message: urlErr, code: 'INVALID_FLAG_VALUE' };
 
-  return missingFilterError(input) ?? mutationSafetyError(input) ?? durationError(input);
+  // Duration before missing-filter so `--older-than ''` reports INVALID_DURATION, not MISSING_FILTER.
+  return durationError(input) ?? missingFilterError(input) ?? mutationSafetyError(input);
 }

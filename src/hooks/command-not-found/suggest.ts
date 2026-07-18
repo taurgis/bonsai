@@ -1,6 +1,7 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
 import { buildCliErrorEnvelope } from '../../lib/envelope.js';
+import { findSwallowedUrlFlag } from '../../lib/argv.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
 /**
@@ -78,13 +79,13 @@ function bareUrlInput(id: string): string | null {
 }
 
 function isJsonMode(argv: string[] | undefined): boolean {
-  return argv?.includes('--json') ?? false;
+  return (argv?.includes('--json') ?? false) || process.argv.includes('--json');
 }
 
 function emitJsonError(
   command: string,
   message: string,
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT',
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT' | 'MISSING_COMMAND',
   suggestions?: string[]
 ): Record<string, unknown> {
   const envelope = buildCliErrorEnvelope({ command, message, code, suggestions });
@@ -98,7 +99,7 @@ export function buildCommandNotFoundDetails(
   argv: string[] | undefined,
   config: Interfaces.Config
 ): {
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT';
+  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT' | 'MISSING_COMMAND';
   command: string;
   jsonMode: boolean;
   message: string;
@@ -107,6 +108,32 @@ export function buildCommandNotFoundDetails(
   // Match against every loaded command id — including hidden ones that stay invokable
   // (`fetch`, plugin internals). Root `--help` hides them; typo recovery should not.
   const commandIds = config.commandIDs;
+
+  // Flag-only argv (`bonsai --read-only`, `bonsai --tags https://…`) reaches command_not_found
+  // with the flag as the "command". That is missing usage, not an unknown command name.
+  if (id.startsWith('-')) {
+    // Prefer process.argv: oclif's hook argv may omit the flag token that became `id`.
+    const swallowed = findSwallowedUrlFlag(process.argv.slice(2)) ?? findSwallowedUrlFlag(argv);
+    const suggestions = swallowed
+      ? [
+          `Pass the URL as the command (flags after): ${config.bin} ${swallowed.url}`,
+          `Or a named command: ${config.bin} list`,
+        ]
+      : [`Pass a URL: ${config.bin} https://example.com`, `Or a command: ${config.bin} list`];
+    const message = swallowed
+      ? [
+          `Missing URL or command. ${swallowed.flag} consumed ${swallowed.url} as its value, so there was no URL left to fetch.`,
+          `Run ${config.bin} --help for usage.`,
+        ].join('\n')
+      : `Missing URL or command. Run ${config.bin} --help for usage.`;
+    return {
+      code: 'MISSING_COMMAND',
+      command: config.bin,
+      jsonMode: isJsonMode(argv),
+      message,
+      suggestions,
+    };
+  }
 
   // A scheme-less URL is the most common "not a command" mistake for this CLI, so steer the user to
   // the `bonsai <url>` shorthand with a scheme before falling back to nearest-command matching (which

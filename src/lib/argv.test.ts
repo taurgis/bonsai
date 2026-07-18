@@ -223,6 +223,60 @@ describe('normalizeArgv', () => {
         argv: ['--topic', 'Docs'],
       },
     },
+    {
+      name: 'leading --read-only before a command relocates after the command',
+      input: ['--read-only', 'list'],
+      expected: {
+        argv: ['list', '--read-only'],
+      },
+    },
+    {
+      name: 'leading --plan before a command relocates after the command',
+      input: ['--plan', 'list', '--json'],
+      expected: {
+        argv: ['list', '--plan', '--json'],
+      },
+    },
+    {
+      name: 'leading --plan before a URL relocates onto fetch',
+      input: ['--plan', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '--plan'],
+      },
+    },
+    {
+      name: 'lone --read-only keeps a flag token for MISSING_COMMAND (no JSON early exit)',
+      input: ['--read-only'],
+      expected: {
+        argv: ['--read-only'],
+      },
+    },
+    {
+      name: 'lone --plan --json triggers early JSON MISSING_COMMAND exit',
+      input: ['--plan', '--json'],
+      expected: {
+        argv: ['--json'],
+        exitWithJson: {
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass a URL: bonsai https://example.com\n' +
+              '* Or a command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'],
+          },
+        },
+      },
+    },
   ];
 
   for (const tc of cases) {

@@ -101,6 +101,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   static stdoutIsPrimaryData = true;
 
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    // Same wording as inspect so agents matching on CACHE_MISS stderr stay consistent.
     return this.cacheMissSuccessJson(data, (url, n) =>
       n > 1 ? `Cache miss for ${url} and ${n - 1} other URLs` : `Cache miss for ${url}`
     );
@@ -117,10 +118,33 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     }
 
     const currentTime = new Date();
-    const results = urls.map((url) =>
-      this.checkSingleStatus(url, currentTime, { ttl, maxAge, tier })
+    type StatusRow = {
+      cacheKey: string;
+      cachePath: string;
+      normalizedUrl: string;
+      status: string;
+      freshness: string;
+      action: string;
+      error?: { code: string; message: string; suggestions?: string[] };
+    };
+    const results = this.mapUrlsAllowingBatchErrors(
+      urls,
+      (url): StatusRow => this.checkSingleStatus(url, currentTime, { ttl, maxAge, tier }),
+      (url, err): StatusRow => ({
+        cacheKey: '',
+        cachePath: '',
+        normalizedUrl: url,
+        status: 'error',
+        freshness: 'none',
+        action: 'none',
+        error: {
+          code: typeof err.code === 'string' && err.code ? err.code : 'INVALID_URL',
+          message: err.message,
+          suggestions: err.suggestions,
+        },
+      })
     );
-    return finalizeBatch(results, (r) => r.status === 'miss');
+    return finalizeBatch(results, (r) => r.status === 'miss' || r.status === 'error');
   }
 
   private checkSingleStatus(

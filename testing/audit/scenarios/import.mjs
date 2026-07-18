@@ -67,6 +67,15 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'MISSING_TOPIC', 'code');
   });
 
+  check('import multi whitespace topic --json MISSING_TOPIC', () => {
+    const r = run(
+      ['import', '--stdin', '--source-url', 'https://a.com', '--source-url', 'https://b.com', '--topic', '   ', '--json'],
+      { input: '# x\n' }
+    );
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'MISSING_TOPIC', 'code');
+  });
+
   check('import invalid ttl --json INVALID_DURATION exit 2', () => {
     const r = run(['import', 'https://example.com/x', '--stdin', '--ttl', '5z', '--json'], {
       input: '# x\n',

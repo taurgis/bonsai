@@ -78,6 +78,12 @@ describe('durationFlagError', () => {
     expect(durationFlagError('--ttl', '7d')).toBeNull();
   });
 
+  it('rejects empty or whitespace-only values', () => {
+    expect(durationFlagError('--ttl', '')).toMatch(/Invalid --ttl:.*must not be empty/);
+    expect(durationFlagError('--max-age', '   ')).toMatch(/Invalid --max-age:.*must not be empty/);
+    expect(durationFlagError('--older-than', '\t')).toMatch(/Invalid --older-than:/);
+  });
+
   it('names the offending flag on a malformed value', () => {
     expect(durationFlagError('--ttl', 'banana')).toMatch(/Invalid --ttl:/);
     expect(durationFlagError('--max-age', 'soon')).toMatch(/Invalid --max-age:/);

@@ -154,7 +154,8 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         this.failInvalidUrl(u, (err as Error).message);
       }
     }) as string[];
-    return hasMulti ? normalized.sort() : normalized;
+    // Deduplicate after normalization so repeated --source-url values do not inflate the key.
+    return hasMulti ? [...new Set(normalized)].sort() : normalized;
   }
 
   private validateSourceMode(hasSingle: boolean, hasMulti: boolean, multiUrls: string[]): void {
@@ -170,7 +171,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         { exit: 2, code: 'MISSING_URL' }
       );
     }
-    if (hasMulti && !this.flags.topic) {
+    if (hasMulti && !this.flags.topic?.trim()) {
       this.error('Multi-source import requires the --topic flag.', {
         exit: 2,
         code: 'MISSING_TOPIC',
@@ -336,7 +337,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       source_urls: sourceUrls,
       normalized_url: singleNormalizedUrl,
       cache_key: cacheKey,
-      topic: this.flags.topic || null,
+      topic: this.flags.topic?.trim() || null,
       tags: this.flags.tags || [],
       format_available: ['compressed', 'detailed'],
       tier,
@@ -372,7 +373,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     // keyword without forcing manual tagging. Explicit --tags always win (handled in applyAutoTags).
     return applyAutoTags({
       metadata,
-      summary: `Synthesized research for ${hasSingle ? singleNormalizedUrl : this.flags.topic}`,
+      summary: `Synthesized research for ${hasSingle ? singleNormalizedUrl : this.flags.topic!.trim()}`,
       compressed,
       detailed,
       provenance: `Imported via agent-supplied research at ${currentTime.toISOString()}`,
@@ -428,9 +429,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       this.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
       this.log(`${'Storage Path:'.padEnd(25)} ${storagePath}`);
       if (!hasSingle) {
-        this.log(`${'Topic:'.padEnd(25)} ${this.flags.topic}`);
+        const topic = this.flags.topic!.trim();
+        this.log(`${'Topic:'.padEnd(25)} ${topic}`);
         this.log(`${'Source URLs:'.padEnd(25)} ${sourceUrls.join(', ')}`);
-        this.log(`\nTip: find it again with ${this.config.bin} list --topic "${this.flags.topic}"`);
+        this.log(`\nTip: find it again with ${this.config.bin} list --topic "${topic}"`);
       }
     }
 

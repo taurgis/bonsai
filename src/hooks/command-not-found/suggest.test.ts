@@ -260,4 +260,36 @@ describe('command_not_found hook', () => {
     const msg = await runHook('zzzhidden');
     expect(msg).not.toContain('Did you mean');
   });
+
+  it('treats a lone flag as MISSING_COMMAND instead of COMMAND_NOT_FOUND', async () => {
+    const msg = await runHook('--read-only');
+    expect(msg).toContain('Missing URL or command');
+    expect(msg).not.toContain('is not a bonsai command');
+
+    const envelope = await runJsonHook('--plan', ['--plan', '--json']);
+    expect(envelope).toMatchObject({
+      command: 'bonsai',
+      ok: false,
+      exitCode: 2,
+      code: 'MISSING_COMMAND',
+    });
+    expect(envelope.suggestions?.[0]).toContain('https://example.com');
+  });
+
+  it('explains when a value flag swallowed the URL', async () => {
+    const prev = process.argv;
+    process.argv = ['node', 'bonsai', '--tags', 'https://example.com/docs', '--json'];
+    try {
+      const envelope = await runJsonHook('--tags', [
+        '--tags',
+        'https://example.com/docs',
+        '--json',
+      ]);
+      expect(envelope.code).toBe('MISSING_COMMAND');
+      expect(envelope.stderr).toContain('consumed https://example.com/docs');
+      expect(envelope.suggestions?.[0]).toContain('https://example.com/docs');
+    } finally {
+      process.argv = prev;
+    }
+  });
 });

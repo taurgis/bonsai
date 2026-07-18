@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { Config } from '@oclif/core';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import ResearchPrune from './prune.js';
 import ResearchImport from './import.js';
 import { existsSync } from 'node:fs';
@@ -177,11 +180,28 @@ describe('prune command unit tests', () => {
       expect(result.candidateCount).toBe(2);
       expect(result.prunedCount).toBe(0);
       expect(process.exitCode).toBe(1);
+
+      const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+      const config = await Config.load(repoRoot);
+      const cmd = new ResearchPrune([], config) as any;
+      const envelope = cmd.toSuccessJson(result);
+      expect(envelope).toMatchObject({
+        ok: false,
+        exitCode: 1,
+        code: 'PRUNE_PARTIAL_FAILURE',
+      });
+      expect(envelope.stderr).toContain('Failed to delete 2 of 2');
     } finally {
       process.exitCode = prevExit;
       candidatesSpy.mockRestore();
       warnSpy.mockRestore();
     }
+  });
+
+  it('rejects empty --older-than as INVALID_DURATION', async () => {
+    await expect(ResearchPrune.run(['--older-than', '', '--dry-run'])).rejects.toThrow(
+      /must not be empty/
+    );
   });
 
   it('rejects zero-length --older-than durations', async () => {
