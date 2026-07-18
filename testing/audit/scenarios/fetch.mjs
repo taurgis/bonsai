@@ -160,6 +160,19 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[1]?.error?.code === 'MISSING_URL_SCHEME', JSON.stringify(env?.data?.[1]));
   });
 
+  check('fetch multi-URL human mode warns the failure reason', () => {
+    const { ws, url } = seedFetchCache();
+    const bad = 'https://this-domain-definitely-does-not-exist-xyz123.invalid';
+    const r = run([url, bad], { cwd: ws.cwd, xdg: ws.xdg, timeout: 60000 });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('Deterministic fetch command fixture'), 'hit content');
+    expect(r.stderr.includes('failed'), r.stderr);
+    expect(
+      r.stderr.includes('DNS') || r.stderr.includes('ENOTFOUND') || r.stderr.includes('Fetch failed'),
+      `reason: ${r.stderr.slice(0, 200)}`
+    );
+  });
+
   check('fetch --force --allow-stale is CONFLICTING_FLAGS', () => {
     const r = run(['https://example.com', '--force', '--allow-stale', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

@@ -396,7 +396,9 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       return buildFetchFailureResult({ bin: this.config.bin, url, dryRun, err });
     }
     if (!batch) this.emitFetchError(err, url);
-    return buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
+    const row = buildFetchFailureFromCaught(this.config.bin, url, err, dryRun);
+    if (!this.jsonEnabled() && row.error?.message) this.warn(row.error.message);
+    return row;
   }
 
   private async fetchSingleTarget(
