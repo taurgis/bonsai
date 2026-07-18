@@ -1,9 +1,9 @@
 import { ConfigCommand, configScopeFlags } from './base.js';
 import {
   ALL_KEYS,
-  KEY_META,
-  BUILT_IN_DEFAULTS,
+  formatConfigEntry,
   readScopedConfig,
+  resolveConfigEntry,
   validKeysHint,
 } from '../../lib/config/index.js';
 
@@ -37,27 +37,16 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
 
     const scope = this.readScope(this.flags.global, this.flags.local);
     const scoped = readScopedConfig(scope, this.config.configDir, process.cwd());
+    const entries = ALL_KEYS.map((key) => resolveConfigEntry(key, scoped));
 
     if (!this.jsonEnabled()) {
       const width = Math.max(...ALL_KEYS.map((k) => k.length)) + 2;
-      for (const key of ALL_KEYS) {
-        const raw = scoped[key];
-        const configured = raw !== undefined;
-        const formatted = configured
-          ? KEY_META[key].format(raw)
-          : `${KEY_META[key].format(BUILT_IN_DEFAULTS[key])} (not configured)`;
-        this.log(`${key.padEnd(width)}${formatted}`);
+      for (const entry of entries) {
+        this.log(`${entry.key.padEnd(width)}${formatConfigEntry(entry)}`);
       }
     }
 
-    const entries = ALL_KEYS.map((key) => {
-      const raw = scoped[key];
-      return {
-        key,
-        value: raw !== undefined ? raw : BUILT_IN_DEFAULTS[key],
-        configured: raw !== undefined,
-      };
-    });
-    return { entries };
+    // Bare array — same shape as `list`'s data payload; no `{ entries }` wrapper.
+    return entries;
   }
 }

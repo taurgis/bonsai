@@ -1,9 +1,9 @@
 import { Args } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
 import {
-  KEY_META,
-  BUILT_IN_DEFAULTS,
+  formatConfigEntry,
   readScopedConfig,
+  resolveConfigEntry,
   validKeysHint,
 } from '../../lib/config/index.js';
 
@@ -41,15 +41,12 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
     this.validateConfigKeyAndScope(key, this.flags.global, this.flags.local);
 
     const scope = this.readScope(this.flags.global, this.flags.local);
-    const value = readScopedConfig(scope, this.config.configDir, process.cwd())[key];
+    const entry = resolveConfigEntry(
+      key,
+      readScopedConfig(scope, this.config.configDir, process.cwd())
+    );
 
-    const meta = KEY_META[key];
-    const displayValue = value !== undefined ? value : BUILT_IN_DEFAULTS[key];
-    const configured = value !== undefined;
-    const formatted = meta.format(displayValue);
-    const suffix = configured ? '' : ' (not configured)';
-    if (!this.jsonEnabled()) this.log(formatted + suffix);
-
-    return { key, value: displayValue, configured };
+    if (!this.jsonEnabled()) this.log(formatConfigEntry(entry));
+    return entry;
   }
 }

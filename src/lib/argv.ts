@@ -1,4 +1,4 @@
-import { buildEnvelope, formatErrorForJson } from './envelope.js';
+import { buildCliErrorEnvelope } from './envelope.js';
 
 export interface NormalizationResult {
   /** The normalized argv array to set on process.argv. */
@@ -20,12 +20,9 @@ function missingUsageJsonExit(): NormalizationResult['exitWithJson'] {
   const suggestions = ['Pass a URL: bonsai https://example.com', 'Or a command: bonsai list'];
   return {
     exitCode: 2,
-    envelope: buildEnvelope({
+    envelope: buildCliErrorEnvelope({
       command: 'bonsai',
-      ok: false,
-      exitCode: 2,
-      stderr: formatErrorForJson({ message, code, suggestions }),
-      data: null,
+      message,
       code,
       suggestions,
     }),
@@ -116,6 +113,23 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   if (jsonMode) core.push('--json');
 
   return { argv: core };
+}
+
+/**
+ * Non-flag positional tokens from a (typically already-normalized) argv. Skips `--help`/`--json`
+ * and any dash-prefixed flags so multi-segment command ids (`config get`) stay intact. Shared by
+ * help-preflight and json-meta — both run after `normalizeArgv` has already folded `help X` →
+ * `X --help` and `-h` → `--help`.
+ */
+export function positionalArgvTokens(argv: readonly string[]): string[] {
+  const tokens: string[] = [];
+  for (const arg of argv) {
+    if (arg === '--') break;
+    if (arg === '--help' || arg === '--json') continue;
+    if (arg.startsWith('-')) continue;
+    tokens.push(arg);
+  }
+  return tokens;
 }
 
 function looksLikeUrl(arg: string): boolean {

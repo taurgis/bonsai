@@ -11,8 +11,7 @@ import {
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
-import { emptyUrlFilterError } from '../lib/url-filter-flag.js';
-import { artifactMatchesUrlFilter } from '../lib/research/url.js';
+import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
@@ -152,24 +151,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   private logListResults(finalResults: any[], totalMatched: number): void {
     if (finalResults.length === 0) {
-      const tip = this.hasActiveFilters()
-        ? `No cached research entries match the given filters. Try relaxing filters, or list everything: ${this.config.bin} list`
-        : `No cached research entries found. Populate the cache first: ${this.config.bin} <url>`;
-      // Under --json, mirror truncation: surface the tip on stderr via warn() so agents see it
-      // without polluting the stdout envelope. Human mode keeps the tip on stdout.
-      if (this.jsonEnabled()) {
-        this.warn(tip);
-        return;
-      }
-      if (this.hasActiveFilters()) {
-        this.log('No cached research entries match the given filters.');
-        this.log(
-          `\nTip: try relaxing filters, or list everything: ${colors.cyan(this.config.bin + ' list')}`
-        );
-      } else {
-        this.log('No cached research entries found.');
-        this.log(`\nTip: populate the cache first: ${colors.cyan(this.config.bin + ' <url>')}`);
-      }
+      this.emitEmptyListGuidance();
       return;
     }
     if (this.jsonEnabled()) return;
@@ -193,6 +175,25 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       );
       this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
     });
+  }
+
+  /** Empty-cache / no-match tip. Under --json, warn on stderr so the stdout envelope stays clean. */
+  private emitEmptyListGuidance(): void {
+    const filtered = this.hasActiveFilters();
+    const headline = filtered
+      ? 'No cached research entries match the given filters.'
+      : 'No cached research entries found.';
+    const tipCmd = filtered ? `${this.config.bin} list` : `${this.config.bin} <url>`;
+    const tipLead = filtered
+      ? 'try relaxing filters, or list everything: '
+      : 'populate the cache first: ';
+
+    if (this.jsonEnabled()) {
+      this.warn(`${headline} ${tipLead.charAt(0).toUpperCase()}${tipLead.slice(1)}${tipCmd}`);
+      return;
+    }
+    this.log(headline);
+    this.log(`\nTip: ${tipLead}${colors.cyan(tipCmd)}`);
   }
 
   async run(): Promise<unknown> {

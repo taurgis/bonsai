@@ -1,5 +1,6 @@
 import { Config } from '@oclif/core';
-import { buildEnvelope, formatErrorForJson } from './envelope.js';
+import { positionalArgvTokens } from './argv.js';
+import { buildCliErrorEnvelope } from './envelope.js';
 import { buildCommandNotFoundDetails } from '../hooks/command-not-found/suggest.js';
 
 type UnknownHelpResult =
@@ -16,17 +17,6 @@ type UnknownHelpResult =
 
 function commandId(parts: readonly string[]): string {
   return parts.join(':');
-}
-
-function positionalTokens(argv: readonly string[]): string[] {
-  const tokens: string[] = [];
-  for (const arg of argv) {
-    if (arg === '--') break;
-    if (arg === '--help' || arg === '--json') continue;
-    if (arg.startsWith('-')) continue;
-    tokens.push(arg);
-  }
-  return tokens;
 }
 
 function commandPrefixLength(tokens: readonly string[], config: Config): number {
@@ -67,7 +57,7 @@ export async function tryUnknownHelpOutput(
 ): Promise<UnknownHelpResult | null> {
   if (!argv.includes('--help')) return null;
 
-  const tokens = positionalTokens(argv);
+  const tokens = positionalArgvTokens(argv);
   if (tokens.length === 0) return null;
 
   const config = await Config.load({ root });
@@ -79,19 +69,11 @@ export async function tryUnknownHelpOutput(
     return {
       kind: 'json',
       exitCode: 2,
-      envelope: buildEnvelope({
+      envelope: buildCliErrorEnvelope({
         command: details.command,
-        ok: false,
-        exitCode: 2,
-        // Match command_not_found: include Code + Try this in stderr, and top-level suggestions.
-        stderr: formatErrorForJson({
-          message: details.message,
-          code: details.code,
-          suggestions: details.suggestions,
-        }),
-        data: null,
+        message: details.message,
         code: details.code,
-        suggestions: details.suggestions?.length ? details.suggestions : undefined,
+        suggestions: details.suggestions,
       }),
     };
   }

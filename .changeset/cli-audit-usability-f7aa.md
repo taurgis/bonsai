@@ -2,4 +2,4 @@
 '@taurgis/bonsai': patch
 ---
 
-Fix CLI contract and UX gaps from an end-to-end audit: nested `--json --help` command ids, unknown-help suggestion envelopes, `--force`/`--allow-stale` conflicts, empty-list tips under `--json`, config `configured` metadata, import compression sanitization, import `-f` for `--file`, reject empty `--url` filters, and expand the manual audit scenarios.
+Fix CLI contract and UX gaps from an end-to-end audit, then restructure the implementation: shared config entry resolution, shared argv/error-envelope helpers, prune flag policy as a pure function, URL-filter validation in its canonical module, and a simpler empty-list tip path.

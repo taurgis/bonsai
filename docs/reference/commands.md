@@ -377,8 +377,8 @@ npx @taurgis/bonsai config unset storage --local
 requested scope (`--global` / `--local`) does not set the key — `value` is still the built-in
 default so agents can apply it without a second lookup.
 
-`config list --json` returns `{ entries: [{ key, value, configured }, ...] }` with the same
-semantics per key.
+`config list --json` returns an array of `{ key, value, configured }` entries with the same
+semantics per key (same array-as-`data` shape as `list`).
 
 ### Flags
 

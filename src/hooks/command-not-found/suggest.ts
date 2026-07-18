@@ -1,6 +1,6 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
-import { buildEnvelope, formatErrorForJson } from '../../lib/envelope.js';
+import { buildCliErrorEnvelope } from '../../lib/envelope.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
 /**
@@ -87,15 +87,7 @@ function emitJsonError(
   code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT',
   suggestions?: string[]
 ): Record<string, unknown> {
-  const envelope = buildEnvelope({
-    command,
-    ok: false,
-    exitCode: 2,
-    stderr: formatErrorForJson({ message, code, suggestions }),
-    data: null,
-    code,
-    suggestions: suggestions?.length ? suggestions : undefined,
-  });
+  const envelope = buildCliErrorEnvelope({ command, message, code, suggestions });
   process.exitCode = 2;
   console.log(JSON.stringify(envelope, null, 2));
   return envelope;

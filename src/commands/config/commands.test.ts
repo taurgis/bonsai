@@ -159,20 +159,18 @@ describe('config get', () => {
 });
 
 describe('config list', () => {
-  it('returns the effective values as entries', async () => {
+  it('returns the effective values as an entries array', async () => {
     const result = (await ConfigList.run([])) as any;
-    expect(result).toEqual({
-      entries: [
-        { key: 'storage', value: 'global', configured: true },
-        { key: 'summary', value: 'conservative', configured: true },
-      ],
-    });
+    expect(result).toEqual([
+      { key: 'storage', value: 'global', configured: true },
+      { key: 'summary', value: 'conservative', configured: true },
+    ]);
   });
 
   it('reflects a project-level value', async () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const result = (await ConfigList.run([])) as any;
-    expect(result.entries.find((e: any) => e.key === 'storage')).toMatchObject({
+    expect(result.find((e: any) => e.key === 'storage')).toMatchObject({
       value: 'project',
       configured: true,
     });
@@ -181,7 +179,7 @@ describe('config list', () => {
   it('reads only the project scope with --local', async () => {
     const result = (await ConfigList.run(['--local'])) as any;
     // Nothing written to the project file yet → key falls back to the default.
-    expect(result.entries.find((e: any) => e.key === 'storage')).toMatchObject({
+    expect(result.find((e: any) => e.key === 'storage')).toMatchObject({
       value: 'global',
       configured: false,
     });
@@ -189,7 +187,7 @@ describe('config list', () => {
 
   it('reads only the user scope with --global', async () => {
     const result = (await ConfigList.run(['--global'])) as any;
-    expect(result.entries.find((e: any) => e.key === 'storage')).toMatchObject({
+    expect(result.find((e: any) => e.key === 'storage')).toMatchObject({
       value: 'global',
       configured: false,
     });
@@ -203,7 +201,7 @@ describe('config list', () => {
       command: 'config list',
       ok: true,
     });
-    expect(envelope.data.entries).toEqual(
+    expect(envelope.data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ key: 'storage', value: 'global', configured: true }),
       ])

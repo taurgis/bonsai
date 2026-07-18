@@ -182,6 +182,36 @@ export function buildEnvelope(parts: EnvelopeParts): Record<string, unknown> {
 }
 
 /**
+ * Usage/not-found style error envelope: message + Code (+ Try this) in `stderr`, stable `code`,
+ * and top-level `suggestions` when present. Shared by argv preflight, help-preflight, and the
+ * command_not_found hook so those paths cannot drift.
+ */
+export function buildCliErrorEnvelope(opts: {
+  command: string;
+  message: string;
+  code: string;
+  suggestions?: string[];
+  exitCode?: number;
+  ref?: string;
+}): Record<string, unknown> {
+  return buildEnvelope({
+    command: opts.command,
+    ok: false,
+    exitCode: opts.exitCode ?? 2,
+    stderr: formatErrorForJson({
+      message: opts.message,
+      code: opts.code,
+      suggestions: opts.suggestions,
+      ref: opts.ref,
+    }),
+    data: null,
+    code: opts.code,
+    suggestions: opts.suggestions?.length ? opts.suggestions : undefined,
+    ref: opts.ref,
+  });
+}
+
+/**
  * Formats a JSON envelope to a string with indentation.
  */
 export function formatEnvelope(parts: EnvelopeParts): string {

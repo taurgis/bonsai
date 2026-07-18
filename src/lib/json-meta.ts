@@ -1,4 +1,5 @@
 import { Config, Help, toConfiguredId } from '@oclif/core';
+import { positionalArgvTokens } from './argv.js';
 import { buildEnvelope } from './envelope.js';
 
 /** Strip ANSI color codes so JSON help text stays machine-stable. */
@@ -24,24 +25,8 @@ class CaptureHelp extends Help {
   }
 }
 
-/**
- * Positional tokens that name the help subject. Skips the `help` verb, `--help`/`-h`/`--json`, and
- * other flags — but keeps flag *values* out by only collecting non-dash tokens. Multi-segment
- * commands (`config get`) must stay intact so the JSON envelope `command` matches the help text.
- */
-function helpSubjectTokens(argv: readonly string[]): string[] {
-  const tokens: string[] = [];
-  for (const arg of argv) {
-    if (arg === '--') break;
-    if (arg === '--help' || arg === '-h' || arg === '--json' || arg === 'help') continue;
-    if (arg.startsWith('-')) continue;
-    tokens.push(arg);
-  }
-  return tokens;
-}
-
 function envelopeCommandId(config: Config, argv: readonly string[]): string {
-  const tokens = helpSubjectTokens(argv);
+  const tokens = positionalArgvTokens(argv);
   if (tokens.length === 0) return config.bin;
 
   // Longest matching command id wins (`config:get` over topic `config`).

@@ -44,7 +44,15 @@ export {
 
 import { readUserConfig, readProjectConfig } from './io.js';
 import { resolveStorageMode, resolveSummaryLevel } from './resolve.js';
-import type { ConfigValues, ResolvedConfig, StorageMode, SummaryLevel } from './schema.js';
+import {
+  BUILT_IN_DEFAULTS,
+  KEY_META,
+  type ConfigKey,
+  type ConfigValues,
+  type ResolvedConfig,
+  type StorageMode,
+  type SummaryLevel,
+} from './schema.js';
 
 /**
  * Read both config files once and resolve the effective storage mode.
@@ -105,4 +113,30 @@ export function readScopedConfig(
   if (scope === 'global') return readUserConfig(configDir);
   if (scope === 'local') return readProjectConfig(cwd);
   return effectiveConfig(configDir, cwd);
+}
+
+/** One config key resolved against a scope: effective value + whether that scope set it. */
+export interface ConfigEntry {
+  key: ConfigKey;
+  value: ResolvedConfig[ConfigKey];
+  configured: boolean;
+}
+
+/**
+ * Resolve a single key from a scoped read. Unset keys fall back to the built-in default while
+ * `configured: false` tells agents the value is not pinned in that scope.
+ */
+export function resolveConfigEntry(key: ConfigKey, scoped: Partial<ConfigValues>): ConfigEntry {
+  const raw = scoped[key];
+  return {
+    key,
+    value: (raw !== undefined ? raw : BUILT_IN_DEFAULTS[key]) as ResolvedConfig[ConfigKey],
+    configured: raw !== undefined,
+  };
+}
+
+/** Human display for a resolved entry (`value` or `value (not configured)`). */
+export function formatConfigEntry(entry: ConfigEntry): string {
+  const formatted = KEY_META[entry.key].format(entry.value);
+  return entry.configured ? formatted : `${formatted} (not configured)`;
 }

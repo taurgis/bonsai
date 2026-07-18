@@ -218,16 +218,18 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     return enrichFetchFailureEnvelope(this.baseSuccessJson(data), data);
   }
 
-  // Validates the duration flags up front, exiting with code 2 on a malformed value.
-  private validateDurationFlags(ttl?: string, maxAge?: string): void {
+  // Validates fetch flags up front, exiting with code 2 on a malformed or contradictory value.
+  private validateFetchFlags(
+    ttl?: string,
+    maxAge?: string,
+    force?: boolean,
+    allowStale?: boolean
+  ): void {
     for (const msg of [durationFlagError('--ttl', ttl), durationFlagError('--max-age', maxAge)]) {
       if (msg) this.error(msg, { exit: 2, code: 'INVALID_DURATION' });
     }
-  }
-
-  // --force skips cache lookup; --allow-stale only applies when a stale entry is served after a
-  // failed revalidation. Together they are a no-op combination that looks intentional — reject it.
-  private rejectForceAllowStaleConflict(force: boolean, allowStale: boolean): void {
+    // --force skips cache lookup; --allow-stale only applies when serving a stale entry after a
+    // failed revalidation. Together they are a no-op combination that looks intentional — reject it.
     if (force && allowStale) {
       this.error('Cannot combine --force with --allow-stale: --force ignores the cache entirely.', {
         exit: 2,
@@ -352,8 +354,7 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     const urls = this.parsedArgv;
     const { ttl, 'max-age': maxAge, force, 'allow-stale': allowStale } = this.flags;
 
-    this.validateDurationFlags(ttl, maxAge);
-    this.rejectForceAllowStaleConflict(force, allowStale);
+    this.validateFetchFlags(ttl, maxAge, force, allowStale);
     const dryRun = this.effectiveDryRun(this.flags['dry-run']);
 
     const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());

@@ -8,7 +8,7 @@ import { parseTtlToMs, durationFlagError } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES } from '../lib/research/schema.js';
 import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
-import { emptyUrlFilterError } from '../lib/url-filter-flag.js';
+import { pruneFlagError } from '../lib/prune-flags.js';
 import { colors } from '../lib/color.js';
 
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
@@ -66,82 +66,21 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static stdoutIsPrimaryData = true;
 
   private validatePruneFlags(): void {
-    const urlErr = emptyUrlFilterError(this.flags.url);
-    if (urlErr) this.error(urlErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
-    this.assertPruneHasFilter();
-    this.assertPruneMutationSafety();
-    this.assertPruneDurations();
-  }
-
-  private assertPruneHasFilter(): void {
-    if (
-      this.flags['older-than'] ||
-      this.flags.inactive ||
-      this.flags['artifact-type'] ||
-      this.flags.url !== undefined
-    ) {
-      return;
-    }
-    this.error(
-      'Must specify at least one pruning filter: --older-than, --inactive, --artifact-type, or --url.',
-      {
-        exit: 2,
-        code: 'MISSING_FILTER',
-        suggestions: [
-          `Preview age-based pruning: ${this.config.bin} prune --older-than 90d --dry-run`,
-        ],
-      }
-    );
-  }
-
-  private assertPruneMutationSafety(): void {
-    // Checked before the generic --dry-run/--yes conflict so a combination like
-    // `--dry-run --yes --read-only` reports the more specific READ_ONLY_MODE code, not
-    // CONFLICTING_FLAGS — read-only mode is the more fundamental constraint being violated.
-    if (this.readOnly && this.flags.yes) {
-      this.error(
-        '--yes cannot be used while read-only mode is active (--read-only/--plan or BONSAI_READ_ONLY/BONSAI_PLAN_MODE): mutations are disabled.',
-        {
-          exit: 2,
-          code: 'READ_ONLY_MODE',
-          suggestions: [`Preview instead: ${this.config.bin} prune --dry-run`],
-        }
-      );
-    }
-    if (this.flags['dry-run'] && this.flags.yes) {
-      this.error(
-        '--dry-run and --yes are mutually exclusive: --dry-run previews without deleting, --yes confirms deletion. Choose one.',
-        { exit: 2, code: 'CONFLICTING_FLAGS' }
-      );
-    }
-    // Read-only mode implicitly previews, so the usual "pick one" safety check is redundant here.
-    if (!this.readOnly && !this.flags['dry-run'] && !this.flags.yes) {
-      const olderThanPart = this.flags['older-than']
-        ? ` --older-than ${this.flags['older-than']}`
-        : '';
-      const urlPart = this.flags.url ? ` --url "${this.flags.url}"` : '';
-      this.error(
-        'Safety check: use --yes to confirm pruning, or --dry-run to preview files that would be deleted.',
-        {
-          exit: 2,
-          code: 'SAFETY_CHECK_REQUIRED',
-          suggestions: [
-            `Preview first: ${this.config.bin} prune --dry-run${olderThanPart}${urlPart}`,
-          ],
-        }
-      );
-    }
-  }
-
-  private assertPruneDurations(): void {
-    // Validate durations up front: scanCacheDir swallows per-file errors, so a malformed
-    // --older-than/--inactive would otherwise be silently ignored and report "0 entries".
-    for (const msg of [
-      durationFlagError('--older-than', this.flags['older-than']),
-      durationFlagError('--inactive', this.flags.inactive),
-    ]) {
-      if (msg) this.error(msg, { exit: 2, code: 'INVALID_DURATION' });
-    }
+    const err = pruneFlagError({
+      olderThan: this.flags['older-than'],
+      inactive: this.flags.inactive,
+      artifactType: this.flags['artifact-type'],
+      url: this.flags.url,
+      dryRun: this.flags['dry-run'],
+      yes: this.flags.yes,
+      readOnly: this.readOnly,
+      bin: this.config.bin,
+      durationErrors: [
+        durationFlagError('--older-than', this.flags['older-than']),
+        durationFlagError('--inactive', this.flags.inactive),
+      ],
+    });
+    if (err) this.error(err.message, { exit: 2, code: err.code, suggestions: err.suggestions });
   }
 
   private shouldPrune(meta: any, currentTime: Date): boolean {

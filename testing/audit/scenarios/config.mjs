@@ -73,7 +73,7 @@ export default function register(harness, fixtures) {
 
     const list = run(['config', 'list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(list.exitCode === 0, `list exit ${list.exitCode}`);
-    const entries = parseJson(list.stdout)?.data?.entries;
+    const entries = parseJson(list.stdout)?.data;
     expect(
       Array.isArray(entries) && entries.some((e) => e.key === 'storage' && e.value === 'project'),
       'project listed'
