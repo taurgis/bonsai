@@ -49,6 +49,8 @@ describe('prune command unit tests', () => {
   it('does not require --dry-run or --yes when --read-only is active (implicit preview)', async () => {
     const result = (await ResearchPrune.run(['--older-than', '30d', '--read-only'])) as any;
     expect(result.dryRun).toBe(true);
+    expect(result.status).toBe('would_prune');
+    expect(result.wouldPruneCount).toBe(result.candidateCount);
     expect(result.prunedCount).toBe(0);
   });
 
@@ -90,7 +92,9 @@ describe('prune command unit tests', () => {
     const dryRunResult = (await ResearchPrune.run(['--older-than', '30d', '--dry-run'])) as any;
 
     expect(dryRunResult.dryRun).toBe(true);
+    expect(dryRunResult.status).toBe('would_prune');
     expect(dryRunResult.candidateCount).toBe(1);
+    expect(dryRunResult.wouldPruneCount).toBe(1);
     expect(dryRunResult.prunedCount).toBe(0);
     expect(dryRunResult.files[0].cacheKey).toBe(volatileImport.cache.key);
     expect(existsSync(volatileImport.cache.path)).toBe(true);
@@ -99,7 +103,9 @@ describe('prune command unit tests', () => {
     const pruneResult = (await ResearchPrune.run(['--older-than', '30d', '--yes'])) as any;
 
     expect(pruneResult.dryRun).toBe(false);
+    expect(pruneResult.status).toBe('pruned');
     expect(pruneResult.candidateCount).toBe(1);
+    expect(pruneResult.wouldPruneCount).toBe(0);
     expect(pruneResult.prunedCount).toBe(1);
     expect(pruneResult.files[0].cacheKey).toBe(volatileImport.cache.key);
     expect(existsSync(volatileImport.cache.path)).toBe(false);

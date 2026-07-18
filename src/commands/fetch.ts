@@ -320,9 +320,15 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     artifact: any
   ): { dir: string; redirectedToGlobal: boolean } {
     if (tmpDir) {
+      const result = writeArtifactSecurely(roots, cacheKey, artifact, { dryRun: true });
+      if (result.redirected) {
+        this.warn(
+          `Detected ${result.secretLabel} in the page content; would store in the global cache instead of the project to avoid committing secrets.`
+        );
+      }
       writeArtifact(tmpDir, cacheKey, artifact);
       // Report the real would-be location, not the throwaway dir that is about to be deleted.
-      return { dir: roots.writeRoot, redirectedToGlobal: false };
+      return { dir: result.dataDir, redirectedToGlobal: result.redirected };
     }
     const result = writeArtifactSecurely(roots, cacheKey, artifact);
     if (result.redirected) {

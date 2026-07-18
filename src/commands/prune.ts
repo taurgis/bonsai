@@ -190,6 +190,8 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
 
     return {
       dryRun,
+      status: dryRun ? 'would_prune' : 'pruned',
+      wouldPruneCount: dryRun ? count : 0,
       prunedCount,
       candidateCount: count,
       files: filesToPrune.map((f) => ({

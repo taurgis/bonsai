@@ -44,7 +44,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
     if (this.effectiveDryRun(this.flags['dry-run'])) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would unset ${key} (${scope})`);
-      return { key, scope, dryRun: true };
+      return { key, scope, dryRun: true, status: 'would_unset' };
     }
 
     const patch = { [key]: undefined } as Partial<ConfigValues>;
@@ -68,6 +68,6 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
     }
 
     if (!this.jsonEnabled()) this.log(`Unset ${key} (${scope})`);
-    return { key, scope, dryRun: false };
+    return { key, scope, dryRun: false, status: 'unset' };
   }
 }

@@ -59,12 +59,14 @@ describe('config set', () => {
   it('does not write on --dry-run', async () => {
     const result = (await ConfigSet.run(['storage', 'project', '--local', '--dry-run'])) as any;
     expect(result.dryRun).toBe(true);
+    expect(result.status).toBe('would_set');
     expect(existsSync(projectConfig())).toBe(false);
   });
 
   it('does not write under --read-only (alias --plan)', async () => {
     const result = (await ConfigSet.run(['storage', 'project', '--local', '--plan'])) as any;
     expect(result.dryRun).toBe(true);
+    expect(result.status).toBe('would_set');
     expect(existsSync(projectConfig())).toBe(false);
   });
 
@@ -73,6 +75,7 @@ describe('config set', () => {
     try {
       const result = (await ConfigSet.run(['storage', 'project', '--local'])) as any;
       expect(result.dryRun).toBe(true);
+      expect(result.status).toBe('would_set');
       expect(existsSync(projectConfig())).toBe(false);
     } finally {
       delete process.env.BONSAI_PLAN_MODE;
@@ -85,7 +88,7 @@ describe('config set', () => {
     );
     const envelope = JSON.parse(lines.join('\n').trim());
     expect(envelope).toMatchObject({ schemaVersion: 1, command: 'config set', ok: true });
-    expect(envelope.data).toMatchObject({ key: 'storage', value: 'project' });
+    expect(envelope.data).toMatchObject({ key: 'storage', value: 'project', status: 'set' });
   });
 
   it('rejects an invalid value with exit 2', async () => {
@@ -235,6 +238,7 @@ describe('config unset', () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const result = (await ConfigUnset.run(['storage', '--local', '--dry-run'])) as any;
     expect(result.dryRun).toBe(true);
+    expect(result.status).toBe('would_unset');
     expect(JSON.parse(readFileSync(projectConfig(), 'utf-8')).storage).toBe('project');
   });
 
@@ -242,6 +246,7 @@ describe('config unset', () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const result = (await ConfigUnset.run(['storage', '--local', '--read-only'])) as any;
     expect(result.dryRun).toBe(true);
+    expect(result.status).toBe('would_unset');
     expect(JSON.parse(readFileSync(projectConfig(), 'utf-8')).storage).toBe('project');
   });
 
@@ -273,6 +278,6 @@ describe('config unset', () => {
     const lines = await captureLog(() => ConfigUnset.run(['storage', '--local', '--json']));
     const envelope = JSON.parse(lines.join('\n').trim());
     expect(envelope).toMatchObject({ schemaVersion: 1, command: 'config unset', ok: true });
-    expect(envelope.data).toMatchObject({ key: 'storage', scope: 'project' });
+    expect(envelope.data).toMatchObject({ key: 'storage', scope: 'project', status: 'unset' });
   });
 });

@@ -65,7 +65,9 @@ export default function register(harness, fixtures) {
       xdg: ws.xdg,
     });
     expect(set.exitCode === 0, `set exit ${set.exitCode}`);
-    expect(parseJson(set.stdout)?.data?.dryRun === true, 'dryRun true');
+    const setData = parseJson(set.stdout)?.data;
+    expect(setData?.dryRun === true, 'dryRun true');
+    expect(setData?.status === 'would_set', `status ${setData?.status}`);
 
     const get = run(['config', 'get', 'storage', '--local', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(parseJson(get.stdout)?.data?.value === 'global', 'project file untouched, default still global');
@@ -80,7 +82,10 @@ export default function register(harness, fixtures) {
   check('prune --read-only previews without requiring --dry-run or --yes', () => {
     const r = run(['prune', '--older-than', '1d', '--read-only', '--json']);
     expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
-    expect(parseJson(r.stdout)?.data?.dryRun === true, 'dryRun true');
+    const data = parseJson(r.stdout)?.data;
+    expect(data?.dryRun === true, 'dryRun true');
+    expect(data?.status === 'would_prune', `status ${data?.status}`);
+    expect(data?.wouldPruneCount === data?.candidateCount, 'wouldPruneCount');
   });
 
   check('config (bare, no command-specific flags) accepts --read-only', () => {
