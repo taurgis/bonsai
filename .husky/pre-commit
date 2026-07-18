@@ -1,8 +1,10 @@
 # Quality gate. lint-staged runs first so the checks below see the
 # formatted, final-committed content. Any non-zero exit aborts the commit.
+# Prettier + ESLint naming-convention run on staged *.ts via lint-staged.
 pnpm lint-staged
 
 # code-structure rule #1: no production file may reach 1000 lines.
+# Defaults to staged files only (see scripts/check-line-counts.ts).
 node scripts/check-line-counts.ts
 
 # Block newly introduced complexity (cyclomatic/cognitive), dead code, and
