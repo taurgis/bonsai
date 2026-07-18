@@ -1,7 +1,10 @@
 import { Args, Flags } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { writeUserConfig, writeProjectConfig, validKeysHint } from '../../lib/config/index.js';
+import { validKeysHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
+import { persistConfigPatch } from '../../lib/config-persist.js';
+import { configWriteStatus } from '../../lib/write-status.js';
+import type { ConfigWriteResult } from '../../lib/cli-result-types.js';
 
 export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
   static id = 'config unset';
@@ -36,38 +39,35 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
   static stdoutIsPrimaryData = true;
 
-  async run(): Promise<unknown> {
+  async run(): Promise<ConfigWriteResult> {
     const key = this.args.key;
     this.validateConfigKeyAndScope(key, this.flags.global, this.flags.local);
 
     const scope = this.writeScope(this.flags.local);
-
-    if (this.effectiveDryRun(this.flags['dry-run'])) {
+    const dryRun = this.effectiveDryRun(this.flags['dry-run']);
+    if (dryRun) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would unset ${key} (${scope})`);
-      return { key, scope, dryRun: true, status: 'would_unset' };
+      return { key, scope, dryRun: true, status: configWriteStatus(true, 'unset') };
     }
 
-    const patch = { [key]: undefined } as Partial<ConfigValues>;
-    if (scope === 'project') {
-      writeProjectConfig(process.cwd(), patch);
-    } else {
-      const configDir = this.config.configDir;
-      if (!configDir) {
-        this.error(
-          'Could not determine user config directory. Use --local to remove project config.',
-          {
-            exit: 1,
-            code: 'CONFIG_DIR_UNAVAILABLE',
-            suggestions: [
-              `Remove project config instead: ${this.config.bin} config unset ${key} --local`,
-            ],
-          }
-        );
-      }
-      writeUserConfig(configDir, patch);
+    const persisted = persistConfigPatch({
+      scope,
+      cwd: process.cwd(),
+      configDir: this.config.configDir,
+      patch: { [key]: undefined } as Partial<ConfigValues>,
+      action: 'unset',
+      bin: this.config.bin,
+      key,
+    });
+    if (!persisted.ok) {
+      this.error(persisted.message, {
+        exit: 1,
+        code: persisted.code,
+        suggestions: persisted.suggestions,
+      });
     }
 
     if (!this.jsonEnabled()) this.log(`Unset ${key} (${scope})`);
-    return { key, scope, dryRun: false, status: 'unset' };
+    return { key, scope, dryRun: false, status: configWriteStatus(false, 'unset') };
   }
 }

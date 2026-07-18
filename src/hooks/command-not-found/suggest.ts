@@ -1,6 +1,6 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
 import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
-import { buildCliErrorEnvelope } from '../../lib/envelope.js';
+import { writeCommandNotFoundJson } from '../../lib/cli-emit.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
 /**
@@ -79,19 +79,6 @@ function bareUrlInput(id: string): string | null {
 
 function isJsonMode(argv: string[] | undefined): boolean {
   return (argv?.includes('--json') ?? false) || process.argv.includes('--json');
-}
-
-function emitJsonError(
-  command: string,
-  message: string,
-  code: 'COMMAND_NOT_FOUND' | 'MISSING_URL_SCHEME' | 'UNEXPECTED_ARGUMENT',
-  suggestions?: string[]
-): Record<string, unknown> {
-  const envelope = buildCliErrorEnvelope({ command, message, code, suggestions });
-  process.exitCode = 2;
-  if (envelope.stderr) process.stderr.write(`${String(envelope.stderr)}\n`);
-  console.log(JSON.stringify(envelope, null, 2));
-  return envelope;
 }
 
 export function buildCommandNotFoundDetails(
@@ -177,7 +164,12 @@ export function buildCommandNotFoundDetails(
 const hook: Hook<'command_not_found'> = async function (opts) {
   const details = buildCommandNotFoundDetails(opts.id, opts.argv, opts.config);
   if (details.jsonMode) {
-    return emitJsonError(details.command, details.message, details.code, details.suggestions);
+    return writeCommandNotFoundJson({
+      command: details.command,
+      message: details.message,
+      code: details.code,
+      suggestions: details.suggestions,
+    });
   }
   // Hook context typings omit `suggestions` even though CLIError accepts them; cast keeps the
   // human pretty-print "Try this:" lines aligned with the JSON envelope.

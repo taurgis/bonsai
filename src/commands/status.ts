@@ -8,14 +8,16 @@ import {
   durationFlagError,
 } from '../lib/research/freshness.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
+import type { StatusRow } from '../lib/cli-result-types.js';
+import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
+import { batchSeparator, cacheMissHint, formatCacheTargetHeader } from '../lib/cache-view.js';
 import { colors } from '../lib/color.js';
-import { CLI_FLAG_DESCRIPTIONS, formatHumanFields } from '../lib/cli-presentation.js';
 
-type CacheStatus = 'hit' | 'miss' | 'stale';
+type CacheStatus = StatusRow['status'];
 // 'none' means no cache entry exists for the URL, so no freshness applies — distinct from
 // 'stale_expired', which describes an entry that exists but has aged past its grace window.
-type FreshnessStatus = 'fresh' | 'stale_grace' | 'stale_expired' | 'none';
-type StatusAction = 'would_fetch' | 'would_revalidate' | 'would_return_cached';
+type FreshnessStatus = StatusRow['freshness'];
+type StatusAction = StatusRow['action'];
 
 interface StatusResult {
   action: StatusAction;
@@ -127,14 +129,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     url: string,
     currentTime: Date,
     policy: { ttl: string | undefined; maxAge: string | undefined; tier: Tier | undefined }
-  ): {
-    cacheKey: string;
-    cachePath: string;
-    normalizedUrl: string;
-    status: string;
-    freshness: string;
-    action: string;
-  } {
+  ): StatusRow {
     const target = this.resolveResearchTargetOrFail(url);
     const { cacheKey, located, normalizedUrl, roots } = target;
     const cached = located?.artifact ?? null;
@@ -143,9 +138,9 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     const artifactPath = located?.path ?? getArtifactPath(roots.writeRoot, cacheKey);
 
     if (!this.jsonEnabled()) {
-      this.logStatusTable(normalizedUrl, cacheKey, artifactPath, result);
+      this.logStatusTable(target, artifactPath, result);
       if (result.status === 'miss') {
-        this.warn(`Cache miss — run: ${this.config.bin} ${normalizedUrl}`);
+        this.warn(cacheMissHint(this.config.bin, normalizedUrl));
       }
     }
 
@@ -160,8 +155,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   }
 
   private logStatusTable(
-    normalizedUrl: string,
-    cacheKey: string,
+    target: { normalizedUrl: string; cacheKey: string; roots: { writeRoot: string } },
     artifactPath: string,
     result: StatusResult
   ): void {
@@ -189,16 +183,18 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
       result.action
     );
 
-    for (const line of formatHumanFields([
-      ['URL', colors.bold(normalizedUrl)],
-      ['Cache Key', colors.bold(cacheKey)],
-      ['Cache Path', colors.gray(artifactPath)],
-      ['Status', statusColor(result.status)],
-      ['Freshness', freshnessColor(result.freshness)],
-      ['Action', actionColor(result.action)],
-    ])) {
+    for (const line of formatCacheTargetHeader(
+      target,
+      [
+        ['Status', statusColor(result.status)],
+        ['Freshness', freshnessColor(result.freshness)],
+        ['Action', actionColor(result.action)],
+      ],
+      artifactPath
+    )) {
       this.log(line);
     }
-    if (this.parsedArgv.length > 1) this.log('='.repeat(40));
+    const sep = batchSeparator(this.parsedArgv.length > 1);
+    if (sep) this.log(sep);
   }
 }

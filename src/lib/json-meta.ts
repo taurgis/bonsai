@@ -1,5 +1,6 @@
 import { Config, Help, toConfiguredId } from '@oclif/core';
 import { positionalArgvTokens } from './argv.js';
+import { VALUE_TAKING_FLAG_TOKENS } from './cli-flag-manifest.js';
 import { buildEnvelope } from './envelope.js';
 
 /** Strip ANSI color codes so JSON help text stays machine-stable. */
@@ -25,7 +26,7 @@ class CaptureHelp extends Help {
 }
 
 function envelopeCommandId(config: Config, argv: readonly string[]): string {
-  const tokens = positionalArgvTokens(argv);
+  const tokens = positionalArgvTokens(argv, VALUE_TAKING_FLAG_TOKENS);
   if (tokens.length === 0) return config.bin;
 
   // Longest matching command id wins (`config:get` over topic `config`).

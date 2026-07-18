@@ -14,6 +14,11 @@ export interface NormalizationResult {
   };
 }
 
+export interface ArgvNormalizeOptions {
+  /** Tokens that consume the next argv value (`--topic`, `-t`, …). From cli-flag-manifest. */
+  valueTakingFlags: ReadonlySet<string>;
+}
+
 /** Shared MISSING_COMMAND copy for flag-only argv preflight. */
 export function missingCommandDetails(
   bin: string,
@@ -39,31 +44,6 @@ export function missingCommandDetails(
   };
 }
 
-/** Flags that consume the next argv token as a value. Keep short aliases in sync with command chars. */
-export const FLAGS_WITH_VALUES = new Set([
-  '--topic',
-  '-t',
-  '--tags',
-  '-g',
-  '--format',
-  '--tier',
-  '--ttl',
-  '-l',
-  '--max-age',
-  '--storage',
-  '--file',
-  '-f',
-  '--input-format',
-  '--source-url',
-  '--freshness',
-  '--artifact-type',
-  '--capture-method',
-  '--older-than',
-  '--inactive',
-  '--limit',
-  '--url',
-]);
-
 /**
  * Boolean flags registered on every command via BaseCommand.baseFlags. oclif only merges those after
  * it picks a command, so `bonsai --read-only list` would otherwise treat `--read-only` as the
@@ -76,12 +56,13 @@ export const GLOBAL_BOOLEAN_FLAGS = new Set(['--read-only', '--plan']);
  * certainly put the URL where the flag value belongs (e.g. `bonsai --tags https://example.com`).
  */
 export function findSwallowedUrlFlag(
-  argv: readonly string[] | undefined
+  argv: readonly string[] | undefined,
+  valueTakingFlags: ReadonlySet<string>
 ): { flag: string; url: string } | null {
   if (!argv?.length) return null;
   for (let i = 0; i < argv.length - 1; i++) {
     const flag = argv[i]!;
-    if (!FLAGS_WITH_VALUES.has(flag)) continue;
+    if (!valueTakingFlags.has(flag)) continue;
     const value = argv[i + 1]!;
     if (value.startsWith('-')) continue;
     if (looksLikeUrl(value)) return { flag, url: value };
@@ -91,9 +72,10 @@ export function findSwallowedUrlFlag(
 
 function missingUsageExit(
   json: boolean,
-  argv: readonly string[]
+  argv: readonly string[],
+  valueTakingFlags: ReadonlySet<string>
 ): NonNullable<NormalizationResult['earlyExit']> {
-  const details = missingCommandDetails('bonsai', findSwallowedUrlFlag(argv));
+  const details = missingCommandDetails('bonsai', findSwallowedUrlFlag(argv, valueTakingFlags));
   return {
     exitCode: 2,
     json,
@@ -110,12 +92,15 @@ function missingUsageExit(
  * Index of the first positional command/URL token, skipping flags (and value-flag operands)
  * plus root meta tokens that never name a command (`--help`, `--json`, globals).
  */
-function firstPositionalIndex(argv: readonly string[]): number {
+function firstPositionalIndex(
+  argv: readonly string[],
+  valueTakingFlags: ReadonlySet<string>
+): number {
   for (let i = 0; i < argv.length; i++) {
     const token = argv[i]!;
     if (token === '--help' || token === '--json' || GLOBAL_BOOLEAN_FLAGS.has(token)) continue;
     if (token.startsWith('-')) {
-      if (FLAGS_WITH_VALUES.has(token)) i++;
+      if (valueTakingFlags.has(token)) i++;
       continue;
     }
     return i;
@@ -124,11 +109,19 @@ function firstPositionalIndex(argv: readonly string[]): number {
 }
 
 /** True when argv selects a command, URL, or root `--version` action (not flag-only usage). */
-function hasCommandToken(argv: readonly string[]): boolean {
-  return argv.includes('--version') || firstPositionalIndex(argv) !== -1;
+function hasCommandToken(argv: readonly string[], valueTakingFlags: ReadonlySet<string>): boolean {
+  return argv.includes('--version') || firstPositionalIndex(argv, valueTakingFlags) !== -1;
 }
 
-export function normalizeArgv(rawArgv: string[]): NormalizationResult {
+/**
+ * Normalize raw process argv for oclif. `valueTakingFlags` must come from the composition root
+ * (`cli-flag-manifest`) — this module stays free of command registry imports.
+ */
+export function normalizeArgv(
+  rawArgv: string[],
+  options: ArgvNormalizeOptions
+): NormalizationResult {
+  const { valueTakingFlags } = options;
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but
   // `bonsai --json list` is otherwise parsed as an unknown command named
   // "--json". Collect every --json, append one copy after the command/URL, and
@@ -158,7 +151,7 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   // forms like `javascript:` or `data:` so fetch can reject unsupported protocols instead of oclif
   // reporting a misleading "command not found". If the invocation begins with a flag, allow common
   // flag-before-argument usage such as `bonsai --format detailed https://example.com`.
-  const firstNonFlagArgIndex = firstPositionalIndex(core);
+  const firstNonFlagArgIndex = firstPositionalIndex(core, valueTakingFlags);
   const rootFetchShape = firstNonFlagArgIndex !== -1 && looksLikeUrl(core[firstNonFlagArgIndex]!);
   if (rootFetchShape) {
     const url = core[firstNonFlagArgIndex]!;
@@ -177,10 +170,10 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
   // Flag-only argv (`--json`, `--read-only`, `--tags https://…`) never resolves a command.
   // Exit here so command_not_found does not special-case dash-prefixed ids.
   // Empty argv and `--help`/`--version` stay with oclif.
-  if (!helpRequested && core.length > 0 && !hasCommandToken(core)) {
+  if (!helpRequested && core.length > 0 && !hasCommandToken(core, valueTakingFlags)) {
     return {
       argv: jsonMode ? ['--json'] : [],
-      earlyExit: missingUsageExit(jsonMode, rawArgv),
+      earlyExit: missingUsageExit(jsonMode, rawArgv, valueTakingFlags),
     };
   }
 
@@ -193,24 +186,22 @@ export function normalizeArgv(rawArgv: string[]): NormalizationResult {
  * help-preflight and json-meta — both run after `normalizeArgv` has already folded `help X` →
  * `X --help` and `-h` → `--help`.
  */
-export function positionalArgvTokens(argv: readonly string[]): string[] {
+export function positionalArgvTokens(
+  argv: readonly string[],
+  valueTakingFlags: ReadonlySet<string>
+): string[] {
   const tokens: string[] = [];
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
     if (arg === '--') break;
     if (arg === '--help' || arg === '--json') continue;
     if (arg.startsWith('-')) {
-      if (valueFlagConsumesNextToken(arg)) i++;
+      if (!arg.includes('=') && valueTakingFlags.has(arg)) i++;
       continue;
     }
     tokens.push(arg);
   }
   return tokens;
-}
-
-function valueFlagConsumesNextToken(arg: string): boolean {
-  if (arg.includes('=')) return false;
-  return FLAGS_WITH_VALUES.has(arg);
 }
 
 function looksLikeUrl(arg: string): boolean {

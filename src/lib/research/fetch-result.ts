@@ -1,4 +1,5 @@
 import type { StorageMode } from '../config/index.js';
+import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
 import { cliErrorFields, type CliErrorShape } from '../envelope.js';
 import { SANDBOX_EGRESS_ERROR_MARKER } from './browser.js';
 import { PROXY_TUNNEL_REJECTION_PATTERN } from './proxy.js';
@@ -38,8 +39,8 @@ export interface FetchResultInput {
   cacheKey: string;
   storageDir: string;
   storageMode: StorageMode;
-  cacheStatus: string;
-  freshnessState: string;
+  cacheStatus: CacheHitStatus | string;
+  freshnessState: FreshnessState | string;
   format: 'compressed' | 'detailed';
   artifact: {
     metadata: {

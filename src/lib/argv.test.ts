@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { BaseCommand } from '../base-command.js';
-import { commands } from '../commands.js';
-import { FLAGS_WITH_VALUES, normalizeArgv, positionalArgvTokens } from './argv.js';
+import { normalizeArgv, positionalArgvTokens } from './argv.js';
+import { VALUE_TAKING_FLAG_TOKENS } from './cli-flag-manifest.js';
 
 describe('normalizeArgv', () => {
   const cases = [
@@ -364,7 +363,7 @@ describe('normalizeArgv', () => {
 
   for (const tc of cases) {
     it(tc.name, () => {
-      const result = normalizeArgv(tc.input);
+      const result = normalizeArgv(tc.input, { valueTakingFlags: VALUE_TAKING_FLAG_TOKENS });
       expect(result.argv).toEqual(tc.expected.argv);
       if (tc.expected.earlyExit) {
         expect(result.earlyExit).toEqual(tc.expected.earlyExit);
@@ -375,36 +374,26 @@ describe('normalizeArgv', () => {
   }
 });
 
-describe('FLAGS_WITH_VALUES', () => {
-  it('matches every value-taking command flag and alias', () => {
-    const expected = new Set<string>();
-    const commandClasses = Object.values(commands);
-
-    for (const command of commandClasses) {
-      const flags = { ...BaseCommand.baseFlags, ...command.flags };
-      for (const [name, flag] of Object.entries(flags)) {
-        if (flag.type === 'boolean') continue;
-        expected.add(`--${name}`);
-        if (flag.char) expected.add(`-${flag.char}`);
-        for (const alias of flag.aliases ?? []) expected.add(`--${alias}`);
-        for (const charAlias of flag.charAliases ?? []) expected.add(`-${charAlias}`);
-      }
-    }
-
-    expect([...FLAGS_WITH_VALUES].sort()).toEqual([...expected].sort());
+describe('VALUE_TAKING_FLAG_TOKENS', () => {
+  it('is derived from command metadata (includes known value-taking flags)', () => {
+    // Derived at module load from command classes — assert the contract agents rely on,
+    // not a hand-maintained duplicate list.
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--topic')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('-t')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--format')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--file')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('-f')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--url')).toBe(true);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--read-only')).toBe(false);
+    expect(VALUE_TAKING_FLAG_TOKENS.has('--json')).toBe(false);
   });
 
   it('keeps value operands out of positional command tokens', () => {
     expect(
-      positionalArgvTokens([
-        'fetch',
-        'https://example.com',
-        '--format',
-        'detailed',
-        '--topic',
-        'Docs',
-        '--json',
-      ])
+      positionalArgvTokens(
+        ['fetch', 'https://example.com', '--format', 'detailed', '--topic', 'Docs', '--json'],
+        VALUE_TAKING_FLAG_TOKENS
+      )
     ).toEqual(['fetch', 'https://example.com']);
   });
 });

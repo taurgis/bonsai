@@ -1,5 +1,6 @@
 import { Config } from '@oclif/core';
 import { positionalArgvTokens } from './argv.js';
+import { VALUE_TAKING_FLAG_TOKENS } from './cli-flag-manifest.js';
 import { buildCliErrorEnvelope } from './envelope.js';
 import { buildCommandNotFoundDetails } from '../hooks/command-not-found/suggest.js';
 
@@ -52,7 +53,7 @@ export async function tryUnknownHelpOutput(
 ): Promise<UnknownHelpResult | null> {
   if (!argv.includes('--help')) return null;
 
-  const tokens = positionalArgvTokens(argv);
+  const tokens = positionalArgvTokens(argv, VALUE_TAKING_FLAG_TOKENS);
   if (tokens.length === 0) return null;
 
   const config = await Config.load({ root });
