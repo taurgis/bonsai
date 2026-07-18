@@ -118,10 +118,8 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     // Parse failures throw before `this.parse()` sets `parsed`, which makes oclif emit a spurious
     // [UnparsedCommand] warning to stderr even under `--json`. CLIParseError subclasses carry `parse`.
     if (err && typeof err === 'object' && 'parse' in err) this.parsed = true;
-    // Clean oclif parse wrappers and attach typo tips before pretty-print / JSON formatting.
-    if (err && typeof err === 'object' && typeof err.message === 'string') {
-      enrichParseError(err);
-    }
+    // Always enrich: unwrap is a no-op without a Parsing wrapper; fuzzy tips no-op without flags/options.
+    enrichParseError(err);
     // Attach the stable code to the error itself so oclif's human pretty-print renders the same
     // `Code:` line that `--json` already reports via stableErrorCodeFrom. Without this, built-in
     // oclif parse errors (invalid enum value, missing arg, unknown flag) printed a code under

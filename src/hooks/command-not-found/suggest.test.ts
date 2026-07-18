@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import hook from './suggest.js';
 
-// Minimal stand-in for the oclif Config the hook reads: the visible/hidden command split, the
-// command id list, the bin name, and the topic separator that toConfiguredId uses for display.
+// Minimal stand-in for the oclif Config the hook reads: command ids (including hidden `fetch`),
+// the bin name, and the topic separator that toConfiguredId uses for display.
 const fakeConfig = {
   bin: 'bonsai',
   topicSeparator: ' ',
