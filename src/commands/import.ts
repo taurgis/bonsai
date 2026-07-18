@@ -20,7 +20,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   static id = 'import';
   static summary = 'Import agent-supplied clean Markdown notes into the local cache.';
   static description =
-    'Accepts a synthesized Markdown note via stdin and registers it under the single target URL or multiple source URLs.';
+    'Accepts a synthesized Markdown note via stdin or --file and registers it under the single target URL or multiple source URLs.';
 
   static examples = [
     {
@@ -319,12 +319,13 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
     const inputFormat = this.flags['input-format'];
     const detailed = sanitizePromptInjection(rawInput);
-    // A caller-supplied compressed input is trusted as-is; only a detailed import is condensed here,
-    // and it shares the same buildCompressed policy (structural pass + extractive fallback) as fetch.
+    // Always sanitize — agent-supplied notes are untrusted regardless of density. When the caller
+    // already provided compressed Markdown, keep that (sanitized) body as the compressed form;
+    // otherwise condense the detailed import with the same policy as fetch.
     const compressed =
       inputFormat === 'detailed'
         ? buildCompressed(detailed, loadSummaryLevel(this.config.configDir, process.cwd()))
-        : rawInput;
+        : detailed;
     const contentHash = createHash('sha256').update(detailed).digest('hex');
 
     const metadata: ResearchArtifactMetadata = {

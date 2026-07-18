@@ -45,6 +45,16 @@ export default function register(harness) {
     const env = parseJson(r.stdout);
     expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
     expect(env?.stderr?.includes('Did you mean config get?'), env?.stderr);
+    expect(env?.suggestions?.[0] === 'bonsai config get', `suggestions ${env?.suggestions}`);
+    expect(env?.stderr?.includes('Try this:'), env?.stderr);
+  });
+
+  check('unknown command with --json --help includes top-level suggestions', () => {
+    const r = run(['--json', 'confg', '--help']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
+    expect(env?.suggestions?.[0] === 'bonsai config', `suggestions ${env?.suggestions}`);
   });
 
   check('bare hostname example.com --json MISSING_URL_SCHEME', () => {

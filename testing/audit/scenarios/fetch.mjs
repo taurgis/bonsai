@@ -138,6 +138,21 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[1]?.error?.code === 'FETCH_FAILED', `second ${JSON.stringify(env?.data?.[1])}`);
   });
 
+  check('fetch --force --allow-stale is CONFLICTING_FLAGS', () => {
+    const r = run(['https://example.com', '--force', '--allow-stale', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CONFLICTING_FLAGS', env?.code);
+    expect(env?.stderr?.includes('--force'), env?.stderr);
+    expect(env?.stderr?.includes('--allow-stale'), env?.stderr);
+  });
+
+  check('fetch --force --allow-stale human mode CONFLICTING_FLAGS', () => {
+    const r = run(['https://example.com', '--force', '--allow-stale']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('Code: CONFLICTING_FLAGS'), r.stderr);
+  });
+
   if (networkEnabled()) {
     check('fetch live URL with rendered flag (AUDIT_NETWORK)', () => {
       const r = run(['https://example.com', '--rendered', '--json'], { timeout: 90000 });

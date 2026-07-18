@@ -195,6 +195,6 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
     this.log(`${colors.cyan('Status:'.padEnd(25))} ${statusColor(result.status)}`);
     this.log(`${colors.cyan('Freshness:'.padEnd(25))} ${freshnessColor(result.freshness)}`);
     this.log(`${colors.cyan('Action:'.padEnd(25))} ${actionColor(result.action)}`);
-    if (this.parsedArgv.length > 1) this.log('-'.repeat(40));
+    if (this.parsedArgv.length > 1) this.log('='.repeat(40));
   }
 }

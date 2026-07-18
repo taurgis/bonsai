@@ -150,8 +150,16 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   }
 
   private logListResults(finalResults: any[], totalMatched: number): void {
-    if (this.jsonEnabled()) return;
     if (finalResults.length === 0) {
+      const tip = this.hasActiveFilters()
+        ? `No cached research entries match the given filters. Try relaxing filters, or list everything: ${this.config.bin} list`
+        : `No cached research entries found. Populate the cache first: ${this.config.bin} <url>`;
+      // Under --json, mirror truncation: surface the tip on stderr via warn() so agents see it
+      // without polluting the stdout envelope. Human mode keeps the tip on stdout.
+      if (this.jsonEnabled()) {
+        this.warn(tip);
+        return;
+      }
       if (this.hasActiveFilters()) {
         this.log('No cached research entries match the given filters.');
         this.log(
@@ -163,6 +171,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       }
       return;
     }
+    if (this.jsonEnabled()) return;
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);
     finalResults.forEach((res, index) => {
       const topicStr = res.topic ? colors.cyan(res.topic) : colors.gray(NO_TOPIC_LABEL);

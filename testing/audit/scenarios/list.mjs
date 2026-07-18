@@ -32,6 +32,35 @@ export default function register(harness, fixtures) {
     expect(r.stdout.includes('populate the cache first'), r.stdout);
   });
 
+  check('list empty cache --json warns tip on stderr', () => {
+    const r = run(['list', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(Array.isArray(env?.data) && env.data.length === 0, 'empty data');
+    expect(r.stderr.includes('No cached research entries found'), r.stderr);
+    expect(r.stderr.includes('Populate the cache first'), r.stderr);
+  });
+
+  check('list no-match filter --json warns tip on stderr', () => {
+    const ws = createWorkspace();
+    const imported = run(
+      ['import', 'https://example.com/audit-list-json-nomatch', '--stdin', '--topic', 'Present', '--json'],
+      {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        input: '# Present\n',
+      }
+    );
+    expect(imported.exitCode === 0, `seed ${imported.exitCode}`);
+    const r = run(['list', '--topic', 'AbsentTopicXYZ', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.data?.length === 0, 'empty');
+    expect(r.stderr.includes('match the given filters'), r.stderr);
+  });
+
   check('list no-match filter tip does not say populate when cache has entries', () => {
     const ws = createWorkspace();
     const imported = run(

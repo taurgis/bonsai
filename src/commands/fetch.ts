@@ -41,7 +41,7 @@ const CAPTURE_DEPS: CaptureDeps = {
 export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   static id = 'fetch';
   static hidden = true;
-  static summary = 'An advanced, locally cached web research tool optimized for LLM ingestion.';
+  static summary = 'Fetch and cache a URL as research Markdown for LLM ingestion.';
   static description =
     'Scrapes the specified URL, strips HTML boilerplate, converts the semantic payload into clean Markdown format, and caches the result locally using dynamic TTL rules.\n\nUsually invoked via the shorthand `bonsai <url>` rather than `bonsai fetch <url>`.';
 
@@ -225,21 +225,31 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
     }
   }
 
+  // --force skips cache lookup; --allow-stale only applies when a stale entry is served after a
+  // failed revalidation. Together they are a no-op combination that looks intentional — reject it.
+  private rejectForceAllowStaleConflict(force: boolean, allowStale: boolean): void {
+    if (force && allowStale) {
+      this.error('Cannot combine --force with --allow-stale: --force ignores the cache entirely.', {
+        exit: 2,
+        code: 'CONFLICTING_FLAGS',
+      });
+    }
+  }
+
   // Re-emit a runtime fetch failure with actionable next steps. Deep fetch/extract code throws plain
   // Errors that otherwise reach the user as a bare "what broke" line with no "what to do"; this
   // attaches recovery hints (e.g. import an auth-blocked page). Everything reaching here is a runtime
   // failure — validation errors (bad flags/URL) exit before the try — so the contract's runtime code
-  // (1) applies. Suggestions render on stderr for humans only; under --json the envelope carries just
-  // the message (toErrorJson), so machine output is unchanged.
+  // (1) applies. Suggestions surface for humans ("Try this:") and under --json via toErrorJson.
   //
-  // Uses `describeError` (below) rather than `err.message` alone: Node/undici's fetch wraps
-  // transport failures (DNS, refused connections, a proxy that won't tunnel to the host) in a
-  // generic "fetch failed" TypeError with the real reason nested in `.cause`, so reading only the
-  // top message would surface a content-free "fetch failed" for exactly the failures a user most
+  // Uses `describeError` rather than `err.message` alone: Node/undici's fetch wraps transport
+  // failures (DNS, refused connections, a proxy that won't tunnel to the host) in a generic
+  // "fetch failed" TypeError with the real reason nested in `.cause`, so reading only the top
+  // message would surface a content-free "fetch failed" for exactly the failures a user most
   // needs a hint for.
   private emitFetchError(err: unknown, url: string): never {
     const message = describeError(err);
-    const guidance = fetchFailureGuidance(message, url);
+    const guidance = fetchFailureGuidance(message, url, this.config.bin);
     this.error(message, {
       exit: 1,
       code: 'FETCH_FAILED',
@@ -340,9 +350,10 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
   async run(): Promise<unknown> {
     const urls = this.parsedArgv;
-    const { ttl, 'max-age': maxAge } = this.flags;
+    const { ttl, 'max-age': maxAge, force, 'allow-stale': allowStale } = this.flags;
 
     this.validateDurationFlags(ttl, maxAge);
+    this.rejectForceAllowStaleConflict(force, allowStale);
     const dryRun = this.effectiveDryRun(this.flags['dry-run']);
 
     const summaryLevel = loadSummaryLevel(this.config.configDir, process.cwd());

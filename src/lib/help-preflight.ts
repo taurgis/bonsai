@@ -1,5 +1,5 @@
 import { Config } from '@oclif/core';
-import { buildEnvelope } from './envelope.js';
+import { buildEnvelope, formatErrorForJson } from './envelope.js';
 import { buildCommandNotFoundDetails } from '../hooks/command-not-found/suggest.js';
 
 type UnknownHelpResult =
@@ -83,9 +83,15 @@ export async function tryUnknownHelpOutput(
         command: details.command,
         ok: false,
         exitCode: 2,
-        stderr: `${details.message}\nCode: ${details.code}`,
+        // Match command_not_found: include Code + Try this in stderr, and top-level suggestions.
+        stderr: formatErrorForJson({
+          message: details.message,
+          code: details.code,
+          suggestions: details.suggestions,
+        }),
         data: null,
         code: details.code,
+        suggestions: details.suggestions?.length ? details.suggestions : undefined,
       }),
     };
   }

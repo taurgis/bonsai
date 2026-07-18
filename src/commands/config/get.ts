@@ -45,10 +45,11 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
 
     const meta = KEY_META[key];
     const displayValue = value !== undefined ? value : BUILT_IN_DEFAULTS[key];
+    const configured = value !== undefined;
     const formatted = meta.format(displayValue);
-    const suffix = value === undefined ? ' (not configured)' : '';
+    const suffix = configured ? '' : ' (not configured)';
     if (!this.jsonEnabled()) this.log(formatted + suffix);
 
-    return { key, value: displayValue };
+    return { key, value: displayValue, configured };
   }
 }

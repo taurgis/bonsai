@@ -364,12 +364,21 @@ npx @taurgis/bonsai config set storage global
 
 # Inspect values
 npx @taurgis/bonsai config get storage          # effective value
-npx @taurgis/bonsai config get storage --local  # project file only
+npx @taurgis/bonsai config get storage --local  # project file only (shows default + "(not configured)" when unset)
 npx @taurgis/bonsai config list                 # all keys
 
 # Remove a key (restores the default)
 npx @taurgis/bonsai config unset storage --local
 ```
+
+### JSON shapes
+
+`config get --json` returns `{ key, value, configured }`. `configured` is `false` when the
+requested scope (`--global` / `--local`) does not set the key — `value` is still the built-in
+default so agents can apply it without a second lookup.
+
+`config list --json` returns `{ entries: [{ key, value, configured }, ...] }` with the same
+semantics per key.
 
 ### Flags
 

@@ -42,16 +42,22 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
       const width = Math.max(...ALL_KEYS.map((k) => k.length)) + 2;
       for (const key of ALL_KEYS) {
         const raw = scoped[key];
-        const formatted = raw !== undefined ? KEY_META[key].format(raw) : '(not configured)';
+        const configured = raw !== undefined;
+        const formatted = configured
+          ? KEY_META[key].format(raw)
+          : `${KEY_META[key].format(BUILT_IN_DEFAULTS[key])} (not configured)`;
         this.log(`${key.padEnd(width)}${formatted}`);
       }
     }
 
-    const values: Record<string, unknown> = {};
-    for (const key of ALL_KEYS) {
+    const entries = ALL_KEYS.map((key) => {
       const raw = scoped[key];
-      values[key] = raw !== undefined ? raw : BUILT_IN_DEFAULTS[key];
-    }
-    return values;
+      return {
+        key,
+        value: raw !== undefined ? raw : BUILT_IN_DEFAULTS[key],
+        configured: raw !== undefined,
+      };
+    });
+    return { entries };
   }
 }

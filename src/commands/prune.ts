@@ -14,7 +14,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
   static summary = 'Clean up old or inactive research cache entries.';
   static description =
-    'Prunes cached research entries based on age, inactivity, or artifact type to free up disk space.';
+    'Prunes cached research entries based on age, inactivity, URL glob, or artifact type to free up disk space.';
 
   static examples = [
     {

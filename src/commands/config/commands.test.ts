@@ -110,13 +110,14 @@ describe('config set', () => {
 describe('config get', () => {
   it('returns the built-in default effective value', async () => {
     const result = (await ConfigGet.run(['storage'])) as any;
-    expect(result).toEqual({ key: 'storage', value: 'global' });
+    expect(result).toEqual({ key: 'storage', value: 'global', configured: true });
   });
 
   it('reads the project value with --local after a set', async () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const result = (await ConfigGet.run(['storage', '--local'])) as any;
     expect(result.value).toBe('project');
+    expect(result.configured).toBe(true);
   });
 
   it('reads only the user scope with --global', async () => {
@@ -124,6 +125,7 @@ describe('config get', () => {
     // --global ignores the project file, so it falls back to the default.
     const result = (await ConfigGet.run(['storage', '--global'])) as any;
     expect(result.value).toBe('global');
+    expect(result.configured).toBe(false);
   });
 
   it('rejects a missing key', async () => {
@@ -142,31 +144,55 @@ describe('config get', () => {
     const lines = await captureLog(() => ConfigGet.run(['storage', '--json']));
     const envelope = JSON.parse(lines.join('\n').trim());
     expect(envelope).toMatchObject({ schemaVersion: 1, command: 'config get', ok: true });
-    expect(envelope.data).toMatchObject({ key: 'storage', value: 'global' });
+    expect(envelope.data).toMatchObject({ key: 'storage', value: 'global', configured: true });
+  });
+
+  it('reports configured:false for an unset scoped key under --json', async () => {
+    const lines = await captureLog(() => ConfigGet.run(['storage', '--local', '--json']));
+    const envelope = JSON.parse(lines.join('\n').trim());
+    expect(envelope.data).toMatchObject({
+      key: 'storage',
+      value: 'global',
+      configured: false,
+    });
   });
 });
 
 describe('config list', () => {
-  it('returns the effective values', async () => {
+  it('returns the effective values as entries', async () => {
     const result = (await ConfigList.run([])) as any;
-    expect(result).toEqual({ storage: 'global', summary: 'conservative' });
+    expect(result).toEqual({
+      entries: [
+        { key: 'storage', value: 'global', configured: true },
+        { key: 'summary', value: 'conservative', configured: true },
+      ],
+    });
   });
 
   it('reflects a project-level value', async () => {
     await ConfigSet.run(['storage', 'project', '--local']);
     const result = (await ConfigList.run([])) as any;
-    expect(result.storage).toBe('project');
+    expect(result.entries.find((e: any) => e.key === 'storage')).toMatchObject({
+      value: 'project',
+      configured: true,
+    });
   });
 
   it('reads only the project scope with --local', async () => {
     const result = (await ConfigList.run(['--local'])) as any;
     // Nothing written to the project file yet → key falls back to the default.
-    expect(result.storage).toBe('global');
+    expect(result.entries.find((e: any) => e.key === 'storage')).toMatchObject({
+      value: 'global',
+      configured: false,
+    });
   });
 
   it('reads only the user scope with --global', async () => {
     const result = (await ConfigList.run(['--global'])) as any;
-    expect(result.storage).toBe('global');
+    expect(result.entries.find((e: any) => e.key === 'storage')).toMatchObject({
+      value: 'global',
+      configured: false,
+    });
   });
 
   it('emits the envelope under --json', async () => {
@@ -176,8 +202,12 @@ describe('config list', () => {
       schemaVersion: 1,
       command: 'config list',
       ok: true,
-      data: { storage: 'global' },
     });
+    expect(envelope.data.entries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ key: 'storage', value: 'global', configured: true }),
+      ])
+    );
   });
 
   it('rejects --global and --local together', async () => {

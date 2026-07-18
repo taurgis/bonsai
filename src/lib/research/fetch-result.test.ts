@@ -94,6 +94,12 @@ describe('fetchFailureGuidance', () => {
     }
   });
 
+  it('uses the provided bin name in import hints', () => {
+    const g = fetchFailureGuidance('Fetch failed with status 403 Forbidden', url, 'my-bonsai');
+    expect(g?.suggestions.some((s) => s.includes(`my-bonsai import ${url} --stdin`))).toBe(true);
+    expect(g?.suggestions.every((s) => !s.includes('bonsai import'))).toBe(true);
+  });
+
   it('suggests checking the URL on a 404', () => {
     const g = fetchFailureGuidance('Fetch failed with status 404 Not Found', url);
     expect(g?.suggestions.join(' ')).toMatch(/correct/i);

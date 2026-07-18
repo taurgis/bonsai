@@ -35,8 +35,8 @@ npx @taurgis/bonsai config set summary balanced
 
 # Inspect values
 npx @taurgis/bonsai config get storage          # effective value
-npx @taurgis/bonsai config get storage --local  # project file only
-npx @taurgis/bonsai config list                 # all keys
+npx @taurgis/bonsai config get storage --local  # project file only; JSON includes configured:false when unset
+npx @taurgis/bonsai config list                 # all keys (`--json` → { entries: [{ key, value, configured }] })
 
 # Remove a key (restores the default)
 npx @taurgis/bonsai config unset storage --local
