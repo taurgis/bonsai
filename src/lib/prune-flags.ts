@@ -66,6 +66,10 @@ function mutationSafetyError(input: PruneFlagInput): PruneFlagError | null {
       message:
         '--dry-run and --yes are mutually exclusive: --dry-run previews without deleting, --yes confirms deletion. Choose one.',
       code: 'CONFLICTING_FLAGS',
+      suggestions: [
+        `Preview without deleting: ${input.bin} prune --dry-run`,
+        `Or confirm deletion: ${input.bin} prune --yes`,
+      ],
     };
   }
   // Read-only mode implicitly previews, so the usual "pick one" safety check is redundant then.

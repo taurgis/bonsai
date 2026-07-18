@@ -234,6 +234,9 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       this.error('Cannot combine --force with --allow-stale: --force ignores the cache entirely.', {
         exit: 2,
         code: 'CONFLICTING_FLAGS',
+        suggestions: [
+          'Use --force to fetch fresh content, or omit --force when you want --allow-stale fallback.',
+        ],
       });
     }
   }

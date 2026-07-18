@@ -22,7 +22,8 @@ export default function register(harness, fixtures) {
     expect(env?.code === 'UNEXPECTED_ARGUMENT', env?.code);
     expect(env?.stderr?.includes('Unexpected argument: extra'), env?.stderr);
     expect(!env?.stderr?.includes('is not a bonsai command'), env?.stderr);
-    expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 80)}`);
+    expect(r.stderr.includes('Code: UNEXPECTED_ARGUMENT'), `stderr: ${r.stderr.slice(0, 120)}`);
+    expect(!r.stderr.includes('is not a bonsai command'), r.stderr);
   });
 
   check('list empty --url is INVALID_FLAG_VALUE', () => {

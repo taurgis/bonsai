@@ -101,6 +101,14 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   static stdoutIsPrimaryData = true;
 
+  private importSourceSuggestions(): string[] {
+    const bin = this.config.bin;
+    return [
+      `Single-source import: ${bin} import https://example.com/docs --file notes.md`,
+      `Multi-source import: ${bin} import --source-url https://example.com/a --topic "Topic" --file notes.md`,
+    ];
+  }
+
   // Isolated so tests can force the interactive branch; `isTTY` is `true` only on a real terminal and
   // falsy (undefined) for pipes, files, and /dev/null. See https://nodejs.org/api/process.html#processstdin
   protected stdinIsInteractive(): boolean {
@@ -163,30 +171,38 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       this.error('Cannot specify both positional <url> and --source-url flags.', {
         exit: 2,
         code: 'CONFLICTING_FLAGS',
+        suggestions: [
+          'Use the positional URL for single-source import, or use only --source-url for multi-source import.',
+        ],
       });
     }
     if (!hasSingle && !hasMulti) {
       this.error(
         'Must specify either positional <url> (for single-source) or --source-url (for multi-source) import.',
-        { exit: 2, code: 'MISSING_URL' }
+        { exit: 2, code: 'MISSING_URL', suggestions: this.importSourceSuggestions() }
       );
     }
     if (hasMulti && !this.resolvedTopic()) {
       this.error('Multi-source import requires the --topic flag.', {
         exit: 2,
         code: 'MISSING_TOPIC',
+        suggestions: [`Add a topic: ${this.config.bin} import --source-url <url> --topic "Topic"`],
       });
     }
     if (!this.flags.stdin && !this.flags.file) {
       this.error('Either --stdin or --file <path> must be specified to import content.', {
         exit: 2,
         code: 'MISSING_INPUT',
+        suggestions: this.stdinImportSuggestions(),
       });
     }
     if (this.flags.stdin && this.flags.file) {
       this.error('Cannot specify both --stdin and --file. Choose one input source.', {
         exit: 2,
         code: 'CONFLICTING_FLAGS',
+        suggestions: [
+          'Pipe content with --stdin, or read a file with --file notes.md; do not pass both.',
+        ],
       });
     }
   }
@@ -240,28 +256,52 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         });
       }
       if ((err as Error).message.includes('stdin size limit exceeded')) {
-        this.error((err as Error).message, { exit: 1, code: 'STDIN_TOO_LARGE' });
+        this.error((err as Error).message, {
+          exit: 1,
+          code: 'STDIN_TOO_LARGE',
+          suggestions: ['Reduce the input below 1 MiB, or split the note into smaller imports.'],
+        });
       }
       // Genuine stream failure reading stdin → I/O failure (exit 1).
-      this.error((err as Error).message, { exit: 1, code: 'IO_ERROR' });
+      this.error((err as Error).message, {
+        exit: 1,
+        code: 'IO_ERROR',
+        suggestions: ['Retry with --file notes.md if stdin is unreliable in this shell.'],
+      });
     }
     return rawInput;
   }
 
   private readAndValidateFile(filePath: string): string {
     if (!this.fsExistsSync(filePath)) {
-      this.error(`File does not exist: ${filePath}`, { exit: 2, code: 'FILE_NOT_FOUND' });
+      this.error(`File does not exist: ${filePath}`, {
+        exit: 2,
+        code: 'FILE_NOT_FOUND',
+        suggestions: ['Check the path, or pipe content with --stdin.'],
+      });
     }
     const stat = this.fsStatSync(filePath);
     if (!stat.isFile()) {
-      this.error(`Path is not a file: ${filePath}`, { exit: 2, code: 'NOT_A_FILE' });
+      this.error(`Path is not a file: ${filePath}`, {
+        exit: 2,
+        code: 'NOT_A_FILE',
+        suggestions: ['Pass a Markdown file path, or pipe content with --stdin.'],
+      });
     }
     if (stat.size > 1024 * 1024) {
-      this.error('File size limit exceeded (max 1 MiB).', { exit: 1, code: 'FILE_TOO_LARGE' });
+      this.error('File size limit exceeded (max 1 MiB).', {
+        exit: 1,
+        code: 'FILE_TOO_LARGE',
+        suggestions: ['Reduce the file below 1 MiB, or split the note into smaller imports.'],
+      });
     }
     const content = this.fsReadFileSync(filePath);
     if (!content.trim()) {
-      this.error('Empty file content provided.', { exit: 2, code: 'EMPTY_INPUT' });
+      this.error('Empty file content provided.', {
+        exit: 2,
+        code: 'EMPTY_INPUT',
+        suggestions: ['Provide non-empty Markdown content.'],
+      });
     }
     return content;
   }
@@ -272,7 +312,11 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     if (this.flags.stdin || fileReadsStdin) {
       const rawInput = await this.readStdinWithGuard();
       if (!rawInput.trim()) {
-        this.error('Empty stdin content provided.', { exit: 2, code: 'EMPTY_INPUT' });
+        this.error('Empty stdin content provided.', {
+          exit: 2,
+          code: 'EMPTY_INPUT',
+          suggestions: this.stdinImportSuggestions(),
+        });
       }
       return rawInput;
     }
@@ -286,11 +330,19 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
         // which throw CLIErrors carrying their own exit code and message — preserve those.
         // Only an unexpected read failure becomes a wrapped I/O failure (exit 1).
         if (err instanceof Errors.CLIError) throw err;
-        this.error(`Failed to read file: ${(err as Error).message}`, { exit: 1, code: 'IO_ERROR' });
+        this.error(`Failed to read file: ${(err as Error).message}`, {
+          exit: 1,
+          code: 'IO_ERROR',
+          suggestions: ['Check file permissions, or pipe content with --stdin.'],
+        });
       }
     }
 
-    this.error('No input source specified.', { exit: 2, code: 'MISSING_INPUT' });
+    this.error('No input source specified.', {
+      exit: 2,
+      code: 'MISSING_INPUT',
+      suggestions: this.stdinImportSuggestions(),
+    });
   }
 
   /** Trimmed --topic, or null when absent/whitespace-only. */

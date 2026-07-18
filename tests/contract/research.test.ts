@@ -2,6 +2,15 @@ import { describe, it, expect } from 'vitest';
 import { runContract } from './runner.ts';
 import { hasInternetAccess } from '../helpers/network.ts';
 
+function expectMirroredErrorStderr(
+  result: ReturnType<typeof runContract>,
+  envelope: { stderr?: string },
+  code: string
+) {
+  expect(result.stderr).toContain(`Code: ${code}`);
+  expect(result.stderr).toContain(envelope.stderr);
+}
+
 describe('research contract tests', () => {
   it('bonsai --help exits 0 and lists top-level commands', () => {
     const result = runContract(['--help']);
@@ -38,7 +47,7 @@ describe('research contract tests', () => {
       data: null,
     });
     expect(envelope.stderr).toContain('Missing URL or command');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'MISSING_COMMAND');
   });
 
   it('bonsai config --json returns structured subcommand metadata', () => {
@@ -192,7 +201,7 @@ describe('research contract tests', () => {
     });
     expect(envelope.stderr).toContain('Did you mean list?');
     expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'COMMAND_NOT_FOUND');
   });
 
   it('does not invent a suggestion for unrelated short unknown commands', () => {
@@ -383,7 +392,7 @@ describe('CLI ergonomics and error contracts', () => {
     expect(envelope.stderr).toContain('Unexpected argument: extra');
     expect(envelope.stderr).toContain('Code: UNEXPECTED_ARGUMENT');
     expect(envelope.stderr).not.toContain('is not a bonsai command');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'UNEXPECTED_ARGUMENT');
   });
 
   it('unknown topic subcommand with --help uses command-not-found suggestions', () => {
@@ -407,7 +416,7 @@ describe('CLI ergonomics and error contracts', () => {
     });
     expect(envelope.stderr).toContain('config frobnicate is not a bonsai command.');
     expect(envelope.stderr).not.toContain('Did you mean config?');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'COMMAND_NOT_FOUND');
   });
 
   it('unknown topic subcommand with --json --help returns command-not-found envelope', () => {
@@ -422,7 +431,7 @@ describe('CLI ergonomics and error contracts', () => {
       data: null,
     });
     expect(envelope.stderr).toContain('Did you mean config get?');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'COMMAND_NOT_FOUND');
   });
 
   it('non-http(s) URL shorthand reports the protocol error, not "command not found"', () => {
@@ -575,7 +584,7 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'MISSING_URL',
       data: null,
     });
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'MISSING_URL');
   });
 
   it('import missing file JSON includes FILE_NOT_FOUND code', () => {
@@ -592,7 +601,7 @@ describe('CLI ergonomics and error contracts', () => {
       data: null,
     });
     expect(envelope.stderr).toContain('File does not exist');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'FILE_NOT_FOUND');
   });
 
   it('config set unknown key JSON includes UNKNOWN_KEY code', () => {
@@ -605,7 +614,7 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'UNKNOWN_KEY',
       data: null,
     });
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'UNKNOWN_KEY');
   });
 
   it('inspect CACHE_MISS suggestion uses the configured bin name', () => {
@@ -635,7 +644,7 @@ describe('CLI ergonomics and error contracts', () => {
     });
     expect(envelope.stderr).toContain('Code: FETCH_FAILED');
     expect(envelope.suggestions?.length).toBeGreaterThan(0);
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'FETCH_FAILED');
   });
 
   it('scheme-less hostname JSON includes MISSING_URL_SCHEME code', () => {
@@ -651,7 +660,7 @@ describe('CLI ergonomics and error contracts', () => {
     });
     expect(envelope.stderr).toContain('https://example.com');
     expect(envelope.stderr).toContain('Code: MISSING_URL_SCHEME');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'MISSING_URL_SCHEME');
   });
 
   it('invalid flag option JSON includes INVALID_FLAG_VALUE code', () => {
@@ -667,7 +676,7 @@ describe('CLI ergonomics and error contracts', () => {
       data: null,
     });
     expect(envelope.stderr).not.toContain('See more help with --help');
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'INVALID_FLAG_VALUE');
   });
 
   it('import invalid ttl JSON includes INVALID_DURATION code', () => {
@@ -683,6 +692,6 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'INVALID_DURATION',
       data: null,
     });
-    expect(result.stderr).toBe('');
+    expectMirroredErrorStderr(result, envelope, 'INVALID_DURATION');
   });
 });

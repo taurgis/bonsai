@@ -7,6 +7,7 @@ export function limitFlag(max: number, defaultValue: number, description: string
         throw new Errors.CLIError(`Limit must be an integer between 1 and ${max}.`, {
           exit: 2,
           code: 'INVALID_LIMIT',
+          suggestions: [`Use an integer from 1 to ${max}.`],
         });
       }
 
@@ -15,6 +16,7 @@ export function limitFlag(max: number, defaultValue: number, description: string
         throw new Errors.CLIError(`Limit must be between 1 and ${max}.`, {
           exit: 2,
           code: 'INVALID_LIMIT',
+          suggestions: [`Use a value from 1 to ${max}.`],
         });
       }
 

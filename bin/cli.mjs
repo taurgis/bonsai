@@ -19,6 +19,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 function exitWithEnvelope(result) {
   process.exitCode = result.exitCode;
   if (result.json) {
+    const message = String(result.envelope.stderr ?? '');
+    if (message) console.error(message);
     console.log(JSON.stringify(result.envelope, null, 2));
   } else {
     const message = String(result.envelope.stderr ?? '');
@@ -48,6 +50,8 @@ if (unknownHelp) {
 const jsonMeta = await tryJsonMetaOutput(result.argv, root);
 if (jsonMeta) {
   process.exitCode = jsonMeta.exitCode;
+  const message = String(jsonMeta.envelope.stderr ?? '');
+  if (message) console.error(message);
   console.log(JSON.stringify(jsonMeta.envelope, null, 2));
   process.exit();
 }
