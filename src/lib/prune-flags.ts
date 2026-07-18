@@ -44,7 +44,7 @@ function missingFilterError(input: PruneFlagInput): PruneFlagError | null {
     message:
       'Must specify at least one pruning filter: --older-than, --inactive, --artifact-type, or --url.',
     code: 'MISSING_FILTER',
-    suggestions: [`Preview age-based pruning: ${input.bin} prune --older-than 90d --dry-run`],
+    suggestions: [`Preview age-based pruning: ${input.bin} prune --older-than 30d --dry-run`],
   };
 }
 

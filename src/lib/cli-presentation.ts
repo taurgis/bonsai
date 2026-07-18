@@ -3,10 +3,9 @@ import { colors } from './color.js';
 const HUMAN_LABEL_WIDTH = 25;
 
 export const CLI_FLAG_DESCRIPTION_FRAGMENTS = {
+  durationExamples: 'e.g. "2h", "7d", "6m"',
   freshnessTierPolicy: 'freshness tier policy',
   topic: 'topic',
-  ttlExample: 'e.g. "2h", "7d"',
-  importTtlExample: 'e.g. "24h", "7d"',
   storageSecretScope: 'secrets always stored globally',
   taxonomicTags: 'taxonomic tags',
   filterTags: 'tags',
@@ -15,19 +14,26 @@ export const CLI_FLAG_DESCRIPTION_FRAGMENTS = {
 
 export const CLI_FLAG_DESCRIPTIONS = {
   freshnessTierPolicy: CLI_FLAG_DESCRIPTION_FRAGMENTS.freshnessTierPolicy,
-  statusFreshnessTierPolicy:
-    `${CLI_FLAG_DESCRIPTION_FRAGMENTS.freshnessTierPolicy} to evaluate against (default: the cached entry's own tier)`,
-  fetchTtl: 'predicted lifespan: number + h/d/w/m/y (m = months), e.g. "2h", "7d", "6m"',
-  importTtl: `predicted lifespan of the data (${CLI_FLAG_DESCRIPTION_FRAGMENTS.importTtlExample})`,
-  statusTtl: `custom TTL duration to evaluate against (${CLI_FLAG_DESCRIPTION_FRAGMENTS.ttlExample})`,
+  statusFreshnessTierPolicy: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.freshnessTierPolicy} to evaluate; when omitted, uses the cached entry's own tier`,
+  fetchTtl: `TTL duration for freshness (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
+  importTtl: `TTL duration for imported note freshness (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
+  statusTtl: `TTL duration to evaluate freshness (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
+  maxAge: `maximum cache age to accept (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
   fetchStorage: `override where this result is cached (${CLI_FLAG_DESCRIPTION_FRAGMENTS.storageSecretScope})`,
   importStorage: `override where this note is cached (${CLI_FLAG_DESCRIPTION_FRAGMENTS.storageSecretScope})`,
-  fetchTopic: `the main category/${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} of the research for metadata tagging`,
-  importTopic: `the main ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} for this research note`,
-  filterTopic: `filter by exact ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} (case-insensitive)`,
+  fetchTopic: `main research ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} for metadata`,
+  importTopic: `main ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} for this research note`,
+  filterTopic: `exact ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} (case-insensitive)`,
   fetchTags: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.taxonomicTags} for this research (${CLI_FLAG_DESCRIPTION_FRAGMENTS.repeatable})`,
   importTags: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.taxonomicTags} (${CLI_FLAG_DESCRIPTION_FRAGMENTS.repeatable})`,
-  filterTags: `filter by ${CLI_FLAG_DESCRIPTION_FRAGMENTS.filterTags} (must match all tags specified)`,
+  filterTags: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.filterTags} to require (must match all)`,
+  format: 'output format',
+  readOnly:
+    '(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE',
+  sourceUrlGlob: 'source URL glob (case-insensitive, supports * wildcard)',
+  listArtifactType:
+    'artifact type; section children are omitted from list - use inspect to see them',
+  pruneArtifactType: 'artifact type to prune, including section children',
 } as const;
 
 export type HumanField = readonly [label: string, value: string];

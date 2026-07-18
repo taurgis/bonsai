@@ -1,6 +1,6 @@
 # Caching & Freshness
 
-Bonsai is cache-first: it decides what to do *before* touching the network. This
+Bonsai is cache-first: it decides what to do _before_ touching the network. This
 page explains how entries are keyed, when they count as fresh, and how stale
 entries are revalidated cheaply. For the full byte-level specification, see the
 [Cache Protocol](/reference/cache-protocol).
@@ -21,10 +21,10 @@ single Markdown file (`<cache_key>.md`) with a YAML frontmatter header.
 
 ## Where the cache lives
 
-| Storage | Location |
-| --- | --- |
+| Storage              | Location                                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Global** (default) | macOS `~/Library/Application Support/bonsai/research/` · Linux `~/.local/share/bonsai/research/` · Windows `%LOCALAPPDATA%\bonsai\research\` |
-| **Project** | `<project>/.bonsai/research/` (config in `.bonsai.json`) |
+| **Project**          | `<project>/.bonsai/research/` (config in `.bonsai.json`)                                                                                     |
 
 See [Storage Modes](/concepts/storage-modes) for choosing between them.
 
@@ -32,18 +32,18 @@ See [Storage Modes](/concepts/storage-modes) for choosing between them.
 
 If no custom `--ttl` is supplied, the freshness window comes from the `--tier`:
 
-| Tier | Fresh window | Grace window | Use case |
-| --- | --- | --- | --- |
-| `volatile` | 7 days | 5 days | Latest releases, volatile changelogs, beta docs |
-| `standard` | 30 days | 14 days | General API docs and developer guides |
-| `stable` | 180 days | 60 days | RFCs, standards, long-lived references |
+| Tier       | Fresh window | Grace window | Use case                                        |
+| ---------- | ------------ | ------------ | ----------------------------------------------- |
+| `volatile` | 7 days       | 5 days       | Latest releases, volatile changelogs, beta docs |
+| `standard` | 30 days      | 14 days      | General API docs and developer guides           |
+| `stable`   | 180 days     | 60 days      | RFCs, standards, long-lived references          |
 
 Freshness is computed at lookup time by comparing the current time against
 `validated_at` (or `fetched_at`, whichever is more recent).
 
 ### Custom TTLs
 
-Pass `--ttl` (e.g. `2h`, `7d`, `30d`) to set the fresh window exactly. The grace
+Pass `--ttl` (e.g. `2h`, `7d`, `6m`) to set the fresh window exactly. The grace
 window is then derived **proportionally** from the active tier's grace-to-fresh
 ratio. For the default `standard` tier that ratio is `14/30 ≈ 46.6%`, so a
 custom `--ttl 10d` gets roughly a 4.6-day grace window.

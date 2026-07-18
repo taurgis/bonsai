@@ -9,14 +9,16 @@ How Bonsai caches research locally: where files live, what metadata each one car
 Each cached artifact is a single Markdown file (`<cache_key>.md`), written under the directory Bonsai resolves from its oclif data directory (`this.config.dataDir`).
 
 Where that path lands depends on how the CLI runs:
-* **Standalone Bonsai CLI**: `~/.local/share/bonsai/research/` on Linux-style XDG systems, or the platform-specific oclif data directory for the `bonsai` binary.
-* **Project-local Bonsai cache**: `<project>/.bonsai/research/` when `config set storage project --local` is active.
-* **OS-Specific Standards**:
-  * **macOS**: `~/Library/Application Support/bonsai/research/`
-  * **Linux**: `~/.local/share/bonsai/research/`
-  * **Windows**: `%LOCALAPPDATA%\bonsai\research\`
+
+- **Standalone Bonsai CLI**: `~/.local/share/bonsai/research/` on Linux-style XDG systems, or the platform-specific oclif data directory for the `bonsai` binary.
+- **Project-local Bonsai cache**: `<project>/.bonsai/research/` when `config set storage project --local` is active.
+- **OS-Specific Standards**:
+  - **macOS**: `~/Library/Application Support/bonsai/research/`
+  - **Linux**: `~/.local/share/bonsai/research/`
+  - **Windows**: `%LOCALAPPDATA%\bonsai\research\`
 
 Inside this folder, you will find:
+
 1. **Durable Cache Files**: Named `<sha256_hash>.md`.
 2. **Temporary/Scratch Files**: Created atomically under a `tmp` directory during writes to prevent file corruption.
 
@@ -32,7 +34,7 @@ The project cache is meant to be committed, so it must never hold credentials. B
 a write under `project` storage, the artifact's content is scanned for known secret
 patterns (API keys, bearer/JWT tokens, private-key blocks, `secret=`/`token=`
 assignments, etc.). On a match the artifact is **redirected to the global cache**, a
-warning naming the credential *type* (never its value) is printed, and the JSON
+warning naming the credential _type_ (never its value) is printed, and the JSON
 envelope sets `redirectedToGlobal: true`. Global storage is not scanned, since it is
 never committed.
 
@@ -43,6 +45,7 @@ never committed.
 Two URLs that differ only in casing, a trailing slash, or query-parameter order should hit the same cache entry. To make that happen, Bonsai normalizes every requested URL before it resolves the cache key.
 
 ### URL Normalization Rules
+
 1. **Scheme & Host**: Converted to lowercase.
 2. **Trailing Slash**: Appended to root-level domain/path (e.g., `https://example.com` becomes `https://example.com/`).
 3. **Hash Anchor Removal**: Fragments (e.g., `#section-1`) are removed.
@@ -50,7 +53,9 @@ Two URLs that differ only in casing, a trailing slash, or query-parameter order 
 5. **Port Sanitization**: Default HTTP (80) and HTTPS (443) ports are stripped.
 
 ### Cache Key Formula
+
 The cache key is the **SHA-256 hash** of the normalized URL string representation:
+
 ```typescript
 const cacheKey = crypto.createHash('sha256').update(normalizedUrl).digest('hex');
 ```
@@ -64,6 +69,7 @@ For imported multi-source synthesis files (which do not map to a single source U
 Every cache entry is one human-readable Markdown file: a **YAML frontmatter** block at the top, then the content payloads beneath it.
 
 ### File Structure Example
+
 ```markdown
 ---
 schema_version: 1
@@ -105,29 +111,30 @@ This section contains the Markdown representation. The file maintains both detai
 ```
 
 ### Frontmatter Schema Specifications
-* `schema_version`: (number) Currently `1`.
-* `artifact_type`: (string) `source` (web scraped), `research_note` (multi-source synthesis imported via `import`), `index` (navigation hub or llms.txt site index), or `section` (heading-level child of a page).
-* `source_url`: (string) The primary source URL.
-* `source_urls`: (array of strings) List of source URLs associated with this entry.
-* `normalized_url`: (string) The normalized primary URL.
-* `cache_key`: (string) Hex SHA-256 hash.
-* `topic`: (string | null) User-defined topic/category classification.
-* `tags`: (array of strings) Taxonomy tags.
-* `format_available`: (array of strings) List containing `compressed` and/or `detailed`.
-* `tier`: (string) The freshness tier: `stable`, `standard`, or `volatile`.
-* `ttl`: (string | null) Custom lifetime duration string (e.g. `2h`, `7d`).
-* `fetched_at`: (ISO string | null) Timestamp of the last successful network crawl.
-* `validated_at`: (ISO string | null) Timestamp of the last freshness verification.
-* `stale_after`: (ISO string | null) Timestamp when the fresh window expires.
-* `capture_method`: (string | null) `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown` (the page's machine-readable `.md` route), or `github_source` (raw source fetched from the page's GitHub edit link).
-* `extraction_status`: (string | null) `extracted`, `agent_supplied`, or `failed`. A page that resolves to an error/"not found" shell (including SPA pages that return HTTP 200 but render only an error notice) is stored as `failed`: the full error markdown is discarded and a compact one-line marker is cached in its place, so repeat lookups cost a handful of tokens and revalidation re-fetches the page when the entry goes stale.
-* `extraction_confidence`: (string | null) `high`, `medium`, or `low`.
-* `quality_notes`: (array of strings) Informative tags about the scrape quality.
-* `etag`: (string | null) HTTP response `ETag` header.
-* `last_modified`: (string | null) HTTP response `Last-Modified` header.
-* `content_hash`: (string) SHA-256 of the raw detailed Markdown.
-* `token_estimate`: (object) Contains `{ compressed: number, detailed: number }` estimating the LLM token consumption.
-* `status`: (string) `active` or `archived`.
+
+- `schema_version`: (number) Currently `1`.
+- `artifact_type`: (string) `source` (web scraped), `research_note` (multi-source synthesis imported via `import`), `index` (navigation hub or llms.txt site index), or `section` (heading-level child of a page).
+- `source_url`: (string) The primary source URL.
+- `source_urls`: (array of strings) List of source URLs associated with this entry.
+- `normalized_url`: (string) The normalized primary URL.
+- `cache_key`: (string) Hex SHA-256 hash.
+- `topic`: (string | null) User-defined topic/category classification.
+- `tags`: (array of strings) Taxonomy tags.
+- `format_available`: (array of strings) List containing `compressed` and/or `detailed`.
+- `tier`: (string) The freshness tier: `stable`, `standard`, or `volatile`.
+- `ttl`: (string | null) Custom lifetime duration string (e.g. `2h`, `7d`).
+- `fetched_at`: (ISO string | null) Timestamp of the last successful network crawl.
+- `validated_at`: (ISO string | null) Timestamp of the last freshness verification.
+- `stale_after`: (ISO string | null) Timestamp when the fresh window expires.
+- `capture_method`: (string | null) `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown` (the page's machine-readable `.md` route), or `github_source` (raw source fetched from the page's GitHub edit link).
+- `extraction_status`: (string | null) `extracted`, `agent_supplied`, or `failed`. A page that resolves to an error/"not found" shell (including SPA pages that return HTTP 200 but render only an error notice) is stored as `failed`: the full error markdown is discarded and a compact one-line marker is cached in its place, so repeat lookups cost a handful of tokens and revalidation re-fetches the page when the entry goes stale.
+- `extraction_confidence`: (string | null) `high`, `medium`, or `low`.
+- `quality_notes`: (array of strings) Informative tags about the scrape quality.
+- `etag`: (string | null) HTTP response `ETag` header.
+- `last_modified`: (string | null) HTTP response `Last-Modified` header.
+- `content_hash`: (string) SHA-256 of the raw detailed Markdown.
+- `token_estimate`: (object) Contains `{ compressed: number, detailed: number }` estimating the LLM token consumption.
+- `status`: (string) `active` or `archived`.
 
 ---
 
@@ -137,18 +144,20 @@ The cache computes freshness at lookup time by comparing `currentTime` against `
 
 If no custom `--ttl` is provided on scrape/import, the freshness window is determined by the `--tier` flag:
 
-| Tier | Fresh Window (TTL) | Grace Window (Stale Revalidation) | Description / Typical Target |
-| --- | --- | --- | --- |
-| `volatile` | **7 Days** | **5 Days** | Volatile APIs, changelogs, release notes, security feeds |
-| `standard` | **30 Days** | **14 Days** | General developer documentation, libraries, guides |
-| `stable` | **180 Days** | **60 Days** | Standards documents, RFCs, language specs (e.g., ECMA, HTML5) |
+| Tier       | Fresh Window (TTL) | Grace Window (Stale Revalidation) | Description / Typical Target                                  |
+| ---------- | ------------------ | --------------------------------- | ------------------------------------------------------------- |
+| `volatile` | **7 Days**         | **5 Days**                        | Volatile APIs, changelogs, release notes, security feeds      |
+| `standard` | **30 Days**        | **14 Days**                       | General developer documentation, libraries, guides            |
+| `stable`   | **180 Days**       | **60 Days**                       | Standards documents, RFCs, language specs (e.g., ECMA, HTML5) |
 
 ### Proportional Grace Calculation for Custom TTLs
-When a custom `--ttl` string (e.g., `--ttl 24h` or `--ttl 90d`) is supplied:
+
+When a custom `--ttl` string (e.g., `--ttl 2h`, `--ttl 7d`, or `--ttl 6m`) is supplied:
+
 1. The **Fresh Window** is set exactly to the parsed duration.
 2. The **Grace Window** is calculated proportionally using the ratio of the base tier's grace-to-fresh window:
    $$\text{Grace Window} = \text{Parsed TTL} \times \left( \frac{\text{Default Tier Grace Window}}{\text{Default Tier Fresh Window}} \right)$$
-   * For the default `standard` tier, the ratio is $\frac{14}{30} \approx 46.6\%$. A custom TTL of 10 days gets a grace window of 4.6 days.
+   - For the default `standard` tier, the ratio is $\frac{14}{30} \approx 46.6\%$. A custom TTL of 10 days gets a grace window of 4.6 days.
 
 ---
 
@@ -174,15 +183,18 @@ The decision flow at request time:
          with code `5`.
 
 ### Conditional HTTP Headers
+
 If the stored frontmatter contains `etag` or `last_modified`:
-* `If-None-Match` is populated with `etag`.
-* `If-Modified-Since` is populated with `last_modified`.
+
+- `If-None-Match` is populated with `etag`.
+- `If-Modified-Since` is populated with `last_modified`.
 
 If the server returns `304 Not Modified`:
-* The local cache file is touched.
-* The `validated_at` timestamp is updated to the current time.
-* The `stale_after` timestamp is recalculated and extended.
-* No body payload is downloaded, parsed, or converted, so the check costs little more than the round trip.
+
+- The local cache file is touched.
+- The `validated_at` timestamp is updated to the current time.
+- The `stale_after` timestamp is recalculated and extended.
+- No body payload is downloaded, parsed, or converted, so the check costs little more than the round trip.
 
 ---
 
@@ -191,7 +203,7 @@ If the server returns `304 Not Modified`:
 When revalidation fails (connection timeout, DNS failure, or a crashed target server), behavior depends on how stale the entry is:
 
 1. **Inside Grace Window (`stale_grace`)**:
-   * If `--allow-stale` is **active**: The CLI serves the cached note and exits normally (exit code `0`).
-   * If `--allow-stale` is **inactive**: The CLI serves the cached note to avoid blocking the caller, but exits with **Exit Code 5** to notify the system that the content is stale and could not be verified. Warning logs are printed to `stderr`.
+   - If `--allow-stale` is **active**: The CLI serves the cached note and exits normally (exit code `0`).
+   - If `--allow-stale` is **inactive**: The CLI serves the cached note to avoid blocking the caller, but exits with **Exit Code 5** to notify the system that the content is stale and could not be verified. Warning logs are printed to `stderr`.
 2. **Expired (`stale_expired`)**:
-   * Stale content beyond the grace window is considered dead. The CLI will attempt a full fetch. If the fetch fails, it throws a connection error and exits with **Exit Code 1**.
+   - Stale content beyond the grace window is considered dead. The CLI will attempt a full fetch. If the fetch fails, it throws a connection error and exits with **Exit Code 1**.

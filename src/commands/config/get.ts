@@ -4,7 +4,7 @@ import { formatConfigEntry, resolveConfigEntry, validKeysHint } from '../../lib/
 
 export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
   static id = 'config get';
-  static summary = 'Get the effective value of a research configuration key.';
+  static summary = 'Get a research configuration value';
   static description = `Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: ${validKeysHint()}.`;
 
   static examples = [
@@ -24,8 +24,8 @@ export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
 
   static flags = {
     ...configScopeFlags({
-      global: 'Read from user-level config only.',
-      local: 'Read from project-level config only.',
+      global: 'read user-level config only',
+      local: 'read project-level config only',
     }),
   };
 

@@ -57,17 +57,17 @@ function describeCacheStatus(
 
 export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   static id = 'status';
-  static summary = 'Check the cache status of a URL without fetching or writing.';
+  static summary = 'Check cache status without fetching or writing';
   static description =
-    'Reports whether the URL is cached, its freshness state, and what action (fetch, revalidate, or cached return) the root fetch command would take.';
+    'Report cache hit/miss state, freshness, and the action the URL shorthand would take.';
 
   static examples = [
     {
-      description: 'check if a URL is already in the cache',
+      description: 'check whether a URL is cached',
       command: '<%= config.bin %> <%= command.id %> https://example.com/docs',
     },
     {
-      description: 'check status against a specific freshness tier and TTL',
+      description: 'evaluate status with a specific tier and TTL',
       command:
         '<%= config.bin %> <%= command.id %> https://example.com/docs --tier volatile --ttl 2h',
     },
@@ -78,7 +78,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   static args = {
     url: Args.string({
       required: true,
-      description: 'the URL to check',
+      description: 'URL to check',
     }),
   };
 
@@ -94,7 +94,7 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
       description: CLI_FLAG_DESCRIPTIONS.statusTtl,
     }),
     'max-age': Flags.string({
-      description: 'maximum age of cache to accept (e.g. "1d", "30d")',
+      description: CLI_FLAG_DESCRIPTIONS.maxAge,
     }),
   };
 

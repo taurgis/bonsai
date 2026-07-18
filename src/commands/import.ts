@@ -19,26 +19,27 @@ import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 
 export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   static id = 'import';
-  static summary = 'Import agent-supplied clean Markdown notes into the local cache.';
+  static summary = 'Import agent-supplied Markdown into cache';
   static description =
-    'Accepts a synthesized Markdown note via stdin or --file and registers it under the single target URL or multiple source URLs.';
+    'Store supplied Markdown under one URL or a multi-source research note, using the same freshness and storage metadata as fetched pages.';
 
   static examples = [
     {
-      description: 'import detailed research for a single URL via stdin',
-      command: 'echo "# My Article" | <%= config.bin %> import https://example.com/docs --stdin',
+      description: 'import detailed research for one URL from stdin',
+      command:
+        'printf "# My Article\\n" | <%= config.bin %> import https://example.com/docs --stdin --ttl 7d',
     },
     {
-      description: 'import research synthesized from multiple source URLs',
+      description: 'import a research note synthesized from multiple source URLs',
       command:
         'echo "# Synthesized" | <%= config.bin %> import --stdin --topic "React docs" --source-url https://react.dev/a --source-url https://react.dev/b',
     },
     {
-      description: 'import research from a local Markdown file',
+      description: 'import research from a Markdown file',
       command: '<%= config.bin %> import https://example.com/docs --file path/to/notes.md',
     },
     {
-      description: 'import research from stdin using the standard file placeholder',
+      description: 'import research from stdin with the file placeholder',
       command: 'cat notes.md | <%= config.bin %> import https://example.com/docs --file -',
     },
   ];
@@ -50,7 +51,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       // this, the Markdown piped for `--stdin` is swallowed into `url`, making multi-source import
       // (`import --stdin --source-url ...`) wrongly look like it also got a positional URL.
       ignoreStdin: true,
-      description: 'the single source URL of the page (only for single-source import)',
+      description: 'single source URL for single-source import',
     }),
   };
 
@@ -61,10 +62,10 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     }),
     file: Flags.string({
       char: 'f',
-      description: 'path to a Markdown file containing research notes to import, or "-" for stdin',
+      description: 'Markdown file to import, or "-" for stdin',
     }),
     'input-format': Flags.option({
-      description: 'format of the input provided',
+      description: 'input content format',
       options: ['compressed', 'detailed'] as const,
       default: 'detailed',
     })(),
@@ -83,7 +84,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       default: 'standard',
     })(),
     'source-url': Flags.string({
-      description: 'repeated source URLs for multi-source import',
+      description: 'source URLs for multi-source import (can be repeated)',
       multiple: true,
     }),
     ttl: Flags.string({
@@ -91,7 +92,7 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
       description: CLI_FLAG_DESCRIPTIONS.importTtl,
     }),
     'dry-run': Flags.boolean({
-      description: 'validate and preview the import without writing to cache',
+      description: 'validate import without writing cache',
       default: false,
     }),
     storage: Flags.option({

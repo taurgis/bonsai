@@ -3,7 +3,7 @@ import { formatConfigEntry, resolveConfigEntries, validKeysHint } from '../../li
 
 export default class ConfigList extends ConfigCommand<typeof ConfigList> {
   static id = 'config list';
-  static summary = 'List all research configuration keys and their effective values.';
+  static summary = 'List research configuration values';
   static description = `Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: ${validKeysHint()}.`;
 
   static examples = [
@@ -19,8 +19,8 @@ export default class ConfigList extends ConfigCommand<typeof ConfigList> {
 
   static flags = {
     ...configScopeFlags({
-      global: 'Show user-level config only.',
-      local: 'Show project-level config only.',
+      global: 'show user-level config only',
+      local: 'show project-level config only',
     }),
   };
 

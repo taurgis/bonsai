@@ -8,36 +8,60 @@ The package is published as `@taurgis/bonsai` and installs a `bonsai` binary. On
 
 ---
 
+## Intentional CLI asymmetries
+
+Bonsai keeps a few asymmetries because they match agent workflows:
+
+- The root URL form (`bonsai <url>`) is the primary fetch UX. The underlying
+  `fetch` command is hidden from the command list, but `bonsai help fetch`
+  remains the full reference for URL-form flags.
+- `status --tier` has no default. When omitted, status evaluates freshness
+  against the cached artifact's own tier; setting a default would silently
+  re-grade `stable` or `volatile` entries.
+- `list --artifact-type` omits `section` because `list` reports page-level
+  artifacts (`source`, `research_note`, and `index`). `prune --artifact-type`
+  includes `section` so agents can clean up every cached artifact type.
+- Short flags are command-local. For example, `-f` means fetch `--format` but
+  import `--file`, and `-g` means tags on cache commands but `--global` on
+  config commands. Check each command's help before reusing short flags.
+
+---
+
 ## 1. Root fetch command
 
-The primary command. It crawls a URL and retrieves from cache.
+The primary command. It caches or retrieves a URL by using the URL shorthand for
+the hidden `fetch` command.
 
 ### Usage
+
 ```bash
-npx @taurgis/bonsai <url> [flags]
+bonsai <url> [flags]
 ```
 
 ### Positional Arguments
-* `<url>`: Required string. The full HTTP or HTTPS URL to crawl.
+
+- `<url>`: Required string. The full HTTP or HTTPS URL to crawl.
 
 ### Command-Line Flags
-| Flag | Short | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `--topic` | `-t` | string | `null` | Main topic category for metadata tagging. |
-| `--tags` | `-g` | string | `[]` | taxonomic tags (can be repeated). |
-| `--format` | `-f` | choice | `compressed` | Output density format: `compressed` or `detailed`. |
-| `--tier` | — | choice | `standard` | Freshness tier logic: `stable`, `standard`, or `volatile`. |
-| `--ttl` | `-l` | duration | `null` | Custom lifespan override (e.g. "2h", "7d", "30d"). |
-| `--max-age` | — | duration | `null` | Read-time threshold. Forces refresh if cache is older than duration. |
-| `--force` | — | boolean | `false` | Ignore cached copies and force a full network crawl. |
-| `--dry-run` | — | boolean | `false` | Crawl and extract without writing to cache. |
-| `--allow-stale` | — | boolean | `false` | Allow serving stale entries if remote server is offline. |
-| `--rendered` | — | boolean | `false` | Force browser-rendered extraction for pages that require client-side JavaScript (e.g. SPA docs). |
-| `--storage` | — | choice | (configured) | Override cache location for this run: `global` or `project`. Secret-bearing pages are always stored globally. |
-| `--read-only` | — | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
-| `--json` | — | boolean | `false` | Format command response as machine-readable JSON. |
+
+| Flag            | Short | Type     | Default      | Description                                                                                                                     |
+| --------------- | ----- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `--topic`       | `-t`  | string   | `null`       | Main research topic for metadata.                                                                                               |
+| `--tags`        | `-g`  | string   | `[]`         | taxonomic tags (can be repeated).                                                                                               |
+| `--format`      | `-f`  | choice   | `compressed` | Output format: `compressed` or `detailed`.                                                                                      |
+| `--tier`        | —     | choice   | `standard`   | Freshness tier logic: `stable`, `standard`, or `volatile`.                                                                      |
+| `--ttl`         | `-l`  | duration | `null`       | TTL duration for freshness (e.g. "2h", "7d", "6m").                                                                             |
+| `--max-age`     | —     | duration | `null`       | Maximum cache age to accept (e.g. "2h", "7d", "6m").                                                                            |
+| `--force`       | —     | boolean  | `false`      | Ignore cached copies and force a full network crawl.                                                                            |
+| `--dry-run`     | —     | boolean  | `false`      | Crawl and extract without writing to cache.                                                                                     |
+| `--allow-stale` | —     | boolean  | `false`      | Allow serving stale entries if remote server is offline.                                                                        |
+| `--rendered`    | —     | boolean  | `false`      | Force browser-rendered extraction for pages that require client-side JavaScript (e.g. SPA docs).                                |
+| `--storage`     | —     | choice   | (configured) | Override cache location for this run: `global` or `project`. Secret-bearing pages are always stored globally.                   |
+| `--read-only`   | —     | boolean  | `false`      | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
+| `--json`        | —     | boolean  | `false`      | Format command response as machine-readable JSON.                                                                               |
 
 ### JSON Output Envelope Schema
+
 ```json
 {
   "schemaVersion": 1,
@@ -89,26 +113,32 @@ was taken (a `refreshed` result still reports the pre-fetch `stale_expired`). On
 Save agent-supplied Markdown text directly to local storage.
 
 ### Usage
+
 ```bash
-npx @taurgis/bonsai import [url] [flags]
+bonsai import [url] [flags]
 ```
 
 ### Positional Arguments
-* `[url]`: Optional string. The target URL (only for single-source import). Must omit if `--source-url` is used.
+
+- `[url]`: Optional string. The target URL (only for single-source import). Must omit if `--source-url` is used.
 
 ### Command-Line Flags
-* `--stdin` **or** `--file <path>`: Exactly one input source is required. `--file -` reads stdin (same as `--stdin`).
-* `--dry-run`: Validate and preview the import without writing (also implied by global `--read-only` / `--plan`).
-* `--source-url`: Repeated string. Source URLs representing a multi-source synthesis.
-* `--input-format`: choice (`detailed` or `compressed`). Defaults to `detailed`.
-* `--topic`: string. Categorized topic. **Required** for multi-source import.
-* `--tags`, `--tier`, `--ttl`: Metadata options mapped to cache rules.
-* `--storage`: choice (`global` or `project`). Override the configured cache location for this import. Notes containing secrets are always stored globally and never written to a project cache.
-* `--read-only` / `--plan`: Block the write; reports `dryRun: true` and `cache.status: "would_import"`.
+
+- `--stdin` **or** `--file <path>`: Exactly one input source is required. `--file -` reads stdin (same as `--stdin`).
+- `--dry-run`: Validate the import without writing (also implied by global `--read-only` / `--plan`).
+- `--source-url`: Source URLs for multi-source import (repeatable).
+- `--input-format`: Input content format (`detailed` or `compressed`). Defaults to `detailed`.
+- `--topic`: Main topic. **Required** for multi-source import.
+- `--tags`: Taxonomic tags (repeatable).
+- `--tier`: Freshness tier policy (`stable`, `standard`, or `volatile`).
+- `--ttl`: TTL duration for imported note freshness (e.g. "2h", "7d", "6m").
+- `--storage`: Storage mode (`global` or `project`). Override the configured cache location for this import. Notes containing secrets are always stored globally and never written to a project cache.
+- `--read-only` / `--plan`: Block the write; reports `dryRun: true` and `cache.status: "would_import"`.
 
 Localhost and other private hosts are accepted as **cache keys** for import. Network fetches to those hosts remain blocked by the SSRF guard.
 
 ### JSON Output envelope `data` block
+
 ```json
 {
   "dryRun": false,
@@ -151,19 +181,22 @@ the note again with `list --topic "…"`.
 Inspect cache state and planning outcomes without performing fetches or writes.
 
 ### Usage
+
 ```bash
-npx @taurgis/bonsai status <url> [flags]
+bonsai status <url> [flags]
 ```
 
 ### Command-Line Flags
-| Flag | Short | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `--tier` | — | choice | (artifact's tier) | Evaluate freshness as if the entry used this tier. |
-| `--ttl` | `-l` | duration | — | Evaluate freshness against this TTL override. |
-| `--max-age` | — | duration | — | Treat the entry as expired when older than this age. |
-| `--json` | — | boolean | `false` | Machine-readable envelope. |
+
+| Flag        | Short | Type     | Default | Description                                                                          |
+| ----------- | ----- | -------- | ------- | ------------------------------------------------------------------------------------ |
+| `--tier`    | —     | choice   | —       | Evaluate freshness with this tier; when omitted, use the cached artifact's own tier. |
+| `--ttl`     | `-l`  | duration | —       | TTL duration to evaluate freshness (e.g. "2h", "7d", "6m").                          |
+| `--max-age` | —     | duration | —       | Maximum cache age to accept (e.g. "2h", "7d", "6m").                                 |
+| `--json`    | —     | boolean  | `false` | Machine-readable envelope.                                                           |
 
 ### JSON Output envelope `data` block
+
 ```json
 {
   "cacheKey": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
@@ -189,11 +222,13 @@ while prior hit/miss rows stay in `data` — same keep-prior-hits contract as `f
 Display cached headers and frontmatter metadata for a URL.
 
 ### Usage
+
 ```bash
-npx @taurgis/bonsai inspect <url>
+bonsai inspect <url>
 ```
 
 ### JSON Output envelope `data` block
+
 ```json
 {
   "cacheKey": "0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7",
@@ -241,33 +276,36 @@ Browse the cache by metadata, without printing page content. `list` filters the
 whole cache and sorts the matches newest-first, so it answers "what do I have?"
 
 ### Usage
+
 ```bash
-npx @taurgis/bonsai list [flags]
+bonsai list [flags]
 ```
 
 `list` takes no positional argument; every filter is a flag, and with no flags
 it returns the most recent entries across all read roots.
 
-`list` reports page-level artifacts (`source` and `research_note`). The
+`list` reports page-level artifacts (`source`, `research_note`, and `index`). The
 `section` sub-chunks a page is split into are omitted so a single fetch does not
 flood the listing — find them with `inspect` (which lists a page's sections).
 
 ### Command-Line Flags
-| Flag | Short | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `--topic` | `-t` | string | — | Keep only entries with this exact topic (case-insensitive). |
-| `--tags` | `-g` | string | — | Keep entries carrying **all** the given tags (repeatable). |
-| `--freshness` | — | choice | — | Filter by freshness: `fresh`, `stale_grace`, or `stale_expired`. |
-| `--artifact-type` | — | choice | — | Filter by type: `source`, `research_note`, or `index`. (Section children are never listed, so `section` is not offered here.) |
-| `--capture-method` | — | choice | — | Filter by capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`. |
-| `--url` | — | glob | — | Keep entries whose source URL matches a case-insensitive glob (supports `*`). |
-| `--limit` | — | integer | `50` | Cap the result count (1–100). |
-| `--json` | — | boolean | `false` | Return the machine-readable envelope. |
+
+| Flag               | Short | Type    | Default | Description                                                                                                                |
+| ------------------ | ----- | ------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `--topic`          | `-t`  | string  | —       | Exact topic (case-insensitive).                                                                                            |
+| `--tags`           | `-g`  | string  | —       | Tags to require; all repeated tags must match.                                                                             |
+| `--freshness`      | —     | choice  | —       | Freshness state: `fresh`, `stale_grace`, or `stale_expired`.                                                               |
+| `--artifact-type`  | —     | choice  | —       | Artifact type: `source`, `research_note`, or `index`. Section children are omitted from `list`; use `inspect` to see them. |
+| `--capture-method` | —     | choice  | —       | Capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`.                |
+| `--url`            | —     | glob    | —       | Source URL glob (case-insensitive, supports `*`).                                                                          |
+| `--limit`          | —     | integer | `50`    | Cap the result count (1–100).                                                                                              |
+| `--json`           | —     | boolean | `false` | Return the machine-readable envelope.                                                                                      |
 
 Results are sorted by `validated_at` (falling back to `fetched_at`), newest
 first, then truncated to `--limit`.
 
 ### JSON Output envelope `data` block
+
 ```json
 [
   {
@@ -296,8 +334,9 @@ spans **every read root** (project and global), so a key present in both is
 deleted from both.
 
 ### Usage
+
 ```bash
-npx @taurgis/bonsai prune [flags]
+bonsai prune [flags]
 ```
 
 Two guardrails make accidental deletion hard:
@@ -311,30 +350,30 @@ Two guardrails make accidental deletion hard:
   meant.
 
 ### Command-Line Flags
-| Flag | Short | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `--older-than` | — | duration | — | Prune by **content age** (`fetched_at`, falling back to `validated_at`), e.g. `30d`. Zero durations are rejected. |
-| `--inactive` | — | duration | — | Prune by **idle time** since last validation (`validated_at`, falling back to `fetched_at`), e.g. `14d`. |
-| `--artifact-type` | — | choice | — | Limit pruning to `source`, `research_note`, `index`, or `section`. |
-| `--url` | — | glob | — | Limit pruning to source URLs matching a case-insensitive glob (supports `*`). |
-| `--dry-run` | — | boolean | `false` | List what would be deleted, delete nothing. Mutually exclusive with `--yes`. |
-| `--yes` | `-y` | boolean | `false` | Confirm deletion. Required for a real prune (rejected under `--read-only`). |
-| `--read-only` / `--plan` | — | boolean | `false` | Implicit preview; mutations disabled. |
-| `--json` | — | boolean | `false` | Return the machine-readable envelope. |
+
+| Flag                     | Short | Type     | Default | Description                                                                                                               |
+| ------------------------ | ----- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `--older-than`           | —     | duration | —       | Content age threshold (`fetched_at`, falling back to `validated_at`), e.g. `30d`. Zero durations are rejected.            |
+| `--inactive`             | —     | duration | —       | Idle time threshold (`validated_at`, falling back to `fetched_at`), e.g. `14d`.                                           |
+| `--artifact-type`        | —     | choice   | —       | Artifact type to prune: `source`, `research_note`, `index`, or `section`. Unlike `list`, prune includes section children. |
+| `--url`                  | —     | glob     | —       | Source URL glob (case-insensitive, supports `*`).                                                                         |
+| `--dry-run`              | —     | boolean  | `false` | Preview files without deleting. Mutually exclusive with `--yes`.                                                          |
+| `--yes`                  | `-y`  | boolean  | `false` | Confirm deletion. Required for a real prune (rejected under `--read-only`).                                               |
+| `--read-only` / `--plan` | —     | boolean  | `false` | Implicit preview; mutations disabled.                                                                                     |
+| `--json`                 | —     | boolean  | `false` | Return the machine-readable envelope.                                                                                     |
 
 `--older-than` and `--inactive` are distinct: a recently revalidated but originally-old page can match
 `--older-than` while still failing `--inactive`. When some unlinks fail, `prunedCount` reports actual
 deletes and the process exits `1`.
 
 ### JSON Output envelope `data` block
+
 ```json
 {
   "dryRun": true,
   "prunedCount": 0,
   "candidateCount": 3,
-  "files": [
-    { "cacheKey": "0f115db0...e9d7", "path": "/path/to/cache/0f115db0...e9d7.md" }
-  ]
+  "files": [{ "cacheKey": "0f115db0...e9d7", "path": "/path/to/cache/0f115db0...e9d7.md" }]
 }
 ```
 
@@ -352,10 +391,10 @@ config dir) > built-in default (`global`).
 
 ### Storage modes
 
-| Mode | Cache location | Read behavior |
-| --- | --- | --- |
-| `global` (default) | OCLIF data dir (`<dataDir>/research/`) | Reads the global cache only. |
-| `project` | `<cwd>/.bonsai/research/` (committable) | Reads the project cache first, then falls back to the global cache. |
+| Mode               | Cache location                          | Read behavior                                                       |
+| ------------------ | --------------------------------------- | ------------------------------------------------------------------- |
+| `global` (default) | OCLIF data dir (`<dataDir>/research/`)  | Reads the global cache only.                                        |
+| `project`          | `<cwd>/.bonsai/research/` (committable) | Reads the project cache first, then falls back to the global cache. |
 
 The project cache is intended to be shared/committed with a repository. To keep
 secrets out of version control, any artifact whose content matches a known
@@ -363,24 +402,24 @@ credential pattern (API keys, tokens, private keys, `secret=`/`token=`
 assignments, etc.) is **always written to the global cache**, even when
 `project` storage is selected. A warning is printed, and the JSON envelope
 reports `redirectedToGlobal: true`. The matched secret value is never echoed;
-only the credential *type* is named.
+only the credential _type_ is named.
 
 ### Subcommands
 
 ```bash
 # Store this project's research cache inside the repo
-npx @taurgis/bonsai config set storage project --local
+bonsai config set storage project --local
 
 # Set the user-wide default
-npx @taurgis/bonsai config set storage global
+bonsai config set storage global
 
 # Inspect values
-npx @taurgis/bonsai config get storage          # effective value
-npx @taurgis/bonsai config get storage --local  # project file only (shows default + "(not configured)" when unset)
-npx @taurgis/bonsai config list                 # all keys
+bonsai config get storage          # effective value
+bonsai config get storage --local  # project file only (shows default + "(not configured)" when unset)
+bonsai config list                 # all keys
 
 # Remove a key (restores the default)
-npx @taurgis/bonsai config unset storage --local
+bonsai config unset storage --local
 ```
 
 ### JSON shapes
@@ -395,14 +434,14 @@ semantics per key (same array-as-`data` shape as `list`).
 
 ### Flags
 
-* `--global` / `-g`: target the user-level config file (default for `set`/`unset`).
-* `--local` / `--project` / `-p`: target the project-level config file (`.bonsai.json`).
-* `--dry-run`: (`set`/`unset`) show the change without writing.
-* `--json`: machine-readable envelope.
+- `--global` / `-g`: target the user-level config file (default for `set`/`unset`).
+- `--local` / `--project` / `-p`: target the project-level config file (`.bonsai.json`).
+- `--dry-run`: (`set`/`unset`) show the change without writing.
+- `--json`: machine-readable envelope.
 
 ### Configuration keys
 
-| Key | Values | Default | Description |
-| --- | --- | --- | --- |
-| `storage` | `global`, `project` | `global` | Where new research artifacts are cached. |
+| Key       | Values                                   | Default        | Description                                                                                                                                                    |
+| --------- | ---------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage` | `global`, `project`                      | `global`       | Where new research artifacts are cached.                                                                                                                       |
 | `summary` | `conservative`, `balanced`, `aggressive` | `conservative` | How aggressively the `compressed` variant condenses prose (headings, code blocks, tables, and lists are always preserved). Also settable via `BONSAI_SUMMARY`. |

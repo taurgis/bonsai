@@ -125,15 +125,22 @@ This repo currently contains planning material, generated agent instructions, an
 
 Agents working in this codebase or utilizing Bonsai must run the compiled CLI commands directly instead of executing manual web-scrapes or manual researcher workflows:
 
-* **Retrieve / Cache Scrape**: `node bin/cli.mjs <url> [--json]`
-* **Retrieve (Browser-Rendered SPA)**: `node bin/cli.mjs <url> --rendered [--json]`
-* **Import Synthesized Notes**: `node bin/cli.mjs import <url> --file <path> [--json]`
-* **Status Checklist**: `node bin/cli.mjs status <url> [--json]`
-* **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
-* **List Database**: `node bin/cli.mjs list [filters] [--json]`
-* **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
+- **Retrieve / Cache Scrape**: `node bin/cli.mjs <url> [--json]`
+- **Retrieve (Browser-Rendered SPA)**: `node bin/cli.mjs <url> --rendered [--json]`
+- **Import Synthesized Notes**: `node bin/cli.mjs import <url> --file <path> [--json]`
+- **Status Checklist**: `node bin/cli.mjs status <url> [--json]`
+- **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
+- **List Database**: `node bin/cli.mjs list [filters] [--json]`
+- **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
 
 Published standalone usage is `npx @taurgis/bonsai <url>` or `bonsai <url>` after installation. Do not document bare `npx bonsai` unless an unscoped npm shim is actually published.
+
+Intentional CLI asymmetries to preserve:
+
+- `fetch` stays hidden from the command list; the primary UX is URL shorthand (`bonsai <url>` / `node bin/cli.mjs <url>`), with `bonsai help fetch` as the detailed URL-form reference.
+- `status --tier` has no default; omitting it evaluates freshness against the cached artifact's stored tier.
+- `list --artifact-type` omits `section` so listings stay page-level; `prune --artifact-type` includes `section` so cleanup can target every artifact type.
+- Short flags are command-local (`-f` is fetch format but import file; `-g` is tags on cache commands but global scope on config commands). Check command help before reusing short flags.
 
 ### Browser-Rendered Extraction (`--rendered`)
 

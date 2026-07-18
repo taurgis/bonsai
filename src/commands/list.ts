@@ -24,25 +24,25 @@ const LISTABLE_ARTIFACT_TYPES = ARTIFACT_TYPES.filter((type) => type !== 'sectio
 
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static id = 'list';
-  static summary = 'List cached research artifacts by metadata filters.';
+  static summary = 'List cached research artifacts by metadata';
   static description =
-    'Lists cached research artifacts, including metadata details like path, source count, freshness, token estimates, and quality metrics without printing full content.';
+    'List page-level cached artifacts with source URLs, topic, tags, freshness, capture method, and token estimates.';
 
   static examples = [
     {
-      description: 'list all cached entries',
+      description: 'list cached entries',
       command: '<%= config.bin %> list',
     },
     {
-      description: 'list cached entries for a specific topic with JSON output',
+      description: 'list entries for a topic as JSON',
       command: '<%= config.bin %> list --topic "React Suspense" --json',
     },
     {
-      description: 'list only fresh entries filtered by tags',
+      description: 'list fresh entries matching tags',
       command: '<%= config.bin %> list --freshness fresh --tags node --tags url',
     },
     {
-      description: 'list entries matching a specific URL glob',
+      description: 'list entries matching a URL glob',
       command: '<%= config.bin %> list --url "https://react.dev/*"',
     },
   ];
@@ -58,22 +58,21 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       multiple: true,
     }),
     url: Flags.string({
-      description: 'filter by source URL glob pattern (case-insensitive, supports * wildcard)',
+      description: CLI_FLAG_DESCRIPTIONS.sourceUrlGlob,
     }),
     freshness: Flags.option({
-      description: 'filter by freshness state',
+      description: 'freshness state',
       options: ['fresh', 'stale_grace', 'stale_expired'] as const,
     })(),
     'artifact-type': Flags.option({
-      description:
-        'filter by artifact type (section children are omitted from list — use inspect to see them)',
+      description: CLI_FLAG_DESCRIPTIONS.listArtifactType,
       options: LISTABLE_ARTIFACT_TYPES,
     })(),
     'capture-method': Flags.option({
-      description: 'filter by capture method',
+      description: 'capture method',
       options: CAPTURE_METHODS,
     })(),
-    limit: limitFlag(100, 50, 'maximum number of results to return (default 50, max 100)'),
+    limit: limitFlag(100, 50, 'result count (default 50, max 100)'),
   };
 
   static stdoutIsPrimaryData = true;

@@ -101,7 +101,7 @@
   "oclif": {
     "bin": "bonsai",
     "dirname": "bonsai",
-    "description": "Bonsai is a standalone local research cache CLI for AI agents.\nResearch and cache a web page by passing its URL directly:\n\n  $ bonsai https://nodejs.org/api/url.html\n\nThe URL form is shorthand for fetching and caching the page; run `bonsai help fetch` for its full reference. The commands listed below inspect, list, import, and prune the local research cache.",
+    "description": "Bonsai is a standalone local research cache CLI for AI agents.\nResearch and cache a web page by passing its URL directly:\n\n  $ bonsai https://nodejs.org/api/url.html\n\nThe URL form is shorthand for fetching and caching the page; run `bonsai help fetch` for URL-form flags. Commands below inspect, list, import, and prune the local research cache.\n\nShort flags are command-local; check each command's --help before reusing -f, -g, -t, or -l.",
     "plugins": [
       "@oclif/plugin-autocomplete"
     ],
@@ -116,7 +116,7 @@
     },
     "topics": {
       "config": {
-        "description": "Manage research cache storage configuration (global vs project)"
+        "description": "Manage research cache configuration"
       }
     }
   }

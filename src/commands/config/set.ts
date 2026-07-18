@@ -10,18 +10,18 @@ import type { ConfigValues } from '../../lib/config/index.js';
 
 export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
   static id = 'config set';
-  static summary = 'Set a research configuration key.';
+  static summary = 'Set a research configuration key';
   static description =
-    'Persist a configuration value. Writes user-level config by default; pass --local to write the project-level config (.bonsai.json in cwd).\n\n' +
+    'Persist a configuration value. Writes user-level config by default; pass --local for project-level config (.bonsai.json in cwd).\n\n' +
     `Valid keys: ${validKeysHint()}. The inline form \`<key>=<value>\` is also accepted.`;
 
   static examples = [
     {
-      description: 'store research cache inside the current project',
+      description: 'store research cache in the current project',
       command: '<%= config.bin %> config set storage project --local',
     },
     {
-      description: 'set the user-level default using the inline key=value form',
+      description: 'set the user-level default with key=value',
       command: '<%= config.bin %> config set storage=global',
     },
   ];
@@ -33,11 +33,11 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
 
   static flags = {
     ...configScopeFlags({
-      global: 'Write to user-level config (default).',
-      local: 'Write to project-level config (.bonsai.json in cwd).',
+      global: 'write user-level config (default)',
+      local: 'write project-level config (.bonsai.json in cwd)',
     }),
     'dry-run': Flags.boolean({
-      description: 'show what would be written without saving',
+      description: 'preview write without saving',
       default: false,
     }),
   };

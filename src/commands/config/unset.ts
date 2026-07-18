@@ -5,7 +5,7 @@ import type { ConfigValues } from '../../lib/config/index.js';
 
 export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
   static id = 'config unset';
-  static summary = 'Remove a research configuration key.';
+  static summary = 'Remove a research configuration key';
   static description = `Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: ${validKeysHint()}.`;
 
   static examples = [
@@ -25,11 +25,11 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
 
   static flags = {
     ...configScopeFlags({
-      global: 'Remove from user-level config (default).',
-      local: 'Remove from project-level config (.bonsai.json in cwd).',
+      global: 'remove from user-level config (default)',
+      local: 'remove from project-level config (.bonsai.json in cwd)',
     }),
     'dry-run': Flags.boolean({
-      description: 'show what would be removed without saving',
+      description: 'preview removal without saving',
       default: false,
     }),
   };
