@@ -1,16 +1,20 @@
 /**
  * Prefactoring contract pins for audit #72 / parent #71.
  *
- * These tests document the externally observable CLI contract at the subprocess
- * seam. They must not change production behavior — only fail if a later change
- * drifts exit codes, envelope field sets, stable error codes, help, stream
- * routing, or read-command determinism.
+ * Pins gaps the older contract files did not cover: per-command help (USAGE +
+ * EXAMPLES), success envelopes for read/write commands that only had failure
+ * pins, stream routing, and byte-identical stdout for read commands.
+ *
+ * Failure codes already pinned in research.test.ts are not re-asserted here —
+ * the contract suite as a whole (this file + research*.test.ts) satisfies #72.
+ * These tests must not change production behavior.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runContract, type RunResult } from './runner.ts';
+import { hasInternetAccess } from '../helpers/network.ts';
 
 const HIT_URL = 'https://example.com/contract-pin-hit';
 
@@ -53,11 +57,12 @@ function env(extra: Record<string, string> = {}) {
   };
 }
 
+/** Run with explicit `raw` so ANSI handling matches research.test.ts call sites. */
 function run(args: string[], options: { input?: string; raw?: boolean } = {}): RunResult {
   return runContract(args, {
     cwd,
     env: env(),
-    raw: options.raw ?? true,
+    raw: options.raw ?? false,
     input: options.input,
   });
 }
@@ -65,7 +70,9 @@ function run(args: string[], options: { input?: string; raw?: boolean } = {}): R
 function seedCachedHit(): void {
   const note = join(cwd, 'pin-note.md');
   writeFileSync(note, '# Contract pin\n\nSeeded for read-command pins.\n', 'utf-8');
-  const imported = run(['import', HIT_URL, '--file', note, '--topic', 'contract-pin', '--json']);
+  const imported = run(['import', HIT_URL, '--file', note, '--topic', 'contract-pin', '--json'], {
+    raw: true,
+  });
   expect(imported.exitCode).toBe(0);
 }
 
@@ -83,7 +90,7 @@ function expectKeys(obj: Record<string, unknown>, keys: readonly string[]): void
 function expectSuccessEnvelope(
   result: RunResult,
   command: string,
-  dataMatcher?: Record<string, unknown> | unknown[]
+  dataMatcher?: Record<string, unknown>
 ): Record<string, unknown> {
   expect(result.exitCode).toBe(0);
   const envelope = parseEnvelope(result);
@@ -94,12 +101,13 @@ function expectSuccessEnvelope(
     ok: true,
     exitCode: 0,
     stdout: '',
+    stderr: '',
   });
   // --json mode: stdout is exactly one JSON document (no leading/trailing human text).
   expect(result.stdout.trim().startsWith('{')).toBe(true);
   expect(result.stdout.trim().endsWith('}')).toBe(true);
   if (dataMatcher !== undefined) {
-    expect(envelope.data).toMatchObject(dataMatcher as Record<string, unknown>);
+    expect(envelope.data).toMatchObject(dataMatcher);
   }
   return envelope;
 }
@@ -127,7 +135,7 @@ function expectErrorEnvelope(
 }
 
 function expectHelp(args: string[], usageNeedle: string): void {
-  const result = runContract(args, { cwd, env: env() });
+  const result = run(args);
   expect(result.exitCode).toBe(0);
   expect(result.stdout).toContain('USAGE');
   expect(result.stdout).toContain(usageNeedle);
@@ -173,131 +181,106 @@ describe('command help contract', () => {
   });
 });
 
-describe('success and failure exit codes + JSON envelope field sets', () => {
-  it('import success and MISSING_URL failure pin envelope fields', () => {
+describe('success JSON envelope field sets (gaps vs research.test.ts)', () => {
+  it('fetch URL shorthand success pins the envelope field set', async (ctx) => {
+    if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
+    // Current contract: URL-shorthand fetch reports command "bonsai" (not "fetch").
+    const result = run(['https://example.com', '--json'], { raw: true });
+    expectSuccessEnvelope(result, 'bonsai', {
+      command: 'bonsai',
+      format: 'compressed',
+    });
+  });
+
+  it('import success pins the envelope field set', () => {
     const note = join(cwd, 'import-ok.md');
     writeFileSync(note, '# Import ok\n', 'utf-8');
     expectSuccessEnvelope(
-      run(['import', HIT_URL, '--file', note, '--topic', 'import-ok', '--json']),
+      run(['import', HIT_URL, '--file', note, '--topic', 'import-ok', '--json'], { raw: true }),
       'import',
       { command: 'import', artifactType: 'source' }
     );
-
-    expectErrorEnvelope(run(['import', '--json']), 'import', 'MISSING_URL', 2);
   });
 
-  it('list success and INVALID_LIMIT failure pin envelope fields', () => {
+  it('list success pins the envelope field set', () => {
     seedCachedHit();
-    const success = expectSuccessEnvelope(run(['list', '--json']), 'list');
+    const success = expectSuccessEnvelope(run(['list', '--json'], { raw: true }), 'list');
     expect(Array.isArray(success.data)).toBe(true);
-
-    expectErrorEnvelope(run(['list', '--limit', '0', '--json']), 'list', 'INVALID_LIMIT', 2);
   });
 
-  it('inspect hit success and CACHE_MISS failure pin envelope fields', () => {
+  it('inspect hit success pins the envelope field set', () => {
     seedCachedHit();
-    expectSuccessEnvelope(run(['inspect', HIT_URL, '--json']), 'inspect', {
+    expectSuccessEnvelope(run(['inspect', HIT_URL, '--json'], { raw: true }), 'inspect', {
       status: 'hit',
       normalizedUrl: HIT_URL,
     });
-
-    const miss = run(['inspect', 'https://example.com/contract-pin-miss', '--json']);
-    expect(miss.exitCode).toBe(1);
-    const envelope = parseEnvelope(miss);
-    expectKeys(envelope, ERROR_ENVELOPE_KEYS);
-    expect(envelope).toMatchObject({
-      schemaVersion: 1,
-      command: 'inspect',
-      ok: false,
-      exitCode: 1,
-      code: 'CACHE_MISS',
-      stdout: '',
-    });
-    expect(String(envelope.stderr)).toContain('Code: CACHE_MISS');
   });
 
-  it('status hit success and CACHE_MISS failure pin envelope fields', () => {
+  it('status hit success pins the envelope field set', () => {
     seedCachedHit();
-    expectSuccessEnvelope(run(['status', HIT_URL, '--json']), 'status', {
+    expectSuccessEnvelope(run(['status', HIT_URL, '--json'], { raw: true }), 'status', {
       status: 'hit',
       action: 'would_return_cached',
       normalizedUrl: HIT_URL,
     });
-
-    const miss = run(['status', 'https://example.com/contract-pin-status-miss', '--json']);
-    expect(miss.exitCode).toBe(1);
-    const envelope = parseEnvelope(miss);
-    expectKeys(envelope, ERROR_ENVELOPE_KEYS);
-    expect(envelope).toMatchObject({
-      command: 'status',
-      ok: false,
-      exitCode: 1,
-      code: 'CACHE_MISS',
-    });
   });
 
-  it('prune dry-run success and MISSING_FILTER failure pin envelope fields', () => {
-    expectSuccessEnvelope(run(['prune', '--older-than', '30d', '--dry-run', '--json']), 'prune', {
-      dryRun: true,
-      status: 'would_prune',
-    });
-
-    expectErrorEnvelope(run(['prune', '--json']), 'prune', 'MISSING_FILTER', 2);
+  it('prune dry-run success pins the envelope field set', () => {
+    expectSuccessEnvelope(
+      run(['prune', '--older-than', '30d', '--dry-run', '--json'], { raw: true }),
+      'prune',
+      { dryRun: true, status: 'would_prune' }
+    );
   });
 
-  it('config get success and UNKNOWN_KEY failure pin envelope fields', () => {
+  it('config get success pins the envelope field set', () => {
     // BONSAI_STORAGE=project is set by the isolated contract env, so the effective
     // value is project with configured:true (env counts as configured).
-    expectSuccessEnvelope(run(['config', 'get', 'storage', '--json']), 'config get', {
-      key: 'storage',
-      value: 'project',
-      configured: true,
-    });
-
-    expectErrorEnvelope(run(['config', 'get', 'bogus', '--json']), 'config get', 'UNKNOWN_KEY', 2);
+    expectSuccessEnvelope(
+      run(['config', 'get', 'storage', '--json'], { raw: true }),
+      'config get',
+      {
+        key: 'storage',
+        value: 'project',
+        configured: true,
+      }
+    );
   });
 
-  it('config set success and UNKNOWN_KEY failure pin envelope fields', () => {
+  it('config set success pins the envelope field set', () => {
     expectSuccessEnvelope(
-      run(['config', 'set', 'storage', 'project', '--local', '--json']),
+      run(['config', 'set', 'storage', 'project', '--local', '--json'], { raw: true }),
       'config set',
       { key: 'storage', value: 'project', status: 'set', scope: 'project' }
     );
-
-    expectErrorEnvelope(
-      run(['config', 'set', 'bogus', 'value', '--json']),
-      'config set',
-      'UNKNOWN_KEY',
-      2
-    );
   });
 
-  it('config unset success and UNKNOWN_KEY failure pin envelope fields', () => {
-    run(['config', 'set', 'storage', 'project', '--local', '--json']);
+  it('config unset success pins the envelope field set', () => {
+    run(['config', 'set', 'storage', 'project', '--local', '--json'], { raw: true });
     expectSuccessEnvelope(
-      run(['config', 'unset', 'storage', '--local', '--json']),
+      run(['config', 'unset', 'storage', '--local', '--json'], { raw: true }),
       'config unset',
-      {
-        key: 'storage',
-        status: 'unset',
-        scope: 'project',
-      }
+      { key: 'storage', status: 'unset', scope: 'project' }
     );
+  });
+});
 
+describe('failure codes not already pinned in research.test.ts', () => {
+  it('config get UNKNOWN_KEY pins the error envelope', () => {
     expectErrorEnvelope(
-      run(['config', 'unset', 'bogus', '--json']),
-      'config unset',
+      run(['config', 'get', 'bogus', '--json'], { raw: true }),
+      'config get',
       'UNKNOWN_KEY',
       2
     );
   });
 
-  it('fetch JSON failure pins FETCH_FAILED envelope fields (offline-safe host)', () => {
+  it('config unset UNKNOWN_KEY pins the error envelope', () => {
     expectErrorEnvelope(
-      run(['https://this-domain-definitely-does-not-exist-xyz123.invalid', '--json']),
-      'bonsai',
-      'FETCH_FAILED',
-      1
+      run(['config', 'unset', 'bogus', '--json'], { raw: true }),
+      'config unset',
+      'UNKNOWN_KEY',
+      2
     );
   });
 });
@@ -305,7 +288,7 @@ describe('success and failure exit codes + JSON envelope field sets', () => {
 describe('stream routing contract', () => {
   it('human list puts primary output on stdout and leaves stderr empty on success', () => {
     seedCachedHit();
-    const result = runContract(['list'], { cwd, env: env() });
+    const result = run(['list']);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('cached research');
     expect(result.stderr).toBe('');
@@ -313,7 +296,7 @@ describe('stream routing contract', () => {
 
   it('human status hit puts primary output on stdout and leaves stderr empty', () => {
     seedCachedHit();
-    const result = runContract(['status', HIT_URL], { cwd, env: env() });
+    const result = run(['status', HIT_URL]);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Status:');
     expect(result.stdout).toContain('hit');
@@ -321,7 +304,7 @@ describe('stream routing contract', () => {
   });
 
   it('human usage errors go to stderr with empty stdout', () => {
-    const result = runContract(['prune'], { cwd, env: env() });
+    const result = run(['prune']);
     expect(result.exitCode).toBe(2);
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('Must specify at least one pruning filter');
@@ -329,16 +312,15 @@ describe('stream routing contract', () => {
 
   it('--json success stdout is only the envelope object (parseable, no trailing human text)', () => {
     seedCachedHit();
-    const result = run(['list', '--json']);
+    const result = run(['list', '--json'], { raw: true });
     expect(result.exitCode).toBe(0);
-    // Strict: entire stdout is one JSON value — no banner before/after.
     expect(() => JSON.parse(result.stdout)).not.toThrow();
     expect(result.stdout.trim().startsWith('{')).toBe(true);
     expect(result.stdout.trim().endsWith('}')).toBe(true);
   });
 
   it('--json usage error stdout is only the envelope; process stderr mirrors the error text', () => {
-    const result = run(['config', 'get', 'bogus', '--json']);
+    const result = run(['config', 'get', 'bogus', '--json'], { raw: true });
     const envelope = expectErrorEnvelope(result, 'config get', 'UNKNOWN_KEY', 2);
     expect(() => JSON.parse(result.stdout)).not.toThrow();
     // Current contract: usage-style --json failures also mirror Code: lines onto process stderr.
@@ -350,8 +332,8 @@ describe('stream routing contract', () => {
 describe('read-command determinism', () => {
   it('list --json is byte-identical across two runs with the same cache', () => {
     seedCachedHit();
-    const first = run(['list', '--json']);
-    const second = run(['list', '--json']);
+    const first = run(['list', '--json'], { raw: true });
+    const second = run(['list', '--json'], { raw: true });
     expect(first.exitCode).toBe(0);
     expect(second.exitCode).toBe(0);
     expect(second.stdout).toBe(first.stdout);
@@ -359,8 +341,8 @@ describe('read-command determinism', () => {
 
   it('inspect --json is byte-identical across two runs with the same cache', () => {
     seedCachedHit();
-    const first = run(['inspect', HIT_URL, '--json']);
-    const second = run(['inspect', HIT_URL, '--json']);
+    const first = run(['inspect', HIT_URL, '--json'], { raw: true });
+    const second = run(['inspect', HIT_URL, '--json'], { raw: true });
     expect(first.exitCode).toBe(0);
     expect(second.exitCode).toBe(0);
     expect(second.stdout).toBe(first.stdout);
@@ -368,16 +350,16 @@ describe('read-command determinism', () => {
 
   it('status --json is byte-identical across two runs with the same cache', () => {
     seedCachedHit();
-    const first = run(['status', HIT_URL, '--json']);
-    const second = run(['status', HIT_URL, '--json']);
+    const first = run(['status', HIT_URL, '--json'], { raw: true });
+    const second = run(['status', HIT_URL, '--json'], { raw: true });
     expect(first.exitCode).toBe(0);
     expect(second.exitCode).toBe(0);
     expect(second.stdout).toBe(first.stdout);
   });
 
   it('config get --json is byte-identical across two runs with the same config', () => {
-    const first = run(['config', 'get', 'storage', '--json']);
-    const second = run(['config', 'get', 'storage', '--json']);
+    const first = run(['config', 'get', 'storage', '--json'], { raw: true });
+    const second = run(['config', 'get', 'storage', '--json'], { raw: true });
     expect(first.exitCode).toBe(0);
     expect(second.exitCode).toBe(0);
     expect(second.stdout).toBe(first.stdout);
