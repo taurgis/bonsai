@@ -35,6 +35,7 @@ function fallbackSuggestionsForCode(
     case 'UNKNOWN_FLAG':
     case 'INVALID_FLAG_VALUE':
     case 'MISSING_FLAG_VALUE':
+    case 'DUPLICATE_FLAG':
     case 'MISSING_ARGUMENT':
     case 'UNEXPECTED_ARGUMENT':
       return [`Check usage: ${help}`];

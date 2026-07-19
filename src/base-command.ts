@@ -8,7 +8,12 @@ import {
   EXIT_OK,
   EXIT_STALE_SERVED,
 } from './lib/cli-error-policy.js';
-import { buildEnvelope, enrichCacheMissEnvelope, enrichRowErrorEnvelope } from './lib/envelope.js';
+import {
+  buildEnvelope,
+  enrichCacheMissEnvelope,
+  enrichRowErrorEnvelope,
+  formatErrorForJson,
+} from './lib/envelope.js';
 import { enrichParseError } from './lib/parse-error-ux.js';
 import {
   resolveResearchTarget,
@@ -235,7 +240,9 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         results.push(fn(url));
       } catch (err) {
         if (!batch || !(err instanceof Errors.CLIError)) throw err;
-        if (!this.jsonEnabled()) this.warn(err.message);
+        // Mirror the single-URL error format (message + Code: + Try this:) rather than a bare
+        // message, so a row failure in a batch is exactly as actionable as it is standalone.
+        if (!this.jsonEnabled()) this.warn(formatErrorForJson(err));
         results.push(failureRow(url, err));
       }
     }

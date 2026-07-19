@@ -32,6 +32,11 @@ export function stableErrorCodeFrom(err: unknown): string | undefined {
   ) {
     return 'MISSING_FLAG_VALUE';
   }
+  // Repeating a single-value flag (e.g. `--topic a --topic b`) is also a plain CLIError with no
+  // dedicated class — oclif's parser rejects it before any flag-specific validation runs.
+  if (typeof e?.message === 'string' && /^Flag --\S+ can only be specified once$/.test(e.message)) {
+    return 'DUPLICATE_FLAG';
+  }
   return undefined;
 }
 

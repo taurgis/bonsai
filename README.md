@@ -110,7 +110,7 @@ Common flags:
 * `--max-age`: Read-time freshness threshold.
 * `--force`: Force a fresh fetch.
 * `--dry-run`: Scrape and validate without writing to cache.
-* `--allow-stale`: Serve stale cache if the remote site is offline.
+* `--allow-stale`: Suppress the exit `5` signal when a within-grace stale entry is served after failed revalidation (see [Freshness and Cache Rules](#freshness-and-cache-rules) below). Stale content is served within the grace window regardless of this flag; it does not extend serving beyond the grace window.
 * `--rendered`: Use browser-rendered extraction for SPA pages.
 * `--read-only` (alias `--plan`): Block all filesystem writes/deletes across every command; network fetches still run. See [Read-only / plan mode](#read-only--plan-mode) below.
 * `--json`: Return structured machine-readable output.
@@ -235,7 +235,10 @@ If no `--ttl` is specified, freshness is computed from the tier:
 | `standard` | 30 days | 14 days | General API docs and developer guides |
 | `stable` | 180 days | 60 days | RFCs, standards, long-lived references |
 
-When stale entries still have `ETag` or `Last-Modified` metadata, Bonsai attempts cheap revalidation before a full refetch. If revalidation fails and `--allow-stale` is omitted, the CLI can serve the stale content while exiting with code `5`.
+When stale entries still have `ETag` or `Last-Modified` metadata, Bonsai attempts cheap revalidation before a full refetch. If revalidation fails:
+
+* **Within the grace window**, the stale content is served either way. By default this exits with code `5` so a caller can detect "this result may be outdated"; `--allow-stale` suppresses that signal and exits `0` instead, since the caller has already said outdated content is acceptable.
+* **Past the grace window**, the entry is expired and revalidation failure is always a hard error (exit `1`) — `--allow-stale` has no effect here, since there is no fresher fallback to serve.
 
 ---
 
@@ -303,7 +306,7 @@ When run with `--json`, commands return a stable envelope:
 | `0` | Success. |
 | `1` | Runtime failure (network error, fetch failed, file read error). |
 | `2` | Usage error (invalid flag, bad URL, missing required argument). |
-| `5` | Stale content served — the cache entry is past its grace window but `--allow-stale` is set. The returned content is still usable. |
+| `5` | Stale content served — revalidation failed within the grace window and `--allow-stale` was omitted. The returned content is still usable. |
 
 ---
 

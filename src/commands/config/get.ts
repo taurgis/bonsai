@@ -5,7 +5,7 @@ import { formatConfigEntry, resolveConfigEntry, validKeysHint } from '../../lib/
 export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {
   static id = 'config get';
   static summary = 'Get a research configuration value';
-  static description = `Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: ${validKeysHint()}.`;
+  static description = `Print a config value. Without --global/--local, shows the merged effective value, in precedence order: a per-command override flag (e.g. \`fetch --storage\`) > env var > project file > user file > built-in default.\n\nValid keys: ${validKeysHint()}.`;
 
   static examples = [
     {

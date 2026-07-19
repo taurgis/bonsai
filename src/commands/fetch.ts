@@ -75,7 +75,12 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       default: false,
     }),
     'allow-stale': Flags.boolean({
-      description: 'serve stale cache if revalidation fails',
+      // Stale content within the grace window is served either way after a failed revalidation;
+      // this only suppresses the exit-5 "served stale" signal. It has no effect once an entry is
+      // past its grace window (that failure is always a hard error). See README's Freshness
+      // section and docs/concepts/caching-and-freshness.md for the full decision flow.
+      description:
+        'suppress exit code 5 when stale cache is served within grace after failed revalidation',
       default: false,
     }),
     rendered: Flags.boolean({

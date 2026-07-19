@@ -225,8 +225,7 @@ describe('CA bundle SPKI pinning for Chrome (getCaBundleSpkiHashes / getChromeSp
     }
   });
 
-  it('returns [] when no proxy is configured, even if a CA bundle is present', () => {
-    process.env.NODE_EXTRA_CA_CERTS = certAPath;
+  it('returns [] when neither a proxy nor a CA bundle is configured', () => {
     expect(getChromeSpkiArgs()).toEqual([]);
   });
 
@@ -242,8 +241,16 @@ describe('CA bundle SPKI pinning for Chrome (getCaBundleSpkiHashes / getChromeSp
     expect(getCaBundleSpkiHashes()).toEqual([expectedHashA]);
   });
 
-  it('emits --ignore-certificate-errors-spki-list only when a proxy is configured', () => {
+  it('emits --ignore-certificate-errors-spki-list whenever a CA bundle is discoverable, proxy or not', () => {
     process.env.HTTPS_PROXY = 'http://127.0.0.1:9999';
+    process.env.NODE_EXTRA_CA_CERTS = certAPath;
+    expect(getChromeSpkiArgs()).toEqual([`--ignore-certificate-errors-spki-list=${expectedHashA}`]);
+  });
+
+  it('emits --ignore-certificate-errors-spki-list from a discoverable CA bundle even with no proxy configured', () => {
+    // Some environments intercept HTTPS transparently (or via a proxy Chrome reaches without an
+    // explicit --proxy-server flag) while still exporting a CA bundle env var, with no
+    // HTTPS_PROXY/HTTP_PROXY set at all. Chrome still needs to trust that CA in that shape too.
     process.env.NODE_EXTRA_CA_CERTS = certAPath;
     expect(getChromeSpkiArgs()).toEqual([`--ignore-certificate-errors-spki-list=${expectedHashA}`]);
   });

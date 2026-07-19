@@ -54,7 +54,7 @@ bonsai <url> [flags]
 | `--max-age`     | —     | duration | `null`       | Maximum cache age to accept (e.g. "2h", "7d", "6m").                                                                            |
 | `--force`       | —     | boolean  | `false`      | Ignore cached copies and force a full network crawl.                                                                            |
 | `--dry-run`     | —     | boolean  | `false`      | Crawl and extract without writing to cache.                                                                                     |
-| `--allow-stale` | —     | boolean  | `false`      | Allow serving stale entries if remote server is offline.                                                                        |
+| `--allow-stale` | —     | boolean  | `false`      | Suppress exit code `5` when a within-grace stale entry is served after failed revalidation; has no effect once an entry is past its grace window. |
 | `--rendered`    | —     | boolean  | `false`      | Force browser-rendered extraction for pages that require client-side JavaScript (e.g. SPA docs).                                |
 | `--storage`     | —     | choice   | (configured) | Override cache location for this run: `global` or `project`. Secret-bearing pages are always stored globally.                   |
 | `--read-only`   | —     | boolean  | `false`      | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |

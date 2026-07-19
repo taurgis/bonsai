@@ -76,60 +76,60 @@ describe('buildChromeArgs (sandbox proxy CLI flags)', () => {
     expect(args).toContain('--ssl-version-max=tls1.2');
   });
 
-  it('has no --ignore-certificate-errors-spki-list flag when no proxy is configured', () => {
+  it('has no --ignore-certificate-errors-spki-list flag when no CA bundle is discoverable', () => {
+    // Also configure a proxy: the flag must stay absent purely because no CA bundle env var
+    // points at a real file — proxy presence alone must never trigger the pin.
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+    const args = buildChromeArgs();
+    expect(args.some((a) => a.startsWith('--ignore-certificate-errors-spki-list='))).toBe(false);
+  });
+
+  function generateTestCaBundle(dir: string): { certPath: string; expectedHash: string } {
+    const certPath = join(dir, 'ca.pem');
+    execFileSync('openssl', [
+      'req',
+      '-x509',
+      '-newkey',
+      'rsa:2048',
+      '-nodes',
+      '-keyout',
+      join(dir, 'ca.key'),
+      '-out',
+      certPath,
+      '-days',
+      '1',
+      '-subj',
+      '/CN=bonsai-test-ca',
+    ]);
+    const pubkey = execFileSync('openssl', ['x509', '-in', certPath, '-pubkey', '-noout']);
+    const der = execFileSync('openssl', ['pkey', '-pubin', '-outform', 'der'], { input: pubkey });
+    const digest = execFileSync('openssl', ['dgst', '-sha256', '-binary'], { input: der });
+    const expectedHash = execFileSync('openssl', ['enc', '-base64', '-A'], { input: digest })
+      .toString('utf8')
+      .trim();
+    return { certPath, expectedHash };
+  }
+
+  it('pins the SPKI hash of the discovered CA bundle when a proxy is configured', () => {
     const dir = mkdtempSync(join(tmpdir(), 'bonsai-ca-bundle-'));
     try {
-      const certPath = join(dir, 'ca.pem');
-      execFileSync('openssl', [
-        'req',
-        '-x509',
-        '-newkey',
-        'rsa:2048',
-        '-nodes',
-        '-keyout',
-        join(dir, 'ca.key'),
-        '-out',
-        certPath,
-        '-days',
-        '1',
-        '-subj',
-        '/CN=bonsai-test-ca',
-      ]);
+      const { certPath, expectedHash } = generateTestCaBundle(dir);
+      process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
       process.env.NODE_EXTRA_CA_CERTS = certPath;
       const args = buildChromeArgs();
-      expect(args.some((a) => a.startsWith('--ignore-certificate-errors-spki-list='))).toBe(false);
+      expect(args).toContain(`--ignore-certificate-errors-spki-list=${expectedHash}`);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it('pins the SPKI hash of the discovered CA bundle when a proxy is configured', () => {
+  it('pins the discovered CA bundle even when no proxy is configured', () => {
+    // A CA bundle env var can be set by an environment that intercepts HTTPS transparently (or
+    // via a proxy Chrome reaches without an explicit --proxy-server flag), with no HTTPS_PROXY/
+    // HTTP_PROXY set at all. Chrome still needs to trust that CA regardless of proxy detection.
     const dir = mkdtempSync(join(tmpdir(), 'bonsai-ca-bundle-'));
     try {
-      const certPath = join(dir, 'ca.pem');
-      execFileSync('openssl', [
-        'req',
-        '-x509',
-        '-newkey',
-        'rsa:2048',
-        '-nodes',
-        '-keyout',
-        join(dir, 'ca.key'),
-        '-out',
-        certPath,
-        '-days',
-        '1',
-        '-subj',
-        '/CN=bonsai-test-ca',
-      ]);
-      const pubkey = execFileSync('openssl', ['x509', '-in', certPath, '-pubkey', '-noout']);
-      const der = execFileSync('openssl', ['pkey', '-pubin', '-outform', 'der'], { input: pubkey });
-      const digest = execFileSync('openssl', ['dgst', '-sha256', '-binary'], { input: der });
-      const expectedHash = execFileSync('openssl', ['enc', '-base64', '-A'], { input: digest })
-        .toString('utf8')
-        .trim();
-
-      process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
+      const { certPath, expectedHash } = generateTestCaBundle(dir);
       process.env.NODE_EXTRA_CA_CERTS = certPath;
       const args = buildChromeArgs();
       expect(args).toContain(`--ignore-certificate-errors-spki-list=${expectedHash}`);

@@ -178,9 +178,9 @@ The decision flow at request time:
          serve the local cached file (no body downloaded).
        - **`200 OK` (new content)** → scrape the new HTML, update the cache,
          then serve it.
-       - **Network error / offline** → if `--allow-stale` is set, serve the
-         cached file (exit `0`); otherwise output the stale content and exit
-         with code `5`.
+       - **Network error / offline** → serve the cached file either way; exit
+         `0` if `--allow-stale` is set, otherwise exit with code `5` to flag
+         that the served content is stale and unverified.
 
 ### Conditional HTTP Headers
 

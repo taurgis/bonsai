@@ -226,6 +226,24 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[1]?.error?.code === 'INVALID_URL', JSON.stringify(env?.data?.[1]));
   });
 
+  // A batch row failure must be exactly as actionable as the same error standalone: Code: and
+  // Try this: lines, not just a bare warning message.
+  check('status multi-URL human mode row failure includes Code and Try this', () => {
+    const ws = createWorkspace();
+    const hitUrl = 'https://example.com/audit-status-batch-invalid-human';
+    const imported = run(['import', hitUrl, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Status batch invalid human\n',
+    });
+    expect(imported.exitCode === 0, `import ${imported.exitCode}`);
+
+    const r = run(['status', hitUrl, 'not-a-url'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('Code: INVALID_URL'), r.stderr);
+    expect(r.stderr.includes('Try this:'), r.stderr);
+  });
+
   check('inspect multi-URL keeps hit when later URL is scheme-less', () => {
     const ws = createWorkspace();
     const hitUrl = 'https://example.com/audit-inspect-batch-scheme';
