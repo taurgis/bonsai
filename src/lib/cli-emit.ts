@@ -17,11 +17,12 @@ export function printJsonEnvelope(envelope: Record<string, unknown>): void {
 }
 
 /**
- * For BaseCommand.toErrorJson: write error lines to stderr and return the envelope object
- * (oclif prints the return value to stdout).
+ * For BaseCommand.toErrorJson: return the envelope object (oclif prints it to stdout).
+ * Error text lives in `envelope.stderr` only — process stderr stays clean under `--json`,
+ * matching CACHE_MISS / batch overlays and oclif JSON log suppression.
  */
 export function writeJsonErrorStderr(parts: JsonEnvelopeParts): Record<string, unknown> {
-  const envelope = buildEnvelope({
+  return buildEnvelope({
     command: parts.command,
     ok: parts.ok,
     exitCode: parts.exitCode,
@@ -31,8 +32,6 @@ export function writeJsonErrorStderr(parts: JsonEnvelopeParts): Record<string, u
     suggestions: parts.suggestions,
     ref: parts.ref,
   });
-  if (parts.stderr) process.stderr.write(`${parts.stderr}\n`);
-  return envelope;
 }
 
 export interface PreflightExit {
@@ -41,12 +40,11 @@ export interface PreflightExit {
   envelope: Record<string, unknown>;
 }
 
-/** Print a preflight usage/error result (stderr + JSON envelope, or oclif-style human error) and exit. */
+/** Print a preflight usage/error result (JSON envelope on stdout, or oclif-style human error) and exit. */
 export function exitWithPreflight(result: PreflightExit): never {
   process.exitCode = result.exitCode;
   const message = String(result.envelope.stderr ?? '');
   if (result.json) {
-    if (message) process.stderr.write(`${message}\n`);
     printJsonEnvelope(result.envelope);
   } else if (message) {
     console.error(` ›   Error: ${message.replaceAll('\n', '\n ›   ')}`);
@@ -68,7 +66,6 @@ export function writeCommandNotFoundJson(opts: {
     suggestions: opts.suggestions,
   });
   process.exitCode = 2;
-  if (envelope.stderr) process.stderr.write(`${String(envelope.stderr)}\n`);
   printJsonEnvelope(envelope);
   return envelope;
 }

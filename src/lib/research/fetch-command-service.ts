@@ -327,7 +327,7 @@ function failureRowOrRethrow(url: string, err: unknown, run: FetchRun) {
   }
   const row =
     err instanceof Errors.CLIError
-      ? buildFetchFailureResult({ bin: io.bin, url, dryRun, err })
+      ? buildFetchFailureResult({ url, dryRun, err })
       : buildFetchFailureFromCaught(io.bin, url, err, dryRun);
   // Human batches only get the spinner "failed" label unless we echo the reason.
   if (!io.json) io.warn(row.error.message);
@@ -353,7 +353,6 @@ async function fetchSingleTarget(url: string, run: FetchRun) {
   }
 
   const resultData = buildFetchResultData({
-    bin: io.bin,
     url,
     normalizedUrl,
     cacheKey,

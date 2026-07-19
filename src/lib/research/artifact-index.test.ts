@@ -169,4 +169,17 @@ describe('loadIndexedArtifacts (sidecar index)', () => {
       rmSync(dir, { recursive: true, force: true });
     }
   });
+
+  it('persist: false returns results without writing .search-index.json', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'fnr-index-nopersist-'));
+    try {
+      writeArtifact(dir, 'abc123', makeArtifact('abc123', 'No index write.'));
+      const researchDir = join(dir, 'research');
+      const results = loadIndexedArtifactsForDir(researchDir, { persist: false });
+      expect(results).toHaveLength(1);
+      expect(existsSync(INDEX_PATH(dir))).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });

@@ -89,10 +89,6 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
 
   static stdoutIsPrimaryData = true;
 
-  protected override envelopeCommandId(): string {
-    return this.config.bin;
-  }
-
   /**
    * When a multi-URL batch has any per-URL failure, keep the result array (including hits) and
    * surface FETCH_FAILED on the envelope — same batch contract as status/inspect CACHE_MISS.
