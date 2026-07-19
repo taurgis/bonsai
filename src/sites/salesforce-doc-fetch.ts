@@ -46,6 +46,7 @@ const ERROR_PATTERNS = [
 /** True when the extracted text is an error/not-found/loading shell rather than real content.
  *
  * @param text - Extracted Markdown text to check.
+ * @returns True when the text matches a Salesforce error/not-found pattern.
  */
 export function looksLikeSalesforceError(text: string): boolean {
   return ERROR_PATTERNS.some((re) => re.test(text));
@@ -319,7 +320,7 @@ function buildCaptureScript(contentSelectors: string[], extraRemove: string[]): 
 }
 
 /**
- * Options for the shared Salesforce LWR shadow-DOM fetcher.
+ * Options for the shared Salesforce Lightning Web Runtime (LWR) shadow-DOM fetcher.
  * `contentSelectors` drive the priority content-container pick; `removeSelectors` strips
  * per-site chrome that survives the shared BASE_REMOVE_SELECTORS list.
  */
@@ -455,13 +456,14 @@ function buildSalesforceFetchResult(
 }
 
 /**
- * Renders a Salesforce LWR doc page, serializes its shadow-DOM content container, and converts
- * it to Markdown. Validates the host before any network access.
+ * Renders a Salesforce Lightning Web Runtime (LWR) doc page, serializes its shadow-DOM content
+ * container, and converts it to Markdown. Validates the host before any network access.
  *
  * @param url - The Salesforce doc page URL to fetch.
  * @param options - Allowed host, priority content selectors, and optional per-site remove selectors.
  * @returns Extracted Markdown, fetch metadata, and browser-capture provenance.
  * @throws {Error} When the URL is invalid, the host is not the allowed host, DNS is unsafe,
+ *   Chrome/CDP navigation or evaluation fails, the response body exceeds the size limit,
  *   or the captured content is too short / looks like an error page.
  */
 export async function fetchSalesforceDoc(

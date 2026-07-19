@@ -19,10 +19,12 @@ const CONTENT_SELECTORS = [
  * Fetches a developer.salesforce.com doc page. Supported articles publish a Markdown twin at the
  * derived `.md` route ("View as Markdown"), which is preferred: one static request instead of a
  * browser render, and it returns the article's source. Pages without a validated twin (API
- * reference, atlas.* books, landing pages) fall back to the shared LWR shadow-DOM fetcher.
+ * reference, atlas.* books, landing pages) fall back to the shared Lightning Web Runtime (LWR)
+ * shadow-DOM fetcher.
  *
  * @param url - The developer.salesforce.com doc page URL.
  * @returns Extracted Markdown, fetch metadata, and capture provenance (route_markdown or browser_fallback).
+ * @throws {Error} When the browser fallback path fails (same modes as `fetchSalesforceDoc`).
  */
 export async function fetchDeveloperPage(url: string): Promise<SiteFetchResult> {
   const fromMarkdownRoute = await fetchDeveloperRouteMarkdown(url);

@@ -2,10 +2,10 @@ import type { SiteModule } from './types.js';
 import { salesforce } from './salesforce/index.js';
 import { salesforceDeveloper } from './salesforce-developer/index.js';
 
-// The known documentation sites. A plain constant, not a registry: these ship
-// with the CLI, so there is nothing to register at runtime. Sites with custom
-// fetch behavior live in their own module (e.g. ./salesforce). Salesforce Help and
-// Salesforce Developer are separate modules — different domains, different extraction.
+/**
+ * Built-in documentation site modules shipped with the CLI (not a runtime registry).
+ * Salesforce Help and Salesforce Developer are separate entries — different domains and extractors.
+ */
 export const SITES: SiteModule[] = [
   salesforce,
   salesforceDeveloper,

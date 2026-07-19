@@ -11,6 +11,7 @@ import type { SummaryLevel } from '../config/schema.js';
 import { STOPWORDS, tokenize } from './keywords.js';
 import { estimateTokens } from './token-estimate.js';
 
+/** Re-export of the configured summary aggressiveness level (`conservative` | `balanced` | `aggressive`). */
 export type { SummaryLevel };
 
 /**

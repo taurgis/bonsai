@@ -1,10 +1,11 @@
-/** Hostnames served by Salesforce-operated LWR doc sites with shared browser-capture logic. */
+/** Hostnames served by Salesforce-operated Lightning Web Runtime (LWR) doc sites with shared browser-capture logic. */
 export const ALLOWED_DOC_HOSTS = new Set(['help.salesforce.com', 'developer.salesforce.com']);
 
 /**
  * Returns true when `hostname` is one of the allowed Salesforce doc hosts.
  *
  * @param hostname - Hostname to check (case-insensitive).
+ * @returns True when the hostname is in `ALLOWED_DOC_HOSTS`.
  */
 export function isAllowedDocHost(hostname: string): boolean {
   return ALLOWED_DOC_HOSTS.has(hostname.toLowerCase());

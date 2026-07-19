@@ -7,7 +7,7 @@ import type { PageMapEntry } from './capabilities.js';
 // not promoted to verified source until a raw URL is fetched and validated.
 
 /**
- * Page-map and source-path data recovered from a Next.js / RSC HTML payload.
+ * Page-map and source-path data recovered from a Next.js / React Server Components (RSC) HTML payload.
  * `sourcePathHints` are unverified; they must be validated before being promoted to a source link.
  */
 export interface NextRscData {
@@ -26,8 +26,8 @@ function dedupe(items: string[]): string[] {
 }
 
 /**
- * Scans Next/RSC HTML for a page map (route + title, with optional source path) and any
- * `filePath` source hints. Returns empty arrays when no payload is present.
+ * Scans Next.js / React Server Components (RSC) HTML for a page map (route + title, with optional
+ * source path) and any `filePath` source hints. Returns empty arrays when no payload is present.
  *
  * @param html - Full page HTML containing embedded `__NEXT_DATA__` or `self.__next_f` payloads.
  * @returns Recovered page map entries and unverified source-path hints.

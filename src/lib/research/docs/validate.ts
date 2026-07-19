@@ -25,6 +25,7 @@ const ERROR_PAGE_PATTERNS = [
 /** True when short text reads like an error/soft-404 page rather than real content.
  *
  * @param text - Body text to inspect (only short bodies trigger the heuristic).
+ * @returns True when the text matches an error/soft-404 pattern.
  */
 export function looksLikeErrorPage(text: string): boolean {
   const trimmed = text.trim();

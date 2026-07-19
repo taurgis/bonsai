@@ -16,6 +16,9 @@ const GITHUB_EDIT_BLOB =
 /**
  * Converts a GitHub `edit`/`blob` URL into a raw.githubusercontent.com URL. Returns null for any
  * URL that is not a recognized GitHub edit/blob link, so callers never fabricate a raw URL.
+ *
+ * @param href - A GitHub edit or blob URL (or any other string).
+ * @returns A GithubSource candidate, or null when `href` is not a recognized edit/blob link.
  */
 export function parseGithubSourceLink(href: string): GithubSource | null {
   const match = href.match(GITHUB_EDIT_BLOB);
@@ -112,6 +115,9 @@ export function vitepressRouteMarkdown(url: string): string | null {
 /**
  * Tries every known URL->source mapper in turn. Returns the first candidate, or null. The result
  * is a CANDIDATE; it must be validated by fetching before being recorded as a verified source.
+ *
+ * @param url - A documentation page URL to map.
+ * @returns The first GithubSource candidate, or null when no mapper recognizes the URL.
  */
 export function mapUrlToSource(url: string): GithubSource | null {
   return mapNodeApiSource(url) ?? mapMdnSource(url);

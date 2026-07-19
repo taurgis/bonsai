@@ -48,6 +48,7 @@ const MIN_USEFUL_CHARS = 600;
  *
  * @param caps - Detected site capabilities; `recommendedCapture === 'rendered'` forces a fallback.
  * @param extraction - Result of static extraction, or null when static fetch failed.
+ * @returns True when a rendered (browser) fallback should be attempted.
  */
 export function renderedFallbackNeeded(
   caps: SiteCapabilities,

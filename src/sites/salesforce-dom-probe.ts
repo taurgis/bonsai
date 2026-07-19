@@ -1,6 +1,6 @@
 import type { CdpPage } from '../lib/research/browser.js';
 
-/** Shared in-page helpers for traversing Salesforce LWR open shadow roots. */
+/** Shared in-page helpers for traversing Salesforce Lightning Web Runtime (LWR) open shadow roots. */
 export const SALESFORCE_SHADOW_DOM_HELPERS = `
 const deepElements = (root) => {
   const out = [];
@@ -74,7 +74,9 @@ export function buildPriorityContainerPickBlock(
   `;
 }
 
-/** CDP expression polled until the priority content host reaches minChars and the body settles.
+/**
+ * Chrome DevTools Protocol (CDP) expression polled until the priority content host reaches
+ * `minChars` and the body settles.
  *
  * @param selectors - CSS selectors in priority order matching the site's content containers.
  * @param minChars - Minimum text length before the container is considered ready.
@@ -110,10 +112,11 @@ export function buildContentReadyProbeExpression(selectors: string[], minChars: 
  * Polls until the priority Salesforce content host is ready and body text has settled.
  * Returns without throwing on timeout; the caller captures whatever rendered and judges quality.
  *
- * @param page - Open CDP page to evaluate expressions on.
+ * @param page - Open Chrome DevTools Protocol (CDP) page to evaluate expressions on.
  * @param selectors - CSS selectors in priority order matching the site's content containers.
  * @param minChars - Minimum container text length before polling stops.
  * @param timeoutMs - Maximum wall-clock time (ms) to wait before giving up.
+ * @returns Resolves when content is ready, or when `timeoutMs` elapses (no throw on timeout).
  */
 export async function pollSalesforceContentReady(
   page: CdpPage,
