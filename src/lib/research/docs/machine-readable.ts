@@ -8,11 +8,16 @@ import { vitepressRouteMarkdown } from './source-map.js';
 // as non-HTML/non-error text before it is trusted. An advertised link is only a candidate, never
 // proof. The fetcher is injected so tests run against fixtures without network.
 
+/** A successfully validated machine-readable artifact and its body text. */
 export interface MachineReadableResult {
   artifact: MachineReadableArtifact; // evidence is 'verified' on a returned result
   body: string;
 }
 
+/**
+ * Injectable HTTP fetcher used by the machine-readable probe functions.
+ * Tests supply a fixture fetcher; production code uses `fetchText`.
+ */
 export type TextFetcher = (
   url: string
 ) => Promise<{ content: string; finalUrl: string; status: number; contentType: string | null }>;
@@ -49,6 +54,11 @@ async function tryFetchValidText(url: string, fetcher: TextFetcher): Promise<str
 /**
  * Probes conventional and advertised `llms.txt` URLs. Returns the first that validates as same-origin
  * text, or null. The result is a site-INDEX artifact for discovery — not a replacement for page content.
+ *
+ * @param pageUrl - The doc page URL; its origin is used for same-origin checks and candidate construction.
+ * @param caps - Site capabilities from the detector, carrying any advertised llms.txt links.
+ * @param fetcher - HTTP fetcher (injectable for tests).
+ * @returns A verified MachineReadableResult, or null when no valid llms.txt is found.
  */
 export async function probeLlmsTxt(
   pageUrl: string,
@@ -69,6 +79,11 @@ export async function probeLlmsTxt(
 /**
  * Probes a page-level `.md` route. The derived route is only a candidate: it must be same-origin,
  * fetch successfully, and validate as non-HTML/non-error Markdown before being trusted.
+ *
+ * @param pageUrl - The doc page URL to derive the `.md` route from.
+ * @param caps - Site capabilities carrying any advertised route-markdown links.
+ * @param fetcher - HTTP fetcher (injectable for tests).
+ * @returns A verified MachineReadableResult, or null when no valid route Markdown is found.
  */
 export async function probeRouteMarkdown(
   pageUrl: string,

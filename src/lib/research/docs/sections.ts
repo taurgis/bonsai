@@ -2,6 +2,7 @@
 // big API reference (e.g. Node `url.html`, ~17.5k tokens) becomes addressable section artifacts.
 // Pure string work: no I/O, no artifact construction. H4+ headings stay within their parent chunk.
 
+/** A single H2/H3 section chunk extracted from a long Markdown document. */
 export interface SectionChunk {
   anchor: string;
   headingPath: string; // breadcrumb, e.g. "URL > The WHATWG URL API > Class: URL"
@@ -17,6 +18,13 @@ const HEADING_RE = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 // "API documentation" — not the raw link syntax, which otherwise leaks the URL into the anchor and
 // breadcrumb. Confirmed against github-slugger, which documents that it operates on plain heading
 // text rather than parsing Markdown: https://github.com/Flet/github-slugger
+/**
+ * Strips Markdown formatting from a raw heading string, returning plain text suitable for building
+ * GitHub-style anchors and breadcrumb labels.
+ *
+ * @param raw - The heading text as it appears in Markdown (may contain links, code, emphasis).
+ * @returns Plain text with links, images, inline code, and emphasis markers removed.
+ */
 export function headingPlainText(raw: string): string {
   // The `\(…\)` part tolerates one level of balanced parens so a real-world target like
   // `URL_(disambiguation)` doesn't leave a dangling ")" in the rendered breadcrumb text.
@@ -31,6 +39,13 @@ export function headingPlainText(raw: string): string {
 }
 
 // GitHub-style anchor slug: lowercase, drop punctuation, spaces -> hyphens.
+/**
+ * Converts plain heading text into a GitHub-compatible anchor slug: lowercase, punctuation
+ * removed, spaces replaced with hyphens.
+ *
+ * @param text - Plain heading text (output of `headingPlainText`).
+ * @returns URL-safe anchor slug string.
+ */
 export function slugifyHeading(text: string): string {
   return text
     .toLowerCase()
@@ -77,6 +92,9 @@ function breadcrumb(headings: HeadingLine[], current: number): string {
 /**
  * Splits Markdown into H2/H3 section chunks. Returns an empty array when the document has fewer
  * than two such headings (nothing meaningful to chunk).
+ *
+ * @param markdown - Full detailed Markdown document to split.
+ * @returns Ordered array of H2/H3 section chunks, or an empty array for short/flat documents.
  */
 export function splitMarkdownSections(markdown: string): SectionChunk[] {
   const lines = markdown.split('\n');

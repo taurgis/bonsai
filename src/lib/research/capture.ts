@@ -15,16 +15,19 @@ import { validateTextArtifact } from './docs/validate.js';
 // rendered fallback for SPA/empty/low-quality pages (T-18). llms.txt is probed as discovery only.
 // All fetchers are injected so the orchestration is unit-testable without network or a browser.
 
+/** Injected fetcher dependencies for `capturePage`. All three are required. */
 export interface CaptureDeps {
   fetchStatic: (url: string) => Promise<FetchResult>;
   fetchRendered: (url: string) => Promise<FetchResult>;
   fetchText: TextFetcher;
 }
 
+/** Options passed to `capturePage` by the caller. */
 export interface CaptureOptions {
   forceRendered?: boolean;
 }
 
+/** Full outcome of a `capturePage` call, including provenance and capability metadata. */
 export interface CaptureOutcome {
   fetchResult: FetchResult;
   extraction: ExtractionResult;
@@ -39,6 +42,13 @@ const MIN_USEFUL_CHARS = 600;
 
 // A static extraction needs rendering help when it failed outright, the detector says the page is
 // an SPA/client-rendered, or the extracted article is too thin/low-confidence to be useful.
+/**
+ * Returns true when the static extraction result is missing or too weak to serve as the artifact,
+ * meaning the caller should attempt a rendered fallback.
+ *
+ * @param caps - Detected site capabilities; `recommendedCapture === 'rendered'` forces a fallback.
+ * @param extraction - Result of static extraction, or null when static fetch failed.
+ */
 export function renderedFallbackNeeded(
   caps: SiteCapabilities,
   extraction: ExtractionResult | null
@@ -208,6 +218,12 @@ async function renderedFallbackOutcome(
  * Captures a page's best-available content. Order: forced rendered → route/source Markdown → static
  * HTML → rendered fallback. Returns the chosen fetch result, extraction, detected capabilities, and
  * provenance (capture method, source URL, machine-readable artifacts, attempted methods).
+ *
+ * @param url - The page URL to capture.
+ * @param options - Capture options (e.g. `forceRendered`).
+ * @param deps - Injected fetchers for static, rendered, and text requests.
+ * @returns Full CaptureOutcome including the best extraction and capture provenance.
+ * @throws {Error} When all capture strategies fail and no usable content is produced.
  */
 export async function capturePage(
   url: string,

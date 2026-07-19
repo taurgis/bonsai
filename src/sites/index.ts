@@ -15,6 +15,12 @@ export const SITES: SiteModule[] = [
   { id: 'tanstack', name: 'TanStack', domains: ['tanstack.com'] },
 ];
 
+/**
+ * Matches a URL to its registered site module by hostname. Returns undefined for unrecognized hosts.
+ *
+ * @param url - Any URL string; invalid URLs return undefined rather than throwing.
+ * @returns The matching SiteModule, or undefined when no registered site owns the URL's hostname.
+ */
 export function detectSite(url: string): SiteModule | undefined {
   let hostname: string;
   try {
@@ -25,6 +31,12 @@ export function detectSite(url: string): SiteModule | undefined {
   return SITES.find((site) => site.domains.includes(hostname));
 }
 
+/**
+ * Looks up a registered site module by its stable identifier (e.g. `'salesforce'`).
+ *
+ * @param id - The site module's `id` field.
+ * @returns The matching SiteModule, or undefined when no module with that id is registered.
+ */
 export function getSiteModuleById(id: string): SiteModule | undefined {
   return SITES.find((site) => site.id === id);
 }

@@ -2,6 +2,7 @@
 // candidate URL only; callers MUST validate it with a real fetch before trusting it (T-19). A
 // repository link alone is never "supported source mapping". All inputs are untrusted.
 
+/** A resolved pointer to a public GitHub source file for a documentation page. */
 export interface GithubSource {
   repository: string; // owner/repo
   branch: string;
@@ -36,6 +37,13 @@ export function parseGithubSourceLink(href: string): GithubSource | null {
 const NODE_API =
   /^https?:\/\/nodejs\.org\/(?:[a-z-]+\/)?(?:docs\/)?(?:latest(?:-v\d+\.x)?\/)?api\/([a-z_]+)\.html/i;
 
+/**
+ * Maps a Node.js API docs URL to its source file in the nodejs/node GitHub repository.
+ * Returns null when the URL is not a recognized Node.js API page.
+ *
+ * @param url - A nodejs.org API documentation URL.
+ * @returns A GithubSource candidate, or null for unrecognized URLs.
+ */
 export function mapNodeApiSource(url: string): GithubSource | null {
   const match = url.match(NODE_API);
   if (!match) return null;
@@ -53,6 +61,13 @@ export function mapNodeApiSource(url: string): GithubSource | null {
 // files/en-us/web/javascript/.../index.md (content paths are lowercased).
 const MDN_DOCS = /^https?:\/\/developer\.mozilla\.org\/([a-zA-Z-]+)\/docs\/(.+?)\/?$/;
 
+/**
+ * Maps an MDN developer.mozilla.org URL to its source file in the mdn/content GitHub repository.
+ * Returns null when the URL is not a recognized MDN docs page.
+ *
+ * @param url - An MDN documentation URL.
+ * @returns A GithubSource candidate, or null for unrecognized URLs.
+ */
 export function mapMdnSource(url: string): GithubSource | null {
   const match = url.match(MDN_DOCS);
   if (!match) return null;
@@ -70,6 +85,13 @@ export function mapMdnSource(url: string): GithubSource | null {
 
 // VitePress route Markdown: a docs page at /guide/intro.html (or /guide/intro) also serves
 // /guide/intro.md. Returns the candidate `.md` route URL; validate before use (T-24/T-19).
+/**
+ * Derives the candidate `.md` route URL for a VitePress page. Returns null when the URL already
+ * ends with `.md` or cannot be parsed. The result is a candidate that must be validated by fetching.
+ *
+ * @param url - A VitePress documentation page URL.
+ * @returns The derived `.md` route URL, or null for non-applicable URLs.
+ */
 export function vitepressRouteMarkdown(url: string): string | null {
   let parsed: URL;
   try {

@@ -1,5 +1,11 @@
+/** Hostnames served by Salesforce-operated LWR doc sites with shared browser-capture logic. */
 export const ALLOWED_DOC_HOSTS = new Set(['help.salesforce.com', 'developer.salesforce.com']);
 
+/**
+ * Returns true when `hostname` is one of the allowed Salesforce doc hosts.
+ *
+ * @param hostname - Hostname to check (case-insensitive).
+ */
 export function isAllowedDocHost(hostname: string): boolean {
   return ALLOWED_DOC_HOSTS.has(hostname.toLowerCase());
 }
@@ -7,6 +13,9 @@ export function isAllowedDocHost(hostname: string): boolean {
 /**
  * Coveo indexes Help articles under an internal `/help_doccontent` URL; rewrite it to the
  * canonical `/s/articleView` page a human (or our fetcher) can actually open.
+ *
+ * @param rawUrl - Any URL string; non-matching URLs are returned unchanged.
+ * @returns The canonical articleView URL, or `rawUrl` unchanged if no rewrite applies.
  */
 export function normalizeHelpDocContentUrl(rawUrl: string): string {
   let url: URL;

@@ -6,6 +6,11 @@ import { cleanDocsChrome } from './docs/clean-dom.js';
 import { analyzeMarkdownQuality } from './docs/quality-gates.js';
 import { sanitizePromptInjection } from './prompt-injection.js';
 
+/**
+ * Readability-extracted content from a page, ready to store as a research artifact.
+ * `confidence` reflects the extracted text length; `qualityNotes` carry stable `quality:*` codes
+ * for downstream agent use. `isIndexHub` is true when the page is a nav hub rather than an article.
+ */
 export interface ExtractionResult {
   title: string;
   detailedMarkdown: string;
@@ -69,6 +74,11 @@ function determineConfidence(textLength: number): {
 
 /**
  * Extracts readerable content from an HTML document, sanitizes it, and converts it to detailed Markdown.
+ *
+ * @param html - Raw HTML of the page to extract.
+ * @param finalUrl - The resolved URL after any redirects; used to resolve relative links.
+ * @returns Extracted title, Markdown body, confidence level, quality notes, and index-hub flag.
+ * @throws {Error} When Readability cannot parse any article content from the page.
  */
 export function extractHtmlContent(html: string, finalUrl: string): ExtractionResult {
   const { document } = parseHTML(html);

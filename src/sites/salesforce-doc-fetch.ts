@@ -43,7 +43,10 @@ const ERROR_PATTERNS = [
   /sorry to interrupt/i,
 ];
 
-/** True when the extracted text is an error/not-found/loading shell rather than real content. */
+/** True when the extracted text is an error/not-found/loading shell rather than real content.
+ *
+ * @param text - Extracted Markdown text to check.
+ */
 export function looksLikeSalesforceError(text: string): boolean {
   return ERROR_PATTERNS.some((re) => re.test(text));
 }
@@ -95,6 +98,13 @@ const MARKDOWN_TOOLBAR_LINE = /^(copy as markdown|view as markdown|copy url to m
 // content and renders as a bare `[](url)`. (Images `![](url)` are intentionally not matched.)
 const EMPTY_LINK_LINE = /^\[\]\([^)]*\)$/;
 
+/**
+ * Removes known boilerplate lines from converted Salesforce Markdown: the feedback widget text,
+ * "View as Markdown" toolbar labels, and empty icon-anchor lines.
+ *
+ * @param markdown - Markdown output from the DOM or content API conversion.
+ * @returns Markdown with boilerplate lines stripped and excess blank lines collapsed.
+ */
 export function stripBoilerplate(markdown: string): string {
   return markdown
     .split('\n')
@@ -111,7 +121,11 @@ export function stripBoilerplate(markdown: string): string {
 
 const DOCS_CONTENT_API = '/docs/get_document_content/';
 
-/** Parses the Salesforce private content API JSON payload. */
+/** Parses the Salesforce private content API JSON payload.
+ *
+ * @param raw - Raw JSON string from the `/docs/get_document_content/` network response.
+ * @returns Parsed `{ content, title }` object, or null when the body is empty or unparseable.
+ */
 export function parseDocsApiPayload(raw: string): { content: string; title: string } | null {
   if (!raw?.trim()) return null;
   try {
@@ -123,7 +137,14 @@ export function parseDocsApiPayload(raw: string): { content: string; title: stri
   }
 }
 
-/** Keeps whichever Markdown source carries more structural content (DOM vs content API HTML). */
+/** Keeps whichever Markdown source carries more structural content (DOM vs content API HTML).
+ *
+ * @param domMarkdown - Markdown serialized from the shadow-DOM container.
+ * @param apiHtml - Raw HTML body from the Salesforce content API.
+ * @param domTitle - Page title from the DOM capture.
+ * @param apiTitle - Title from the content API response.
+ * @returns The richer Markdown, the winning title, and a flag indicating whether the API source won.
+ */
 export function preferRicherMarkdown(
   domMarkdown: string,
   apiHtml: string,
@@ -297,6 +318,11 @@ function buildCaptureScript(contentSelectors: string[], extraRemove: string[]): 
   })()`;
 }
 
+/**
+ * Options for the shared Salesforce LWR shadow-DOM fetcher.
+ * `contentSelectors` drive the priority content-container pick; `removeSelectors` strips
+ * per-site chrome that survives the shared BASE_REMOVE_SELECTORS list.
+ */
 export interface SalesforceDocOptions {
   allowedHost: string;
   contentSelectors: string[];
@@ -431,6 +457,12 @@ function buildSalesforceFetchResult(
 /**
  * Renders a Salesforce LWR doc page, serializes its shadow-DOM content container, and converts
  * it to Markdown. Validates the host before any network access.
+ *
+ * @param url - The Salesforce doc page URL to fetch.
+ * @param options - Allowed host, priority content selectors, and optional per-site remove selectors.
+ * @returns Extracted Markdown, fetch metadata, and browser-capture provenance.
+ * @throws {Error} When the URL is invalid, the host is not the allowed host, DNS is unsafe,
+ *   or the captured content is too short / looks like an error page.
  */
 export async function fetchSalesforceDoc(
   url: string,

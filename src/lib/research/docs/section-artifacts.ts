@@ -22,6 +22,11 @@ function childKey(parentKey: string, anchor: string): string {
 /**
  * Derives section child artifacts from a parent page artifact. Returns [] when the page is short
  * or has too few headings to chunk.
+ *
+ * @param parent - The parent page artifact whose `detailed` Markdown will be split.
+ * @param currentTime - Timestamp to embed in child artifact metadata.
+ * @param summaryLevel - Extractive summarization level for building each child's `compressed` field.
+ * @returns Array of section ResearchArtifacts, empty when the page is below the token threshold.
  */
 export function buildSectionArtifacts(
   parent: ResearchArtifact,
@@ -72,6 +77,12 @@ function activeChildrenOf(dataDir: string, parentKey: string): ResearchArtifact[
  * Regenerates a page's section artifacts: writes fresh children and archives any prior child whose
  * heading no longer exists, so a revalidated parent never leaves orphaned sections active. Returns
  * the number of active section children written.
+ *
+ * @param dataDir - Root data directory used by `scanCacheDir` and `writeArtifact`.
+ * @param parent - The parent page artifact to derive sections from.
+ * @param currentTime - Timestamp embedded in the child artifacts.
+ * @param summaryLevel - Extractive summarization level for child `compressed` fields.
+ * @returns Count of active section children written to disk.
  */
 export function persistSectionArtifacts(
   dataDir: string,

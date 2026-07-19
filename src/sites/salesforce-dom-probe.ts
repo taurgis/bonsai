@@ -40,6 +40,11 @@ const textLenFor = (el) =>
  * In-page block: pick the highest-priority content container that exists on the page.
  * Does not fall through to lower-priority selectors when a higher-priority host is present
  * (e.g. doc-content-layout banner vs doc-amf-reference table).
+ *
+ * @param selectors - CSS selectors in priority order; the first that matches wins.
+ * @param minChars - Minimum text length a matched container must have to be accepted.
+ * @param containerVar - Name of the JS variable to assign the result to (default `'container'`).
+ * @returns A JavaScript code block string (without the surrounding `(() => {…})()` wrapper).
  */
 export function buildPriorityContainerPickBlock(
   selectors: string[],
@@ -69,7 +74,12 @@ export function buildPriorityContainerPickBlock(
   `;
 }
 
-/** CDP expression polled until the priority content host reaches minChars and the body settles. */
+/** CDP expression polled until the priority content host reaches minChars and the body settles.
+ *
+ * @param selectors - CSS selectors in priority order matching the site's content containers.
+ * @param minChars - Minimum text length before the container is considered ready.
+ * @returns A self-invoking JS expression string that evaluates to `{ has: boolean, len: number }`.
+ */
 export function buildContentReadyProbeExpression(selectors: string[], minChars: number): string {
   return `(() => {
     ${SALESFORCE_SHADOW_DOM_HELPERS}
@@ -99,6 +109,11 @@ export function buildContentReadyProbeExpression(selectors: string[], minChars: 
 /**
  * Polls until the priority Salesforce content host is ready and body text has settled.
  * Returns without throwing on timeout; the caller captures whatever rendered and judges quality.
+ *
+ * @param page - Open CDP page to evaluate expressions on.
+ * @param selectors - CSS selectors in priority order matching the site's content containers.
+ * @param minChars - Minimum container text length before polling stops.
+ * @param timeoutMs - Maximum wall-clock time (ms) to wait before giving up.
  */
 export async function pollSalesforceContentReady(
   page: CdpPage,

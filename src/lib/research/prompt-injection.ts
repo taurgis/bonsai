@@ -152,6 +152,14 @@ function stripQuotes(span: string): string {
   return span;
 }
 
+/**
+ * Scans Markdown for embedded prompt-injection attacks and redacts any block or line that matches.
+ * Detects direct patterns, plus base64/hex-encoded variants and typoglycemia obfuscation.
+ * HTML comments are checked first; the body is then split on paragraph breaks and scanned line-by-line.
+ *
+ * @param markdown - Markdown content (possibly untrusted, sourced from fetched pages).
+ * @returns Sanitized Markdown with harmful instruction blocks replaced by a redaction placeholder.
+ */
 export function sanitizePromptInjection(markdown: string): string {
   return markdown
     .replace(HTML_COMMENT, (comment) => redactBlock(comment))

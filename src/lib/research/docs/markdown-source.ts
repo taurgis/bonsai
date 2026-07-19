@@ -6,6 +6,7 @@ import { sanitizePromptInjection } from '../prompt-injection.js';
 // ExtractionResult shape the HTML pipeline produces, so source content slots into the cache
 // pipeline unchanged (T-19). Embedded raw HTML in Markdown is sanitized; MDX is never executed.
 
+/** Result of stripping a YAML frontmatter block from a Markdown document. */
 export interface ParsedFrontmatter {
   frontmatter: Record<string, string>;
   body: string;
@@ -13,6 +14,14 @@ export interface ParsedFrontmatter {
 
 // Parses a leading YAML frontmatter block (--- ... ---). Only flat scalar keys are read; nested
 // structures are ignored (we only need title/description). The block is stripped from the body.
+/**
+ * Extracts the leading YAML frontmatter block from a Markdown string. Only flat scalar keys are
+ * read; nested structures are silently ignored. The returned `body` has the frontmatter block
+ * and its delimiters stripped.
+ *
+ * @param md - Raw Markdown/MDX string, possibly starting with `---` frontmatter.
+ * @returns Parsed flat key/value frontmatter and the remaining Markdown body.
+ */
 export function parseFrontmatter(md: string): ParsedFrontmatter {
   const normalized = md.replace(/^﻿/, '');
   if (!normalized.startsWith('---')) return { frontmatter: {}, body: normalized };
@@ -37,6 +46,9 @@ export function parseFrontmatter(md: string): ParsedFrontmatter {
 /**
  * Removes dangerous embedded HTML from untrusted Markdown: <script>/<style> blocks, inline event
  * handler attributes, and javascript: URLs. Leaves ordinary Markdown and benign inline HTML intact.
+ *
+ * @param md - Markdown/MDX source string from a public but untrusted URL.
+ * @returns Sanitized Markdown with unsafe HTML constructs removed.
  */
 export function sanitizeSourceMarkdown(md: string): string {
   return (
@@ -115,6 +127,10 @@ function stripMdnHiddenSamples(md: string): string {
  * fences through verbatim. Every text-level cleanup in this pipeline must go through this guard:
  * fenced code is quoted material, and "cleaning" it destroys the samples readers came for
  * (a `<script>` line in an example, a bash `# comment`, a literal `javascript:` URL).
+ *
+ * @param md - Markdown document to process.
+ * @param transform - Function applied to each non-fenced segment.
+ * @returns Transformed Markdown with fenced code blocks left verbatim.
  */
 export function outsideFences(md: string, transform: (segment: string) => string): string {
   return md
@@ -219,6 +235,10 @@ function confidenceFor(length: number): ExtractionResult['confidence'] {
  * Builds an ExtractionResult from public Markdown/MDX source. Frontmatter is parsed for the title
  * and the body is sanitized. The detailed Markdown is the source itself, preserving code fences,
  * tabs, and admonitions better than HTML conversion.
+ *
+ * @param md - Raw Markdown/MDX source from a public URL.
+ * @param sourceUrl - The URL the source was fetched from; used for MDN KumaScript gating and the quality note.
+ * @returns ExtractionResult with the cleaned Markdown body as `detailedMarkdown`.
  */
 export function extractFromSource(md: string, sourceUrl: string): ExtractionResult {
   const { frontmatter, body } = parseFrontmatter(md);

@@ -29,6 +29,9 @@ const PROBE_HEADERS = {
  * Derives the candidate `.md` route for a developer.salesforce.com doc URL, or null when the URL
  * can't serve one (wrong host, not under /docs/, or an atlas.* book — verified to answer `.md`
  * with an HTML shell, never Markdown). Query/hash are view state and are dropped.
+ *
+ * @param url - A developer.salesforce.com doc URL (or any URL; non-matching returns null).
+ * @returns The derived `.md` URL, or null when no `.md` route exists for this URL.
  */
 export function deriveMarkdownUrl(url: string): string | null {
   let parsed: URL;
@@ -49,7 +52,11 @@ export function deriveMarkdownUrl(url: string): string | null {
 // not published on the .md route (they 404), so they'd survive as inert noise in the artifact.
 const INCLUDE_DIRECTIVE = /^\s*::include\{[^}]*\}\s*$/;
 
-/** Removes unresolvable `::include{…}` directive lines, reporting how many were dropped. */
+/** Removes unresolvable `::include{…}` directive lines, reporting how many were dropped.
+ *
+ * @param md - Markdown body from the `.md` route response.
+ * @returns Cleaned body string and a count of removed directive lines.
+ */
 export function stripIncludeDirectives(md: string): { body: string; dropped: number } {
   let dropped = 0;
   const body = md
@@ -100,6 +107,10 @@ const PROBE_TIMEOUT_MS = 4_000;
 // thin is a rollout stub, and falling back gives the rendered page a chance to do better.
 const MIN_TWIN_CHARS = 100;
 
+/**
+ * Injectable HTTP fetcher used by `fetchDeveloperRouteMarkdown`. The default is `fetchText`;
+ * tests inject a fixture fetcher to avoid real network calls.
+ */
 export type RouteMarkdownFetcher = (
   url: string,
   options?: { headers?: Record<string, string>; timeoutMs?: number }
@@ -109,6 +120,10 @@ export type RouteMarkdownFetcher = (
  * Probes the derived `.md` route for a developer doc URL. Returns a complete SiteFetchResult
  * (with route_markdown provenance) when the twin validates, or null so the caller falls back to
  * the browser capture. Never throws: any network/validation failure is just "no twin".
+ *
+ * @param url - The developer.salesforce.com doc page URL to probe.
+ * @param fetcher - HTTP fetcher (injectable for tests; defaults to `fetchText`).
+ * @returns SiteFetchResult with route_markdown provenance, or null when no valid twin is found.
  */
 export async function fetchDeveloperRouteMarkdown(
   url: string,

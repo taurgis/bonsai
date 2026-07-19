@@ -5,8 +5,10 @@
 // the page hints at the capability but the endpoint/index/source is not proven. A visible search
 // button is at most a `signal` — never `verified` (see T-16/T-20 acceptance criteria).
 
+/** Two-valued confidence marker: `verified` = observed in bytes; `signal` = hinted but unproven. */
 export type Evidence = 'verified' | 'signal';
 
+/** Recognized client-side doc rendering engines. */
 export type DocsEngine =
   | 'vitepress'
   | 'docusaurus'
@@ -15,7 +17,7 @@ export type DocsEngine =
   | 'generated-static'
   | 'spa';
 
-// Reusable docs generators / hosted platforms layered on top of (or independent of) an engine.
+/** Reusable docs generators and hosted platforms layered on top of (or independent of) an engine. */
 export type DocsFramework =
   | 'mkdocs'
   | 'material-mkdocs'
@@ -32,6 +34,7 @@ export type DocsFramework =
   | 'docsy'
   | 'just-the-docs';
 
+/** Recognized machine-readable artifact types a docs site may expose. */
 export type MachineReadableType =
   | 'llms.txt'
   | 'llms-full.txt'
@@ -40,6 +43,7 @@ export type MachineReadableType =
   | 'sitemap'
   | 'source-edit-link';
 
+/** A machine-readable artifact discovered (or inferred) for a docs site. */
 export interface MachineReadableArtifact {
   type: MachineReadableType;
   url: string;
@@ -48,6 +52,7 @@ export interface MachineReadableArtifact {
 
 // A pointer to public source for a page. `evidence: verified` only once a raw URL is proven
 // fetchable; an edit link or repo path discovered in markup is a `signal` until then.
+/** A pointer to the public Markdown/MDX source for a page. Only `verified` once a raw URL is fetched successfully. */
 export interface SourceHint {
   type: 'markdown' | 'mdx' | 'html';
   url?: string;
@@ -57,6 +62,7 @@ export interface SourceHint {
   evidence: Evidence;
 }
 
+/** Known search providers a docs site may use. */
 export type SearchProvider =
   | 'algolia-docsearch'
   | 'vitepress-local'
@@ -70,6 +76,7 @@ export type SearchProvider =
   | 'readme-algolia'
   | 'custom';
 
+/** Search capability detected for a docs site, with optional index coordinates. */
 export interface SearchCapability {
   provider: SearchProvider;
   evidence: Evidence;
@@ -80,12 +87,14 @@ export interface SearchCapability {
   publicEndpoint?: string;
 }
 
+/** A single entry in a docs site's page map: title, route URL, and optional source path. */
 export interface PageMapEntry {
   title: string;
   url: string;
   sourcePath?: string;
 }
 
+/** Full capability snapshot for a docs site, as populated by the detector and probe modules. */
 export interface SiteCapabilities {
   docsEngine?: DocsEngine;
   framework?: DocsFramework;
@@ -99,6 +108,11 @@ export interface SiteCapabilities {
   notes: string[];
 }
 
+/**
+ * Returns a baseline SiteCapabilities with no engine/framework detected and an empty capability set.
+ *
+ * @returns A minimal SiteCapabilities object suitable as a starting point for detectors and probes.
+ */
 export function emptyCapabilities(): SiteCapabilities {
   return { recommendedCapture: 'static', machineReadable: [], notes: [] };
 }
