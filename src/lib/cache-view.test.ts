@@ -1,20 +1,24 @@
+import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { batchSeparator, cacheMissHint, formatCacheTargetHeader } from './cache-view.js';
 
 describe('cache-view', () => {
   it('formats the shared URL/key/path header used by status and inspect', () => {
+    const writeRoot = join('/tmp', 'cache');
+    const cacheKey = 'a'.repeat(64);
     const lines = formatCacheTargetHeader(
       {
         normalizedUrl: 'https://example.com/docs',
-        cacheKey: 'a'.repeat(64),
-        roots: { writeRoot: '/tmp/cache' },
+        cacheKey,
+        roots: { writeRoot },
       },
       [['Status', 'hit']]
     );
-    expect(lines.join('\n')).toContain('https://example.com/docs');
-    expect(lines.join('\n')).toContain('a'.repeat(64));
-    expect(lines.join('\n')).toContain('/tmp/cache/research/');
-    expect(lines.join('\n')).toContain('hit');
+    const text = lines.join('\n');
+    expect(text).toContain('https://example.com/docs');
+    expect(text).toContain(cacheKey);
+    expect(text).toContain(join(writeRoot, 'research', `${cacheKey}.md`));
+    expect(text).toContain('hit');
   });
 
   it('builds the cache-miss tip with the fetch shorthand', () => {
