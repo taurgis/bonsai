@@ -43,6 +43,18 @@ export function detectSecret(text: string): string | null {
   return null;
 }
 
+/**
+ * Strip every secret-pattern match from `text`, replacing each with a single space. Matches the
+ * original (case-preserved, unsplit) text, so callers must run this before any lowercasing or
+ * tokenization step that would otherwise hide a pattern like `AKIA…` or `ghp_…` from detection.
+ */
+export function stripSecrets(text: string): string {
+  return SECRET_PATTERNS.reduce(
+    (result, { re }) => result.replace(new RegExp(re.source, `${re.flags}g`), ' '),
+    text
+  );
+}
+
 /** Scan every content field of an artifact. Returns the detected secret's label, or null. */
 export function scanArtifactForSecret(artifact: ResearchArtifact): string | null {
   const haystack = [artifact.summary, artifact.compressed, artifact.detailed, artifact.provenance]

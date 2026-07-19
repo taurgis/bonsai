@@ -80,6 +80,21 @@ describe('extractKeywords', () => {
     expect(tags).not.toContain('inlinecode');
   });
 
+  it('never surfaces a secret-shaped token as a keyword, across secret shapes', () => {
+    const cases = [
+      'API key: sk-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD is required for this notes API.',
+      'AWS credentials AKIAIOSFODNN7EXAMPLE were committed by mistake in these notes.',
+      'GitHub token ghp_abcdefghijklmnopqrstuvwxyz1234567890AB leaked in these notes.',
+      'Google API key AIzaSyA1234567890abcdefghijklmnopqrstuv appears in these notes.',
+    ];
+    for (const body of cases) {
+      const tags = extractKeywords(`# Notes\n${body}`, 5);
+      for (const tag of tags) {
+        expect(tag).not.toMatch(/sk-|akia|ghp_|aiza/i);
+      }
+    }
+  });
+
   it('is deterministic for ties (alphabetical) and respects the max', () => {
     const text = 'alpha beta gamma delta'; // all frequency 1
     expect(extractKeywords(text, 2)).toEqual(['alpha', 'beta']);
