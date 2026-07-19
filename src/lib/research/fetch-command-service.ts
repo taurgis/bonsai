@@ -11,6 +11,7 @@ import {
   buildFetchFailureResult,
   buildFetchResultData,
   describeError,
+  extractionQualityWarnings,
   FETCH_STATUS_LABEL,
   fetchFailureGuidance,
   reportCacheStatus,
@@ -379,6 +380,9 @@ async function fetchSingleTarget(url: string, run: FetchRun) {
   if (!io.json) {
     if (dryRun && cacheStatus !== 'hit' && cacheStatus !== 'stale') {
       io.log('[dry-run] Preview only — cache was not written.');
+    }
+    for (const warning of extractionQualityWarnings(resultData.source.qualityNotes)) {
+      io.warn(`${normalizedUrl}: ${warning}`);
     }
     io.log(resultData.content);
     const separator = batchSeparator(run.urlCount > 1);

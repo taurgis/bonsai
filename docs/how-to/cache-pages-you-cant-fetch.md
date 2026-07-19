@@ -16,7 +16,15 @@ You need this workflow when a normal fetch returns too little:
 | Almost-empty output, `extraction_confidence: low` | A single-page app that renders body text in the browser. |
 | `IP address … is a blocked local or private target` | A `localhost` or private-network URL the SSRF guard rejects. |
 
-Check confidence after a fetch with `inspect`:
+A very short extraction prints a stderr warning right on the fetch itself, so
+you don't need a separate command to notice it:
+
+```
+Warning: https://spa-docs.example.com/guide: extracted content is very short (less than 500 characters)
+```
+
+To double-check confidence and quality notes on a page you already cached,
+inspect it:
 
 ```bash
 npx @taurgis/bonsai inspect https://spa-docs.example.com/guide

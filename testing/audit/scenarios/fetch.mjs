@@ -238,6 +238,17 @@ export default function register(harness, fixtures) {
       expect(env?.schemaVersion === 1, 'envelope');
     });
 
+    check('fetch of a very-short page warns the extraction-quality note on stderr in human mode (AUDIT_NETWORK)', () => {
+      // extraction_confidence 'low' and its "warning: ..." quality note used to be visible only
+      // via --json (source.qualityNotes) — a human-mode fetch gave zero signal the cached content
+      // might be incomplete. example.com's single short paragraph reliably trips the <500-char
+      // low-confidence threshold.
+      const r = run(['https://example.com'], { timeout: 90000 });
+      expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+      expect(r.stderr.includes('extracted content is very short'), r.stderr);
+      expect(!r.stderr.includes('warning:'), `prefix should be stripped: ${r.stderr}`);
+    });
+
     check('fetch of a JSON endpoint fails with the content-type error, not a corrupted browser fallback (AUDIT_NETWORK)', () => {
       // A non-HTML response must never silently succeed via the automatic rendered-browser
       // fallback (Chrome renders a built-in JSON viewer for anything, which would extract as
@@ -249,6 +260,20 @@ export default function register(harness, fixtures) {
       expect(env?.ok === false, 'ok false');
       expect(env?.stderr?.includes('Rejected content type'), env?.stderr);
       expect(env?.data === null, JSON.stringify(env?.data));
+    });
+
+    check('fetch redirect-to-private-address stays SSRF-blocked through the auto rendered fallback (AUDIT_NETWORK)', () => {
+      // A public host can redirect the STATIC fetch into a private/loopback address; the static
+      // fetcher's per-hop DNS check blocks that (not a content-type error), which used to make
+      // capturePage's automatic rendered-browser fallback retry the same URL — and Chrome follows
+      // redirects internally with no further DNS check, silently rendering the internal target as
+      // if it were a normal page. This must stay a hard SSRF-blocked failure end-to-end.
+      const target = encodeURIComponent('http://127.0.0.1:1/');
+      const r = run([`https://httpbin.org/redirect-to?url=${target}`, '--json'], { timeout: 90000 });
+      expect(r.exitCode === 1, `exit ${r.exitCode}`);
+      const env = parseJson(r.stdout);
+      expect(env?.ok === false, 'ok false');
+      expect(env?.stderr?.includes('blocked local or private target'), env?.stderr);
     });
 
     check('fetch Salesforce Developer guide via route .md twin (AUDIT_NETWORK)', () => {

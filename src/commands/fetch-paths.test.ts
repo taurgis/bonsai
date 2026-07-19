@@ -469,6 +469,43 @@ describe('fetch command branch coverage', () => {
     expect(result.source.captureMethod).toBe('browser_fallback');
   });
 
+  it('low-confidence extraction: warns on stderr in human mode with the note text (no "warning:" prefix)', async () => {
+    mocks.capturePage.mockResolvedValue(
+      fakeCapture('# Short\n\nTiny.', {
+        extraction: {
+          title: 'Short',
+          detailedMarkdown: '# Short\n\nTiny.',
+          confidence: 'low',
+          qualityNotes: [
+            'readability extracted main article',
+            'warning: extracted content is very short (less than 500 characters)',
+          ],
+        },
+      })
+    );
+    const warnSpy = vi.spyOn(FetchCommand.prototype, 'warn').mockImplementation((input) => input);
+
+    await FetchCommand.run([TEST_URL]);
+
+    const warnedMessage = String(
+      warnSpy.mock.calls.find((call) => String(call[0]).includes('very short'))?.[0]
+    );
+    expect(warnedMessage).toBe(
+      `${normalizeUrl(TEST_URL)}: extracted content is very short (less than 500 characters)`
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('high-confidence extraction: no quality warning on stderr', async () => {
+    mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+    const warnSpy = vi.spyOn(FetchCommand.prototype, 'warn').mockImplementation((input) => input);
+
+    await FetchCommand.run([TEST_URL]);
+
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
   it('site module fetchPage: uses the custom fetch strategy, not capturePage', async () => {
     const fetchPage = vi.fn().mockResolvedValue({
       fetchResult: fakeFetchResult(),

@@ -5,7 +5,9 @@ import { join } from 'node:path';
 import {
   assertRenderedHttpOk,
   buildChromeArgs,
+  captureNavigatedPage,
   describeNavigationFailure,
+  describeUnsafeNavigationTarget,
   fetchRenderedHtml,
   findChromePath,
   ResponseCapture,
@@ -257,6 +259,116 @@ describe('assertRenderedHttpOk', () => {
 
   it('does not throw when no document response was observed', () => {
     expect(() => assertRenderedHttpOk(undefined)).not.toThrow();
+  });
+});
+
+// This is the guard openCdpPage's Fetch-domain interception runs against every navigated (and
+// redirected) Document request, closing the SSRF gap where a page that starts on a safe public
+// host redirects the rendered-fallback capture into a private/internal address or a non-http(s)
+// scheme — something Chrome would otherwise follow with no further safety check. IP-literal inputs
+// keep these deterministic and network-free (checkDnsSafety short-circuits DNS lookup for them).
+describe('describeUnsafeNavigationTarget', () => {
+  it('blocks a private/loopback IP target', async () => {
+    const err = await describeUnsafeNavigationTarget('http://127.0.0.1:19999/');
+    expect(err?.message).toContain('blocked local or private target');
+  });
+
+  it('allows a safe public IP target', async () => {
+    expect(await describeUnsafeNavigationTarget('http://8.8.8.8/')).toBeNull();
+  });
+
+  it('blocks a non-http(s) scheme, e.g. a redirect to file:', async () => {
+    const err = await describeUnsafeNavigationTarget('file:///etc/passwd');
+    expect(err?.message).toContain('Unsupported protocol "file:"');
+  });
+
+  it('blocks a redirect target carrying embedded credentials', async () => {
+    const err = await describeUnsafeNavigationTarget('http://user:pass@example.com/');
+    expect(err?.message).toContain('usernames or passwords');
+  });
+
+  it('blocks an unparseable URL', async () => {
+    const err = await describeUnsafeNavigationTarget('not a url');
+    expect(err?.message).toContain('Could not parse');
+  });
+});
+
+// A fake CdpPage whose Page.navigate/Runtime.evaluate calls succeed trivially, so tests can drive
+// captureNavigatedPage's takeBlockedNavigationError checkpoints and waitForLoad's ready/timeout
+// behavior directly, without spawning a real browser. `blockedOnCalls` answers successive
+// takeBlockedNavigationError() calls in order (extra calls repeat the last answer). When
+// `fireLoadEvent` is set, the fake fires Page.loadEventFired as soon as waitForLoad subscribes to
+// it (waitForLoad itself registers no listener until called, so firing any earlier would be a
+// no-op) — that's what lets waitForLoad resolve instead of timing out.
+function makeFakeNavigablePage(blockedOnCalls: Array<Error | null>, fireLoadEvent = false) {
+  let calls = 0;
+  const client = {
+    on(event: string, handler: (params: unknown) => void) {
+      if (fireLoadEvent && event === 'S:Page.loadEventFired') queueMicrotask(() => handler({}));
+    },
+    send: vi.fn(async (method: string) => {
+      if (method === 'Page.navigate') return { frameId: 'F1' };
+      if (method === 'Runtime.evaluate') return { result: { value: '<html>ok</html>' } };
+      return {};
+    }),
+  };
+  const takeBlockedNavigationError = vi.fn(() => {
+    const err = blockedOnCalls[Math.min(calls, blockedOnCalls.length - 1)];
+    calls += 1;
+    return err;
+  });
+  return {
+    client,
+    sessionId: 'S',
+    close: vi.fn(),
+    takeBlockedNavigationError,
+  } as unknown as CdpPage;
+}
+
+describe('captureNavigatedPage blocked-navigation checkpoints', () => {
+  it('prefers the safety-guard reason over a generic waitForLoad timeout (checkpoint: blocked mid-load)', async () => {
+    // Page.navigate resolves clean (checkpoint 1 sees null); no load event is ever emitted, so
+    // waitForLoad times out — but the guard recorded a block by then, and that specific reason
+    // must win over the opaque "Navigation timed out" message.
+    const page = makeFakeNavigablePage([
+      null,
+      new Error('IP address "127.0.0.1" is a blocked local or private target.'),
+    ]);
+
+    await expect(
+      captureNavigatedPage(page, 'https://example.com/', {
+        timeout: 30,
+        limit: 999_999,
+        settleMs: 0,
+      })
+    ).rejects.toThrow('IP address "127.0.0.1" is a blocked local or private target.');
+  });
+
+  it('throws the safety-guard reason recorded just after a clean page load (checkpoint: blocked post-load)', async () => {
+    const page = makeFakeNavigablePage(
+      [null, new Error('IP address "127.0.0.1" is a blocked local or private target.')],
+      true
+    );
+
+    await expect(
+      captureNavigatedPage(page, 'https://example.com/', {
+        timeout: 5_000,
+        limit: 999_999,
+        settleMs: 0,
+      })
+    ).rejects.toThrow('IP address "127.0.0.1" is a blocked local or private target.');
+  });
+
+  it('captures normally when nothing was ever blocked', async () => {
+    const page = makeFakeNavigablePage([null], true);
+
+    const result = await captureNavigatedPage(page, 'https://example.com/', {
+      timeout: 5_000,
+      limit: 999_999,
+      settleMs: 0,
+    });
+
+    expect(result.content).toBe('<html>ok</html>');
   });
 });
 

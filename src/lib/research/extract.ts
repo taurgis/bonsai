@@ -55,6 +55,12 @@ function cleanUnsafeElements(document: any): void {
   }
 }
 
+/**
+ * Prefix marking a `qualityNotes` entry as human-prose worth surfacing on stderr (as opposed to
+ * the stable `quality:*` machine codes in the same array, which are for agents parsing `--json`).
+ */
+export const QUALITY_WARNING_PREFIX = 'warning: ';
+
 function determineConfidence(textLength: number): {
   confidence: 'high' | 'medium' | 'low';
   notes: string[];
@@ -64,7 +70,9 @@ function determineConfidence(textLength: number): {
 
   if (textLength < 500) {
     confidence = 'low';
-    notes.push('warning: extracted content is very short (less than 500 characters)');
+    notes.push(
+      `${QUALITY_WARNING_PREFIX}extracted content is very short (less than 500 characters)`
+    );
   } else if (textLength < 2000) {
     confidence = 'medium';
   }

@@ -3,8 +3,19 @@ import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
 import type { ResearchArtifact } from './schema.js';
 import { cliErrorFields, type CliErrorShape } from '../envelope.js';
 import { SANDBOX_EGRESS_ERROR_MARKER } from './browser.js';
+import { QUALITY_WARNING_PREFIX } from './extract.js';
 import { PROXY_TUNNEL_REJECTION_PATTERN } from './proxy.js';
 import { getArtifactPath } from './storage.js';
+
+/**
+ * Human-prose warnings pulled out of `qualityNotes` (e.g. very-short extraction). The remaining
+ * `quality:*` machine codes stay `--json`-only; this is what stderr shows in human-readable mode.
+ */
+export function extractionQualityWarnings(qualityNotes: readonly string[]): string[] {
+  return qualityNotes
+    .filter((note) => note.startsWith(QUALITY_WARNING_PREFIX))
+    .map((note) => note.slice(QUALITY_WARNING_PREFIX.length));
+}
 
 /** Cache status as reported to users: dry-run remaps write-implying statuses to `would_*`. */
 export type ReportedCacheStatus =

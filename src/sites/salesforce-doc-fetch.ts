@@ -383,10 +383,20 @@ async function captureSalesforceAttempt(
     { url },
     page.sessionId
   );
+  // A fast redirect can fail synchronously within Page.navigate's own response (surfacing as
+  // nav.errorText below); check the Fetch-domain safety guard first so a blocked navigation (e.g.
+  // an SSRF attempt via a private-address redirect) reports its specific reason instead of the
+  // opaque net::ERR_BLOCKED_BY_CLIENT that Chrome's own errorText would otherwise give it.
+  const blockedNavigation = page.takeBlockedNavigationError();
+  if (blockedNavigation) throw blockedNavigation;
   if (nav.errorText) {
     throw describeNavigationFailure(nav.errorText, url);
   }
   await waitForLoad(page.client, page.sessionId, TIMEOUT_MS, 0).catch(() => {});
+  // A mid-navigation redirect may have been blocked after Page.navigate returned; surface that
+  // instead of letting Chrome's resulting error page sail through as captured content.
+  const blockedNavigationAfterLoad = page.takeBlockedNavigationError();
+  if (blockedNavigationAfterLoad) throw blockedNavigationAfterLoad;
   await page.client
     .send('Runtime.evaluate', { expression: ACCEPT_CONSENT_EXPRESSION }, page.sessionId)
     .catch(() => {});
