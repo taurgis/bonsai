@@ -5,13 +5,14 @@ import { join } from 'node:path';
 import { runContract } from './runner.ts';
 import { hasInternetAccess } from '../helpers/network.ts';
 
-function expectMirroredErrorStderr(
+function expectJsonErrorOnEnvelopeOnly(
   result: ReturnType<typeof runContract>,
   envelope: { stderr?: string },
   code: string
 ) {
-  expect(result.stderr).toContain(`Code: ${code}`);
-  expect(result.stderr).toContain(envelope.stderr);
+  // Intentional #73 contract: under --json, error text lives in envelope.stderr only.
+  expect(envelope.stderr).toContain(`Code: ${code}`);
+  expect(result.stderr).toBe('');
 }
 
 function contractWorkspace(prefix: string): string {
@@ -81,7 +82,7 @@ describe('research contract tests', () => {
       data: null,
     });
     expect(envelope.stderr).toContain('Missing URL or command');
-    expectMirroredErrorStderr(result, envelope, 'MISSING_COMMAND');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'MISSING_COMMAND');
   });
 
   it('bonsai config --json returns structured subcommand metadata', () => {
@@ -118,8 +119,8 @@ describe('research contract tests', () => {
       stdout: '',
       stderr: '',
     });
-    // Process stderr may carry an empty-cache tip when the shared contract sandbox is empty;
-    // the stdout envelope must stay machine-clean either way.
+    // --json suppresses human empty-cache tips; process stderr must stay clean.
+    expect(result.stderr).toBe('');
   });
 
   it('accepts duplicate --json before a normal command', () => {
@@ -211,7 +212,7 @@ describe('research contract tests', () => {
     const envelope = JSON.parse(result.stdout);
     expect(envelope).toMatchObject({
       schemaVersion: 1,
-      command: 'bonsai',
+      command: 'fetch',
       ok: false,
       exitCode: 2,
       stdout: '',
@@ -235,7 +236,7 @@ describe('research contract tests', () => {
     });
     expect(envelope.stderr).toContain('Did you mean list?');
     expect(envelope.stderr).toContain('Code: COMMAND_NOT_FOUND');
-    expectMirroredErrorStderr(result, envelope, 'COMMAND_NOT_FOUND');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'COMMAND_NOT_FOUND');
   });
 
   it('does not invent a suggestion for unrelated short unknown commands', () => {
@@ -275,14 +276,14 @@ describe('research contract tests', () => {
     const envelope = JSON.parse(result.stdout);
     expect(envelope).toEqual({
       schemaVersion: 1,
-      command: 'bonsai',
+      command: 'fetch',
       ok: true,
       exitCode: 0,
       stdout: '',
       stderr: '',
       data: {
         schemaVersion: 1,
-        command: 'bonsai',
+        command: 'fetch',
         dryRun: false,
         cache: {
           key: '0f115db062b7c0dd030b16878c99dea5c354b49dc37b38eb8846179c7783e9d7',
@@ -368,6 +369,7 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stderr).toBe('');
   });
 
+
   it('a malformed URL reports an actionable error without stuttering "Invalid URL"', () => {
     const result = runContract(['inspect', 'notaurl']);
     expect(result.exitCode).toBe(2);
@@ -426,7 +428,7 @@ describe('CLI ergonomics and error contracts', () => {
     expect(envelope.stderr).toContain('Unexpected argument: extra');
     expect(envelope.stderr).toContain('Code: UNEXPECTED_ARGUMENT');
     expect(envelope.stderr).not.toContain('is not a bonsai command');
-    expectMirroredErrorStderr(result, envelope, 'UNEXPECTED_ARGUMENT');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'UNEXPECTED_ARGUMENT');
   });
 
   it('unknown topic subcommand with --help uses command-not-found suggestions', () => {
@@ -450,7 +452,7 @@ describe('CLI ergonomics and error contracts', () => {
     });
     expect(envelope.stderr).toContain('config frobnicate is not a bonsai command.');
     expect(envelope.stderr).not.toContain('Did you mean config?');
-    expectMirroredErrorStderr(result, envelope, 'COMMAND_NOT_FOUND');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'COMMAND_NOT_FOUND');
   });
 
   it('unknown topic subcommand with --json --help returns command-not-found envelope', () => {
@@ -465,7 +467,7 @@ describe('CLI ergonomics and error contracts', () => {
       data: null,
     });
     expect(envelope.stderr).toContain('Did you mean config get?');
-    expectMirroredErrorStderr(result, envelope, 'COMMAND_NOT_FOUND');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'COMMAND_NOT_FOUND');
   });
 
   it('non-http(s) URL shorthand reports the protocol error, not "command not found"', () => {
@@ -660,7 +662,7 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'MISSING_URL',
       data: null,
     });
-    expectMirroredErrorStderr(result, envelope, 'MISSING_URL');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'MISSING_URL');
   });
 
   it('import missing file JSON includes FILE_NOT_FOUND code', () => {
@@ -677,7 +679,7 @@ describe('CLI ergonomics and error contracts', () => {
       data: null,
     });
     expect(envelope.stderr).toContain('File does not exist');
-    expectMirroredErrorStderr(result, envelope, 'FILE_NOT_FOUND');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'FILE_NOT_FOUND');
   });
 
   it('config set unknown key JSON includes UNKNOWN_KEY code', () => {
@@ -690,7 +692,7 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'UNKNOWN_KEY',
       data: null,
     });
-    expectMirroredErrorStderr(result, envelope, 'UNKNOWN_KEY');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'UNKNOWN_KEY');
   });
 
   it('inspect CACHE_MISS suggestion uses the configured bin name', () => {
@@ -720,7 +722,7 @@ describe('CLI ergonomics and error contracts', () => {
     });
     expect(envelope.stderr).toContain('Code: FETCH_FAILED');
     expect(envelope.suggestions?.length).toBeGreaterThan(0);
-    expectMirroredErrorStderr(result, envelope, 'FETCH_FAILED');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'FETCH_FAILED');
   });
 
   it('scheme-less hostname JSON includes MISSING_URL_SCHEME code', () => {
@@ -736,7 +738,7 @@ describe('CLI ergonomics and error contracts', () => {
     });
     expect(envelope.stderr).toContain('https://example.com');
     expect(envelope.stderr).toContain('Code: MISSING_URL_SCHEME');
-    expectMirroredErrorStderr(result, envelope, 'MISSING_URL_SCHEME');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'MISSING_URL_SCHEME');
   });
 
   it('invalid flag option JSON includes INVALID_FLAG_VALUE code', () => {
@@ -752,7 +754,7 @@ describe('CLI ergonomics and error contracts', () => {
       data: null,
     });
     expect(envelope.stderr).not.toContain('See more help with --help');
-    expectMirroredErrorStderr(result, envelope, 'INVALID_FLAG_VALUE');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'INVALID_FLAG_VALUE');
   });
 
   it('import invalid ttl JSON includes INVALID_DURATION code', () => {
@@ -768,6 +770,6 @@ describe('CLI ergonomics and error contracts', () => {
       code: 'INVALID_DURATION',
       data: null,
     });
-    expectMirroredErrorStderr(result, envelope, 'INVALID_DURATION');
+    expectJsonErrorOnEnvelopeOnly(result, envelope, 'INVALID_DURATION');
   });
 });

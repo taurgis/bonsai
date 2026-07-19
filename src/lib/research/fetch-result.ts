@@ -41,7 +41,6 @@ export const FETCH_STATUS_LABEL: Record<ReportedCacheStatus, string> = {
 };
 
 export interface FetchResultInput {
-  bin: string;
   url: string;
   normalizedUrl: string;
   cacheKey: string;
@@ -61,7 +60,7 @@ export function buildFetchResultData(input: FetchResultInput) {
   const content = format === 'compressed' ? artifact.compressed : artifact.detailed;
   return {
     schemaVersion: 1,
-    command: input.bin,
+    command: 'fetch',
     dryRun,
     cache: {
       key: input.cacheKey,
@@ -104,18 +103,17 @@ export interface FetchFailureGuidance {
 
 /** Per-URL failure row for multi-URL batches — keeps prior successes in `data`. */
 export function buildFetchFailureResult(input: {
-  bin: string;
   url: string;
   dryRun: boolean;
   err: CliErrorShape;
   fallbackGuidance?: FetchFailureGuidance;
 }) {
-  const { bin, url, dryRun, err, fallbackGuidance } = input;
+  const { url, dryRun, err, fallbackGuidance } = input;
   // Prefer the throw site's suggestions/ref; otherwise attach fetch-specific recovery hints.
   const shaped = err.suggestions?.length || err.ref ? err : { ...err, ...fallbackGuidance };
   return {
     schemaVersion: 1,
-    command: bin,
+    command: 'fetch',
     dryRun,
     error: cliErrorFields(shaped, 'FETCH_FAILED'),
     cache: null,
@@ -136,7 +134,6 @@ export function buildFetchFailureFromCaught(
 ) {
   const message = describeError(err);
   return buildFetchFailureResult({
-    bin,
     url,
     dryRun,
     err: { message, code: 'FETCH_FAILED' },

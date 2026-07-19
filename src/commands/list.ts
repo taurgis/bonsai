@@ -8,12 +8,7 @@ import {
   CAPTURE_METHODS,
   type ResearchArtifactMetadata,
 } from '../lib/research/schema.js';
-import {
-  NO_TOPIC_LABEL,
-  resultListHeading,
-  truncationNotice,
-  type ResultListLabels,
-} from '../lib/text.js';
+import { NO_TOPIC_LABEL, resultListHeading, type ResultListLabels } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
 import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
@@ -188,8 +183,9 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
   }
 
-  /** Empty-cache / no-match tip. Under --json, warn on stderr so the stdout envelope stays clean. */
+  /** Empty-cache / no-match tip (human mode only; --json returns `data: []` with no messaging). */
   private emitEmptyListGuidance(): void {
+    if (this.jsonEnabled()) return;
     const filtered = this.hasActiveFilters();
     const headline = filtered
       ? 'No cached research entries match the given filters.'
@@ -198,11 +194,6 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     const tipLead = filtered
       ? 'try relaxing filters, or list everything: '
       : 'populate the cache first: ';
-
-    if (this.jsonEnabled()) {
-      this.warn(`${headline} ${tipLead.charAt(0).toUpperCase()}${tipLead.slice(1)}${tipCmd}`);
-      return;
-    }
     this.log(headline);
     this.log(`\nTip: ${tipLead}${colors.cyan(tipCmd)}`);
   }
@@ -229,12 +220,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
     const finalResults = results.slice(0, this.flags.limit);
 
-    // Under --json the human heading is suppressed, so surface truncation on stderr instead (warn
-    // always emits, even in --json) without touching the stdout envelope. Human mode already shows
-    // it in the heading, so only warn under --json.
-    const notice = truncationNotice(results.length, finalResults.length, LIST_LABELS);
-    if (notice && this.jsonEnabled()) this.warn(notice);
-
+    // Truncation is already in the human heading; --json callers see the capped `data` array only.
     this.logListResults(finalResults, results.length);
 
     return finalResults;

@@ -1,13 +1,13 @@
 /**
- * Prefactoring contract pins for audit #72 / parent #71.
+ * CLI contract pins for audit #72/#73 (parent #71).
  *
- * Pins gaps the older contract files did not cover: per-command help (USAGE +
- * EXAMPLES), success envelopes for read/write commands that only had failure
- * pins, stream routing, and byte-identical stdout for read commands.
+ * Pins help (USAGE + EXAMPLES), success/error envelopes, stream routing under
+ * `--json`, and byte-identical stdout for read commands. #73 intentional
+ * contract changes (JSON process-stderr silence, fetch envelope command id)
+ * are pinned here alongside the original #72 baseline.
  *
  * Failure codes already pinned in research.test.ts are not re-asserted here —
- * the contract suite as a whole (this file + research*.test.ts) satisfies #72.
- * These tests must not change production behavior.
+ * the contract suite as a whole (this file + research*.test.ts) is the seam.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -184,10 +184,10 @@ describe('command help contract', () => {
 describe('success JSON envelope field sets (gaps vs research.test.ts)', () => {
   it('fetch URL shorthand success pins the envelope field set', async (ctx) => {
     if (!(await hasInternetAccess())) ctx.skip('no internet access in this sandbox');
-    // Current contract: URL-shorthand fetch reports command "bonsai" (not "fetch").
+    // Intentional #73 contract: URL-shorthand fetch reports command "fetch" (not the bin name).
     const result = run(['https://example.com', '--json'], { raw: true });
-    expectSuccessEnvelope(result, 'bonsai', {
-      command: 'bonsai',
+    expectSuccessEnvelope(result, 'fetch', {
+      command: 'fetch',
       format: 'compressed',
     });
   });
@@ -319,13 +319,34 @@ describe('stream routing contract', () => {
     expect(result.stdout.trim().endsWith('}')).toBe(true);
   });
 
-  it('--json usage error stdout is only the envelope; process stderr mirrors the error text', () => {
+  it('empty-cache list --json leaves process stderr empty (no Warning tip)', () => {
+    // Isolated contract cwd/xdg has no artifacts — human mode would tip; --json must not.
+    const result = run(['list', '--json'], { raw: true });
+    const envelope = expectSuccessEnvelope(result, 'list');
+    expect(Array.isArray(envelope.data)).toBe(true);
+    expect(envelope.data).toEqual([]);
+    expect(result.stderr).toBe('');
+    expect(result.stderr).not.toMatch(/Warning/i);
+  });
+
+  it('--json usage error keeps messaging in the envelope only (process stderr empty)', () => {
     const result = run(['config', 'get', 'bogus', '--json'], { raw: true });
     const envelope = expectErrorEnvelope(result, 'config get', 'UNKNOWN_KEY', 2);
     expect(() => JSON.parse(result.stdout)).not.toThrow();
-    // Current contract: usage-style --json failures also mirror Code: lines onto process stderr.
-    expect(result.stderr).toContain(`Code: ${envelope.code}`);
-    expect(result.stderr).toContain(String(envelope.stderr));
+    // Intentional #73 contract: --json failures match CACHE_MISS — no process-stderr mirror.
+    expect(String(envelope.stderr)).toContain(`Code: ${envelope.code}`);
+    expect(result.stderr).toBe('');
+  });
+
+  it('--json CACHE_MISS keeps messaging in the envelope only (process stderr empty)', () => {
+    const result = run(['status', 'https://example.com/contract-pin-cache-miss', '--json'], {
+      raw: true,
+    });
+    expect(result.exitCode).toBe(1);
+    const envelope = parseEnvelope(result);
+    expect(envelope).toMatchObject({ ok: false, code: 'CACHE_MISS', exitCode: 1 });
+    expect(String(envelope.stderr)).toContain('Code: CACHE_MISS');
+    expect(result.stderr).toBe('');
   });
 });
 
