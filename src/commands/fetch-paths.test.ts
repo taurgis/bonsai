@@ -284,6 +284,9 @@ describe('fetch command branch coverage', () => {
 
   it('--dry-run: fetches but never writes to the cache and cleans up the temp dir', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+    const leftoverBefore = new Set(
+      readdirSync(tmpdir()).filter((n) => n.startsWith('fnr-dry-run-'))
+    );
 
     const result: any = await FetchCommand.run([TEST_URL, '--dry-run']);
 
@@ -292,9 +295,9 @@ describe('fetch command branch coverage', () => {
     expect(result.cache.freshness).toBe('none');
     // No artifact persisted to the real cache.
     expect(existsSync(getArtifactPath(await globalDataDir(), result.cache.key))).toBe(false);
-    // No stray fnr-dry-run-* temp dirs left behind.
-    const leftover = readdirSync(tmpdir()).filter((n) => n.startsWith('fnr-dry-run-'));
-    expect(leftover).toHaveLength(0);
+    // No new fnr-dry-run-* temp dirs left behind by this run (ignore siblings from parallel tests).
+    const leftoverAfter = readdirSync(tmpdir()).filter((n) => n.startsWith('fnr-dry-run-'));
+    expect(leftoverAfter.filter((n) => !leftoverBefore.has(n))).toHaveLength(0);
   });
 
   it('--dry-run still reports a secret redirect decision without writing either cache', async () => {
