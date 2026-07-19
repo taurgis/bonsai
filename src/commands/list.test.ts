@@ -306,6 +306,7 @@ describe('list command unit tests', () => {
       const rows = (await ResearchList.run(['--limit', '2', '--json'])) as any[];
       expect(rows.length).toBe(2);
       // Intentional #73: --json suppresses tip/truncation messaging on process stderr.
+      // Envelope `truncation` shape is pinned at the contract seam (cli-contract-pin.test.ts).
       expect(stderrChunks.join('')).not.toMatch(/showing first|truncat/i);
     } finally {
       errSpy.mockRestore();

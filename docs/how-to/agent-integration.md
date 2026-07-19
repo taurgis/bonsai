@@ -48,6 +48,11 @@ The `data` block differs per command. See the [Command Reference](/reference/com
 for each command's schema. `cache.status`, `cache.freshness`, and
 `source.extractionConfidence` are the fields agents most often branch on.
 
+When `list --json` caps results with `--limit`, the envelope includes a top-level
+`truncation` object (`totalMatched`, `shown`, `limit`) while `data` stays the
+capped array. Absence of `truncation` means nothing was cut — do not scrape
+stderr for a tip (process stderr stays empty under `--json`).
+
 ## Read-only / plan mode
 
 Use `--read-only` (alias `--plan`), `BONSAI_READ_ONLY=1`, or `BONSAI_PLAN_MODE=1` when an agent
