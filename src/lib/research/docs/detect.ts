@@ -268,6 +268,10 @@ const FAMILY_DETECTORS: FamilyDetector[] = [
 /**
  * Inspects page HTML and returns the detected docs engine/framework plus any capability signals.
  * Always returns a result; an unrecognized page yields a best-effort static/SPA shape classification.
+ *
+ * @param html - Full page HTML to inspect (not executed — signals matched as substrings).
+ * @param url - Page URL used to resolve relative links in source/llms.txt hints.
+ * @returns Detected SiteCapabilities including engine, framework, recommended capture, and signals.
  */
 export function detectDocsEngine(html: string, url: string): SiteCapabilities {
   const { document } = parseHTML(html);

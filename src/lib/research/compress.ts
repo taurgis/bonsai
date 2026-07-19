@@ -6,17 +6,17 @@ const SUMMARY_FLOOR_TOKENS = 200;
 /**
  * Compresses Markdown text by removing images, simplifying links from [text](url) to [text],
  * and collapsing multiple consecutive blank lines.
+ *
+ * @param markdown - Markdown text to compress.
+ * @returns Structurally compressed Markdown with images removed and links simplified.
  */
 export function compressMarkdown(markdown: string): string {
   if (!markdown) {
     return '';
   }
   let result = markdown;
-  // Remove markdown images: ![alt](url) -> ""
   result = result.replace(/!\[.*?\]\(.*?\)/g, '');
-  // Simplify links: [text](url) -> [text]
   result = result.replace(/\[(.*?)\]\(.*?\)/g, '[$1]');
-  // Collapse multiple consecutive newlines (3 or more) to maximum 2 newlines
   result = result.replace(/\n{3,}/g, '\n\n');
   return result.trim();
 }
@@ -37,6 +37,10 @@ export function compressMarkdown(markdown: string): string {
  * detailed). This means the cache can never end up serving a `compressed` that is larger than
  * `detailed`, or one that is empty while `detailed` has content — if the auto-compaction can't be
  * trusted, the caller transparently gets the (verified) structural form or the detailed text itself.
+ *
+ * @param detailed - Full detailed Markdown for a page.
+ * @param level - Extractive summarization aggressiveness level passed to the summarizer.
+ * @returns The most compact trustworthy Markdown view: summarized, structural, or detailed as fallback.
  */
 export function buildCompressed(detailed: string, level: SummaryLevel): string {
   const structural = compressMarkdown(detailed);

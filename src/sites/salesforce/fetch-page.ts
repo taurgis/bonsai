@@ -17,7 +17,13 @@ const CONTENT_SELECTORS = [
 
 /**
  * Fetches a help.salesforce.com article. Coveo's internal /help_doccontent URLs are rewritten
- * to the canonical /s/articleView page first; the shared LWR fetcher does the rest.
+ * to the canonical /s/articleView page first; the shared Lightning Web Runtime (LWR) fetcher
+ * does the rest.
+ *
+ * @param url - The help.salesforce.com article URL (or a Coveo /help_doccontent URL).
+ * @returns Extracted Markdown, fetch metadata, and browser-capture provenance.
+ * @throws {Error} When host/DNS checks fail, browser capture fails, or content is unreadable
+ *   (same failure modes as `fetchSalesforceDoc`).
  */
 export async function fetchSalesforcePage(url: string): Promise<SiteFetchResult> {
   return fetchSalesforceDoc(normalizeHelpDocContentUrl(url), {

@@ -11,8 +11,12 @@ import type { SummaryLevel } from '../config/schema.js';
 import { STOPWORDS, tokenize } from './keywords.js';
 import { estimateTokens } from './token-estimate.js';
 
+/** Re-export of the configured summary aggressiveness level (`conservative` | `balanced` | `aggressive`). */
 export type { SummaryLevel };
 
+/**
+ * Options for `summarizeMarkdown`. All fields are optional; omitted values use the documented defaults.
+ */
 export interface SummarizeOptions {
   /** Aggressiveness of prose reduction. Default 'conservative'. */
   level?: SummaryLevel;
@@ -208,6 +212,13 @@ function shouldSkipBoundary(masked: string, i: number, end: number): boolean {
 // Splits a single prose paragraph into sentences, avoiding splits inside inline code, after known
 // abbreviations or single-letter initials, and before digits. Exported for unit testing because
 // sentence boundaries are not observable once kept sentences are rejoined.
+/**
+ * Splits a prose paragraph into individual sentences. Avoids false boundaries inside inline code,
+ * after known abbreviations, and before digits.
+ *
+ * @param paragraph - A single prose paragraph (no Markdown structure like headings or lists).
+ * @returns Array of sentence strings in document order.
+ */
 export function splitSentences(paragraph: string): string[] {
   const { masked, restore } = maskInlineCode(paragraph);
   const sentences: string[] = [];
@@ -425,6 +436,10 @@ function reassemble(segments: Segment[], sentences: Sentence[], kept: Set<number
  * Extractively shortens the prose paragraphs of a Markdown document while preserving headings,
  * fenced code blocks, tables, and lists verbatim. Returns the input unchanged when it is below
  * `minTokens` or contains no prose to condense. Deterministic for identical input + options.
+ *
+ * @param markdown - Markdown document to summarize.
+ * @param options - Summarization options (level, minTokens, minSentences).
+ * @returns Summarized Markdown, or the original when no summarization is needed.
  */
 export function summarizeMarkdown(markdown: string, options: SummarizeOptions = {}): string {
   const level = options.level ?? 'conservative';

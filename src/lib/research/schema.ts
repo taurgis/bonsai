@@ -1,3 +1,4 @@
+/** Token counts for the two stored representations of a research artifact. */
 export interface TokenEstimate {
   compressed: number | null;
   detailed: number | null;
@@ -5,6 +6,7 @@ export interface TokenEstimate {
 
 // Single source of truth for the capture-method enum. Command flag `options` lists derive from this
 // so a new method can never drift out of sync with the filters that are supposed to expose it.
+/** All recognized capture methods. Command flag option lists derive from this constant. */
 export const CAPTURE_METHODS = [
   'static_fetch',
   'browser_fallback',
@@ -12,13 +14,17 @@ export const CAPTURE_METHODS = [
   'route_markdown',
   'github_source',
 ] as const;
+/** How a research artifact's content was obtained. */
 export type CaptureMethod = (typeof CAPTURE_METHODS)[number];
 
 // Single source of truth for the artifact-type enum. `index` = navigation/hub or llms.txt site
 // index; `section` = a heading-level child of a page. Command flag `options` derive from this.
+/** All recognized artifact types. `index` = navigation hub or llms.txt; `section` = heading-level child of a page. */
 export const ARTIFACT_TYPES = ['source', 'research_note', 'index', 'section'] as const;
+/** Classification of a research artifact's role. */
 export type ArtifactType = (typeof ARTIFACT_TYPES)[number];
 
+/** Full metadata block stored alongside every cached research artifact. */
 export interface ResearchArtifactMetadata {
   schema_version: number;
   artifact_type: ArtifactType;
@@ -59,6 +65,7 @@ export interface ResearchArtifactMetadata {
   section_heading_path: string | null;
 }
 
+/** A complete research artifact: metadata, summary, compressed and detailed Markdown, and provenance. */
 export interface ResearchArtifact {
   metadata: ResearchArtifactMetadata;
   summary: string;

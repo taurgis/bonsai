@@ -77,6 +77,8 @@ function flattenCodeStructure(pre: any, code: any): void {
 /**
  * Reconstructs newline-delimited text for every highlighted code block in the document and tags it
  * with a `language-x` class when one is detectable. Idempotent and a no-op on plain `<pre>` blocks.
+ *
+ * @param document - linkedom Document object to mutate in place.
  */
 export function normalizeCodeBlocks(document: any): void {
   removeCopyButtons(document);
