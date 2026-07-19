@@ -154,6 +154,24 @@ describe('enrichCacheMissEnvelope / enrichRowErrorEnvelope', () => {
     expect(enriched.data).toBe(data);
   });
 
+  it('points a CACHE_MISS at list --url instead of a duplicate fetch when part of an existing note', () => {
+    const data = [
+      {
+        status: 'miss',
+        normalizedUrl: 'https://b.example/doc',
+        partOfExistingNote: { cacheKey: 'abc123' },
+      },
+    ];
+    const enriched = enrichCacheMissEnvelope({ ok: true, exitCode: 0, data }, data, 'bonsai');
+    expect(enriched).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'CACHE_MISS',
+      suggestions: ['Find it with: bonsai list --url "https://b.example/doc"'],
+    });
+    expect(String(enriched.stderr)).not.toContain('Fetch and cache it first');
+  });
+
   it('supports row-error overlays from per-row error objects', () => {
     const data = [
       { cache: { status: 'hit' } },

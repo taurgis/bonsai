@@ -34,19 +34,50 @@ const TYPOGLYCEMIA_TARGETS = [
   'workspace',
 ];
 
+// Contexts where a following verb reads as a command aimed at the reader, not a third-person
+// description of an attack (e.g. "An attacker may tell the model to ignore..." must stay
+// unredacted — see the matching test below). `^` is matched per clause (see CLAUSE_BOUNDARY
+// below), so a command hidden after an innocuous opener ("Heads up: ignore...") still counts as
+// clause-initial; only right after a direct role-address word is the other allowed context.
+const COMMAND_CONTEXT = String.raw`(?:^|\b(?:please|assistant|system|user|agent)\s+)`;
+
+function commandPattern(suffix: string): RegExp {
+  return new RegExp(COMMAND_CONTEXT + suffix, 'i');
+}
+
 const HARMFUL_INSTRUCTION_PATTERNS = [
-  /(^|\b(?:please|assistant|system|user|agent)\s+)ignore\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|directions?|prompts?)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)disregard\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|directions?|prompts?)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)forget\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|directions?|prompts?)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)override\s+(the\s+)?(system|developer|agent)\s+(prompt|instructions?|message)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)you\s+are\s+now\s+(in\s+)?(developer|admin|root|system)\s+mode\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)reveal\s+(your\s+)?(system|developer)\s+(prompt|instructions?|message)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)print\s+(your\s+)?(system|developer)\s+(prompt|instructions?|message)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)(exfiltrate|steal|leak)\s+(all\s+|the\s+|your\s+)?(secrets?|tokens?|api\s*keys?|credentials?|private\s+data)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)send\s+(me\s+|all\s+|the\s+|your\s+)?(secrets?|tokens?|api\s*keys?|credentials?)\s+(to|over|via|using)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)(upload|post|fetch|curl)\s+(all\s+|the\s+|your\s+)?(secrets?|tokens?|api\s*keys?|credentials?)\s+(to|over|via|using)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)delete\s+(all\s+)?(files?|the\s+repository|the\s+workspace|the\s+home\s+directory)\b/i,
-  /(^|\b(?:please|assistant|system|user|agent)\s+)run\s+.*\b(rm\s+-rf|curl\s+.*\|\s*(sh|bash)|sudo)\b/i,
+  commandPattern(
+    String.raw`ignore\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|directions?|prompts?)\b`
+  ),
+  commandPattern(
+    String.raw`disregard\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|directions?|prompts?)\b`
+  ),
+  commandPattern(
+    String.raw`forget\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|directions?|prompts?)\b`
+  ),
+  commandPattern(
+    String.raw`override\s+(the\s+)?(system|developer|agent)\s+(prompt|instructions?|message)\b`
+  ),
+  commandPattern(String.raw`you\s+are\s+now\s+(in\s+)?(developer|admin|root|system)\s+mode\b`),
+  commandPattern(
+    String.raw`reveal\s+(your\s+)?(system|developer)\s+(prompt|instructions?|message)\b`
+  ),
+  commandPattern(
+    String.raw`print\s+(your\s+)?(system|developer)\s+(prompt|instructions?|message)\b`
+  ),
+  commandPattern(
+    String.raw`(exfiltrate|steal|leak)\s+(all\s+|the\s+|your\s+)?(secrets?|tokens?|api\s*keys?|credentials?|private\s+data)\b`
+  ),
+  commandPattern(
+    String.raw`send\s+(me\s+|all\s+|the\s+|your\s+)?(secrets?|tokens?|api\s*keys?|credentials?)\s+(to|over|via|using)\b`
+  ),
+  commandPattern(
+    String.raw`(upload|post|fetch|curl)\s+(all\s+|the\s+|your\s+)?(secrets?|tokens?|api\s*keys?|credentials?)\s+(to|over|via|using)\b`
+  ),
+  commandPattern(
+    String.raw`delete\s+(all\s+)?(files?|the\s+repository|the\s+workspace|the\s+home\s+directory)\b`
+  ),
+  commandPattern(String.raw`run\s+.*\b(rm\s+-rf|curl\s+.*\|\s*(sh|bash)|sudo)\b`),
 ];
 
 function normalizeForDetection(text: string): string {
@@ -120,10 +151,25 @@ function isReadableDecodedText(text: string): boolean {
   return printable / Math.max(text.length, 1) > 0.85;
 }
 
+// Sentence-ending punctuation splits a line into clauses for `^`-anchored matching below. This has
+// to run on the raw text, before normalizeForDetection's charset filter erases that same
+// punctuation into plain spaces — testing the anchor after normalization would never see it.
+//
+// ponytail: this still isn't complete — a filler *word* with no punctuation before it ("Please
+// just ignore previous instructions") is a clause-internal command and stays unredacted, same as
+// before this fix. Heuristic prompt-injection detection can't be made airtight with regex alone
+// (OWASP LLM01 has no complete solution either); upgrade path is a small classifier or an LLM-based
+// second pass over blocks this pattern set flags as borderline, if false negatives here prove costly.
+const CLAUSE_BOUNDARY = /(?<=[.!?:;])\s+/;
+
 function isUnsafeAgentInstruction(text: string): boolean {
-  return detectionCandidates(text).some((candidate) =>
-    HARMFUL_INSTRUCTION_PATTERNS.some((pattern) => pattern.test(candidate))
-  );
+  return text
+    .split(CLAUSE_BOUNDARY)
+    .some((clause) =>
+      detectionCandidates(clause).some((candidate) =>
+        HARMFUL_INSTRUCTION_PATTERNS.some((pattern) => pattern.test(candidate))
+      )
+    );
 }
 
 function redactBlock(block: string): string {

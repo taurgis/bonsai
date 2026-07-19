@@ -3,11 +3,16 @@ import { BaseCommand } from '../base-command.js';
 import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
 import { batchSeparator, cacheMissHint, formatCacheTargetHeader } from '../lib/cache-view.js';
 import { getArtifactPath, scanCacheDirs } from '../lib/research/storage.js';
+import { artifactMatchesUrlFilter } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
 import { formatHumanField } from '../lib/cli-presentation.js';
 import type { ResearchArtifactMetadata } from '../lib/research/schema.js';
-import type { InspectRow, InspectSectionRow } from '../lib/cli-result-types.js';
+import type {
+  InspectExistingNoteRow,
+  InspectRow,
+  InspectSectionRow,
+} from '../lib/cli-result-types.js';
 
 /** Inspect a cached artifact and its section children. */
 export default class ResearchInspect extends BaseCommand<typeof ResearchInspect> {
@@ -58,6 +63,10 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
 
   private missResult(target: ResolvedResearchTarget): InspectRow {
     const artifactPath = getArtifactPath(target.roots.writeRoot, target.cacheKey);
+    const existingNote = this.findExistingNoteContaining(
+      target.roots.readRoots,
+      target.normalizedUrl
+    );
     if (!this.jsonEnabled()) {
       for (const line of formatCacheTargetHeader(
         target,
@@ -66,7 +75,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       )) {
         this.log(line);
       }
-      this.warn(cacheMissHint(this.config.bin, target.normalizedUrl));
+      this.warn(this.missGuidance(target.normalizedUrl, existingNote));
       const sep = batchSeparator(this.parsedArgv.length > 1);
       if (sep) this.log(sep);
     }
@@ -77,7 +86,50 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       status: 'miss',
       metadata: null,
       sections: [],
+      partOfExistingNote: existingNote,
     };
+  }
+
+  // A URL with no cache key of its own can still be a secondary `--source-url` of an already
+  // imported multi-source research_note (those key off topic+content, not any one URL — see
+  // docs/reference/cache-protocol.md). Without this check, the generic "fetch and cache it" miss
+  // hint would steer the caller into creating an unrelated duplicate entry instead of finding the
+  // note that already covers this URL (discoverable today via `list --url`).
+  //
+  // ponytail: `status` and `fetch` have the same blind spot on a miss (they'd still suggest a
+  // fetch/refetch for a URL that's really a secondary source of an existing note) but aren't
+  // patched here — `status` is meant to stay a cheap pre-flight check, and `fetch`'s miss path
+  // already does real work (an actual network fetch) rather than just reporting a status, so
+  // adding a full cache scan to either changes their cost profile more than this fix's scope
+  // warrants. Extend this same scan to those commands if the gap proves costly in practice.
+  private findExistingNoteContaining(
+    readRoots: string[],
+    normalizedUrl: string
+  ): InspectExistingNoteRow | null {
+    const matches = scanCacheDirs<InspectExistingNoteRow>(
+      readRoots,
+      (artifact) => {
+        const meta = artifact.metadata;
+        if (meta.status !== 'active') return null;
+        if (!artifactMatchesUrlFilter(meta, normalizedUrl)) return null;
+        return {
+          cacheKey: meta.cache_key,
+          artifactType: meta.artifact_type,
+          topic: meta.topic,
+          sourceUrls: meta.source_urls,
+        };
+      },
+      { persistIndex: !this.readOnly }
+    );
+    return matches[0] ?? null;
+  }
+
+  private missGuidance(normalizedUrl: string, existingNote: InspectExistingNoteRow | null): string {
+    if (!existingNote) return cacheMissHint(this.config.bin, normalizedUrl);
+    return [
+      `${normalizedUrl} has no cache entry of its own, but it is a source of an existing ${existingNote.artifactType} (cache key: ${existingNote.cacheKey}).`,
+      `Find it with: ${this.config.bin} list --url "${normalizedUrl}"`,
+    ].join('\n');
   }
 
   private hitResult(target: ResolvedResearchTarget): InspectRow {

@@ -88,6 +88,19 @@ describe('renderedFallbackNeeded', () => {
       })
     ).toBe(false);
   });
+
+  it('does not render when static rejected the content type, even with no extraction', () => {
+    const staticError = new Error(
+      'Rejected content type "application/json". Only HTML is supported.'
+    );
+    expect(renderedFallbackNeeded(emptyCapabilities(), null, staticError)).toBe(false);
+  });
+
+  it('still renders on an ordinary static failure (not a content-type rejection)', () => {
+    expect(
+      renderedFallbackNeeded(emptyCapabilities(), null, new Error('static fetch failed'))
+    ).toBe(true);
+  });
 });
 
 describe('capturePage', () => {
@@ -179,6 +192,23 @@ describe('capturePage', () => {
     );
     expect(out.captureMethod).toBe('static_fetch');
     expect(out.extraction.detailedMarkdown).toMatch(/Widgets/);
+  });
+
+  it('does not auto-retry rendered when static rejects the content type, and surfaces the rejection', async () => {
+    // A JSON/PDF/binary response is not "maybe needs JavaScript" — it fundamentally isn't a web
+    // page, so the automatic rendered fallback must not mask that with a Chrome-rendered viewer.
+    const url = 'https://api.example.com/data.json';
+    const rejectingDeps: CaptureDeps = {
+      fetchStatic: async () => {
+        throw new Error('Rejected content type "application/json". Only HTML is supported.');
+      },
+      fetchRendered: async () => htmlResult(load('static-article.html'), url),
+      fetchText: async () => {
+        throw new Error(`404 ${url}`);
+      },
+    };
+
+    await expect(capturePage(url, {}, rejectingDeps)).rejects.toThrow(/Rejected content type/);
   });
 
   it('forces rendered capture when requested', async () => {

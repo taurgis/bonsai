@@ -218,6 +218,19 @@ export default function register(harness, fixtures) {
       expect(env?.schemaVersion === 1, 'envelope');
     });
 
+    check('fetch of a JSON endpoint fails with the content-type error, not a corrupted browser fallback (AUDIT_NETWORK)', () => {
+      // A non-HTML response must never silently succeed via the automatic rendered-browser
+      // fallback (Chrome renders a built-in JSON viewer for anything, which would extract as
+      // "high-confidence" garbage) — it must surface the same content-type rejection static fetch
+      // already reports, exactly like the equivalent PDF case.
+      const r = run(['https://httpbin.org/json', '--json'], { timeout: 90000 });
+      expect(r.exitCode === 1, `exit ${r.exitCode}`);
+      const env = parseJson(r.stdout);
+      expect(env?.ok === false, 'ok false');
+      expect(env?.stderr?.includes('Rejected content type'), env?.stderr);
+      expect(env?.data === null, JSON.stringify(env?.data));
+    });
+
     check('fetch Salesforce Developer guide via route .md twin (AUDIT_NETWORK)', () => {
       // Supported developer.salesforce.com articles publish a Markdown twin at <article>.md; the
       // site module probes it before the browser and must record the provenance on the artifact.

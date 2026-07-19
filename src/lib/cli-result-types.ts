@@ -65,6 +65,18 @@ export interface InspectSectionRow {
   tokenEstimate: TokenEstimate;
 }
 
+/**
+ * An already-cached artifact (typically a multi-source `research_note`) that lists the requested
+ * URL among its own `source_urls`, surfaced on an `inspect` miss so the requested URL isn't
+ * mistaken for wholly uncached content when it is really a secondary source of an existing note.
+ */
+export interface InspectExistingNoteRow {
+  cacheKey: string;
+  artifactType: string;
+  topic: string | null;
+  sourceUrls: string[];
+}
+
 /** One row in `inspect --json` output. */
 export interface InspectRow {
   cacheKey: string;
@@ -73,6 +85,8 @@ export interface InspectRow {
   status: 'hit' | 'miss';
   metadata: ResearchArtifactMetadata | null;
   sections: InspectSectionRow[];
+  /** Set on a miss when the URL is already a source of a different cached artifact (see above). */
+  partOfExistingNote?: InspectExistingNoteRow | null;
 }
 
 /** One row in `status --json` output. */

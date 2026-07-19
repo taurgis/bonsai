@@ -1,4 +1,4 @@
-import type { FetchResult } from './fetcher.js';
+import { isUnsupportedContentTypeError, type FetchResult } from './fetcher.js';
 import type { ExtractionResult } from './extract.js';
 import type { CaptureMethod } from './schema.js';
 import type { MachineReadableArtifact, SiteCapabilities } from './docs/capabilities.js';
@@ -46,12 +46,19 @@ const MIN_USEFUL_CHARS = 600;
  *
  * @param caps - Detected site capabilities; `recommendedCapture === 'rendered'` forces a fallback.
  * @param extraction - Result of static extraction, or null when static fetch failed.
+ * @param staticError - The static fetch's failure, if any. A content-type policy rejection (JSON,
+ *   PDF, binary) means the URL isn't a web page at all — a browser would just render its own
+ *   built-in viewer for it, producing a corrupted-looking "extracted" artifact — so that specific
+ *   failure is a hard stop, never a fallback trigger. `--rendered` still bypasses this entirely (it
+ *   skips the static phase), so an informed retry remains available.
  * @returns True when a rendered (browser) fallback should be attempted.
  */
 export function renderedFallbackNeeded(
   caps: SiteCapabilities,
-  extraction: ExtractionResult | null
+  extraction: ExtractionResult | null,
+  staticError: Error | null = null
 ): boolean {
+  if (staticError && isUnsupportedContentTypeError(staticError)) return false;
   if (!extraction) return true;
   if (caps.recommendedCapture === 'rendered') return true;
   return extraction.confidence === 'low' && extraction.detailedMarkdown.length < MIN_USEFUL_CHARS;
@@ -204,7 +211,7 @@ async function renderedFallbackOutcome(
   phase: StaticPhase,
   extraction: ExtractionResult | null
 ): Promise<CaptureOutcome | null> {
-  if (!renderedFallbackNeeded(phase.capabilities, extraction)) return null;
+  if (!renderedFallbackNeeded(phase.capabilities, extraction, phase.staticError)) return null;
   try {
     return await renderedOutcome(url, deps, attemptedMethods, phase.machineReadable);
   } catch (renderErr) {

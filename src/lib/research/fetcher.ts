@@ -209,6 +209,18 @@ function assertOk(res: Response): void {
   }
 }
 
+/**
+ * True when `err` is the static fetcher's own content-type policy rejection (non-HTML body or
+ * content-type), as opposed to a transient failure (network error, timeout, HTTP error status).
+ * The caller uses this to distinguish "this URL fundamentally isn't a web page" — where an
+ * automatic rendered-browser retry would just render Chrome's built-in JSON/PDF viewer and produce
+ * a corrupted-looking "extracted" artifact — from "this page may need JavaScript", where retrying
+ * rendered is the whole point of the fallback.
+ */
+export function isUnsupportedContentTypeError(err: unknown): boolean {
+  return err instanceof Error && /^Rejected /.test(err.message);
+}
+
 async function processFetchResponse(
   res: Response,
   limit: number,

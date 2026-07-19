@@ -265,7 +265,14 @@ bonsai inspect <url>
 ```
 
 On a miss, `metadata` is `null`, `sections` is `[]`, and the command exits `1` with `CACHE_MISS`
-while still returning `data` (including hit rows in a multi-URL batch).
+while still returning `data` (including hit rows in a multi-URL batch). A miss row also carries
+`partOfExistingNote`: `null` for a genuinely uncached URL, or `{ cacheKey, artifactType, topic,
+sourceUrls }` when the URL has no cache key of its own but is already listed among another cached
+artifact's `source_urls` — typically a multi-source `research_note` imported with `--source-url`,
+which keys off topic and content rather than any single URL (see
+[Caching Protocol Specification](cache-protocol.md)). The accompanying hint points at
+`bonsai list --url "<url>"` to find it, instead of suggesting a fetch that would create an
+unrelated duplicate entry.
 Invalid URLs in a multi-URL batch follow the same keep-prior-hits contract as `status`/`fetch`
 (`error` rows, exit `1`).
 
