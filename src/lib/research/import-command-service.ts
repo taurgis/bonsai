@@ -142,23 +142,14 @@ export function finishImportCommandService(
   }
 
   if (!io.json) {
-    io.log(
-      dryRun
-        ? `[dry-run] Would import research artifact.`
-        : `Successfully imported research artifact.`
-    );
-    const fields: Array<readonly [string, string]> = [
-      ['Cache Key', cacheKey],
-      ['Storage Path', storagePath],
-    ];
-    if (!hasSingle) {
-      const topic = resolvedTopic(flags)!;
-      fields.push(['Topic', topic], ['Source URLs', sourceUrls.join(', ')]);
-    }
-    for (const line of formatHumanFields(fields)) io.log(line);
-    if (!hasSingle) {
-      io.log(`\nTip: find it again with ${io.bin} list --topic "${topic}"`);
-    }
+    logImportHumanSuccess(io, {
+      dryRun,
+      cacheKey,
+      storagePath,
+      hasSingle,
+      flags,
+      sourceUrls,
+    });
   }
 
   return {
@@ -195,6 +186,38 @@ export function finishImportCommandService(
         : artifact.metadata.token_estimate.detailed,
     content: flags.inputFormat === 'compressed' ? artifact.compressed : artifact.detailed,
   };
+}
+
+function logImportHumanSuccess(
+  io: CliIo,
+  opts: {
+    dryRun: boolean;
+    cacheKey: string;
+    storagePath: string;
+    hasSingle: boolean;
+    flags: ImportCommandFlags;
+    sourceUrls: string[];
+  }
+): void {
+  const { dryRun, cacheKey, storagePath, hasSingle, flags, sourceUrls } = opts;
+  io.log(
+    dryRun
+      ? `[dry-run] Would import research artifact.`
+      : `Successfully imported research artifact.`
+  );
+  const fields: Array<readonly [string, string]> = [
+    ['Cache Key', cacheKey],
+    ['Storage Path', storagePath],
+  ];
+  let topic: string | undefined;
+  if (!hasSingle) {
+    topic = resolvedTopic(flags)!;
+    fields.push(['Topic', topic], ['Source URLs', sourceUrls.join(', ')]);
+  }
+  for (const line of formatHumanFields(fields)) io.log(line);
+  if (topic) {
+    io.log(`\nTip: find it again with ${io.bin} list --topic "${topic}"`);
+  }
 }
 
 function importSourceSuggestions(bin: string): string[] {
