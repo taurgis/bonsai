@@ -2,7 +2,9 @@ import { isIP } from 'node:net';
 
 /**
  * Checks if a literal IPv4 address is in a safe range.
- * Rejects loopback, private RFC1918, and link-local ranges.
+ * Rejects "this network", loopback, private RFC1918, shared address space (CGNAT), and link-local
+ * ranges — the non-globally-reachable blocks in the IANA IPv4 special-purpose registry
+ * (https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml).
  */
 export function isSafeIpv4(ip: string): boolean {
   const parts = ip.split('.').map(Number);
@@ -10,12 +12,17 @@ export function isSafeIpv4(ip: string): boolean {
   const [a, b, c] = parts;
   if (a === undefined || b === undefined || c === undefined) return false;
 
+  // "This network" / unspecified: 0.0.0.0/8 (includes 0.0.0.0 itself, a well-known SSRF-filter
+  // bypass — many stacks route it to the loopback interface, same as 127.0.0.1).
+  if (a === 0) return false;
   // Loopback: 127.0.0.0/8
   if (a === 127) return false;
   // Private (RFC1918): 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
   if (a === 10) return false;
   if (a === 172 && b >= 16 && b <= 31) return false;
   if (a === 192 && b === 168) return false;
+  // Shared Address Space / CGNAT (RFC6598): 100.64.0.0/10
+  if (a === 100 && b >= 64 && b <= 127) return false;
   // Link-local: 169.254.0.0/16
   if (a === 169 && b === 254) return false;
   return true;
@@ -23,7 +30,7 @@ export function isSafeIpv4(ip: string): boolean {
 
 /**
  * Checks if a literal IPv6 address is in a safe range.
- * Rejects loopback, unspecified, link-local, and mapped unsafe IPv4 ranges.
+ * Rejects loopback, unspecified, link-local, unique-local, and mapped unsafe IPv4 ranges.
  */
 export function isSafeIpv6(ip: string): boolean {
   const cleanIp = ip.toLowerCase().trim();
@@ -38,6 +45,13 @@ export function isSafeIpv6(ip: string): boolean {
     cleanIp.startsWith('fea') ||
     cleanIp.startsWith('feb')
   ) {
+    return false;
+  }
+  // Unique Local Address (RFC4193): fc00::/7 (fc00 to fdff) — IPv6's RFC1918 equivalent, commonly
+  // used for internal/container networks. Only a full 4-digit first hextet can reach 0xfc00; a
+  // shorter one (leading zeros suppressed) is always < 0x1000 and safely out of range.
+  const firstGroup = cleanIp.split(':')[0] ?? '';
+  if (firstGroup.length === 4 && (firstGroup.startsWith('fc') || firstGroup.startsWith('fd'))) {
     return false;
   }
   // IPv4-mapped IPv6: ::ffff:127.0.0.1

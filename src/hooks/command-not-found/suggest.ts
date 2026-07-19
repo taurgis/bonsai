@@ -77,8 +77,49 @@ function bareUrlInput(id: string): string | null {
   return looksLikeSchemelessUrl(id) ? id : null;
 }
 
+/**
+ * The id's colon-joined segments when every one individually looks like a URL missing its scheme,
+ * else null. Covers the multi-URL batch-fetch typo (`bonsai example.com example.org` folds into one
+ * id, "example.com:example.org") that {@link bareUrlInput} misses: parsed as a single URL, the colon
+ * between two hostnames reads as an invalid port, so the whole-string check fails even though each
+ * segment on its own is a plain scheme-less host.
+ */
+function bareUrlSegments(id: string): string[] | null {
+  const segments = id.split(':');
+  return segments.length > 1 && segments.every((segment) => looksLikeSchemelessUrl(segment))
+    ? segments
+    : null;
+}
+
 function isJsonMode(argv: string[] | undefined): boolean {
   return (argv?.includes('--json') ?? false) || process.argv.includes('--json');
+}
+
+/** Shared "did you mean https://…?" response for one or several scheme-less URLs. */
+function missingUrlSchemeDetails(
+  urls: string[],
+  argv: string[] | undefined,
+  config: Interfaces.Config
+): {
+  code: 'MISSING_URL_SCHEME';
+  command: string;
+  jsonMode: boolean;
+  message: string;
+  suggestions: string[];
+} {
+  const attempted = urls.join(' ');
+  const suggestion = `${config.bin} ${urls.map((url) => `https://${url}`).join(' ')}`;
+  return {
+    code: 'MISSING_URL_SCHEME',
+    command: attempted,
+    jsonMode: isJsonMode(argv),
+    message: [
+      `${attempted} is not a ${config.bin} command.`,
+      `Run ${config.bin} help for a list of available commands.`,
+      `Did you mean ${suggestion}? URLs need an http:// or https:// scheme.`,
+    ].join('\n'),
+    suggestions: [suggestion],
+  };
 }
 
 export function buildCommandNotFoundDetails(
@@ -101,20 +142,10 @@ export function buildCommandNotFoundDetails(
   // never finds a command for a hostname). The correction is shown, never auto-run (clig.dev).
   // Flag-only argv never reaches here — normalizeArgv early-exits those as MISSING_COMMAND.
   const bareUrl = bareUrlInput(id);
-  if (bareUrl) {
-    const suggestion = `${config.bin} https://${bareUrl}`;
-    return {
-      code: 'MISSING_URL_SCHEME',
-      command: bareUrl,
-      jsonMode: isJsonMode(argv),
-      message: [
-        `${bareUrl} is not a ${config.bin} command.`,
-        `Run ${config.bin} help for a list of available commands.`,
-        `Did you mean ${suggestion}? URLs need an http:// or https:// scheme.`,
-      ].join('\n'),
-      suggestions: [suggestion],
-    };
-  }
+  if (bareUrl) return missingUrlSchemeDetails([bareUrl], argv, config);
+
+  const bareUrls = bareUrlSegments(id);
+  if (bareUrls) return missingUrlSchemeDetails(bareUrls, argv, config);
 
   const segments = id.split(':');
   const unexpected = exactZeroArgCommandPrefix(segments, commandIds, config);

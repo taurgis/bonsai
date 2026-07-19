@@ -227,6 +227,44 @@ describe('command_not_found hook', () => {
     expect(msg).toContain('Did you mean bonsai https://93.184.216.34?');
   });
 
+  // Two scheme-less URLs (a batch-fetch typo) fold into one colon-joined id; parsed whole that reads
+  // as an invalid port, so each segment must be checked on its own to still offer the scheme hint.
+  it('suggests the URL shorthand for multiple scheme-less hosts (batch fetch)', async () => {
+    const msg = await runHook('example.com:example.org');
+    expect(msg).toContain('example.com example.org is not a bonsai command.');
+    expect(msg).toContain('Did you mean bonsai https://example.com https://example.org?');
+  });
+
+  it('emits a JSON error envelope for multiple scheme-less hosts when --json is present', async () => {
+    const envelope = await runJsonHook('example.com:example.org');
+    expect(envelope).toMatchObject({
+      command: 'example.com example.org',
+      ok: false,
+      exitCode: 2,
+      code: 'MISSING_URL_SCHEME',
+      stdout: '',
+      data: null,
+    });
+    expect(envelope.stderr).toContain(
+      'Did you mean bonsai https://example.com https://example.org?'
+    );
+  });
+
+  it('suggests the URL shorthand for three scheme-less hosts', async () => {
+    const msg = await runHook('a.example:b.example:c.example');
+    expect(msg).toContain(
+      'Did you mean bonsai https://a.example https://b.example https://c.example?'
+    );
+  });
+
+  // One segment that is not URL-shaped (no dot) means this is not a batch-fetch typo — falls back
+  // to ordinary command-typo handling instead of guessing which segments were meant as URLs.
+  it('does not offer the batch URL hint when only some segments look like URLs', async () => {
+    const msg = await runHook('example.com:frobnicate');
+    expect(msg).not.toContain('https://');
+    expect(msg).not.toContain('Did you mean');
+  });
+
   // A dotless token is an ordinary command typo, not a forgotten-scheme URL, so the URL hint must
   // not fire and the nearest-command path must still own the suggestion.
   it('does not offer the URL hint for a dotless command typo', async () => {

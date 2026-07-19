@@ -28,12 +28,13 @@ To guard against Server-Side Request Forgery (SSRF), the CLI intercepts hostname
 ### Blocked Target Blocks (RFC1918 & Localhost)
 The crawler will block the request if the resolved IP falls within any of the following blocks:
 * **IPv4 Blocks**:
+  * `0.0.0.0/8` ("This network" / unspecified — routes to loopback on many stacks)
   * `127.0.0.0/8` (Loopback / Localhost)
   * `10.0.0.0/8` (Private Network)
+  * `100.64.0.0/10` (Shared Address Space / CGNAT)
   * `172.16.0.0/12` (Private Network)
   * `192.168.0.0/16` (Private Network)
   * `169.254.0.0/16` (Link-Local / Link-Local Metadata Services)
-  * `0.0.0.0/32` (Broadcast)
 * **IPv6 Blocks**:
   * `::1/128` (Loopback / Localhost)
   * `fc00::/7` (Unique Local Addresses)
