@@ -34,28 +34,23 @@ logs/
 .vscode/
 .DS_Store
 
-# Nexus-installed agent instruction files (skills may be committed)
+# Nexus-managed agent files: skills, rules, agents, and instructions are
+# committed; other agent-local state stays ignored
 .agents/*
 !.agents/skills/
 !.agents/skills/**
 !.agents/rules/
-.agents/rules/*
-!.agents/rules/development.md
+!.agents/rules/**
 .claude/*
 !.claude/skills/
 !.claude/skills/**
 !.claude/rules/
-.claude/rules/*
-!.claude/rules/generated/
-.claude/rules/generated/*
-!.claude/rules/generated/development.md
+!.claude/rules/**
+!.claude/agents/
+!.claude/agents/**
 .cursor/*
 !.cursor/rules/
-.cursor/rules/*
-!.cursor/rules/development.mdc
-.github/agents/
-.github/instructions/*
-!.github/instructions/development.instructions.md
+!.cursor/rules/**
 
 # Agent specific local paths
 .gemini/
