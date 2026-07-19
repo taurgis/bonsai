@@ -111,7 +111,7 @@ Parse the JSON to list specific files and exports that became unused.
 ### GitHub Actions: Using the Official Action
 
 ```yaml
-- uses: fallow-rs/fallow@v2
+- uses: fallow-rs/fallow@v3
   with:
     command: dead-code
     fail-on-issues: true
@@ -123,7 +123,7 @@ Parse the JSON to list specific files and exports that became unused.
 Fail a PR only when it introduces new security candidates (or makes existing ones newly reachable). Gated failures exit with code 8; the `issues` output counts only matching gate candidates. PR comment and review renderers skip security envelopes.
 
 ```yaml
-- uses: fallow-rs/fallow@v2
+- uses: fallow-rs/fallow@v3
   with:
     command: security
     security-gate: new   # or newly-reachable (needs a base ref via changed-since or PR auto-scoping)
@@ -134,7 +134,7 @@ GitLab equivalent: `FALLOW_COMMAND: "security"` with `FALLOW_SECURITY_GATE: "new
 ### GitHub Actions: With Health Score
 
 ```yaml
-- uses: fallow-rs/fallow@v2
+- uses: fallow-rs/fallow@v3
   with:
     score: true
     changed-since: main
@@ -145,7 +145,7 @@ Computes a health score (0-100 with letter grade) in combined mode and enables t
 ### GitHub Actions: Severity-Aware PR Quality Gate (Audit)
 
 ```yaml
-- uses: fallow-rs/fallow@v2
+- uses: fallow-rs/fallow@v3
   with:
     command: audit
     gate: new-only        # default; fails only on findings introduced by this PR
@@ -157,7 +157,7 @@ Runs `fallow audit` to combine dead-code + complexity + duplication scoped to ch
 The action exposes `outputs.verdict` (`pass`/`warn`/`fail`) and `outputs.gate` for downstream conditionals; `outputs.issues` holds the introduced count under `gate: new-only` and the total count under `gate: all`.
 
 ```yaml
-- uses: fallow-rs/fallow@v2
+- uses: fallow-rs/fallow@v3
   id: fallow
   with:
     command: audit
@@ -174,7 +174,7 @@ Three additional outputs surface silent failures in the action's PR comment / re
 The official action supports inline PR annotations via GitHub workflow commands. This does not require Advanced Security (unlike SARIF upload) and works on any GitHub plan.
 
 ```yaml
-- uses: fallow-rs/fallow@v2
+- uses: fallow-rs/fallow@v3
   with:
     command: dead-code
     changed-since: main
@@ -242,9 +242,10 @@ fallow:
   variables:
     FALLOW_COMMENT: "true"
     FALLOW_SUMMARY_SCOPE: "diff"
+    FALLOW_PR_COMMENT_LAYOUT: "gate-only"
 ```
 
-Posts a summary comment on the MR with issue counts and findings. In MR pipelines, `--changed-since` is auto-detected from `$CI_MERGE_REQUEST_TARGET_BRANCH_NAME`, so only issues from changed files are reported. `FALLOW_SUMMARY_SCOPE: "diff"` also hides project-level dependency/catalog/override findings whose anchor line is outside the diff. Requires `GITLAB_TOKEN` CI/CD variable (project access token with `api` scope); `CI_JOB_TOKEN` is read-only for MR notes in the official GitLab API.
+Posts a summary comment on the MR with issue counts and findings. In MR pipelines, `--changed-since` is auto-detected from `$CI_MERGE_REQUEST_TARGET_BRANCH_NAME`, so only issues from changed files are reported. `FALLOW_SUMMARY_SCOPE: "diff"` also hides project-level dependency/catalog/override findings whose anchor line is outside the diff. `FALLOW_PR_COMMENT_LAYOUT: "gate-only"` keeps the sticky comment compact when GitLab Code Quality is the primary review surface. Requires `GITLAB_TOKEN` CI/CD variable (project access token with `api` scope); `CI_JOB_TOKEN` is read-only for MR notes in the official GitLab API.
 
 ### GitLab CI: With Inline Code Review Comments
 
@@ -272,12 +273,13 @@ fallow:
   variables:
     FALLOW_COMMENT: "true"
     FALLOW_SUMMARY_SCOPE: "diff"
+    FALLOW_PR_COMMENT_LAYOUT: "gate-only"
     FALLOW_REVIEW: "true"
     FALLOW_REVIEW_GUIDANCE: "true"
     FALLOW_FAIL_ON_ISSUES: "true"
 ```
 
-Posts both a summary comment and inline review comments on the MR. `FALLOW_SUMMARY_SCOPE: "diff"` only affects the sticky summary; inline review comments remain anchored to diff lines. The template auto-detects the package manager (npm/pnpm/yarn) from lockfiles, so review comments show the correct commands for the project (e.g., `pnpm remove` instead of `npm uninstall`).
+Posts both a summary comment and inline review comments on the MR. `FALLOW_SUMMARY_SCOPE: "diff"` and `FALLOW_PR_COMMENT_LAYOUT` only affect the sticky summary; inline review comments remain anchored to diff lines. The template auto-detects the package manager (npm/pnpm/yarn) from lockfiles, so review comments show the correct commands for the project (e.g., `pnpm remove` instead of `npm uninstall`).
 
 ### GitLab CI: With Health Score and Trend
 
@@ -640,7 +642,7 @@ Focus on findings that are BOTH dead code and duplicated:
 
 ## Custom Plugin Setup
 
-For frameworks not covered by the 122 built-in plugins.
+For frameworks not covered by the 123 built-in plugins.
 
 ### Option 1: Inline framework config
 

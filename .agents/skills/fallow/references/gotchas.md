@@ -23,7 +23,7 @@ Always preview with `--dry-run` before applying. This is a destructive operation
 
 ## Don't Create Config Unless Needed
 
-Fallow works with zero configuration for most projects thanks to 122 auto-detecting framework plugins. Creating an unnecessary config file can mask issues or override detection behavior.
+Fallow works with zero configuration for most projects thanks to 123 auto-detecting framework plugins. Creating an unnecessary config file can mask issues or override detection behavior.
 
 ```bash
 # WRONG: creating config for a standard Next.js project
@@ -484,9 +484,15 @@ When `fallow health --css` reports `css_analytics.unused_theme_tokens`, treat th
 
 The detector intentionally abstains when a Tailwind plugin or published CSS surface could consume tokens invisibly. Always run the row's `actions[].command` verification before deleting a token, and do not run `fallow fix` for these rows.
 
+The same Tailwind v4 projects also get `css_analytics.token_consumers`, the reverse index: per `@theme` token, where it is consumed (a `consumer_count` plus a located `consumers[]` sample tagged `theme-var` / `css-var` / `utility` / `apply`), so you can read a token's blast radius before changing it. Treat `consumer_count` as a static lower bound: a computed class name such as `bg-${color}` is invisible to the scan, so a `0` here is the same "nothing fallow can see consumes this" population as `unused_theme_tokens`, not a deletion proof. `token_consumers` is descriptive context with no `actions[]`; drive any deletion off `unused_theme_tokens` and its verification command.
+
+`token_consumers` also covers CSS-in-JS token DEFINITIONS (StyleX `defineVars`, vanilla-extract `createTheme` / `createThemeContract` / `createGlobalTheme`, and PandaCSS `defineTokens`), disambiguated by the consumer `kind`: StyleX and vanilla-extract entries use `kind` `js-member`, `token` is the binding-qualified dotted access path (`vars.color.primary`), and `namespace` is the defining binding (`vars`); PandaCSS entries use the defining binding plus token path (`tokens.colors.brand`) and `token(...)` consumers are tagged `js-call`. The cross-file scan uses fallow's shared import resolver, so relative imports, tsconfig `paths` aliases, and workspace package imports can resolve to the token definition. Dynamic import strings, unresolved aliases, generated package state, and computed token access still keep `consumer_count` a lower bound, and unlike Tailwind there is no corroborating dead-token finding, so a CSS-in-JS `consumer_count` of `0` is a weaker signal. Gated on a declared CSS-in-JS library (`@stylexjs/stylex`, `@vanilla-extract/css`, or `@pandacss/dev`).
+
 ## CSS Health Candidates Are Advisory
 
 `fallow health --css` also emits advisory cleanup and typo candidates in `css_analytics.unreferenced_css_classes` (a plain-CSS class defined but matched by no `class`/`className` in project markup), `css_analytics.unresolved_class_references` (the reverse: a markup class one edit away from a defined class, a likely typo), `css_analytics.unused_font_faces`, `css_analytics.undefined_keyframes`, and `css_analytics.font_size_unit_mix`. Treat them like review prompts, not confirmed defects. Run each row's `actions[].command` before changing CSS, because fonts, classes, animations, and type scales can be driven by inline styles, JavaScript, CMS templates, or preprocessor expansion that static analysis intentionally does not execute.
+
+`fallow health --css` also derives `styling_health`, a descriptive A-F grade (and 0-100 `score`) for CSS quality, scored SEPARATELY from the code `health_score`. It is descriptive-only: it never gates an exit code, badge, or CI, and never affects the code score, so do NOT branch automation on it. Read it as a design-system credibility signal. It weights design-token DRIFT over byte-identical repetition: the `token_erosion` penalty includes a hardcoded-value-sprawl term over distinct `box-shadow` / `border-radius` / `line-height` values, but counts only HARDCODED literals: a system that references its scale via `var(--*)` scores 0 sprawl regardless of how many tokens it defines (so "tokenize repeated values" is the remedy the human output suggests). A grade from a thin CSS surface (or predominantly compile-time-atomic CSS-in-JS like StyleX/Panda) is marked `confidence: "low"` with a reason. `styling_health.formula_version` bumps when the rubric is recalibrated; if you diff the score/grade over time, gate on it and re-baseline at a bump rather than reading the step-change as a regression.
 
 ---
 
