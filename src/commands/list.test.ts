@@ -194,24 +194,9 @@ describe('list command unit tests', () => {
       .mockResolvedValueOnce('# Truncation A\nBody A')
       .mockResolvedValueOnce('# Truncation B\nBody B')
       .mockResolvedValueOnce('# Truncation C\nBody C');
-    await ResearchImport.run([
-      'https://example.com/trunc-a',
-      '--stdin',
-      '--topic',
-      'TruncA',
-    ]);
-    await ResearchImport.run([
-      'https://example.com/trunc-b',
-      '--stdin',
-      '--topic',
-      'TruncB',
-    ]);
-    await ResearchImport.run([
-      'https://example.com/trunc-c',
-      '--stdin',
-      '--topic',
-      'TruncC',
-    ]);
+    await ResearchImport.run(['https://example.com/trunc-a', '--stdin', '--topic', 'TruncA']);
+    await ResearchImport.run(['https://example.com/trunc-b', '--stdin', '--topic', 'TruncB']);
+    await ResearchImport.run(['https://example.com/trunc-c', '--stdin', '--topic', 'TruncC']);
     readSpy.mockRestore();
 
     const logged: string[] = [];
@@ -264,13 +249,23 @@ describe('list command unit tests', () => {
       stderrChunks.push(String(chunk));
       return true;
     }) as typeof process.stderr.write);
+    const stdoutChunks: string[] = [];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      stdoutChunks.push(args.map(String).join(' '));
+    });
     try {
       const rows = (await ResearchList.run(['--limit', '2', '--json'])) as any[];
       expect(rows.length).toBe(2);
       // Intentional #73: --json suppresses tip/truncation messaging on process stderr.
       expect(stderrChunks.join('')).not.toMatch(/showing first|truncat/i);
+      // #91: machine-readable truncation lives on the envelope, not stderr.
+      const envelope = JSON.parse(stdoutChunks.join('\n').trim());
+      expect(envelope.truncation).toEqual({ totalMatched: 3, shown: 2, limit: 2 });
+      expect(Array.isArray(envelope.data)).toBe(true);
+      expect(envelope.data).toHaveLength(2);
     } finally {
       errSpy.mockRestore();
+      logSpy.mockRestore();
     }
   });
 });

@@ -325,8 +325,35 @@ describe('stream routing contract', () => {
     const envelope = expectSuccessEnvelope(result, 'list');
     expect(Array.isArray(envelope.data)).toBe(true);
     expect(envelope.data).toEqual([]);
+    expect(envelope.truncation).toBeUndefined();
     expect(result.stderr).toBe('');
     expect(result.stderr).not.toMatch(/Warning/i);
+  });
+
+  it('list --json truncated by --limit surfaces envelope.truncation (no process-stderr tip)', () => {
+    // Seed three entries so --limit 2 must truncate.
+    for (const [slug, topic] of [
+      ['trunc-a', 'TruncA'],
+      ['trunc-b', 'TruncB'],
+      ['trunc-c', 'TruncC'],
+    ] as const) {
+      const note = join(cwd, `${slug}.md`);
+      writeFileSync(note, `# ${topic}\n\nBody.\n`, 'utf-8');
+      const imported = run(
+        ['import', `https://example.com/${slug}`, '--file', note, '--topic', topic, '--json'],
+        { raw: true }
+      );
+      expect(imported.exitCode).toBe(0);
+    }
+
+    const result = run(['list', '--limit', '2', '--json'], { raw: true });
+    const envelope = expectSuccessEnvelope(result, 'list');
+    expect(Array.isArray(envelope.data)).toBe(true);
+    expect((envelope.data as unknown[]).length).toBe(2);
+    expect(envelope.truncation).toEqual({ totalMatched: 3, shown: 2, limit: 2 });
+    // Intentional #73: no process-stderr truncation tip under --json.
+    expect(result.stderr).toBe('');
+    expect(result.stderr).not.toMatch(/truncat|showing first/i);
   });
 
   it('--json usage error keeps messaging in the envelope only (process stderr empty)', () => {

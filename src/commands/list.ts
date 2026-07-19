@@ -34,6 +34,12 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static description =
     'List page-level cached artifacts with source URLs, topic, tags, freshness, capture method, and token estimates.';
 
+  /**
+   * When `--json` results were capped by `--limit`, attached to the success envelope so agents can
+   * detect truncation without scraping prose (#91 / AUDIT_71_FINAL #73 deferred).
+   */
+  private jsonTruncation: { totalMatched: number; shown: number; limit: number } | null = null;
+
   static examples = [
     {
       description: 'list cached entries',
@@ -225,9 +231,24 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
     const finalResults = results.slice(0, this.flags.limit);
 
-    // Truncation is already in the human heading; --json callers see the capped `data` array only.
+    // Human heading carries truncation; --json gets an envelope `truncation` object when capped.
+    this.jsonTruncation =
+      results.length > finalResults.length
+        ? {
+            totalMatched: results.length,
+            shown: finalResults.length,
+            limit: this.flags.limit,
+          }
+        : null;
     this.logListResults(finalResults, results.length);
 
     return finalResults;
+  }
+
+  /** Attach `truncation` when the returned `data` array was capped by `--limit`. */
+  protected override toSuccessJson(data: unknown): Record<string, unknown> {
+    const envelope = this.baseSuccessJson(data);
+    if (!this.jsonTruncation) return envelope;
+    return { ...envelope, truncation: this.jsonTruncation };
   }
 }
