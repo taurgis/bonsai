@@ -38,12 +38,24 @@ logs/
 .agents/*
 !.agents/skills/
 !.agents/skills/**
+!.agents/rules/
+.agents/rules/*
+!.agents/rules/development.md
 .claude/*
 !.claude/skills/
 !.claude/skills/**
-.cursor/
+!.claude/rules/
+.claude/rules/*
+!.claude/rules/generated/
+.claude/rules/generated/*
+!.claude/rules/generated/development.md
+.cursor/*
+!.cursor/rules/
+.cursor/rules/*
+!.cursor/rules/development.mdc
 .github/agents/
-.github/instructions/
+.github/instructions/*
+!.github/instructions/development.instructions.md
 
 # Agent specific local paths
 .gemini/
