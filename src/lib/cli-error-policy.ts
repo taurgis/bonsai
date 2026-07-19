@@ -11,7 +11,7 @@ export function exitCodeOf(err: { oclif?: { exit?: number }; exitCode?: number }
 }
 
 /** Default recovery tips when a throw site set a stable code but no suggestions. */
-export function fallbackSuggestionsForCode(
+function fallbackSuggestionsForCode(
   code: string | undefined,
   bin: string,
   command: string

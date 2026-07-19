@@ -14,7 +14,7 @@ import {
   fetchFailureGuidance,
   reportCacheStatus,
 } from './fetch-result.js';
-import { checkMaxAgeExpired, durationFlagError, evaluateFreshness } from './freshness.js';
+import { durationFlagError, evaluateFreshnessWithMaxAge } from './freshness.js';
 import { fetchRenderedHtml } from './browser.js';
 import { capturePage, type CaptureDeps, type CaptureOutcome } from './capture.js';
 import { persistSectionArtifacts } from './docs/section-artifacts.js';
@@ -32,9 +32,9 @@ import { detectSite } from '../../sites/index.js';
 import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/types.js';
 
 const CAPTURE_DEPS: CaptureDeps = {
-  fetchStatic: (url) => fetchStaticHtml(url),
-  fetchRendered: (url) => fetchRenderedHtml(url),
-  fetchText: (url) => fetchText(url),
+  fetchStatic: fetchStaticHtml,
+  fetchRendered: fetchRenderedHtml,
+  fetchText,
 };
 
 /** Cache status, freshness, and artifact resolved for one URL. */
@@ -145,10 +145,10 @@ async function executeCacheHit(
   run: FetchRun
 ): Promise<ResolvedFetchArtifact> {
   const { currentTime, flags, io } = run;
-  const isExpired = checkMaxAgeExpired(cached, currentTime, flags.maxAge);
-  const freshnessState = isExpired
-    ? 'stale_expired'
-    : evaluateFreshness(cached.metadata, currentTime, flags.ttl);
+  const freshnessState = evaluateFreshnessWithMaxAge(cached, currentTime, {
+    ttl: flags.ttl,
+    maxAge: flags.maxAge,
+  });
 
   if (freshnessState === 'fresh') {
     return { cacheStatus: 'hit', freshnessState, artifact: cached };
@@ -193,17 +193,17 @@ async function executeCacheMiss(
     extraction = capture.extraction;
   }
 
-  const artifact = createArtifactFromFetch(
-    normalizedUrl,
+  const artifact = createArtifactFromFetch({
+    url: normalizedUrl,
     normalizedUrl,
     cacheKey,
     fetchResult,
     extraction,
-    flags.tier,
-    flags.ttl || null,
+    tier: flags.tier,
+    ttl: flags.ttl || null,
     currentTime,
-    summaryLevel
-  );
+    summaryLevel,
+  });
 
   artifact.metadata.topic = flags.topic || null;
   artifact.metadata.tags = flags.tags || [];
@@ -396,14 +396,9 @@ function applyCaptureMetadata(artifact: ResearchArtifact, capture: CaptureOutcom
 
 function handleStaleRevalidationResult(io: CliIo, revalResult: RevalidationResult): void {
   if (revalResult.status !== 'stale') return;
-  if (revalResult.allowed) {
-    io.warn(
-      `Serving stale content within grace period: revalidation failed (${revalResult.error}).`
-    );
-  } else {
-    io.warn(
-      `Serving stale content within grace period (exit 5): revalidation failed (${revalResult.error}).`
-    );
-    process.exitCode = 5;
-  }
+  const exitSuffix = revalResult.allowed ? '' : ' (exit 5)';
+  io.warn(
+    `Serving stale content within grace period${exitSuffix}: revalidation failed (${revalResult.error}).`
+  );
+  if (!revalResult.allowed) process.exitCode = 5;
 }

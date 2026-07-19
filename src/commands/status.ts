@@ -3,9 +3,8 @@ import { BaseCommand } from '../base-command.js';
 import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
 import { getArtifactPath } from '../lib/research/storage.js';
 import {
-  evaluateFreshness,
-  checkMaxAgeExpired,
   durationFlagError,
+  evaluateFreshnessWithMaxAge,
 } from '../lib/research/freshness.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
 import type { StatusRow } from '../lib/cli-result-types.js';
@@ -34,10 +33,7 @@ function resolveFreshness(
   maxAge: string | undefined,
   tier: Tier | undefined
 ): FreshnessStatus {
-  const isMaxAgeExpired = maxAge ? checkMaxAgeExpired(cached, currentTime, maxAge) : false;
-  return isMaxAgeExpired
-    ? 'stale_expired'
-    : evaluateFreshness(cached.metadata, currentTime, ttl || cached.metadata.ttl, tier);
+  return evaluateFreshnessWithMaxAge(cached, currentTime, { ttl, maxAge, tier });
 }
 
 function describeCacheStatus(

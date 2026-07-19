@@ -15,6 +15,7 @@ import { estimateTokens } from './token-estimate.js';
 import { deriveCacheKey } from './cache-key.js';
 import { normalizeUrl } from './url.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
+import { formatHumanField } from '../cli-presentation.js';
 
 const INPUT_LIMIT_BYTES = 1024 * 1024;
 const STDIN_TIMEOUT_MS = 1000;
@@ -150,12 +151,12 @@ export function finishImportCommandService(
         ? `[dry-run] Would import research artifact.`
         : `Successfully imported research artifact.`
     );
-    io.log(`${'Cache Key:'.padEnd(25)} ${cacheKey}`);
-    io.log(`${'Storage Path:'.padEnd(25)} ${storagePath}`);
+    io.log(formatHumanField('Cache Key', cacheKey));
+    io.log(formatHumanField('Storage Path', storagePath));
     if (!hasSingle) {
       const topic = resolvedTopic(flags)!;
-      io.log(`${'Topic:'.padEnd(25)} ${topic}`);
-      io.log(`${'Source URLs:'.padEnd(25)} ${sourceUrls.join(', ')}`);
+      io.log(formatHumanField('Topic', topic));
+      io.log(formatHumanField('Source URLs', sourceUrls.join(', ')));
       io.log(`\nTip: find it again with ${io.bin} list --topic "${topic}"`);
     }
   }

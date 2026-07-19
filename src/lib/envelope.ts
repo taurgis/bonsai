@@ -98,7 +98,7 @@ export function cliErrorFields(
  * Overlay a batch failure onto a success envelope while keeping per-row `data`.
  * Shared by multi-URL status/inspect (CACHE_MISS) and fetch/row errors.
  */
-export function enrichBatchFailureEnvelope<T>(
+function enrichBatchFailureEnvelope<T>(
   envelope: Record<string, unknown>,
   data: unknown,
   opts: {

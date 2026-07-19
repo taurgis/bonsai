@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { fetchStaticHtml, fetchText, postJson } from './fetcher.js';
+import { fetchStaticHtml, fetchText } from './fetcher.js';
 import * as dns from 'node:dns/promises';
 import * as undici from 'undici';
 
@@ -287,60 +287,6 @@ describe('fetchText (non-HTML text fetcher)', () => {
   });
 });
 
-describe('postJson', () => {
-  const originalFetch = globalThis.fetch;
-
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.mocked(dns.lookup).mockResolvedValue([{ address: '93.184.215.14', family: 4 }] as any);
-  });
-
-  afterEach(() => {
-    globalThis.fetch = originalFetch;
-  });
-
-  it('sends a JSON body with merged headers and returns the response text', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({}),
-      body: (async function* () {
-        yield new TextEncoder().encode('{"hits":[]}');
-      })(),
-    });
-    globalThis.fetch = fetchMock;
-
-    const out = await postJson(
-      'https://app-dsn.algolia.net/1/indexes/x/query',
-      { params: 'query=test' },
-      { 'X-Algolia-API-Key': 'key' }
-    );
-    expect(out).toBe('{"hits":[]}');
-
-    const [, init] = fetchMock.mock.calls[0]!;
-    expect(init.method).toBe('POST');
-    expect(init.headers).toMatchObject({
-      'content-type': 'application/json',
-      'X-Algolia-API-Key': 'key',
-    });
-    expect(init.body).toBe(JSON.stringify({ params: 'query=test' }));
-  });
-
-  it('throws on a non-ok search response', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 403,
-      statusText: 'Forbidden',
-      headers: new Headers({}),
-      body: null,
-    });
-
-    await expect(postJson('https://app-dsn.algolia.net/1/indexes/x/query', {})).rejects.toThrow(
-      /Search request failed with status 403 Forbidden/
-    );
-  });
-});
-
 describe('sandbox proxy routing', () => {
   const originalFetch = globalThis.fetch;
   const originalHttpsProxy = process.env.HTTPS_PROXY;
@@ -527,53 +473,5 @@ describe('sandbox proxy routing', () => {
       /Fetch failed with status 404/
     );
     expect(globalFetchMock).not.toHaveBeenCalled();
-  });
-
-  it('routes postJson through the proxy dispatcher when configured', async () => {
-    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
-    const globalFetchMock = vi.fn();
-    globalThis.fetch = globalFetchMock;
-
-    const undiciFetchMock = vi.mocked(undici.fetch);
-    undiciFetchMock.mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({}),
-      body: (async function* () {
-        yield new TextEncoder().encode('{"hits":[]}');
-      })(),
-    } as any);
-
-    const out = await postJson('https://app-dsn.algolia.net/1/indexes/x/query', { q: 'test' });
-
-    expect(out).toBe('{"hits":[]}');
-    expect(globalFetchMock).not.toHaveBeenCalled();
-    const [, init] = undiciFetchMock.mock.calls[0]!;
-    expect((init as { dispatcher?: unknown }).dispatcher).toBeDefined();
-    expect((init as { method?: string }).method).toBe('POST');
-  });
-
-  it('falls back postJson to a direct connection when the proxy refuses to tunnel', async () => {
-    process.env.HTTPS_PROXY = 'http://127.0.0.1:46271';
-    const globalFetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({}),
-      body: (async function* () {
-        yield new TextEncoder().encode('{"hits":["direct"]}');
-      })(),
-    });
-    globalThis.fetch = globalFetchMock;
-
-    vi.mocked(undici.fetch).mockRejectedValue(
-      new TypeError('fetch failed', {
-        cause: new Error('Proxy response (403) !== 200 when HTTP Tunneling'),
-      })
-    );
-
-    const out = await postJson('https://app-dsn.algolia.net/1/indexes/x/query', { q: 'test' });
-
-    expect(out).toBe('{"hits":["direct"]}');
-    expect(globalFetchMock).toHaveBeenCalledTimes(1);
   });
 });
