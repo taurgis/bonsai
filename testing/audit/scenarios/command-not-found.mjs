@@ -45,19 +45,20 @@ export default function register(harness) {
     expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
     expect(env?.stderr?.includes('config frobnicate is not a bonsai command.'), env?.stderr);
     expect(!env?.stderr?.includes('Did you mean config?'), env?.stderr);
-    expect(r.stderr.includes('Code: COMMAND_NOT_FOUND'), `stderr: ${r.stderr.slice(0, 120)}`);
-    expect(!r.stderr.includes('Did you mean config?'), r.stderr);
+    // Intentional #73 contract: --json failures stay in the envelope only; process stderr is clean.
+    expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr.slice(0, 120)}`);
   });
 
   check('unknown topic subcommand with --json --help returns envelope', () => {
     const r = run(['--json', 'config', 'gett', '--help']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
-    expect(r.stderr.includes('Code: COMMAND_NOT_FOUND'), `stderr: ${r.stderr.slice(0, 120)}`);
     const env = parseJson(r.stdout);
     expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
     expect(env?.stderr?.includes('Did you mean config get?'), env?.stderr);
     expect(env?.suggestions?.[0] === 'bonsai config get', `suggestions ${env?.suggestions}`);
     expect(env?.stderr?.includes('Try this:'), env?.stderr);
+    // Intentional #73 contract: --json failures stay in the envelope only; process stderr is clean.
+    expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr.slice(0, 120)}`);
   });
 
   check('unknown command with --json --help includes top-level suggestions', () => {

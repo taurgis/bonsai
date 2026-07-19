@@ -8,7 +8,7 @@ export default function register(harness) {
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     expect(env?.schemaVersion === 1, 'schemaVersion');
     expect(env?.ok === true, 'ok');
-    // Empty-cache tips intentionally land on stderr under --json (stdout stays a clean envelope).
+    // Empty-cache tips are suppressed entirely under --json (not moved to stderr); stdout stays a clean envelope.
     expect(env?.stdout === '', 'envelope stdout must stay empty');
   });
 

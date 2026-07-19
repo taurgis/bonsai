@@ -22,8 +22,8 @@ export default function register(harness, fixtures) {
     expect(env?.code === 'UNEXPECTED_ARGUMENT', env?.code);
     expect(env?.stderr?.includes('Unexpected argument: extra'), env?.stderr);
     expect(!env?.stderr?.includes('is not a bonsai command'), env?.stderr);
-    expect(r.stderr.includes('Code: UNEXPECTED_ARGUMENT'), `stderr: ${r.stderr.slice(0, 120)}`);
-    expect(!r.stderr.includes('is not a bonsai command'), r.stderr);
+    // Intentional #73 contract: --json failures stay in the envelope only; process stderr is clean.
+    expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr.slice(0, 120)}`);
   });
 
   check('list empty --url is INVALID_FLAG_VALUE', () => {
@@ -39,16 +39,18 @@ export default function register(harness, fixtures) {
     expect(r.stdout.includes('populate the cache first'), r.stdout);
   });
 
-  check('list empty cache --json warns tip on stderr', () => {
+  check('list empty cache --json returns clean empty data with no tip anywhere', () => {
     const r = run(['list', '--json']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
     expect(Array.isArray(env?.data) && env.data.length === 0, 'empty data');
-    expect(r.stderr.includes('No cached research entries found'), r.stderr);
-    expect(r.stderr.includes('Populate the cache first'), r.stderr);
+    // Intentional #73 contract: the human-mode empty-cache tip is suppressed entirely under --json
+    // (not moved to stderr) — envelope.stderr and process stderr both stay empty.
+    expect(env?.stderr === '', `envelope stderr should stay empty: ${env?.stderr}`);
+    expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr}`);
   });
 
-  check('list no-match filter --json warns tip on stderr', () => {
+  check('list no-match filter --json returns clean empty data with no tip anywhere', () => {
     const ws = createWorkspace();
     const imported = run(
       ['import', 'https://example.com/audit-list-json-nomatch', '--stdin', '--topic', 'Present', '--json'],
@@ -64,8 +66,11 @@ export default function register(harness, fixtures) {
       xdg: ws.xdg,
     });
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
-    expect(parseJson(r.stdout)?.data?.length === 0, 'empty');
-    expect(r.stderr.includes('match the given filters'), r.stderr);
+    const env = parseJson(r.stdout);
+    expect(env?.data?.length === 0, 'empty');
+    // Intentional #73 contract: no-match tip is suppressed entirely under --json.
+    expect(env?.stderr === '', `envelope stderr should stay empty: ${env?.stderr}`);
+    expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr}`);
   });
 
   check('list no-match filter tip does not say populate when cache has entries', () => {
@@ -111,7 +116,7 @@ export default function register(harness, fixtures) {
     );
   });
 
-  check('list --json limit truncation warns on stderr only', () => {
+  check('list --json limit truncation surfaces envelope.truncation, no stderr tip', () => {
     const ws = createWorkspace();
     for (const url of [
       'https://example.com/audit-list-limit-one',
@@ -133,7 +138,12 @@ export default function register(harness, fixtures) {
     expect(listed.exitCode === 0, `list exit ${listed.exitCode}`);
     expect(env?.data?.length === 1, `data length ${env?.data?.length}`);
     expect(env?.stdout === '', 'stdout field remains clean');
-    expect(listed.stderr.includes('2 entries matched; returning the first 1'), listed.stderr);
+    // Intentional #73 contract: truncation signal moved to envelope.truncation (#91), never process stderr.
+    expect(
+      env?.truncation && env.truncation.totalMatched === 2 && env.truncation.shown === 1 && env.truncation.limit === 1,
+      `truncation ${JSON.stringify(env?.truncation)}`
+    );
+    expect(listed.stderr === '', `process stderr should stay clean under --json: ${listed.stderr}`);
   });
 
   check('import then list filters by source URL glob', () => {
