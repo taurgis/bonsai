@@ -4,7 +4,6 @@ import { BaseCommand } from '../base-command.js';
 import {
   finishImportCommandService,
   prepareImportCommandService,
-  type CliIo,
   type ImportCommandFlags,
   type ImportCommandArgs,
 } from '../lib/research/import-command-service.js';
@@ -102,7 +101,8 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
     return process.stdin.isTTY === true;
   }
 
-  private async readStdin(limitBytes: number = 1024 * 1024): Promise<string> {
+  // The byte limit is owned by the import service (INPUT_LIMIT_BYTES) and always passed in.
+  private async readStdin(limitBytes: number): Promise<string> {
     return new Promise((resolve, reject) => {
       let data = '';
       let bytesRead = 0;
@@ -144,19 +144,6 @@ export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
 
   protected fsReadFileSync(filePath: string): string {
     return fs.readFileSync(filePath, 'utf8');
-  }
-
-  private cliIo(): CliIo {
-    return {
-      bin: this.config.bin,
-      configDir: this.config.configDir,
-      dataDir: this.config.dataDir,
-      cwd: process.cwd(),
-      json: this.jsonEnabled(),
-      warn: (msg) => void this.warn(msg),
-      log: (msg) => this.log(msg),
-      error: (msg, opts) => this.error(msg, opts),
-    };
   }
 
   private serviceArgs(): ImportCommandArgs {

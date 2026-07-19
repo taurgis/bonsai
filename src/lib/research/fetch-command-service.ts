@@ -21,11 +21,14 @@ import { persistSectionArtifacts } from './docs/section-artifacts.js';
 import { fetchStaticHtml, fetchText } from './fetcher.js';
 import { applyAutoTags } from './keywords.js';
 import { persistArtifact } from './persist-artifact.js';
-import { createArtifactFromFetch, revalidateCache } from './revalidate.js';
+import { createArtifactFromFetch, revalidateCache, type RevalidationResult } from './revalidate.js';
 import { resolveResearchTarget } from './resolve-target.js';
+import type { ResearchArtifact } from './schema.js';
 import type { LocatedArtifact } from './storage.js';
 import type { StoreRoots } from './store-roots.js';
-import { looksLikeSchemelessUrl } from './url.js';
+import { failInvalidUrl, type CliIo } from './cli-io.js';
+import { batchSeparator } from '../cache-view.js';
+import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
 import { detectSite } from '../../sites/index.js';
 import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/types.js';
 
@@ -35,18 +38,11 @@ const CAPTURE_DEPS: CaptureDeps = {
   fetchText: (url) => fetchText(url),
 };
 
-export interface CliIo {
-  bin: string;
-  configDir: string | undefined;
-  dataDir: string;
-  cwd: string;
-  json: boolean;
-  warn(msg: string): void;
-  log(msg: string): void;
-  error(
-    msg: string,
-    opts: { exit: number; code?: string; suggestions?: string[]; ref?: string }
-  ): never;
+/** Cache status, freshness, and artifact resolved for one URL. */
+interface ResolvedFetchArtifact {
+  cacheStatus: CacheHitStatus;
+  freshnessState: FreshnessState;
+  artifact: ResearchArtifact;
 }
 
 export interface FetchCommandSpinner {
@@ -76,6 +72,7 @@ export interface FetchCommandServiceOptions {
   spinner: FetchCommandSpinner;
 }
 
+/** Reject invalid duration values and contradictory flag pairs before any URL work starts. */
 export function validateFetchCommandFlags(io: CliIo, flags: FetchCommandFlags): void {
   for (const msg of [
     durationFlagError('--ttl', flags.ttl),
@@ -96,6 +93,10 @@ export function validateFetchCommandFlags(io: CliIo, flags: FetchCommandFlags): 
   }
 }
 
+/**
+ * Fetch/serve each URL against the cache and return the command's `--json` data payload
+ * (a single row, or an array for multi-URL batches with failures kept as rows).
+ */
 export async function runFetchCommandService(opts: FetchCommandServiceOptions): Promise<unknown> {
   const { dryRun, flags, io, spinner, urls } = opts;
   const summaryLevel = loadSummaryLevel(io.configDir, io.cwd);
@@ -115,20 +116,20 @@ export async function runFetchCommandService(opts: FetchCommandServiceOptions): 
         results.push(failureRowOrRethrow(url, err, dryRun, batch, io, spinner));
       }
     }
-    return finalizeBatch(results, (r) => Boolean(r?.error));
+    return finalizeBatch(results, (row) => 'error' in row);
   } finally {
     if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
   }
 }
 
 async function executeCacheHit(
-  cached: any,
+  cached: ResearchArtifact,
   targetDir: string,
   currentTime: Date,
   summaryLevel: SummaryLevel,
   flags: FetchCommandFlags,
   io: CliIo
-): Promise<{ cacheStatus: any; freshnessState: any; artifact: any }> {
+): Promise<ResolvedFetchArtifact> {
   const isExpired = checkMaxAgeExpired(cached, currentTime, flags.maxAge);
   const freshnessState = isExpired
     ? 'stale_expired'
@@ -160,7 +161,7 @@ async function executeCacheMiss(
   cacheKey: string,
   summaryLevel: SummaryLevel,
   flags: FetchCommandFlags
-): Promise<any> {
+): Promise<ResearchArtifact> {
   const siteModule = detectSite(normalizedUrl);
   const useRendered = flags.rendered || Boolean(siteModule?.defaults?.rendered);
 
@@ -217,24 +218,8 @@ function resolveArtifactTargetOrFail(io: CliIo, url: string, flags: FetchCommand
       lookup: !flags.force,
     });
   } catch (err) {
-    failInvalidUrl(io, url, (err as Error).message);
+    failInvalidUrl(io.error, url, (err as Error).message);
   }
-}
-
-// Single exit point matching BaseCommand.failInvalidUrl so batch rows/error envelopes stay stable.
-function failInvalidUrl(io: CliIo, url: string, message: string): never {
-  if (looksLikeSchemelessUrl(url)) {
-    io.error(message, {
-      exit: 2,
-      code: 'MISSING_URL_SCHEME',
-      suggestions: [`Use a full URL: https://${url}`],
-    });
-  }
-  io.error(`Invalid URL: ${message}`, {
-    exit: 2,
-    code: 'INVALID_URL',
-    suggestions: ['Provide a valid http:// or https:// URL.'],
-  });
 }
 
 async function resolveArtifact(
@@ -247,13 +232,7 @@ async function resolveArtifact(
   summaryLevel: SummaryLevel,
   flags: FetchCommandFlags,
   io: CliIo
-): Promise<{
-  cacheStatus: any;
-  freshnessState: any;
-  artifact: any;
-  storageDir: string;
-  redirectedToGlobal: boolean;
-}> {
+): Promise<ResolvedFetchArtifact & { storageDir: string; redirectedToGlobal: boolean }> {
   if (located) {
     // Revalidate where the entry already lives; on dry-run use the throwaway dir so the cache is
     // never mutated. ponytail: revalidation rewrites in place, so a refreshed project entry that
@@ -294,7 +273,7 @@ function persistFreshArtifact(
   roots: StoreRoots,
   tmpDir: string | null,
   cacheKey: string,
-  artifact: any,
+  artifact: ResearchArtifact,
   io: CliIo
 ): { dir: string; redirectedToGlobal: boolean } {
   const result = persistArtifact({
@@ -314,9 +293,9 @@ function persistFreshArtifact(
 // is freshly written (T-22). Best-effort: never let chunking break the main result.
 function persistSectionsIfFresh(
   targetDir: string,
-  artifact: any,
+  artifact: ResearchArtifact,
   currentTime: Date,
-  cacheStatus: any,
+  cacheStatus: CacheHitStatus,
   summaryLevel: SummaryLevel
 ): void {
   if (cacheStatus !== 'miss' && cacheStatus !== 'refreshed') return;
@@ -381,7 +360,7 @@ async function fetchSingleTarget(
     spinner: FetchCommandSpinner;
     urlCount: number;
   }
-): Promise<any> {
+) {
   const { currentTime, tmpDir, summaryLevel, dryRun } = ctx;
   const { flags, io, spinner, urlCount } = deps;
   const target = resolveArtifactTargetOrFail(io, url, flags);
@@ -408,8 +387,7 @@ async function fetchSingleTarget(
   persistSectionsIfFresh(tmpDir ?? storageDir, artifact, currentTime, cacheStatus, summaryLevel);
 
   if (!io.json) {
-    const reported = reportCacheStatus(cacheStatus, dryRun);
-    spinner.stop(FETCH_STATUS_LABEL[reported] ?? reported);
+    spinner.stop(FETCH_STATUS_LABEL[reportCacheStatus(cacheStatus, dryRun)]);
   }
 
   const resultData = buildFetchResultData({
@@ -432,8 +410,9 @@ async function fetchSingleTarget(
       io.log('[dry-run] Preview only — cache was not written.');
     }
     io.log(resultData.content);
-    if (urlCount > 1) {
-      io.log('\n' + '='.repeat(40) + '\n');
+    const separator = batchSeparator(urlCount > 1);
+    if (separator) {
+      io.log(`\n${separator}\n`);
     }
   }
 
@@ -442,7 +421,7 @@ async function fetchSingleTarget(
 
 // Copies Phase 2 capability provenance from a capture outcome onto the artifact metadata.
 function applyCaptureMetadata(
-  artifact: any,
+  artifact: ResearchArtifact,
   capture: Awaited<ReturnType<typeof capturePage>>
 ): void {
   const meta = artifact.metadata;
@@ -457,7 +436,7 @@ function applyCaptureMetadata(
   }
 }
 
-function handleStaleRevalidationResult(io: CliIo, revalResult: any): void {
+function handleStaleRevalidationResult(io: CliIo, revalResult: RevalidationResult): void {
   if (revalResult.status !== 'stale') return;
   if (revalResult.allowed) {
     io.warn(

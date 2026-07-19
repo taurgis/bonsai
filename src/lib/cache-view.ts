@@ -15,6 +15,7 @@ export function cacheTargetHeaderFields(
   ];
 }
 
+/** Header field lines plus any command-specific extras, formatted for human output. */
 export function formatCacheTargetHeader(
   target: { normalizedUrl: string; cacheKey: string; roots: { writeRoot: string } },
   extra: HumanField[] = [],
@@ -23,10 +24,14 @@ export function formatCacheTargetHeader(
   return formatHumanFields([...cacheTargetHeaderFields(target, artifactPath), ...extra]);
 }
 
+/** Stderr tip pointing at the fetch shorthand when a URL has no cache entry. */
 export function cacheMissHint(bin: string, normalizedUrl: string): string {
   return `Cache miss — run: ${bin} ${normalizedUrl}`;
 }
 
+const BATCH_SEPARATOR_WIDTH = 40;
+
+/** Visual row separator between per-URL blocks in multi-URL human output; null for single URLs. */
 export function batchSeparator(multi: boolean): string | null {
-  return multi ? '='.repeat(40) : null;
+  return multi ? '='.repeat(BATCH_SEPARATOR_WIDTH) : null;
 }

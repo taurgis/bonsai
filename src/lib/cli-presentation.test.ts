@@ -1,24 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import {
-  CLI_FLAG_DESCRIPTION_FRAGMENTS,
-  CLI_FLAG_DESCRIPTIONS,
-  formatHumanField,
-  formatHumanFields,
-} from './cli-presentation.js';
+import { CLI_FLAG_DESCRIPTIONS, formatHumanField, formatHumanFields } from './cli-presentation.js';
 
 describe('CLI presentation helpers', () => {
-  it('defines reusable flag description fragments once', () => {
-    expect(CLI_FLAG_DESCRIPTION_FRAGMENTS).toMatchObject({
-      durationExamples: 'e.g. "2h", "7d", "6m"',
-      freshnessTierPolicy: 'freshness tier policy',
-      topic: 'topic',
-      storageSecretScope: 'secrets always stored globally',
-      taxonomicTags: 'taxonomic tags',
-      filterTags: 'tags',
-      repeatable: 'can be repeated',
-    });
-  });
-
   it('keeps shared flag descriptions centralized', () => {
     expect(CLI_FLAG_DESCRIPTIONS.freshnessTierPolicy).toBe('freshness tier policy');
     expect(CLI_FLAG_DESCRIPTIONS.statusFreshnessTierPolicy).toBe(

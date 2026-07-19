@@ -25,6 +25,7 @@ export function buildJsonEnvelope(parts: JsonEnvelopeParts): Record<string, unkn
   });
 }
 
+/** Print the envelope as pretty JSON on stdout (the machine-readable channel). */
 export function printJsonEnvelope(envelope: Record<string, unknown>): void {
   console.log(JSON.stringify(envelope, null, 2));
 }

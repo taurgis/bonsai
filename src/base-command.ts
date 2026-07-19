@@ -10,7 +10,7 @@ import {
   type ResolveResearchTargetOptions,
   type ResolvedResearchTarget,
 } from './lib/research/resolve-target.js';
-import { looksLikeSchemelessUrl } from './lib/research/url.js';
+import { failInvalidUrl, type CliIo } from './lib/research/cli-io.js';
 
 /**
  * Shared base for every Bonsai command. Enables oclif's native `--json` flag,
@@ -143,24 +143,23 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     }
   }
 
-  /**
-   * Single exit point for a URL that failed normalization, shared by every URL-accepting command.
-   * The scheme-less message is already self-contained and actionable, so it is surfaced as-is;
-   * other parse failures keep the "Invalid URL:" prefix for context.
-   */
+  /** Exit for a URL that failed normalization; see {@link failInvalidUrl} for the code contract. */
   protected failInvalidUrl(url: string, message: string): never {
-    if (looksLikeSchemelessUrl(url)) {
-      this.error(message, {
-        exit: 2,
-        code: 'MISSING_URL_SCHEME',
-        suggestions: [`Use a full URL: https://${url}`],
-      });
-    }
-    this.error(`Invalid URL: ${message}`, {
-      exit: 2,
-      code: 'INVALID_URL',
-      suggestions: ['Provide a valid http:// or https:// URL.'],
-    });
+    failInvalidUrl((msg, opts) => this.error(msg, opts), url, message);
+  }
+
+  /** Command context handed to command services (fetch/import) so they stay oclif-free. */
+  protected cliIo(): CliIo {
+    return {
+      bin: this.config.bin,
+      configDir: this.config.configDir,
+      dataDir: this.config.dataDir,
+      cwd: process.cwd(),
+      json: this.jsonEnabled(),
+      warn: (msg) => void this.warn(msg),
+      log: (msg) => this.log(msg),
+      error: (msg, opts) => this.error(msg, opts),
+    };
   }
 
   /** Single source of truth for the `--json` envelope shape, shared by success and error output. */
