@@ -2,26 +2,22 @@ import { colors } from './color.js';
 import { formatHumanFields, type HumanField } from './cli-presentation.js';
 import { getArtifactPath } from './research/storage.js';
 
-/** Shared URL / cache-key / path header used by status and inspect human output. */
-export function cacheTargetHeaderFields(
-  target: { normalizedUrl: string; cacheKey: string; roots: { writeRoot: string } },
-  artifactPath?: string
-): HumanField[] {
-  const path = artifactPath ?? getArtifactPath(target.roots.writeRoot, target.cacheKey);
-  return [
-    ['URL', colors.bold(target.normalizedUrl)],
-    ['Cache Key', colors.bold(target.cacheKey)],
-    ['Cache Path', colors.gray(path)],
-  ];
-}
-
-/** Header field lines plus any command-specific extras, formatted for human output. */
+/**
+ * Shared URL / cache-key / path header used by status and inspect human output, plus any
+ * command-specific extra rows, formatted as label/value lines.
+ */
 export function formatCacheTargetHeader(
   target: { normalizedUrl: string; cacheKey: string; roots: { writeRoot: string } },
   extra: HumanField[] = [],
   artifactPath?: string
 ): string[] {
-  return formatHumanFields([...cacheTargetHeaderFields(target, artifactPath), ...extra]);
+  const path = artifactPath ?? getArtifactPath(target.roots.writeRoot, target.cacheKey);
+  return formatHumanFields([
+    ['URL', colors.bold(target.normalizedUrl)],
+    ['Cache Key', colors.bold(target.cacheKey)],
+    ['Cache Path', colors.gray(path)],
+    ...extra,
+  ]);
 }
 
 /** Stderr tip pointing at the fetch shorthand when a URL has no cache entry. */

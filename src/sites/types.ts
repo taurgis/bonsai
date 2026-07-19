@@ -1,17 +1,11 @@
 import type { ExtractionResult } from '../lib/research/extract.js';
+import type { FetchedContent } from '../lib/research/fetcher.js';
 import type { CaptureMethod } from '../lib/research/schema.js';
 
 // Shape a site module's fetchPage must return — the same inputs createArtifactFromFetch
 // consumes, so a custom fetch slots into the generic caching pipeline unchanged.
 export interface SiteFetchResult {
-  fetchResult: {
-    contentType: string | null;
-    etag: string | null;
-    lastModified: string | null;
-    finalUrl: string;
-    responseSize: number;
-    content: string;
-  };
+  fetchResult: FetchedContent;
   extraction: ExtractionResult;
   // Capture provenance. Modules report how they actually got the content ('route_markdown' when
   // a source twin was used, 'browser_fallback' for a rendered capture) plus the source-doc URL

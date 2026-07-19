@@ -93,16 +93,16 @@ export async function prepareImportCommandService(opts: {
   const singleNormalizedUrl = hasSingle ? sourceUrls[0] || '' : '';
   const cacheKey = deriveImportCacheKey(hasSingle, singleNormalizedUrl, sourceUrls, flags);
 
-  const artifact = buildImportArtifact(
+  const artifact = buildImportArtifact({
     hasSingle,
-    args.url,
+    singleUrl: args.url,
     singleNormalizedUrl,
     sourceUrls,
     cacheKey,
     rawInput,
     flags,
-    io
-  );
+    io,
+  });
 
   const roots = loadStoreRoots({
     configDir: io.configDir,
@@ -414,16 +414,18 @@ function deriveImportCacheKey(
   return createHash('sha256').update(combinedString).digest('hex');
 }
 
-function buildImportArtifact(
-  hasSingle: boolean,
-  singleUrl: string | undefined,
-  singleNormalizedUrl: string,
-  sourceUrls: string[],
-  cacheKey: string,
-  rawInput: string,
-  flags: ImportCommandFlags,
-  io: CliIo
-): ResearchArtifact {
+function buildImportArtifact(opts: {
+  hasSingle: boolean;
+  singleUrl: string | undefined;
+  singleNormalizedUrl: string;
+  sourceUrls: string[];
+  cacheKey: string;
+  rawInput: string;
+  flags: ImportCommandFlags;
+  io: CliIo;
+}): ResearchArtifact {
+  const { hasSingle, singleUrl, singleNormalizedUrl, sourceUrls, cacheKey, rawInput, flags, io } =
+    opts;
   const currentTime = new Date();
   const ttl = flags.ttl || null;
   const { freshWindowMs } = getPolicy(flags.tier, ttl);

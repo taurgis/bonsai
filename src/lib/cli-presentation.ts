@@ -34,7 +34,7 @@ export const CLI_FLAG_DESCRIPTIONS = {
 
 export type HumanField = readonly [label: string, value: string];
 
-export function formatHumanLabel(label: string): string {
+function formatHumanLabel(label: string): string {
   const text = `${label}:`;
   return colors.cyan(text.padEnd(Math.max(HUMAN_LABEL_WIDTH, text.length)));
 }
