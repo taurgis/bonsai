@@ -187,6 +187,7 @@ describe('list command unit tests', () => {
 
   it('excludes section sub-artifacts so a chunked page does not flood the listing', async () => {
     // Real on-disk scan: page source + section child under project storage (no scanCacheDirs mock).
+    // BONSAI_STORAGE restored by useIsolatedCache afterEach.
     process.env.BONSAI_STORAGE = 'project';
     writeArtifact(
       projectDir(),
@@ -217,6 +218,7 @@ describe('list command unit tests', () => {
 
   it('exposes every schema capture method / artifact type as a filter (no enum drift)', async () => {
     // Seed a route_markdown index hub on disk so list filters hit real scanCacheDirs.
+    // BONSAI_STORAGE restored by useIsolatedCache afterEach.
     process.env.BONSAI_STORAGE = 'project';
     writeArtifact(
       projectDir(),
