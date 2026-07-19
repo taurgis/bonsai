@@ -65,7 +65,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
         exit: 2,
         code: 'INVALID_VALUE',
         suggestions: meta.values?.map(
-          (value) => `Set ${keyArg}: ${this.config.bin} config set ${keyArg} ${value}`
+          (value) => `Set ${keyArg} to "${value}": ${this.config.bin} config set ${keyArg} ${value}`
         ),
       });
     }

@@ -43,7 +43,12 @@ export default function register(harness, fixtures) {
   check('config set invalid value --json INVALID_VALUE', () => {
     const r = run(['config', 'set', 'storage', 'bogus', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
-    expect(parseJson(r.stdout)?.code === 'INVALID_VALUE', 'code');
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_VALUE', 'code');
+    // Each suggested value names the value it sets, not a repeated generic "Set storage:" label
+    // (two identical-looking bullets differing only in their trailing token is not actionable).
+    expect(env?.suggestions?.includes('Set storage to "global": bonsai config set storage global'), env?.suggestions);
+    expect(env?.suggestions?.includes('Set storage to "project": bonsai config set storage project'), env?.suggestions);
   });
 
   check('config get unknown --json UNKNOWN_KEY', () => {

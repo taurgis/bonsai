@@ -83,6 +83,27 @@ export default function register(harness) {
     expect(r.stderr.includes('https://example.com'), r.stderr.slice(0, 200));
   });
 
+  // Two scheme-less hosts (a batch-fetch typo) fold into one colon-joined id before this CLI ever
+  // sees them; the single-URL check alone would fail to parse that joined id (an invalid port), so
+  // each segment must be checked on its own to still offer the scheme hint.
+  check('two bare hostnames (batch fetch typo) --json MISSING_URL_SCHEME', () => {
+    const r = run(['--json', 'example.com', 'example.org']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'MISSING_URL_SCHEME', env?.code);
+    expect(
+      env?.stderr?.includes('https://example.com https://example.org'),
+      env?.stderr
+    );
+    expect(env?.suggestions?.[0] === 'bonsai https://example.com https://example.org', env?.suggestions);
+  });
+
+  check('two bare hostnames suggest https scheme for both human', () => {
+    const r = run(['example.com', 'example.org']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('https://example.com https://example.org'), r.stderr.slice(0, 200));
+  });
+
   check('lone --read-only is MISSING_COMMAND not COMMAND_NOT_FOUND', () => {
     const r = run(['--read-only', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);

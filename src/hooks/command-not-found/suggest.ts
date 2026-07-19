@@ -77,6 +77,20 @@ function bareUrlInput(id: string): string | null {
   return looksLikeSchemelessUrl(id) ? id : null;
 }
 
+/**
+ * The id's colon-joined segments when every one individually looks like a URL missing its scheme,
+ * else null. Covers the multi-URL batch-fetch typo (`bonsai example.com example.org` folds into one
+ * id, "example.com:example.org") that {@link bareUrlInput} misses: parsed as a single URL, the colon
+ * between two hostnames reads as an invalid port, so the whole-string check fails even though each
+ * segment on its own is a plain scheme-less host.
+ */
+function bareUrlSegments(id: string): string[] | null {
+  const segments = id.split(':');
+  return segments.length > 1 && segments.every((segment) => looksLikeSchemelessUrl(segment))
+    ? segments
+    : null;
+}
+
 function isJsonMode(argv: string[] | undefined): boolean {
   return (argv?.includes('--json') ?? false) || process.argv.includes('--json');
 }
@@ -109,6 +123,22 @@ export function buildCommandNotFoundDetails(
       jsonMode: isJsonMode(argv),
       message: [
         `${bareUrl} is not a ${config.bin} command.`,
+        `Run ${config.bin} help for a list of available commands.`,
+        `Did you mean ${suggestion}? URLs need an http:// or https:// scheme.`,
+      ].join('\n'),
+      suggestions: [suggestion],
+    };
+  }
+
+  const bareUrls = bareUrlSegments(id);
+  if (bareUrls) {
+    const suggestion = `${config.bin} ${bareUrls.map((url) => `https://${url}`).join(' ')}`;
+    return {
+      code: 'MISSING_URL_SCHEME',
+      command: bareUrls.join(' '),
+      jsonMode: isJsonMode(argv),
+      message: [
+        `${bareUrls.join(' ')} is not a ${config.bin} command.`,
         `Run ${config.bin} help for a list of available commands.`,
         `Did you mean ${suggestion}? URLs need an http:// or https:// scheme.`,
       ].join('\n'),

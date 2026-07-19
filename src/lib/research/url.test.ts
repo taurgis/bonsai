@@ -70,6 +70,15 @@ describe('isSafeIp safety check', () => {
     expect(isSafeIp('192.168.100.1')).toBe(false);
     // Link-local IPv4
     expect(isSafeIp('169.254.1.1')).toBe(false);
+    // "This network" / unspecified IPv4 (RFC791/RFC1122) — a documented SSRF-filter bypass that
+    // routes to loopback on many stacks.
+    expect(isSafeIp('0.0.0.0')).toBe(false);
+    expect(isSafeIp('0.1.2.3')).toBe(false);
+    // Shared Address Space / CGNAT IPv4 (RFC6598)
+    expect(isSafeIp('100.64.0.1')).toBe(false);
+    expect(isSafeIp('100.127.255.255')).toBe(false);
+    expect(isSafeIp('100.63.255.255')).toBe(true);
+    expect(isSafeIp('100.128.0.0')).toBe(true);
 
     // Public IPv4
     expect(isSafeIp('8.8.8.8')).toBe(true);
@@ -81,6 +90,11 @@ describe('isSafeIp safety check', () => {
     expect(isSafeIp('::')).toBe(false);
     // Link-local IPv6
     expect(isSafeIp('fe80::1')).toBe(false);
+    // Unique Local Address IPv6 (RFC4193) — IPv6's RFC1918 equivalent
+    expect(isSafeIp('fc00::1')).toBe(false);
+    expect(isSafeIp('fd12:3456::1')).toBe(false);
+    expect(isSafeIp('fdff:ffff::1')).toBe(false);
+    expect(isSafeIp('fe00::1')).toBe(true);
     // IPv4-mapped IPv6 loopback/private
     expect(isSafeIp('::ffff:127.0.0.1')).toBe(false);
     expect(isSafeIp('::ffff:10.0.0.1')).toBe(false);

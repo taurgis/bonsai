@@ -38,6 +38,26 @@ export default function register(harness, fixtures) {
     expect(!r.stderr.includes('not found'), r.stderr);
   });
 
+  // SSRF guard: literal IPs in blocked ranges are rejected before any socket opens, so these run
+  // fully offline regardless of AUDIT_NETWORK. Each address below is caught by `isSafeIp` alone —
+  // no DNS lookup involved.
+  function expectSsrfBlocked(name, url) {
+    check(name, () => {
+      const r = run([url, '--json']);
+      expect(r.exitCode === 1, `exit ${r.exitCode}`);
+      const env = parseJson(r.stdout);
+      expect(env?.code === 'FETCH_FAILED', env?.code);
+      expect(env?.stderr?.includes('blocked local or private target'), env?.stderr);
+    });
+  }
+
+  expectSsrfBlocked('fetch blocks loopback IPv4 (127.0.0.1)', 'http://127.0.0.1/');
+  // 0.0.0.0/8 ("this network") routes to loopback on many stacks — a documented SSRF-filter bypass.
+  expectSsrfBlocked('fetch blocks unspecified IPv4 (0.0.0.0)', 'http://0.0.0.0/');
+  expectSsrfBlocked('fetch blocks shared address space / CGNAT IPv4 (100.64.0.0/10)', 'http://100.64.0.1/');
+  // IPv6 Unique Local Address (RFC4193) — the IPv6 equivalent of RFC1918 private space.
+  expectSsrfBlocked('fetch blocks IPv6 unique-local address (fc00::/7)', 'http://[fc00::1]/');
+
   check('fetch --json invalid ttl INVALID_DURATION + exit 2 match', () => {
     const r = run(['https://example.com', '--ttl', '5z', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
