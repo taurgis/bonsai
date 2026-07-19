@@ -126,7 +126,7 @@ This section contains the Markdown representation. The file maintains both detai
 - `fetched_at`: (ISO string | null) Timestamp of the last successful network crawl.
 - `validated_at`: (ISO string | null) Timestamp of the last freshness verification.
 - `stale_after`: (ISO string | null) Timestamp when the fresh window expires.
-- `capture_method`: (string | null) `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown` (the page's machine-readable `.md` route), or `github_source` (raw source fetched from the page's GitHub edit link).
+- `capture_method`: (string | null) `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown` (a machine-readable `.md` twin of the page — usually same-host, but for some [site modules](/reference/site-modules) a documented third-party mirror), or `github_source` (raw source fetched from the page's GitHub edit link).
 - `extraction_status`: (string | null) `extracted`, `agent_supplied`, or `failed`. A page that resolves to an error/"not found" shell (including SPA pages that return HTTP 200 but render only an error notice) is stored as `failed`: the full error markdown is discarded and a compact one-line marker is cached in its place, so repeat lookups cost a handful of tokens and revalidation re-fetches the page when the entry goes stale.
 - `extraction_confidence`: (string | null) `high`, `medium`, or `low`.
 - `quality_notes`: (array of strings) Informative tags about the scrape quality.

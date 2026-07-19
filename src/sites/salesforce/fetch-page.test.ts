@@ -1,19 +1,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// fetchSalesforcePage is a thin wrapper: it normalizes Coveo /help_doccontent URLs and delegates
-// to the shared LWR fetcher. Mock the shared fetcher so we assert wiring (host, selectors, removes)
-// without spawning a browser.
+// fetchSalesforcePage is a thin wrapper: it normalizes Coveo /help_doccontent URLs, probes the
+// b2c-developer-tooling Markdown mirror, and delegates to the shared LWR fetcher. Mock both so we
+// assert wiring (host, selectors, removes, twin precedence) without spawning a browser or network.
 vi.mock('../salesforce-doc-fetch.js', () => ({
   fetchSalesforceDoc: vi.fn().mockResolvedValue({ fetchResult: {}, extraction: {} }),
+}));
+vi.mock('./help-tooling-markdown.js', () => ({
+  fetchHelpToolingMarkdown: vi.fn().mockResolvedValue(null),
 }));
 
 import { fetchSalesforcePage } from './fetch-page.js';
 import { fetchSalesforceDoc } from '../salesforce-doc-fetch.js';
+import { fetchHelpToolingMarkdown } from './help-tooling-markdown.js';
 
 beforeEach(() => {
   vi.mocked(fetchSalesforceDoc)
     .mockReset()
     .mockResolvedValue({ fetchResult: {}, extraction: {} } as never);
+  vi.mocked(fetchHelpToolingMarkdown).mockReset().mockResolvedValue(null);
 });
 
 afterEach(() => {
@@ -43,5 +48,23 @@ describe('fetchSalesforcePage', () => {
     const parsed = new URL(passedUrl);
     expect(parsed.pathname).toBe('/s/articleView');
     expect(parsed.searchParams.get('id')).toBe('sf.security.htm');
+  });
+
+  it('prefers a validated b2c-developer-tooling Markdown twin and skips the browser fetch entirely', async () => {
+    const twin = {
+      fetchResult: { content: '# md' },
+      extraction: { title: 'md' },
+      captureMethod: 'route_markdown',
+      sourceDocUrl:
+        'https://salesforcecommercecloud.github.io/b2c-developer-tooling/help/help-admin/b2c_x.md',
+    };
+    vi.mocked(fetchHelpToolingMarkdown).mockResolvedValueOnce(twin as any);
+
+    const out = await fetchSalesforcePage(
+      'https://help.salesforce.com/s/articleView?id=cc.b2c_x.htm&type=5'
+    );
+
+    expect(out).toBe(twin);
+    expect(fetchSalesforceDoc).not.toHaveBeenCalled();
   });
 });

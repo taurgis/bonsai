@@ -1,6 +1,7 @@
 import type { SiteFetchResult } from '../types.js';
 import { fetchSalesforceDoc } from '../salesforce-doc-fetch.js';
 import { normalizeHelpDocContentUrl } from '../coveo.js';
+import { fetchHelpToolingMarkdown } from './help-tooling-markdown.js';
 
 // Containers a Help article renders into (inside shadow DOM); the shared fetcher pierces
 // shadow roots to find them, falling back to the page body when none match.
@@ -16,17 +17,21 @@ const CONTENT_SELECTORS = [
 ];
 
 /**
- * Fetches a help.salesforce.com article. Coveo's internal /help_doccontent URLs are rewritten
- * to the canonical /s/articleView page first; the shared Lightning Web Runtime (LWR) fetcher
- * does the rest.
+ * Fetches a help.salesforce.com article. Coveo's internal /help_doccontent URLs are rewritten to
+ * the canonical /s/articleView page first. The Salesforce B2C Developer Tooling project mirrors a
+ * curated set of B2C Commerce Help articles as static Markdown; that twin is probed next, and used
+ * when it validates. Otherwise the shared Lightning Web Runtime (LWR) fetcher renders the page.
  *
  * @param url - The help.salesforce.com article URL (or a Coveo /help_doccontent URL).
- * @returns Extracted Markdown, fetch metadata, and browser-capture provenance.
- * @throws {Error} When host/DNS checks fail, browser capture fails, or content is unreadable
- *   (same failure modes as `fetchSalesforceDoc`).
+ * @returns Extracted Markdown, fetch metadata, and capture provenance (route_markdown or browser_fallback).
+ * @throws {Error} When the browser fallback path fails (same modes as `fetchSalesforceDoc`).
  */
 export async function fetchSalesforcePage(url: string): Promise<SiteFetchResult> {
-  return fetchSalesforceDoc(normalizeHelpDocContentUrl(url), {
+  const normalizedUrl = normalizeHelpDocContentUrl(url);
+  const fromToolingMirror = await fetchHelpToolingMarkdown(normalizedUrl);
+  if (fromToolingMirror) return fromToolingMirror;
+
+  return fetchSalesforceDoc(normalizedUrl, {
     allowedHost: 'help.salesforce.com',
     contentSelectors: CONTENT_SELECTORS,
     removeSelectors: [
