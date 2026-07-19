@@ -243,6 +243,17 @@ describe('search-index metadata writes under read-only', () => {
     expect(existsSync(join(projectResearchDir(), SEARCH_INDEX))).toBe(false);
   });
 
+  it('inspect --read-only does not create .search-index.json', () => {
+    seedProjectImport();
+    expect(existsSync(join(projectResearchDir(), SEARCH_INDEX))).toBe(false);
+
+    const inspected = run(['inspect', HIT_URL, '--read-only', '--json'], {
+      env: { BONSAI_STORAGE: 'project' },
+    });
+    expect(inspected.exitCode).toBe(0);
+    expect(existsSync(join(projectResearchDir(), SEARCH_INDEX))).toBe(false);
+  });
+
   it('list without read-only may persist the search index (writable baseline)', () => {
     seedProjectImport();
     expect(run(['list', '--json'], { env: { BONSAI_STORAGE: 'project' } }).exitCode).toBe(0);
