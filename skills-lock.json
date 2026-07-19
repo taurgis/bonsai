@@ -458,84 +458,19 @@
       "installVersion": "1.0.0"
     },
     "ponytail": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
+      "source": "dietrichgebert/ponytail",
       "sourceType": "github",
-      "computedHash": "e91ed2fadde7b43e4b413b24f2ecb9d8f03e7baace10b140305e30cdf67bc88a",
+      "computedHash": "2ee5886565dabc8b144766951193b5bffdce0ad5feb608cf128b88e0c9a38092",
       "agents": [
-        "github-copilot",
         "claude-code",
-        "cursor",
-        "antigravity",
-        "codex"
+        "github-copilot"
       ],
       "repoPath": "skills/ponytail/SKILL.md",
       "installPath": ".agents/skills/ponytail",
-      "installHash": "5459c4db58879728453d94546c51a2e459b6803ef02a558d3f10817e0f8cbaa5",
-      "sourceHash": "e91ed2fadde7b43e4b413b24f2ecb9d8f03e7baace10b140305e30cdf67bc88a",
+      "installHash": "210fa0831f649ce9f8a305f7b7c8cf2a0dd09ac4dd53067109941b96e7811d4e",
+      "sourceHash": "2ee5886565dabc8b144766951193b5bffdce0ad5feb608cf128b88e0c9a38092",
       "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
-    },
-    "ponytail-audit": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "computedHash": "60d97ceea90c03d6cf6004539e65ab7be1a23ecff6dc1da36f05aa04e98b58c8",
-      "agents": [
-        "github-copilot",
-        "claude-code",
-        "cursor",
-        "antigravity",
-        "codex"
-      ],
-      "repoPath": "skills/ponytail-audit/SKILL.md",
-      "installPath": ".agents/skills/ponytail-audit",
-      "installHash": "3f99920e2b1eb85bcbb83762d32c6a8fe96c23739e277720304b15769706a1cc",
-      "sourceHash": "60d97ceea90c03d6cf6004539e65ab7be1a23ecff6dc1da36f05aa04e98b58c8",
-      "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
-    },
-    "ponytail-debt": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "computedHash": "936fd2e6e88983f03de3b39f4ae13d05dfece12fc0160273ae657d02e0015000",
-      "agents": [
-        "github-copilot",
-        "claude-code",
-        "cursor",
-        "antigravity",
-        "codex"
-      ],
-      "repoPath": "skills/ponytail-debt/SKILL.md",
-      "installPath": ".agents/skills/ponytail-debt",
-      "installHash": "d05ecaedb1a4a9f1c3b1dce9b470c23ca1ff377b4c4bb5f4fc8aeea01bb12e31",
-      "sourceHash": "936fd2e6e88983f03de3b39f4ae13d05dfece12fc0160273ae657d02e0015000",
-      "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
-    },
-    "ponytail-review": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "computedHash": "c2aea3f785047597ae73da52cb1abeba075716d77cbe9626baa1cb43c05c3935",
-      "agents": [
-        "github-copilot",
-        "claude-code",
-        "cursor",
-        "antigravity",
-        "codex"
-      ],
-      "repoPath": "skills/ponytail-review/SKILL.md",
-      "installPath": ".agents/skills/ponytail-review",
-      "installHash": "fcdcab492a88bf83bc2881aec0519c5e4b53eff809abc2da3336052205eadd86",
-      "sourceHash": "c2aea3f785047597ae73da52cb1abeba075716d77cbe9626baa1cb43c05c3935",
-      "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
+      "includePrerelease": false
     },
     "prototype": {
       "source": "mattpocock/skills",
@@ -795,34 +730,6 @@
     }
   },
   "instructions": {
-    ".github/instructions/development-principles-ponytail.instructions.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "repoPath": "instructions/development-principles-ponytail.instructions.md",
-      "installPath": ".github/instructions/development-principles-ponytail.instructions.md",
-      "computedHash": "58d53c2ea271871f03aac733baa8759b0cb64767ec093fd35c066d28fefc702f",
-      "agents": [
-        "github-copilot",
-        "claude-code",
-        "cursor",
-        "antigravity",
-        "codex"
-      ],
-      "linkedSkills": [
-        "graphify",
-        "ponytail",
-        "ponytail-audit",
-        "ponytail-debt",
-        "ponytail-review",
-        "thermo-nuclear-code-quality-review"
-      ],
-      "installHash": "58d53c2ea271871f03aac733baa8759b0cb64767ec093fd35c066d28fefc702f",
-      "sourceHash": "114f4200c877fe6384192d2fff2bc32d431846b7ec6186a74bc8ef3398f0da86",
-      "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
-    },
     ".github/instructions/post-feature-code-review.instructions.md": {
       "source": "Forward-Services-NV/forward-nexus-projects",
       "sourceType": "github",
