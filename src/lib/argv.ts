@@ -1,5 +1,7 @@
+import { EXIT_USAGE } from './cli-error-policy.js';
 import { buildCliErrorEnvelope } from './envelope.js';
 
+/** Result of argv normalization before oclif command dispatch. */
 export interface NormalizationResult {
   /** The normalized argv array to set on process.argv. */
   argv: string[];
@@ -14,6 +16,7 @@ export interface NormalizationResult {
   };
 }
 
+/** Options for {@link normalizeArgv}. */
 export interface ArgvNormalizeOptions {
   /** Tokens that consume the next argv value (`--topic`, `-t`, …). From cli-flag-manifest. */
   valueTakingFlags: ReadonlySet<string>;
@@ -77,7 +80,7 @@ function missingUsageExit(
 ): NonNullable<NormalizationResult['earlyExit']> {
   const details = missingCommandDetails('bonsai', findSwallowedUrlFlag(argv, valueTakingFlags));
   return {
-    exitCode: 2,
+    exitCode: EXIT_USAGE,
     json,
     envelope: buildCliErrorEnvelope({
       command: 'bonsai',

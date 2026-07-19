@@ -5,12 +5,15 @@ import {
   type ConfigValues,
 } from './config/index.js';
 
+/** Scope for config writes (`user` = XDG config dir; `project` = cwd `.bonsai`). */
 export type ConfigWriteScope = 'user' | 'project';
 
+/** Successful config persist outcome. */
 export interface ConfigPersistResult {
   ok: true;
 }
 
+/** Failed config persist outcome with stable code and recovery tips. */
 export interface ConfigPersistFailure {
   ok: false;
   code: 'CONFIG_DIR_UNAVAILABLE';

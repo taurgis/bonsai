@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import type { StorageMode } from '../config/index.js';
 import { loadSummaryLevel } from '../config/index.js';
 import { buildCompressed } from './compress.js';
-import { durationFlagError, getPolicy } from './freshness.js';
+import { durationFlagError, resolveFreshnessPolicy } from './freshness.js';
 import { applyAutoTags } from './keywords.js';
 import { persistArtifact } from './persist-artifact.js';
 import { sanitizePromptInjection } from './prompt-injection.js';
@@ -18,13 +18,17 @@ import { failInvalidUrl, type CliIo } from './cli-io.js';
 import { formatHumanField } from '../cli-presentation.js';
 
 const INPUT_LIMIT_BYTES = 1024 * 1024;
+// ponytail: 1s stdin idle timeout is enough for piped agent input; raise if interactive paste
+// workflows need longer before the read aborts.
 const STDIN_TIMEOUT_MS = 1000;
 
+/** Minimal file-stat shape used by import input hooks. */
 export interface ImportCommandFileStat {
   isFile(): boolean;
   size: number;
 }
 
+/** Injected IO hooks so import stays testable without a live TTY. */
 export interface ImportCommandInputHooks {
   stdinIsInteractive(): boolean;
   readStdin(limitBytes: number): Promise<string>;
@@ -33,6 +37,7 @@ export interface ImportCommandInputHooks {
   fsReadFileSync(filePath: string): string;
 }
 
+/** Parsed flags for one import command invocation. */
 export interface ImportCommandFlags {
   stdin: boolean;
   file?: string;
@@ -45,10 +50,12 @@ export interface ImportCommandFlags {
   storage?: StorageMode;
 }
 
+/** Positional args for one import command invocation. */
 export interface ImportCommandArgs {
   url?: string;
 }
 
+/** Validated import inputs ready for persistence. */
 export interface PreparedImportCommand {
   args: ImportCommandArgs;
   artifact: ResearchArtifact;
@@ -429,7 +436,7 @@ function buildImportArtifact(opts: {
     opts;
   const currentTime = new Date();
   const ttl = flags.ttl || null;
-  const { freshWindowMs } = getPolicy(flags.tier, ttl);
+  const { freshWindowMs } = resolveFreshnessPolicy(flags.tier, ttl);
   const staleAfterTime = new Date(currentTime.getTime() + freshWindowMs);
 
   const detailed = sanitizePromptInjection(rawInput);

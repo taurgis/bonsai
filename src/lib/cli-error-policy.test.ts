@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { enrichErrorForDisplay, exitCodeOf, prepareCliError } from './cli-error-policy.js';
+import { enrichErrorForDisplay, resolveExitCode, prepareCliError } from './cli-error-policy.js';
 
 describe('cli-error-policy', () => {
   it('reads exit codes from oclif.exit then exitCode', () => {
-    expect(exitCodeOf({ oclif: { exit: 2 } })).toBe(2);
-    expect(exitCodeOf({ exitCode: 5 })).toBe(5);
-    expect(exitCodeOf({})).toBe(1);
+    expect(resolveExitCode({ oclif: { exit: 2 } })).toBe(2);
+    expect(resolveExitCode({ exitCode: 5 })).toBe(5);
+    expect(resolveExitCode({})).toBe(1);
   });
 
   it('supplies fallback suggestions for usage codes', () => {

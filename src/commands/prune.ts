@@ -14,6 +14,7 @@ import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 import type { PruneCandidate, PruneWriteResult } from '../lib/cli-result-types.js';
 
+/** Prune cached artifacts by age, idle time, or filters. */
 export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
   static summary = 'Prune cached research artifacts';

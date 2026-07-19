@@ -1,3 +1,5 @@
+import { EXIT_RUNTIME_FAILURE } from './cli-error-policy.js';
+
 /** Fields oclif attaches to CLIError that human pretty-print surfaces but JSON mode must mirror. */
 export interface CliErrorShape {
   message?: string;
@@ -47,6 +49,7 @@ export function normalizeCliErrorMessage(message: string): string {
   return message.endsWith(suffix) ? message.slice(0, -suffix.length) : message;
 }
 
+/** Machine-readable envelope fields for `--json` success and error paths. */
 export interface EnvelopeParts {
   command: string;
   ok: boolean;
@@ -150,7 +153,7 @@ export function enrichCacheMissEnvelope(
       return r?.status === 'miss' ? r : null;
     },
     code: 'CACHE_MISS',
-    exitCode: 1,
+    exitCode: EXIT_RUNTIME_FAILURE,
     message: (first, failures) => {
       const url = first.normalizedUrl ?? '';
       return failures.length > 1
@@ -181,7 +184,7 @@ export function enrichRowErrorEnvelope(
       (failures.length > 1 ? `\n…and ${failures.length - 1} other URL failure(s)` : ''),
     suggestions: (failures) => failures[0]?.suggestions,
     ref: (first) => first.ref,
-    exitCode: 1,
+    exitCode: EXIT_RUNTIME_FAILURE,
   });
 }
 
@@ -201,7 +204,7 @@ export function enrichPrunePartialEnvelope(
   return {
     ...envelope,
     ok: false,
-    exitCode: 1,
+    exitCode: EXIT_RUNTIME_FAILURE,
     code,
     stderr: formatErrorForJson({ message, code }),
   };

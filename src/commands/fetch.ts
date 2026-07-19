@@ -8,6 +8,7 @@ import {
 } from '../lib/research/fetch-command-service.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 
+/** Hidden named `fetch` command; usually invoked as `bonsai <url>`. */
 export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
   static id = 'fetch';
   static hidden = true;

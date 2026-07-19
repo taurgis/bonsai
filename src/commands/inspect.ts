@@ -9,6 +9,7 @@ import { formatHumanField } from '../lib/cli-presentation.js';
 import type { ResearchArtifactMetadata } from '../lib/research/schema.js';
 import type { InspectRow, InspectSectionRow } from '../lib/cli-result-types.js';
 
+/** Inspect a cached artifact and its section children. */
 export default class ResearchInspect extends BaseCommand<typeof ResearchInspect> {
   static id = 'inspect';
   static summary = 'Inspect cached research metadata for a URL';

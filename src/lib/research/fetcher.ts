@@ -5,6 +5,12 @@ import { fetch as undiciFetch } from 'undici';
 import { isSafeIp, normalizeUrl } from './url.js';
 import { getProxyDispatcher, isProxyConfigured, PROXY_TUNNEL_REJECTION_PATTERN } from './proxy.js';
 
+const DEFAULT_FETCH_TIMEOUT_MS = 10_000;
+const DEFAULT_BODY_LIMIT_BYTES = 2 * 1024 * 1024;
+const DEFAULT_MAX_REDIRECTS = 5;
+const HTTP_NOT_MODIFIED = 304;
+const REDIRECT_STATUS_CODES = [301, 302, 303, 307, 308] as const;
+
 // Runs one fetch attempt with its own fresh AbortController/timeout, so that when `doFetch` makes
 // a second attempt (the proxy fallback below) it gets the full timeout budget rather than
 // whatever was left over from the first attempt's signal. Loosely typed at this one boundary
@@ -65,13 +71,19 @@ async function doFetch(
   }
 }
 
+/** Optional transport limits and headers for {@link fetchStaticHtml} / {@link fetchText}. */
 export interface FetchOptions {
+  /** Abort the request after this many milliseconds. */
   timeoutMs?: number;
+  /** Maximum response body size in bytes. */
   bodyLimitBytes?: number;
+  /** Maximum number of HTTP redirects to follow. */
   maxRedirects?: number;
+  /** Extra request headers (e.g. conditional-request validators). */
   headers?: Record<string, string>;
 }
 
+/** Successful or not-modified HTTP fetch result used by capture and revalidation. */
 export interface FetchResult {
   status: number;
   contentType: string | null;
@@ -85,6 +97,12 @@ export interface FetchResult {
 /** The fetched-page fields artifact building consumes — FetchResult minus the transport status. */
 export type FetchedContent = Omit<FetchResult, 'status'>;
 
+/**
+ * Heuristic: body looks like HTML/XML when `Content-Type` is missing.
+ *
+ * @param text - Response body text.
+ * @returns `true` when the trimmed body starts with a common HTML/XML marker.
+ */
 export function looksLikeHtml(text: string): boolean {
   const trimmed = text.trimStart().toLowerCase();
   return (
@@ -95,6 +113,13 @@ export function looksLikeHtml(text: string): boolean {
   );
 }
 
+/**
+ * Resolve a hostname and reject private/loopback targets.
+ * May skip local DNS when only a proxy can resolve the host.
+ *
+ * @param hostname - Host to check (IPv6 literals may be bracketed).
+ * @throws {Error} When the resolved address is not safe to fetch.
+ */
 export async function checkDnsSafety(hostname: string): Promise<void> {
   let hostToResolve = hostname;
   if (hostToResolve.startsWith('[') && hostToResolve.endsWith(']')) {
@@ -169,7 +194,13 @@ function headerMeta(res: Response): Pick<FetchResult, 'contentType' | 'etag' | '
 
 // A 304 carries no body; return an empty result that preserves the validator headers.
 function notModifiedResult(res: Response, currentUrl: string): FetchResult {
-  return { status: 304, ...headerMeta(res), finalUrl: currentUrl, responseSize: 0, content: '' };
+  return {
+    status: HTTP_NOT_MODIFIED,
+    ...headerMeta(res),
+    finalUrl: currentUrl,
+    responseSize: 0,
+    content: '',
+  };
 }
 
 function assertOk(res: Response): void {
@@ -183,7 +214,7 @@ async function processFetchResponse(
   limit: number,
   currentUrl: string
 ): Promise<FetchResult> {
-  if (res.status === 304) return notModifiedResult(res, currentUrl);
+  if (res.status === HTTP_NOT_MODIFIED) return notModifiedResult(res, currentUrl);
   assertOk(res);
 
   const contentType = res.headers.get('content-type');
@@ -218,7 +249,7 @@ async function processTextResponse(
   limit: number,
   currentUrl: string
 ): Promise<FetchResult> {
-  if (res.status === 304) return notModifiedResult(res, currentUrl);
+  if (res.status === HTTP_NOT_MODIFIED) return notModifiedResult(res, currentUrl);
   assertOk(res);
 
   const bodyBytes = await readBodyWithLimit(res.body, limit);
@@ -238,9 +269,9 @@ async function fetchWithRedirects(
   options: FetchOptions,
   process: (res: Response, limit: number, currentUrl: string) => Promise<FetchResult>
 ): Promise<FetchResult> {
-  const timeout = options.timeoutMs ?? 10_000;
-  const limit = options.bodyLimitBytes ?? 2 * 1024 * 1024;
-  const maxRedirects = options.maxRedirects ?? 5;
+  const timeout = options.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
+  const limit = options.bodyLimitBytes ?? DEFAULT_BODY_LIMIT_BYTES;
+  const maxRedirects = options.maxRedirects ?? DEFAULT_MAX_REDIRECTS;
   const initialHeaders = options.headers ?? {};
 
   let currentUrl = normalizeUrl(url);
@@ -256,7 +287,7 @@ async function fetchWithRedirects(
       timeout
     );
 
-    if ([301, 302, 303, 307, 308].includes(res.status)) {
+    if ((REDIRECT_STATUS_CODES as readonly number[]).includes(res.status)) {
       redirectCount++;
       if (redirectCount > maxRedirects) {
         throw new Error(`Too many redirects. Exceeded limit of ${maxRedirects}.`);
@@ -273,6 +304,14 @@ async function fetchWithRedirects(
   }
 }
 
+/**
+ * Fetch an HTML page with DNS, redirect, timeout, and body-size safety.
+ *
+ * @param url - Absolute URL to fetch.
+ * @param options - Optional timeout, body limit, redirect cap, and headers.
+ * @returns Fetch result including body content and validator headers.
+ * @throws {Error} On unsafe DNS, non-HTML content, HTTP failure, or redirect limits.
+ */
 export async function fetchStaticHtml(
   url: string,
   options: FetchOptions = {}
@@ -281,9 +320,14 @@ export async function fetchStaticHtml(
 }
 
 /**
- * Fetches a non-HTML text/data resource (llms.txt, route Markdown, search index) with the same
- * DNS, redirect, timeout, and body-size safety as fetchStaticHtml. Does not enforce a content
- * type; the caller must validate the returned body is the artifact kind it expected.
+ * Fetch a non-HTML text/data resource (llms.txt, route Markdown, search index) with the same
+ * DNS, redirect, timeout, and body-size safety as {@link fetchStaticHtml}. Does not enforce a
+ * content type; the caller must validate the returned body is the artifact kind it expected.
+ *
+ * @param url - Absolute URL to fetch.
+ * @param options - Optional timeout, body limit, redirect cap, and headers.
+ * @returns Fetch result including body text and validator headers.
+ * @throws {Error} On unsafe DNS, HTTP failure, or redirect limits.
  */
 export async function fetchText(url: string, options: FetchOptions = {}): Promise<FetchResult> {
   return fetchWithRedirects(url, options, processTextResponse);

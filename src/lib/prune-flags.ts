@@ -18,6 +18,7 @@ export interface PruneFlagError {
   suggestions?: string[];
 }
 
+/** Flag bag passed into {@link pruneFlagError}. */
 export interface PruneFlagInput {
   olderThan?: string;
   inactive?: string;
@@ -96,6 +97,12 @@ function durationError(input: PruneFlagInput): PruneFlagError | null {
   return null;
 }
 
+/**
+ * Return the first prune usage/safety error, or `null` when flags are valid.
+ *
+ * @param input - Parsed prune flags and binary name.
+ * @returns Error descriptor for `this.error`, or `null`.
+ */
 export function pruneFlagError(input: PruneFlagInput): PruneFlagError | null {
   const urlErr = emptyUrlFilterError(input.url);
   if (urlErr) return { message: urlErr, code: 'INVALID_FLAG_VALUE' };

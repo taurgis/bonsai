@@ -53,6 +53,7 @@ function describeCacheStatus(
     : { status: 'stale', freshness, action: 'would_revalidate' };
 }
 
+/** Report cache hit/miss and freshness without writing. */
 export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
   static id = 'status';
   static summary = 'Check cache status without fetching or writing';

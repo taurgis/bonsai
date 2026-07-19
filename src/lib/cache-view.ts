@@ -5,6 +5,11 @@ import { getArtifactPath } from './research/storage.js';
 /**
  * Shared URL / cache-key / path header used by status and inspect human output, plus any
  * command-specific extra rows, formatted as label/value lines.
+ *
+ * @param target - Normalized URL, cache key, and store roots.
+ * @param extra - Optional additional label/value rows.
+ * @param artifactPath - Optional explicit path; defaults to the write-root artifact path.
+ * @returns Formatted human-output lines.
  */
 export function formatCacheTargetHeader(
   target: { normalizedUrl: string; cacheKey: string; roots: { writeRoot: string } },
@@ -21,8 +26,8 @@ export function formatCacheTargetHeader(
 }
 
 /** Stderr tip pointing at the fetch shorthand when a URL has no cache entry. */
-export function cacheMissHint(bin: string, normalizedUrl: string): string {
-  return `Cache miss — run: ${bin} ${normalizedUrl}`;
+export function cacheMissHint(cliBin: string, normalizedUrl: string): string {
+  return `Cache miss — run: ${cliBin} ${normalizedUrl}`;
 }
 
 const BATCH_SEPARATOR_WIDTH = 40;

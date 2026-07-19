@@ -1,7 +1,7 @@
 import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
-import { enrichErrorForDisplay, exitCodeOf, prepareCliError } from './lib/cli-error-policy.js';
+import { enrichErrorForDisplay, resolveExitCode, prepareCliError, EXIT_OK, EXIT_STALE_SERVED } from './lib/cli-error-policy.js';
 import { buildEnvelope, enrichCacheMissEnvelope, enrichRowErrorEnvelope } from './lib/envelope.js';
 import { enrichParseError } from './lib/parse-error-ux.js';
 import {
@@ -110,7 +110,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     // Unwrap / fuzzy tips are no-ops when not applicable (including non-Error throws with no message).
     enrichParseError(err);
     enrichErrorForDisplay(err, { bin: this.config.bin, command: this.envelopeCommandId() });
-    process.exitCode = process.exitCode ?? exitCodeOf(err);
+    process.exitCode = process.exitCode ?? resolveExitCode(err);
     return super.catch(err);
   }
 
@@ -183,12 +183,18 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    * recursing through their own override.
    */
   protected baseSuccessJson(data: unknown): Record<string, unknown> {
-    // ponytail: the stale-serve path signals "exit 5" by setting process.exitCode inside run()
-    // (e.g. fetch's handleStaleRevalidationResult); this reads it back to mark the envelope. If that
-    // signalling moves off process.exitCode, update here too. Number() normalizes Node's string codes.
-    const exitCode = Number(process.exitCode ?? 0);
-    // Exit 5 means "served stale" — a successful, usable result, so it reports ok.
-    return this.envelope({ ok: exitCode === 0 || exitCode === 5, exitCode, stderr: '', data });
+    // ponytail: the stale-serve path signals EXIT_STALE_SERVED by setting process.exitCode inside
+    // run() (e.g. fetch's handleStaleRevalidationResult); this reads it back to mark the envelope.
+    // If that signalling moves off process.exitCode, update here too. Number() normalizes Node's
+    // string codes.
+    const exitCode = Number(process.exitCode ?? EXIT_OK);
+    // EXIT_STALE_SERVED means "served stale" — a successful, usable result, so it reports ok.
+    return this.envelope({
+      ok: exitCode === EXIT_OK || exitCode === EXIT_STALE_SERVED,
+      exitCode,
+      stderr: '',
+      data,
+    });
   }
 
   /** Wrap a command's return value in the machine-readable envelope emitted under `--json`. */
