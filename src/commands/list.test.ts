@@ -225,7 +225,7 @@ describe('list command unit tests', () => {
     logSpy.mockRestore();
   });
 
-  it('warns on stderr (not stdout) when --json results are truncated', async () => {
+  it('does not warn under --json when results are truncated (envelope data is the capped list)', async () => {
     const fake = Array.from({ length: 3 }, (_, i) => ({
       cacheKey: `k${i}`,
       path: `/x/k${i}.md`,
@@ -251,14 +251,9 @@ describe('list command unit tests', () => {
         return msg;
       });
 
-    await ResearchList.run(['--limit', '2', '--json']);
-    expect(warned.length).toBe(1);
-    expect(warned[0]).toContain('3 entries matched');
-    expect(warned[0]).toContain('max 100');
-
-    // No warning when results fit within --limit.
-    warned.length = 0;
-    await ResearchList.run(['--limit', '50', '--json']);
+    const rows = (await ResearchList.run(['--limit', '2', '--json'])) as any[];
+    expect(rows.length).toBe(2);
+    // Intentional #73: --json suppresses tip/truncation messaging on process stderr.
     expect(warned.length).toBe(0);
 
     scanSpy.mockRestore();
