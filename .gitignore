@@ -34,23 +34,16 @@ logs/
 .vscode/
 .DS_Store
 
-# Nexus-managed agent files: skills, rules, agents, and instructions are
-# committed; other agent-local state stays ignored
+# Nexus-managed agent files: sources are committed (.github/agents,
+# .github/instructions, .agents/skills); per-IDE copies that
+# `forward-nexus sync` regenerates from them stay local
 .agents/*
 !.agents/skills/
 !.agents/skills/**
-!.agents/rules/
-!.agents/rules/**
 .claude/*
 !.claude/skills/
 !.claude/skills/**
-!.claude/rules/
-!.claude/rules/**
-!.claude/agents/
-!.claude/agents/**
-.cursor/*
-!.cursor/rules/
-!.cursor/rules/**
+.cursor/
 
 # Agent specific local paths
 .gemini/
