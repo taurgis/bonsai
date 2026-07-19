@@ -20,17 +20,19 @@ export interface RevalidationResult {
   error?: string;
 }
 
-function buildMetadata(
-  url: string,
-  normalizedUrl: string,
-  cacheKey: string,
-  fetchResult: FetchedContent,
-  extraction: ExtractionResult,
-  tier: 'stable' | 'standard' | 'volatile',
-  ttl: string | null,
-  currentTime: Date,
-  compressed: string
-): ResearchArtifactMetadata {
+function buildMetadata(input: {
+  url: string;
+  normalizedUrl: string;
+  cacheKey: string;
+  fetchResult: FetchedContent;
+  extraction: ExtractionResult;
+  tier: 'stable' | 'standard' | 'volatile';
+  ttl: string | null;
+  currentTime: Date;
+  compressed: string;
+}): ResearchArtifactMetadata {
+  const { url, normalizedUrl, cacheKey, fetchResult, extraction, tier, ttl, currentTime, compressed } =
+    input;
   const contentHash = createHash('sha256').update(extraction.detailedMarkdown).digest('hex');
   const staleAfterTime = new Date(currentTime);
   const { freshWindowMs } = getPolicy(tier, ttl);
@@ -79,16 +81,17 @@ function buildMetadata(
 // Builds a compact error marker instead of caching a full error page. Subsequent lookups serve this
 // tiny marker (a handful of tokens) instead of re-fetching, and revalidation re-checks it when stale
 // so a transient failure recovers into a real artifact.
-function buildErrorArtifact(
-  url: string,
-  normalizedUrl: string,
-  cacheKey: string,
-  fetchResult: FetchedContent,
-  tier: 'stable' | 'standard' | 'volatile',
-  ttl: string | null,
-  currentTime: Date,
-  reason: string
-): ResearchArtifact {
+function buildErrorArtifact(input: {
+  url: string;
+  normalizedUrl: string;
+  cacheKey: string;
+  fetchResult: FetchedContent;
+  tier: 'stable' | 'standard' | 'volatile';
+  ttl: string | null;
+  currentTime: Date;
+  reason: string;
+}): ResearchArtifact {
+  const { url, normalizedUrl, cacheKey, fetchResult, tier, ttl, currentTime, reason } = input;
   const marker =
     `Error: ${url} could not be cached — ${reason}. ` +
     'The page returned an error, so its content was not stored; it will be re-fetched when this entry goes stale.';
@@ -98,7 +101,7 @@ function buildErrorArtifact(
     confidence: 'low' as const,
     qualityNotes: [`error: ${reason}`],
   };
-  const metadata = buildMetadata(
+  const metadata = buildMetadata({
     url,
     normalizedUrl,
     cacheKey,
@@ -107,8 +110,8 @@ function buildErrorArtifact(
     tier,
     ttl,
     currentTime,
-    marker
-  );
+    compressed: marker,
+  });
   metadata.extraction_status = 'failed';
   metadata.extraction_confidence = null;
 
@@ -121,38 +124,23 @@ function buildErrorArtifact(
   };
 }
 
+interface CreateArtifactFromFetchInput {
+  url: string;
+  normalizedUrl: string;
+  cacheKey: string;
+  fetchResult: FetchedContent;
+  extraction: ExtractionResult;
+  tier: 'stable' | 'standard' | 'volatile';
+  ttl: string | null;
+  currentTime: Date;
+  summaryLevel: SummaryLevel;
+}
+
 /**
  * Helper to construct a ResearchArtifact from a fresh HTML fetch.
  */
-export function createArtifactFromFetch(
-  url: string,
-  normalizedUrl: string,
-  cacheKey: string,
-  fetchResult: FetchedContent,
-  extraction: ExtractionResult,
-  tier: 'stable' | 'standard' | 'volatile',
-  ttl: string | null,
-  currentTime: Date,
-  summaryLevel: SummaryLevel
-): ResearchArtifact {
-  // A managed platform / SPA can return HTTP 200 but render only a "not found" / "something went
-  // wrong" shell. Cache a compact marker for those instead of the full error markdown, so repeat
-  // lookups cost a few tokens and revalidation still re-checks the page when the entry goes stale.
-  if (looksLikeErrorPage(extraction.detailedMarkdown)) {
-    return buildErrorArtifact(
-      url,
-      normalizedUrl,
-      cacheKey,
-      fetchResult,
-      tier,
-      ttl,
-      currentTime,
-      'page reported an error or was not found'
-    );
-  }
-
-  const compressed = buildCompressed(extraction.detailedMarkdown, summaryLevel);
-  const metadata = buildMetadata(
+export function createArtifactFromFetch(input: CreateArtifactFromFetchInput): ResearchArtifact {
+  const {
     url,
     normalizedUrl,
     cacheKey,
@@ -161,8 +149,36 @@ export function createArtifactFromFetch(
     tier,
     ttl,
     currentTime,
-    compressed
-  );
+    summaryLevel,
+  } = input;
+  // A managed platform / SPA can return HTTP 200 but render only a "not found" / "something went
+  // wrong" shell. Cache a compact marker for those instead of the full error markdown, so repeat
+  // lookups cost a few tokens and revalidation still re-checks the page when the entry goes stale.
+  if (looksLikeErrorPage(extraction.detailedMarkdown)) {
+    return buildErrorArtifact({
+      url,
+      normalizedUrl,
+      cacheKey,
+      fetchResult,
+      tier,
+      ttl,
+      currentTime,
+      reason: 'page reported an error or was not found',
+    });
+  }
+
+  const compressed = buildCompressed(extraction.detailedMarkdown, summaryLevel);
+  const metadata = buildMetadata({
+    url,
+    normalizedUrl,
+    cacheKey,
+    fetchResult,
+    extraction,
+    tier,
+    ttl,
+    currentTime,
+    compressed,
+  });
 
   return {
     metadata,
@@ -201,17 +217,17 @@ function persistRefreshedArtifact(
   options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel },
   siteFetch?: SiteFetchResult
 ): RevalidationResult {
-  const refreshed = createArtifactFromFetch(
-    meta.source_url,
-    meta.normalized_url,
-    meta.cache_key,
+  const refreshed = createArtifactFromFetch({
+    url: meta.source_url,
+    normalizedUrl: meta.normalized_url,
+    cacheKey: meta.cache_key,
     fetchResult,
     extraction,
-    meta.tier,
-    options.ttlOverride || meta.ttl,
+    tier: meta.tier,
+    ttl: options.ttlOverride || meta.ttl,
     currentTime,
-    options.summaryLevel
-  );
+    summaryLevel: options.summaryLevel,
+  });
   preserveUserMetadata(meta, refreshed, options.rendered);
   // A site-module refresh reports how it actually captured this time; that overrides the
   // carried-over provenance, so a withdrawn .md twin can't leave a stale source_doc_url behind.

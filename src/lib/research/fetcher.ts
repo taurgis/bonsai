@@ -288,33 +288,3 @@ export async function fetchStaticHtml(
 export async function fetchText(url: string, options: FetchOptions = {}): Promise<FetchResult> {
   return fetchWithRedirects(url, options, processTextResponse);
 }
-
-/**
- * Sends a JSON POST and returns the response body text. Used by remote search connectors (e.g.
- * Algolia DocSearch). Enforces the same DNS safety, timeout, and body-size limits as GET fetches.
- */
-export async function postJson(
-  url: string,
-  body: unknown,
-  headers: Record<string, string> = {},
-  options: FetchOptions = {}
-): Promise<string> {
-  const timeout = options.timeoutMs ?? 10_000;
-  const limit = options.bodyLimitBytes ?? 2 * 1024 * 1024;
-  const target = normalizeUrl(url);
-  await checkDnsSafety(new URL(target).hostname);
-
-  const res = await doFetch(
-    target,
-    {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', ...headers },
-      body: JSON.stringify(body),
-      redirect: 'error',
-    },
-    timeout
-  );
-  if (!res.ok) throw new Error(`Search request failed with status ${res.status} ${res.statusText}`);
-  const bytes = await readBodyWithLimit(res.body, limit);
-  return new TextDecoder().decode(bytes);
-}

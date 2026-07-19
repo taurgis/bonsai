@@ -2,7 +2,6 @@ import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core'
 import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
 import { enrichErrorForDisplay, exitCodeOf, prepareCliError } from './lib/cli-error-policy.js';
-import { writeJsonErrorStderr } from './lib/cli-emit.js';
 import { buildEnvelope, enrichCacheMissEnvelope, enrichRowErrorEnvelope } from './lib/envelope.js';
 import { enrichParseError } from './lib/parse-error-ux.js';
 import {
@@ -237,8 +236,9 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       bin: this.config.bin,
       command: this.envelopeCommandId(),
     });
-    // oclif prints the returned object to stdout; we only own stderr here.
-    return writeJsonErrorStderr({
+    // oclif prints the returned object to stdout; error text lives in envelope.stderr only
+    // so process stderr stays clean under `--json` (CACHE_MISS / batch overlays + oclif JSON log suppression).
+    return buildEnvelope({
       command: this.envelopeCommandId(),
       ok: false,
       exitCode: prepared.exitCode,

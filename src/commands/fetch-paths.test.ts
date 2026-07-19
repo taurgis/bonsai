@@ -109,17 +109,17 @@ function seedCachedArtifact(
 ) {
   const normalizedUrl = normalizeUrl(TEST_URL);
   const cacheKey = deriveCacheKey(normalizedUrl);
-  const artifact = createArtifactFromFetch(
-    TEST_URL,
+  const artifact = createArtifactFromFetch({
+    url: TEST_URL,
     normalizedUrl,
     cacheKey,
-    fakeFetchResult(),
-    fakeExtraction(LONG_MARKDOWN),
+    fetchResult: fakeFetchResult(),
+    extraction: fakeExtraction(LONG_MARKDOWN),
     tier,
-    null,
-    fetchedAt,
-    'conservative'
-  );
+    ttl: null,
+    currentTime: fetchedAt,
+    summaryLevel: 'conservative',
+  });
   writeArtifact(dataDir, cacheKey, artifact);
   return { cacheKey, normalizedUrl, artifact };
 }

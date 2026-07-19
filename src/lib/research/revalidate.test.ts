@@ -123,17 +123,17 @@ describe('freshness and revalidation engine', () => {
         qualityNotes: ['warning: extracted content is very short (less than 500 characters)'],
       };
 
-      const artifact = createArtifactFromFetch(
-        'https://docs.example.com/missing',
-        'https://docs.example.com/missing',
-        'abc123',
+      const artifact = createArtifactFromFetch({
+        url: 'https://docs.example.com/missing',
+        normalizedUrl: 'https://docs.example.com/missing',
+        cacheKey: 'abc123',
         fetchResult,
-        errorExtraction,
-        'standard',
-        null,
+        extraction: errorExtraction,
+        tier: 'standard',
+        ttl: null,
         currentTime,
-        'conservative'
-      );
+        summaryLevel: 'conservative',
+      });
 
       expect(artifact.metadata.extraction_status).toBe('failed');
       expect(artifact.metadata.extraction_confidence).toBeNull();
@@ -155,17 +155,17 @@ describe('freshness and revalidation engine', () => {
         qualityNotes: ['readability extracted main article'],
       };
 
-      const artifact = createArtifactFromFetch(
-        'https://docs.example.com/real',
-        'https://docs.example.com/real',
-        'def456',
+      const artifact = createArtifactFromFetch({
+        url: 'https://docs.example.com/real',
+        normalizedUrl: 'https://docs.example.com/real',
+        cacheKey: 'def456',
         fetchResult,
-        goodExtraction,
-        'standard',
-        null,
+        extraction: goodExtraction,
+        tier: 'standard',
+        ttl: null,
         currentTime,
-        'conservative'
-      );
+        summaryLevel: 'conservative',
+      });
 
       expect(artifact.metadata.extraction_status).toBe('extracted');
       expect(artifact.detailed).toContain('substantial documentation page');

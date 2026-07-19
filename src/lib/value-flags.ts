@@ -24,8 +24,8 @@ function flagTokens(name: string, flag: FlagDef): string[] {
 
 /**
  * Derive every CLI token that consumes a following argv value from command class metadata
- * (long names, short chars, aliases). Used by argv normalization so FLAGS_WITH_VALUES cannot
- * drift from the real command surface.
+ * (long names, short chars, aliases). Used by argv normalization so VALUE_TAKING_FLAG_TOKENS
+ * cannot drift from the real command surface.
  */
 export function valueTakingFlagTokensFromCommands(
   commands: Record<string, typeof Command>,

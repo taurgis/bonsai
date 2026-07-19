@@ -9,7 +9,7 @@ function stripAnsi(text: string): string {
 }
 
 /** True when argv asks for help or version together with --json. */
-export function isJsonMetaRequest(argv: readonly string[]): boolean {
+function isJsonMetaRequest(argv: readonly string[]): boolean {
   if (!argv.includes('--json')) return false;
   return argv.includes('--help') || argv.includes('--version');
 }

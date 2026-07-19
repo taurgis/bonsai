@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildEnvelope,
-  enrichBatchFailureEnvelope,
   enrichCacheMissEnvelope,
   enrichRowErrorEnvelope,
   formatErrorForJson,
@@ -127,7 +126,7 @@ describe('buildEnvelope', () => {
   });
 });
 
-describe('enrichBatchFailureEnvelope / enrichCacheMissEnvelope', () => {
+describe('enrichCacheMissEnvelope / enrichRowErrorEnvelope', () => {
   it('passes through when there are no failures', () => {
     const base = { ok: true, exitCode: 0, data: { status: 'hit' } };
     expect(enrichCacheMissEnvelope(base, base.data, 'bonsai')).toBe(base);
@@ -163,22 +162,5 @@ describe('enrichBatchFailureEnvelope / enrichCacheMissEnvelope', () => {
     });
     expect(enriched.stderr).toContain('dns');
     expect(enriched.data).toBe(data);
-  });
-
-  it('exposes the generic picker for custom batch failure shapes', () => {
-    const data = [{ kind: 'ok' }, { kind: 'bad', detail: 'x' }];
-    const enriched = enrichBatchFailureEnvelope<{ detail: string }>(
-      { ok: true, exitCode: 0, data },
-      data,
-      {
-        pick: (row) => {
-          const r = row as { kind?: string; detail?: string };
-          return r.kind === 'bad' && r.detail ? { detail: r.detail } : null;
-        },
-        code: 'CUSTOM',
-        message: (first) => first.detail,
-      }
-    );
-    expect(enriched).toMatchObject({ ok: false, exitCode: 1, code: 'CUSTOM' });
   });
 });

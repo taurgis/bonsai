@@ -4,6 +4,7 @@ import {
   getPolicy,
   evaluateFreshness,
   checkMaxAgeExpired,
+  evaluateFreshnessWithMaxAge,
   durationFlagError,
 } from './freshness.js';
 import type { ResearchArtifactMetadata } from './schema.js';
@@ -164,5 +165,23 @@ describe('checkMaxAgeExpired', () => {
   it('falls back to epoch-0 base time when timestamps are missing', () => {
     const noTimes = { metadata: meta({ fetched_at: null, validated_at: null }) };
     expect(checkMaxAgeExpired(noTimes, base, '1y')).toBe(true);
+  });
+});
+
+describe('evaluateFreshnessWithMaxAge', () => {
+  const base = new Date('2026-06-01T00:00:00.000Z');
+  const cached = { metadata: meta() };
+
+  it('returns stale_expired when max-age is exceeded even if the tier window is still fresh', () => {
+    expect(
+      evaluateFreshnessWithMaxAge(cached, new Date(base.getTime() + 10 * DAY), { maxAge: '7d' })
+    ).toBe('stale_expired');
+  });
+
+  it('falls through to tier freshness when max-age is unset or not exceeded', () => {
+    expect(evaluateFreshnessWithMaxAge(cached, new Date(base.getTime() + 10 * DAY))).toBe('fresh');
+    expect(
+      evaluateFreshnessWithMaxAge(cached, new Date(base.getTime() + 5 * DAY), { maxAge: '7d' })
+    ).toBe('fresh');
   });
 });

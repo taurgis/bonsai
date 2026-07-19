@@ -1,37 +1,8 @@
-import { buildEnvelope, buildCliErrorEnvelope } from './envelope.js';
-
-export interface JsonEnvelopeParts {
-  command: string;
-  ok: boolean;
-  exitCode: number;
-  stderr: string;
-  data?: unknown;
-  code?: string;
-  suggestions?: string[];
-  ref?: string;
-}
+import { buildCliErrorEnvelope } from './envelope.js';
 
 /** Print the envelope as pretty JSON on stdout (the machine-readable channel). */
-export function printJsonEnvelope(envelope: Record<string, unknown>): void {
+function printJsonEnvelope(envelope: Record<string, unknown>): void {
   console.log(JSON.stringify(envelope, null, 2));
-}
-
-/**
- * For BaseCommand.toErrorJson: return the envelope object (oclif prints it to stdout).
- * Error text lives in `envelope.stderr` only — process stderr stays clean under `--json`,
- * matching CACHE_MISS / batch overlays and oclif JSON log suppression.
- */
-export function writeJsonErrorStderr(parts: JsonEnvelopeParts): Record<string, unknown> {
-  return buildEnvelope({
-    command: parts.command,
-    ok: parts.ok,
-    exitCode: parts.exitCode,
-    stderr: parts.stderr,
-    data: parts.data ?? null,
-    code: parts.code,
-    suggestions: parts.suggestions,
-    ref: parts.ref,
-  });
 }
 
 export interface PreflightExit {

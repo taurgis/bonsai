@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  enrichErrorForDisplay,
-  exitCodeOf,
-  fallbackSuggestionsForCode,
-  prepareCliError,
-} from './cli-error-policy.js';
+import { enrichErrorForDisplay, exitCodeOf, prepareCliError } from './cli-error-policy.js';
 
 describe('cli-error-policy', () => {
   it('reads exit codes from oclif.exit then exitCode', () => {
@@ -14,12 +9,18 @@ describe('cli-error-policy', () => {
   });
 
   it('supplies fallback suggestions for usage codes', () => {
-    expect(fallbackSuggestionsForCode('UNKNOWN_FLAG', 'bonsai', 'list')).toEqual([
-      'Check usage: bonsai list --help',
-    ]);
-    expect(fallbackSuggestionsForCode('INVALID_DURATION', 'bonsai', 'bonsai')).toEqual([
-      'Use a whole number plus a unit, e.g. 2h, 7d, or 6m.',
-    ]);
+    expect(
+      prepareCliError(
+        { message: 'bad', code: 'UNKNOWN_FLAG', oclif: { exit: 2 } },
+        { bin: 'bonsai', command: 'list' }
+      ).suggestions
+    ).toEqual(['Check usage: bonsai list --help']);
+    expect(
+      prepareCliError(
+        { message: 'bad', code: 'INVALID_DURATION', oclif: { exit: 2 } },
+        { bin: 'bonsai', command: 'bonsai' }
+      ).suggestions
+    ).toEqual(['Use a whole number plus a unit, e.g. 2h, 7d, or 6m.']);
   });
 
   it('preserves explicit suggestions when preparing errors', () => {

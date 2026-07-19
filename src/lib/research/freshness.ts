@@ -88,13 +88,10 @@ export function getPolicy(
     graceWindowMs = 5 * DAY_MS;
   }
 
-  const activeTtl = ttlOverride;
-  if (activeTtl) {
-    freshWindowMs = parseTtlToMs(activeTtl);
-    const defaultFresh =
-      tier === 'stable' ? 180 * DAY_MS : tier === 'volatile' ? 7 * DAY_MS : 30 * DAY_MS;
-    const defaultGrace =
-      tier === 'stable' ? 60 * DAY_MS : tier === 'volatile' ? 5 * DAY_MS : 14 * DAY_MS;
+  if (ttlOverride) {
+    const defaultFresh = freshWindowMs;
+    const defaultGrace = graceWindowMs;
+    freshWindowMs = parseTtlToMs(ttlOverride);
     graceWindowMs = Math.floor(freshWindowMs * (defaultGrace / defaultFresh));
   }
 
@@ -147,4 +144,23 @@ export function checkMaxAgeExpired(
   const baseTime = Math.max(fetched, validated);
   const ageMs = currentTime.getTime() - baseTime;
   return ageMs > parseTtlToMs(maxAge);
+}
+
+/**
+ * Freshness for a cached artifact, applying `--max-age` before the tier/TTL windows.
+ * Returns `stale_expired` when max-age is exceeded; otherwise delegates to `evaluateFreshness`.
+ */
+export function evaluateFreshnessWithMaxAge(
+  cached: { metadata: ResearchArtifactMetadata },
+  currentTime: Date,
+  options: {
+    ttl?: string | null;
+    maxAge?: string;
+    tier?: 'stable' | 'standard' | 'volatile' | null;
+  } = {}
+): 'fresh' | 'stale_grace' | 'stale_expired' {
+  if (checkMaxAgeExpired(cached, currentTime, options.maxAge)) {
+    return 'stale_expired';
+  }
+  return evaluateFreshness(cached.metadata, currentTime, options.ttl, options.tier);
 }
