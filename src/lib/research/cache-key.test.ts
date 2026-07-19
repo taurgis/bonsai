@@ -24,4 +24,12 @@ describe('cache key derivation', () => {
     const key2 = deriveCacheKey('https://example.com/other');
     expect(key1).not.toBe(key2);
   });
+
+  it('hashes a traversal-shaped URL to hex only (never embeds path segments in the key)', () => {
+    const key = deriveCacheKey('https://example.com/foo/../../etc/passwd#frag');
+    expect(key).toMatch(/^[a-f0-9]{64}$/);
+    expect(key).not.toMatch(/\.\./);
+    expect(key).not.toContain('etc');
+    expect(key).not.toContain('passwd');
+  });
 });
