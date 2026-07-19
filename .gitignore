@@ -34,41 +34,23 @@ logs/
 .vscode/
 .DS_Store
 
-# Nexus-installed agent instruction files (skills may be committed)
+# Nexus-managed agent files: skills, rules, agents, and instructions are
+# committed; other agent-local state stays ignored
 .agents/*
 !.agents/skills/
 !.agents/skills/**
 !.agents/rules/
-.agents/rules/*
-!.agents/rules/development.md
-!.agents/rules/review-agents.md
+!.agents/rules/**
 .claude/*
 !.claude/skills/
 !.claude/skills/**
 !.claude/rules/
-.claude/rules/*
-!.claude/rules/generated/
-.claude/rules/generated/*
-!.claude/rules/generated/development.md
-!.claude/rules/generated/review-agents.md
+!.claude/rules/**
 !.claude/agents/
-.claude/agents/*
-!.claude/agents/AGENT_ALIASES.md
-!.claude/agents/business-analyst.md
-!.claude/agents/senior-code-reviewer.md
-!.claude/agents/senior-qa-engineer.md
+!.claude/agents/**
 .cursor/*
 !.cursor/rules/
-.cursor/rules/*
-!.cursor/rules/development.mdc
-!.cursor/rules/review-agents.mdc
-.github/agents/*
-!.github/agents/business-analyst.agent.md
-!.github/agents/senior-code-reviewer.agent.md
-!.github/agents/senior-qa-engineer.agent.md
-.github/instructions/*
-!.github/instructions/development.instructions.md
-!.github/instructions/review-agents.instructions.md
+!.cursor/rules/**
 
 # Agent specific local paths
 .gemini/

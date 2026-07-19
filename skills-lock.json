@@ -693,10 +693,9 @@
       "includePrerelease": false
     },
     "web-research": {
-      "source": "taurgis/bonsai",
-      "sourceType": "github",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
       "computedHash": "df53565f3d0759abab3ac2e1f160da2629171571ec749f32f569d9ec5d26bff0",
-      "ref": "main",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -704,7 +703,7 @@
         "cursor",
         "antigravity"
       ],
-      "repoPath": "agents/skills/web-research/SKILL.md",
+      "repoPath": ".agents/skills/web-research/SKILL.md",
       "installPath": ".agents/skills/web-research",
       "installHash": "039773fb324f98d3293e21ddde6506f2d78075ffe3e2bcf15aefdecef993081b",
       "sourceHash": "df53565f3d0759abab3ac2e1f160da2629171571ec749f32f569d9ec5d26bff0",
@@ -752,9 +751,9 @@
       "includePrerelease": false
     },
     ".github/instructions/post-feature-code-review.instructions.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "repoPath": "instructions/post-feature-code-review.instructions.md",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/post-feature-code-review.instructions.md",
       "installPath": ".github/instructions/post-feature-code-review.instructions.md",
       "computedHash": "2604bcfc4e1f881bae211a84612d823c9c0c676f45e3d1917395f7d596a556d3",
       "agents": [
@@ -764,16 +763,16 @@
         "antigravity"
       ],
       "installHash": "2604bcfc4e1f881bae211a84612d823c9c0c676f45e3d1917395f7d596a556d3",
-      "sourceHash": "870b5a184df48e1b1b61a1102b222ec12f3d0e92294f50c0d1760e92dd5acc81",
+      "sourceHash": "2604bcfc4e1f881bae211a84612d823c9c0c676f45e3d1917395f7d596a556d3",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.1.0",
       "installVersion": "1.1.0"
     },
     ".github/instructions/post-feature-quality-validation.instructions.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "repoPath": "instructions/post-feature-quality-validation.instructions.md",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/post-feature-quality-validation.instructions.md",
       "installPath": ".github/instructions/post-feature-quality-validation.instructions.md",
       "computedHash": "5988c8a1c6916384a3b5b16754bf1c66441e723e82a7672721f93453a1f7f7cf",
       "agents": [
@@ -783,39 +782,36 @@
         "antigravity"
       ],
       "installHash": "5988c8a1c6916384a3b5b16754bf1c66441e723e82a7672721f93453a1f7f7cf",
-      "sourceHash": "267caea28fd981311fdc9c3f0e8f4077fce6d5fafd35ce32f2ae5480ac4f1ffd",
+      "sourceHash": "5988c8a1c6916384a3b5b16754bf1c66441e723e82a7672721f93453a1f7f7cf",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.0.1",
       "installVersion": "1.0.1"
     },
     ".github/instructions/post-feature-technical-writing.instructions.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "repoPath": "instructions/post-feature-technical-writing.instructions.md",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/post-feature-technical-writing.instructions.md",
       "installPath": ".github/instructions/post-feature-technical-writing.instructions.md",
       "computedHash": "b45e5dff7c38bf33c2d14e3b128e55decde86426d85d0e3c764eb8504e30d164",
       "agents": [
-        "github-copilot",
         "claude-code",
-        "cursor",
+        "codex",
+        "github-copilot",
         "antigravity",
-        "codex"
-      ],
-      "linkedSkills": [
-        "beginner-technical-writing"
+        "cursor"
       ],
       "installHash": "b45e5dff7c38bf33c2d14e3b128e55decde86426d85d0e3c764eb8504e30d164",
-      "sourceHash": "9a633d22a982b2c3690232797885a761c8aeda28d774f4e878b730ca45f676f9",
+      "sourceHash": "b45e5dff7c38bf33c2d14e3b128e55decde86426d85d0e3c764eb8504e30d164",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.1.0",
       "installVersion": "1.1.0"
     },
     ".github/instructions/release-management.instructions.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "repoPath": "instructions/release-management.instructions.md",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/release-management.instructions.md",
       "installPath": ".github/instructions/release-management.instructions.md",
       "computedHash": "252965d962a3682ebb91712bb77e1d8302b671f9e043a03e176fd83d2c8a67ce",
       "agents": [
@@ -825,7 +821,7 @@
         "antigravity"
       ],
       "installHash": "252965d962a3682ebb91712bb77e1d8302b671f9e043a03e176fd83d2c8a67ce",
-      "sourceHash": "6274fa72a8946cf081f62830065fc785caa0e221c4c5b701f22bffccb207c122",
+      "sourceHash": "252965d962a3682ebb91712bb77e1d8302b671f9e043a03e176fd83d2c8a67ce",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.0.2",
@@ -848,9 +844,9 @@
       "includePrerelease": false
     },
     ".github/instructions/senior-quality-engineer-reporting.instructions.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
-      "repoPath": "instructions/senior-quality-engineer-reporting.instructions.md",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/senior-quality-engineer-reporting.instructions.md",
       "installPath": ".github/instructions/senior-quality-engineer-reporting.instructions.md",
       "computedHash": "6cfe4dab657eabcfe7fad428b2b760a2f214564330d211ed9b9efd2933cd933e",
       "agents": [
@@ -867,13 +863,11 @@
       "installVersion": "1.0.0"
     },
     ".github/instructions/web-research.instructions.md": {
-      "source": "taurgis/bonsai",
-      "sourceType": "github",
-      "repoPath": "instructions/web-research.instructions.md",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/web-research.instructions.md",
       "installPath": ".github/instructions/web-research.instructions.md",
-      "computedHash": "10de42cc58d2c3682549526e42bd45ed07506434afb5d280e56a360de43bf2be",
-      "ref": "main",
-      "subpath": "agents",
+      "computedHash": "5438b6c1012f176a0f0f30bc26b09a835985b6c8d272329a2db5afd16d0971c1",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -884,8 +878,8 @@
       "linkedSkills": [
         "web-research"
       ],
-      "installHash": "10de42cc58d2c3682549526e42bd45ed07506434afb5d280e56a360de43bf2be",
-      "sourceHash": "97782c48807c3414d56f820953c649adcb4f8b6b35a064f32f81009ec124107c",
+      "installHash": "5438b6c1012f176a0f0f30bc26b09a835985b6c8d272329a2db5afd16d0971c1",
+      "sourceHash": "9dc4202b31b70cdb11be2f3aafb0ba0f9b18289d6a0ba509d460b9559d155b65",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "4.1.0",
@@ -912,13 +906,11 @@
       "installVersion": "1.0.0"
     },
     ".github/agents/official-docs-researcher.agent.md": {
-      "source": "taurgis/bonsai",
-      "sourceType": "github",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
       "repoPath": "agents/official-docs-researcher.agent.md",
       "installPath": ".github/agents/official-docs-researcher.agent.md",
-      "computedHash": "627fc72fd4304cdedfa45e2af234ea1f500cb25b33cb6a372bfc274c191689aa",
-      "ref": "main",
-      "subpath": "agents",
+      "computedHash": "5bfda89d2ea73a5524659112b55819dbb1ffe555ad6df0af1f09c3708fcd74a8",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -926,8 +918,8 @@
         "cursor",
         "antigravity"
       ],
-      "installHash": "627fc72fd4304cdedfa45e2af234ea1f500cb25b33cb6a372bfc274c191689aa",
-      "sourceHash": "9fb4cb65c6afbdfcae54f827e97c92f11dd76923c276d48c81d9d6a4a5b78bd5",
+      "installHash": "5bfda89d2ea73a5524659112b55819dbb1ffe555ad6df0af1f09c3708fcd74a8",
+      "sourceHash": "db8acda6dd6a06bf5a2f4f08d9eef70e24919f1a998d536a40a5d07f598b7985",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "4.1.0",
@@ -970,8 +962,8 @@
       "installVersion": "1.0.0"
     },
     ".github/agents/senior-quality-engineer.agent.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
       "repoPath": "agents/senior-quality-engineer.agent.md",
       "installPath": ".github/agents/senior-quality-engineer.agent.md",
       "computedHash": "f5cc1bd0badd801d2da8c026186d3aad370701ec9d55a44fece760b10124fa04",
@@ -982,15 +974,15 @@
         "antigravity"
       ],
       "installHash": "f5cc1bd0badd801d2da8c026186d3aad370701ec9d55a44fece760b10124fa04",
-      "sourceHash": "da933ecfb1d8da2f1347ce3abe26d402d68b172de4364fa4a10fc4f06f33c2ef",
+      "sourceHash": "f5cc1bd0badd801d2da8c026186d3aad370701ec9d55a44fece760b10124fa04",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "2.1.0",
       "installVersion": "2.1.0"
     },
     ".github/agents/senior-release-manager.agent.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
       "repoPath": "agents/senior-release-manager.agent.md",
       "installPath": ".github/agents/senior-release-manager.agent.md",
       "computedHash": "fcf46516bac740e86b4b69465db1c7f99ecac469cc7352bcc2c8aa5974e98774",
@@ -1001,30 +993,27 @@
         "antigravity"
       ],
       "installHash": "fcf46516bac740e86b4b69465db1c7f99ecac469cc7352bcc2c8aa5974e98774",
-      "sourceHash": "fd20eb113ba810c93183f17f3de9e0c7c5b746f0fed7301059e9b05729b4f543",
+      "sourceHash": "fcf46516bac740e86b4b69465db1c7f99ecac469cc7352bcc2c8aa5974e98774",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.1.0",
       "installVersion": "1.1.0"
     },
     ".github/agents/senior-technical-writer.agent.md": {
-      "source": "Forward-Services-NV/forward-nexus-projects",
-      "sourceType": "github",
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
       "repoPath": "agents/senior-technical-writer.agent.md",
       "installPath": ".github/agents/senior-technical-writer.agent.md",
       "computedHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
       "agents": [
-        "github-copilot",
         "claude-code",
-        "cursor",
+        "codex",
+        "github-copilot",
         "antigravity",
-        "codex"
-      ],
-      "linkedSkills": [
-        "beginner-technical-writing"
+        "cursor"
       ],
       "installHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
-      "sourceHash": "d0c77f82894781ccaab782bb7180ed8d83c31002cf67966c2c8e19a4a55c6343",
+      "sourceHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
       "versionPolicy": "minor",
       "includePrerelease": false,
       "sourceVersion": "1.0.0",
