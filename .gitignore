@@ -34,16 +34,26 @@ logs/
 .vscode/
 .DS_Store
 
-# Nexus-managed agent files: sources are committed (.github/agents,
-# .github/instructions, .agents/skills); per-IDE copies that
-# `forward-nexus sync` regenerates from them stay local
+# Nexus-managed agent files: sources (.github/agents, .github/instructions,
+# .agents/skills) and the per-IDE files forward-nexus generates from them are
+# committed so every IDE works on a fresh clone; other agent-local state
+# stays ignored. After editing a source, run `forward-nexus sync` and commit
+# the regenerated files.
 .agents/*
 !.agents/skills/
 !.agents/skills/**
+!.agents/rules/
+!.agents/rules/**
 .claude/*
 !.claude/skills/
 !.claude/skills/**
-.cursor/
+!.claude/rules/
+!.claude/rules/**
+!.claude/agents/
+!.claude/agents/**
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
 
 # Agent specific local paths
 .gemini/
