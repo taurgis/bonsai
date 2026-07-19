@@ -225,6 +225,8 @@ async function executeCacheMiss(
     artifact.metadata.capture_method = 'browser_fallback';
   }
 
+  // Auto-tag from the fetched content when the caller supplied none, keeping cached pages
+  // searchable by keyword. Explicit --tags always win (handled in applyAutoTags).
   return applyAutoTags(artifact);
 }
 

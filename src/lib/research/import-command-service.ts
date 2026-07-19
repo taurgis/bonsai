@@ -157,7 +157,7 @@ export function finishImportCommandService(
     }
     for (const line of formatHumanFields(fields)) io.log(line);
     if (!hasSingle) {
-      io.log(`\nTip: find it again with ${io.bin} list --topic "${resolvedTopic(flags)}"`);
+      io.log(`\nTip: find it again with ${io.bin} list --topic "${topic}"`);
     }
   }
 
