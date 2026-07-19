@@ -116,32 +116,37 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   }
 
   private scanCacheDirForList(readRoots: string[], currentTime: Date): ListRow[] {
-    return scanCacheDirs(readRoots, (artifact, filePath): ListRow | null => {
-      if (artifact.metadata.status !== 'active') return null;
-      // Section children are sub-chunks of a page, not artifacts a user "has" — they would flood the
-      // listing (one page yields dozens) and aren't in the documented source/research_note contract.
-      // They stay discoverable through `inspect` (which lists a page's sections). `list` answers "what pages/notes do I have?", so keep it page-level. This
-      // unconditional guard owns the exclusion (the default no-filter case relies on it);
-      // LISTABLE_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
-      // type list can never return. Keep both in sync if section handling ever changes.
-      if (artifact.metadata.artifact_type === 'section') return null;
-      const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
-      if (!this.matchesFilters(artifact.metadata, freshness)) return null;
-      return {
-        cacheKey: artifact.metadata.cache_key,
-        path: filePath,
-        artifactType: artifact.metadata.artifact_type,
-        sourceUrls: artifact.metadata.source_urls,
-        topic: artifact.metadata.topic,
-        tags: artifact.metadata.tags,
-        freshness,
-        captureMethod: artifact.metadata.capture_method,
-        tokenEstimate: artifact.metadata.token_estimate,
-        qualityNotes: artifact.metadata.quality_notes,
-        fetchedAt: artifact.metadata.fetched_at,
-        validatedAt: artifact.metadata.validated_at,
-      };
-    });
+    // Honor effective read-only: listing must not persist the derived search-index sidecar.
+    return scanCacheDirs(
+      readRoots,
+      (artifact, filePath): ListRow | null => {
+        if (artifact.metadata.status !== 'active') return null;
+        // Section children are sub-chunks of a page, not artifacts a user "has" — they would flood the
+        // listing (one page yields dozens) and aren't in the documented source/research_note contract.
+        // They stay discoverable through `inspect` (which lists a page's sections). `list` answers "what pages/notes do I have?", so keep it page-level. This
+        // unconditional guard owns the exclusion (the default no-filter case relies on it);
+        // LISTABLE_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
+        // type list can never return. Keep both in sync if section handling ever changes.
+        if (artifact.metadata.artifact_type === 'section') return null;
+        const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
+        if (!this.matchesFilters(artifact.metadata, freshness)) return null;
+        return {
+          cacheKey: artifact.metadata.cache_key,
+          path: filePath,
+          artifactType: artifact.metadata.artifact_type,
+          sourceUrls: artifact.metadata.source_urls,
+          topic: artifact.metadata.topic,
+          tags: artifact.metadata.tags,
+          freshness,
+          captureMethod: artifact.metadata.capture_method,
+          tokenEstimate: artifact.metadata.token_estimate,
+          qualityNotes: artifact.metadata.quality_notes,
+          fetchedAt: artifact.metadata.fetched_at,
+          validatedAt: artifact.metadata.validated_at,
+        };
+      },
+      { persistIndex: !this.readOnly }
+    );
   }
 
   private hasActiveFilters(): boolean {

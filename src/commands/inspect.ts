@@ -127,15 +127,19 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
 
   // Section children link back via parent_cache_key; list the active ones for this page (T-22).
   private findSections(readRoots: string[], parentKey: string): InspectSectionRow[] {
-    return scanCacheDirs<InspectSectionRow>(readRoots, (artifact) => {
-      const meta = artifact.metadata;
-      if (meta.parent_cache_key !== parentKey || meta.status !== 'active') return null;
-      return {
-        cacheKey: meta.cache_key,
-        anchor: meta.section_anchor,
-        headingPath: meta.section_heading_path,
-        tokenEstimate: meta.token_estimate,
-      };
-    }).sort((a, b) => (a.headingPath ?? '').localeCompare(b.headingPath ?? ''));
+    return scanCacheDirs<InspectSectionRow>(
+      readRoots,
+      (artifact) => {
+        const meta = artifact.metadata;
+        if (meta.parent_cache_key !== parentKey || meta.status !== 'active') return null;
+        return {
+          cacheKey: meta.cache_key,
+          anchor: meta.section_anchor,
+          headingPath: meta.section_heading_path,
+          tokenEstimate: meta.token_estimate,
+        };
+      },
+      { persistIndex: !this.readOnly }
+    ).sort((a, b) => (a.headingPath ?? '').localeCompare(b.headingPath ?? ''));
   }
 }
