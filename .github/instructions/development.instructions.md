@@ -76,6 +76,32 @@ The rules that matter most here:
   path that writes to disk or config.
 - Keep the dependency footprint small — a slow `npx` install is a broken CLI.
 
+## Readability for junior developers
+
+Write code a junior developer can follow without asking for help. Minimal
+code (ponytail) and readable code are the same goal: fewer, clearer lines.
+
+- Names reveal intent: `staleCacheEntries`, not `data` or `arr`; `resolveCacheKey()`,
+  not `doIt()` or `process()`. A reader should know what a thing is without
+  opening its definition.
+- Functions do one thing, named after that thing. If the name needs "and",
+  split the function.
+- No unexplained abbreviations or single-letter names outside tiny scopes
+  (a loop index is fine; `nrmUrl` as a parameter is not).
+- Replace magic numbers and inline literals with named constants
+  (`STALE_AFTER_DAYS = 90`, not `90` in a condition), because the name carries
+  the reasoning the literal cannot.
+- Every exported function, class, and type carries a short JSDoc block:
+  what it does, parameters, return value, and thrown errors. Internal helpers
+  need JSDoc only when the signature alone does not explain them.
+- Inline comments explain *why* (a constraint, a workaround, a non-obvious
+  choice), never *what* the next line does — the code already says that.
+- Prefer early returns over nested conditionals; more than two levels of
+  nesting is a signal to extract or invert.
+- Avoid clever constructs a junior would have to decode: nested ternaries,
+  dense chained expressions, implicit type coercion tricks. Boring and
+  explicit beats compact and cryptic.
+
 ## General development best practices
 
 - Non-trivial logic ships with at least one runnable check that fails if the
