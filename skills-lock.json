@@ -689,7 +689,7 @@
     ".github/agents/business-analyst.agent.md": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "repoPath": "agents/business-analyst.agent.md",
+      "repoPath": ".github/agents/business-analyst.agent.md",
       "installPath": ".github/agents/business-analyst.agent.md",
       "computedHash": "6372c54897742351269e11c7c36a2cc644ceebbee1fc6fe51f68c14518efa61d",
       "agents": [
@@ -707,13 +707,13 @@
     ".github/agents/official-docs-researcher.agent.md": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "repoPath": "agents/official-docs-researcher.agent.md",
+      "repoPath": ".github/agents/official-docs-researcher.agent.md",
       "installPath": ".github/agents/official-docs-researcher.agent.md",
       "computedHash": "5bfda89d2ea73a5524659112b55819dbb1ffe555ad6df0af1f09c3708fcd74a8",
       "agents": [
-        "github-copilot",
         "claude-code",
         "codex",
+        "github-copilot",
         "cursor",
         "antigravity"
       ],
@@ -727,7 +727,7 @@
     ".github/agents/senior-code-reviewer.agent.md": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "repoPath": "agents/senior-code-reviewer.agent.md",
+      "repoPath": ".github/agents/senior-code-reviewer.agent.md",
       "installPath": ".github/agents/senior-code-reviewer.agent.md",
       "computedHash": "d1fc15720af06634d2c67173e8038a02bb18dd1b39e56c494079c4c4438509ba",
       "agents": [
@@ -745,7 +745,7 @@
     ".github/agents/senior-qa-engineer.agent.md": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "repoPath": "agents/senior-qa-engineer.agent.md",
+      "repoPath": ".github/agents/senior-qa-engineer.agent.md",
       "installPath": ".github/agents/senior-qa-engineer.agent.md",
       "computedHash": "223867cb8a005578b0e6305e4dc64f9618739733128d7ddbca64e6f6b737e5ed",
       "agents": [
@@ -763,7 +763,7 @@
     ".github/agents/senior-quality-engineer.agent.md": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "repoPath": "agents/senior-quality-engineer.agent.md",
+      "repoPath": ".github/agents/senior-quality-engineer.agent.md",
       "installPath": ".github/agents/senior-quality-engineer.agent.md",
       "computedHash": "f5cc1bd0badd801d2da8c026186d3aad370701ec9d55a44fece760b10124fa04",
       "agents": [
@@ -782,7 +782,7 @@
     ".github/agents/senior-release-manager.agent.md": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "repoPath": "agents/senior-release-manager.agent.md",
+      "repoPath": ".github/agents/senior-release-manager.agent.md",
       "installPath": ".github/agents/senior-release-manager.agent.md",
       "computedHash": "fcf46516bac740e86b4b69465db1c7f99ecac469cc7352bcc2c8aa5974e98774",
       "agents": [
@@ -801,15 +801,15 @@
     ".github/agents/senior-technical-writer.agent.md": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "repoPath": "agents/senior-technical-writer.agent.md",
+      "repoPath": ".github/agents/senior-technical-writer.agent.md",
       "installPath": ".github/agents/senior-technical-writer.agent.md",
       "computedHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
       "agents": [
         "claude-code",
         "codex",
         "github-copilot",
-        "antigravity",
-        "cursor"
+        "cursor",
+        "antigravity"
       ],
       "installHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
       "sourceHash": "07925c07f1a7ba3f6fad3947be0de0334a2d963b086a81c07b1a99e3838522e3",
