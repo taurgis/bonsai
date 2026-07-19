@@ -190,8 +190,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       ? 'try relaxing filters, or list everything: '
       : 'populate the cache first: ';
     this.log(headline);
-    this.log(`
-Tip: ${tipLead}${colors.cyan(tipCmd)}`);
+    this.log(`\nTip: ${tipLead}${colors.cyan(tipCmd)}`);
   }
 
   async run(): Promise<ListRow[]> {
