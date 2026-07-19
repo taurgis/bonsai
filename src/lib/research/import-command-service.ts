@@ -15,7 +15,7 @@ import { estimateTokens } from './token-estimate.js';
 import { deriveCacheKey } from './cache-key.js';
 import { normalizeUrl } from './url.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
-import { formatHumanField } from '../cli-presentation.js';
+import { formatHumanFields } from '../cli-presentation.js';
 
 const INPUT_LIMIT_BYTES = 1024 * 1024;
 // ponytail: 1s stdin idle timeout is enough for piped agent input; raise if interactive paste
@@ -67,19 +67,6 @@ export interface PreparedImportCommand {
   sourceUrls: string[];
 }
 
-function validateImportCommandRequest(
-  args: ImportCommandArgs,
-  flags: ImportCommandFlags,
-  io: CliIo
-): void {
-  const ttlErr = durationFlagError('--ttl', flags.ttl);
-  if (ttlErr) io.error(ttlErr, { exit: 2, code: 'INVALID_DURATION' });
-
-  const hasSingle = Boolean(args.url);
-  const hasMulti = flags.sourceUrls.length > 0;
-  validateSourceMode(hasSingle, hasMulti, flags, io);
-}
-
 /**
  * Validate the request, read and validate the input content, and build the artifact — everything
  * up to (but excluding) the cache write, so the command can resolve dry-run mode in between.
@@ -94,7 +81,9 @@ export async function prepareImportCommandService(opts: {
   const hasSingle = Boolean(args.url);
   const hasMulti = flags.sourceUrls.length > 0;
 
-  validateImportCommandRequest(args, flags, io);
+  const ttlErr = durationFlagError('--ttl', flags.ttl);
+  if (ttlErr) io.error(ttlErr, { exit: 2, code: 'INVALID_DURATION' });
+  validateSourceMode(hasSingle, hasMulti, flags, io);
   const rawInput = await readAndValidateInput(flags, input, io);
 
   const sourceUrls = getSourceUrls(hasMulti, flags.sourceUrls, args.url, io);
@@ -153,19 +142,14 @@ export function finishImportCommandService(
   }
 
   if (!io.json) {
-    io.log(
-      dryRun
-        ? `[dry-run] Would import research artifact.`
-        : `Successfully imported research artifact.`
-    );
-    io.log(formatHumanField('Cache Key', cacheKey));
-    io.log(formatHumanField('Storage Path', storagePath));
-    if (!hasSingle) {
-      const topic = resolvedTopic(flags)!;
-      io.log(formatHumanField('Topic', topic));
-      io.log(formatHumanField('Source URLs', sourceUrls.join(', ')));
-      io.log(`\nTip: find it again with ${io.bin} list --topic "${topic}"`);
-    }
+    logImportHumanSuccess(io, {
+      dryRun,
+      cacheKey,
+      storagePath,
+      hasSingle,
+      flags,
+      sourceUrls,
+    });
   }
 
   return {
@@ -202,6 +186,38 @@ export function finishImportCommandService(
         : artifact.metadata.token_estimate.detailed,
     content: flags.inputFormat === 'compressed' ? artifact.compressed : artifact.detailed,
   };
+}
+
+function logImportHumanSuccess(
+  io: CliIo,
+  opts: {
+    dryRun: boolean;
+    cacheKey: string;
+    storagePath: string;
+    hasSingle: boolean;
+    flags: ImportCommandFlags;
+    sourceUrls: string[];
+  }
+): void {
+  const { dryRun, cacheKey, storagePath, hasSingle, flags, sourceUrls } = opts;
+  io.log(
+    dryRun
+      ? `[dry-run] Would import research artifact.`
+      : `Successfully imported research artifact.`
+  );
+  const fields: Array<readonly [string, string]> = [
+    ['Cache Key', cacheKey],
+    ['Storage Path', storagePath],
+  ];
+  let topic: string | undefined;
+  if (!hasSingle) {
+    topic = resolvedTopic(flags)!;
+    fields.push(['Topic', topic], ['Source URLs', sourceUrls.join(', ')]);
+  }
+  for (const line of formatHumanFields(fields)) io.log(line);
+  if (topic) {
+    io.log(`\nTip: find it again with ${io.bin} list --topic "${topic}"`);
+  }
 }
 
 function importSourceSuggestions(bin: string): string[] {
@@ -360,27 +376,20 @@ async function readAndValidateInput(
     return rawInput;
   }
 
-  if (flags.file) {
-    const filePath = resolve(flags.file);
-    try {
-      return readAndValidateFile(filePath, input, io);
-    } catch (err) {
-      // readAndValidateFile raises usage errors via io.error, which throw CLIErrors carrying their
-      // own exit code and message -- preserve those. Only an unexpected read failure is wrapped.
-      if (err instanceof Errors.CLIError) throw err;
-      io.error(`Failed to read file: ${(err as Error).message}`, {
-        exit: 1,
-        code: 'IO_ERROR',
-        suggestions: ['Check file permissions, or pipe content with --stdin.'],
-      });
-    }
+  // validateSourceMode already required --stdin or --file.
+  const filePath = resolve(flags.file!);
+  try {
+    return readAndValidateFile(filePath, input, io);
+  } catch (err) {
+    // readAndValidateFile raises usage errors via io.error, which throw CLIErrors carrying their
+    // own exit code and message -- preserve those. Only an unexpected read failure is wrapped.
+    if (err instanceof Errors.CLIError) throw err;
+    io.error(`Failed to read file: ${(err as Error).message}`, {
+      exit: 1,
+      code: 'IO_ERROR',
+      suggestions: ['Check file permissions, or pipe content with --stdin.'],
+    });
   }
-
-  io.error('No input source specified.', {
-    exit: 2,
-    code: 'MISSING_INPUT',
-    suggestions: stdinImportSuggestions(io.bin),
-  });
 }
 
 /** Trimmed --topic, or null when absent/whitespace-only. */

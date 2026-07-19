@@ -24,12 +24,10 @@ import { persistArtifact } from './persist-artifact.js';
 import {
   createArtifactFromFetch,
   revalidateCache,
-  type RevalidationResult,
   type RevalidateSecureWrite,
 } from './revalidate.js';
 import { resolveResearchTarget, type ResolvedResearchTarget } from './resolve-target.js';
 import type { ResearchArtifact } from './schema.js';
-import type { StoreRoots } from './store-roots.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
 import { batchSeparator } from '../cache-view.js';
 import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
@@ -172,7 +170,13 @@ async function executeCacheHit(
     secure,
   });
 
-  handleStaleRevalidationResult(io, revalidationResult);
+  if (revalidationResult.status === 'stale') {
+    const exitSuffix = revalidationResult.allowed ? '' : ` (exit ${EXIT_STALE_SERVED})`;
+    io.warn(
+      `Serving stale content within grace period${exitSuffix}: revalidation failed (${revalidationResult.error}).`
+    );
+    if (!revalidationResult.allowed) process.exitCode = EXIT_STALE_SERVED;
+  }
   if (revalidationResult.redirectWarning) io.warn(revalidationResult.redirectWarning);
 
   return {
@@ -235,22 +239,6 @@ async function executeCacheMiss(
   return applyAutoTags(artifact);
 }
 
-function resolveArtifactTargetOrFail(url: string, run: FetchRun): ResolvedResearchTarget {
-  const { flags, io } = run;
-  try {
-    return resolveResearchTarget({
-      configDir: io.configDir,
-      cwd: io.cwd,
-      dataDir: io.dataDir,
-      url,
-      flagOverride: flags.storage,
-      lookup: !flags.force,
-    });
-  } catch (err) {
-    failInvalidUrl(io.error, url, (err as Error).message);
-  }
-}
-
 async function resolveArtifact(
   target: ResolvedResearchTarget,
   run: FetchRun
@@ -276,26 +264,7 @@ async function resolveArtifact(
   }
 
   const artifact = await executeCacheMiss(normalizedUrl, cacheKey, run);
-  const { dir, redirectedToGlobal } = persistFreshArtifact(roots, cacheKey, artifact, run);
-  // No entry existed at lookup, so there is no prior freshness to report. 'none' (not
-  // 'stale_expired') keeps the field honest -- nothing expired; the page was simply uncached and
-  // has now been fetched fresh. Mirrors the `status` command's miss reporting.
-  return {
-    cacheStatus: 'miss',
-    freshnessState: 'none',
-    artifact,
-    storageDir: dir,
-    redirectedToGlobal,
-  };
-}
-
-function persistFreshArtifact(
-  roots: StoreRoots,
-  cacheKey: string,
-  artifact: ResearchArtifact,
-  run: FetchRun
-): { dir: string; redirectedToGlobal: boolean } {
-  const result = persistArtifact({
+  const write = persistArtifact({
     roots,
     cacheKey,
     artifact,
@@ -303,9 +272,17 @@ function persistFreshArtifact(
     kind: 'fetch',
     scratchDir: run.tmpDir,
   });
-  if (result.redirectWarning) run.io.warn(result.redirectWarning);
-  // Report the real would-be location, not the throwaway dir that is about to be deleted.
-  return { dir: result.dataDir, redirectedToGlobal: result.redirected };
+  if (write.redirectWarning) run.io.warn(write.redirectWarning);
+  // No entry existed at lookup, so there is no prior freshness to report. 'none' (not
+  // 'stale_expired') keeps the field honest -- nothing expired; the page was simply uncached and
+  // has now been fetched fresh. Mirrors the `status` command's miss reporting.
+  return {
+    cacheStatus: 'miss',
+    freshnessState: 'none',
+    artifact,
+    storageDir: write.dataDir,
+    redirectedToGlobal: write.redirected,
+  };
 }
 
 // Long references are split into searchable/inspectable section children whenever the page artifact
@@ -326,30 +303,21 @@ function persistSectionsIfFresh(
   }
 }
 
-// Re-emit a runtime fetch failure with actionable next steps. Deep fetch/extract code throws plain
-// Errors that otherwise reach the user as a bare "what broke" line with no "what to do".
-function emitFetchError(err: unknown, url: string, io: CliIo): never {
-  const message = describeError(err);
-  const guidance = fetchFailureGuidance(message, url, io.bin);
-  io.error(message, {
-    exit: 1,
-    code: 'FETCH_FAILED',
-    suggestions: guidance?.suggestions,
-    ref: guidance?.ref,
-  });
-}
-
-/**
- * Multi-URL batches keep prior successes as failure rows. Flag validation runs before this loop,
- * so every error that reaches here is per-URL -- including INVALID_URL / MISSING_URL_SCHEME.
- */
 function failureRowOrRethrow(url: string, err: unknown, run: FetchRun) {
   const { dryRun, io, spinner } = run;
   // Invalid URLs fail before ux.action.start; stopping a never-started spinner prints noise.
   if (!io.json && spinner.running()) spinner.stop('failed');
   if (run.urlCount === 1) {
     if (err instanceof Errors.CLIError) throw err;
-    emitFetchError(err, url, io);
+    // Deep fetch/extract throws plain Errors; re-emit with actionable next steps.
+    const message = describeError(err);
+    const guidance = fetchFailureGuidance(message, url, io.bin);
+    io.error(message, {
+      exit: 1,
+      code: 'FETCH_FAILED',
+      suggestions: guidance?.suggestions,
+      ref: guidance?.ref,
+    });
   }
   const row =
     err instanceof Errors.CLIError
@@ -362,7 +330,19 @@ function failureRowOrRethrow(url: string, err: unknown, run: FetchRun) {
 
 async function fetchSingleTarget(url: string, run: FetchRun) {
   const { dryRun, flags, io, spinner } = run;
-  const target = resolveArtifactTargetOrFail(url, run);
+  let target: ResolvedResearchTarget;
+  try {
+    target = resolveResearchTarget({
+      configDir: io.configDir,
+      cwd: io.cwd,
+      dataDir: io.dataDir,
+      url,
+      flagOverride: flags.storage,
+      lookup: !flags.force,
+    });
+  } catch (err) {
+    failInvalidUrl(io.error, url, (err as Error).message);
+  }
   const { cacheKey, normalizedUrl, roots } = target;
 
   if (!io.json) {
@@ -418,13 +398,4 @@ function applyCaptureMetadata(artifact: ResearchArtifact, capture: CaptureOutcom
   if (capture.sourceDocUrl && !meta.source_urls.includes(capture.sourceDocUrl)) {
     meta.source_urls.push(capture.sourceDocUrl);
   }
-}
-
-function handleStaleRevalidationResult(io: CliIo, revalidationResult: RevalidationResult): void {
-  if (revalidationResult.status !== 'stale') return;
-  const exitSuffix = revalidationResult.allowed ? '' : ` (exit ${EXIT_STALE_SERVED})`;
-  io.warn(
-    `Serving stale content within grace period${exitSuffix}: revalidation failed (${revalidationResult.error}).`
-  );
-  if (!revalidationResult.allowed) process.exitCode = EXIT_STALE_SERVED;
 }
