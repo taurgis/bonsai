@@ -174,9 +174,12 @@ export default function register(harness, fixtures) {
   check('fetch --read-only with an invalid duration fails fast with no misleading read-only warning', () => {
     const r = run(['https://example.com', '--read-only', '--ttl', 'garbage', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
-    expect(parseJson(r.stdout)?.code === 'INVALID_DURATION', 'code');
-    expect(r.stderr.includes('Code: INVALID_DURATION'), `unexpected stderr: ${r.stderr}`);
-    expect(!r.stderr.includes('Read-only mode active'), `misleading read-only warning: ${r.stderr}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_DURATION', 'code');
+    expect(env?.stderr?.includes('Code: INVALID_DURATION'), `unexpected envelope stderr: ${env?.stderr}`);
+    // Intentional #73 contract: process stderr stays clean under --json, so this also proves the
+    // read-only warn() (which would appear on process stderr) never fired for a validation failure.
+    expect(r.stderr === '', `misleading read-only warning: ${r.stderr}`);
   });
 
   check('fetch --read-only is accepted on a cache hit', () => {

@@ -22,14 +22,16 @@ export default function register(harness) {
     });
   }
 
+  // Intentional #73 contract: --json failures keep their human-readable message in envelope.stderr
+  // only; process stderr stays empty so machine output never mixes with incidental text.
   function expectJsonStderr(name, args, code) {
     check(name, () => {
       const json = run([...args, '--json']);
       const env = parseJson(json.stdout);
       expect(Boolean(env), `stdout is not JSON:\n${json.stdout}`);
       expect(env?.code === code, `json code ${env?.code}`);
-      expect(json.stderr.includes(`Code: ${code}`), `process stderr missing Code: ${code}`);
-      expect(json.stderr.includes(env.stderr), `process stderr missing envelope stderr:\n${json.stderr}`);
+      expect(env?.stderr?.includes(`Code: ${code}`), `envelope stderr missing Code: ${code}`);
+      expect(json.stderr === '', `process stderr should stay clean under --json:\n${json.stderr}`);
     });
   }
 
@@ -119,19 +121,19 @@ export default function register(harness) {
   });
 
   expectJsonStderr(
-    'oclif parse errors keep human error text on process stderr under --json',
+    'oclif parse errors keep human error text in the envelope only under --json',
     ['list', '--limit', '0'],
     'INVALID_LIMIT'
   );
 
   expectJsonStderr(
-    'preflight usage errors keep human error text on process stderr under --json',
+    'preflight usage errors keep human error text in the envelope only under --json',
     [],
     'MISSING_COMMAND'
   );
 
   expectJsonStderr(
-    'command-not-found hook keeps human error text on process stderr under --json',
+    'command-not-found hook keeps human error text in the envelope only under --json',
     ['lisst'],
     'COMMAND_NOT_FOUND'
   );

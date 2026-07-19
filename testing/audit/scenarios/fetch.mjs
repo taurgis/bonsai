@@ -5,7 +5,8 @@ export default function register(harness, fixtures) {
 
   function expectFetchJsonOk(r, env, { format, ok } = {}) {
     expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
-    expect(env?.command === 'bonsai', `command ${env?.command}`);
+    // Intentional #73 contract: URL-shorthand fetch reports command "fetch", not the bin name.
+    expect(env?.command === 'fetch', `command ${env?.command}`);
     if (format !== undefined) expect(env?.data?.format === format, `format ${env?.data?.format}`);
     if (ok) expect(env?.ok === true, 'ok');
     expect(r.stderr === '', `stderr: ${r.stderr.slice(0, 120)}`);
@@ -67,8 +68,9 @@ export default function register(harness, fixtures) {
     const env = parseJson(r.stdout);
     expect(env?.code === 'FETCH_FAILED', env?.code);
     expect(r.exitCode === env?.exitCode, 'process vs envelope exit');
-    expect(r.stderr.includes('Code: FETCH_FAILED'), `stderr: ${r.stderr.slice(0, 120)}`);
-    expect(r.stderr.includes(env.stderr), `stderr missing envelope stderr: ${r.stderr.slice(0, 120)}`);
+    expect(env?.stderr?.includes('Code: FETCH_FAILED'), `envelope stderr: ${env?.stderr}`);
+    // Intentional #73 contract: --json failures stay in the envelope only; process stderr is clean.
+    expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr.slice(0, 120)}`);
   });
 
   check('fetch cached URL --json clean stderr', () => {
