@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import {
   assertRenderedHttpOk,
   buildChromeArgs,
+  captureNavigatedPage,
   describeNavigationFailure,
   describeUnsafeNavigationTarget,
   fetchRenderedHtml,
@@ -289,6 +290,85 @@ describe('describeUnsafeNavigationTarget', () => {
   it('blocks an unparseable URL', async () => {
     const err = await describeUnsafeNavigationTarget('not a url');
     expect(err?.message).toContain('Could not parse');
+  });
+});
+
+// A fake CdpPage whose Page.navigate/Runtime.evaluate calls succeed trivially, so tests can drive
+// captureNavigatedPage's takeBlockedNavigationError checkpoints and waitForLoad's ready/timeout
+// behavior directly, without spawning a real browser. `blockedOnCalls` answers successive
+// takeBlockedNavigationError() calls in order (extra calls repeat the last answer). When
+// `fireLoadEvent` is set, the fake fires Page.loadEventFired as soon as waitForLoad subscribes to
+// it (waitForLoad itself registers no listener until called, so firing any earlier would be a
+// no-op) — that's what lets waitForLoad resolve instead of timing out.
+function makeFakeNavigablePage(blockedOnCalls: Array<Error | null>, fireLoadEvent = false) {
+  let calls = 0;
+  const client = {
+    on(event: string, handler: (params: unknown) => void) {
+      if (fireLoadEvent && event === 'S:Page.loadEventFired') queueMicrotask(() => handler({}));
+    },
+    send: vi.fn(async (method: string) => {
+      if (method === 'Page.navigate') return { frameId: 'F1' };
+      if (method === 'Runtime.evaluate') return { result: { value: '<html>ok</html>' } };
+      return {};
+    }),
+  };
+  const takeBlockedNavigationError = vi.fn(() => {
+    const err = blockedOnCalls[Math.min(calls, blockedOnCalls.length - 1)];
+    calls += 1;
+    return err;
+  });
+  return {
+    client,
+    sessionId: 'S',
+    close: vi.fn(),
+    takeBlockedNavigationError,
+  } as unknown as CdpPage;
+}
+
+describe('captureNavigatedPage blocked-navigation checkpoints', () => {
+  it('prefers the safety-guard reason over a generic waitForLoad timeout (checkpoint: blocked mid-load)', async () => {
+    // Page.navigate resolves clean (checkpoint 1 sees null); no load event is ever emitted, so
+    // waitForLoad times out — but the guard recorded a block by then, and that specific reason
+    // must win over the opaque "Navigation timed out" message.
+    const page = makeFakeNavigablePage([
+      null,
+      new Error('IP address "127.0.0.1" is a blocked local or private target.'),
+    ]);
+
+    await expect(
+      captureNavigatedPage(page, 'https://example.com/', {
+        timeout: 30,
+        limit: 999_999,
+        settleMs: 0,
+      })
+    ).rejects.toThrow('IP address "127.0.0.1" is a blocked local or private target.');
+  });
+
+  it('throws the safety-guard reason recorded just after a clean page load (checkpoint: blocked post-load)', async () => {
+    const page = makeFakeNavigablePage(
+      [null, new Error('IP address "127.0.0.1" is a blocked local or private target.')],
+      true
+    );
+
+    await expect(
+      captureNavigatedPage(page, 'https://example.com/', {
+        timeout: 5_000,
+        limit: 999_999,
+        settleMs: 0,
+      })
+    ).rejects.toThrow('IP address "127.0.0.1" is a blocked local or private target.');
+  });
+
+  it('captures normally when nothing was ever blocked', async () => {
+    const page = makeFakeNavigablePage([null], true);
+
+    const result = await captureNavigatedPage(page, 'https://example.com/', {
+      timeout: 5_000,
+      limit: 999_999,
+      settleMs: 0,
+    });
+
+    expect(result.content).toBe('<html>ok</html>');
   });
 });
 

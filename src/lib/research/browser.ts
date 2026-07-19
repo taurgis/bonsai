@@ -355,6 +355,8 @@ export async function openCdpPage(): Promise<CdpPage> {
       sessionId
     );
     client.on(`${sessionId}:Fetch.requestPaused`, (params: FetchRequestPausedEvent) => {
+      // CdpClient.on's handler type is synchronous (CDP event dispatch isn't awaited), so the
+      // actual async validate-then-continue/fail work runs in this detached IIFE instead.
       void (async () => {
         const { requestId, request } = params;
         const blockReason = await describeUnsafeNavigationTarget(request.url);
@@ -543,6 +545,111 @@ function isTransientBrowserError(err: unknown): boolean {
   );
 }
 
+/**
+ * Navigates an already-open CDP page to `currentUrl` and captures the rendered HTML, honoring the
+ * openCdpPage Fetch-domain safety guard at every point a blocked navigation could otherwise be
+ * discarded in favor of a less specific (or entirely silent) failure:
+ *
+ * 1. Right after `Page.navigate` returns — a fast HTTP redirect chain can already be blocked and
+ *    resolved by this point, surfacing as the generic `nav.errorText` (e.g. `net::ERR_BLOCKED_BY_CLIENT`)
+ *    below if not checked first.
+ * 2. If `waitForLoad` throws — a client-side (JS-triggered) navigation into a blocked target after
+ *    the initial navigation already settled can prevent the load/domContentLoaded events
+ *    `waitForLoad` is waiting on, surfacing as a generic timeout instead of the specific reason.
+ * 3. After `waitForLoad` resolves — a client-side navigation blocked without otherwise disrupting
+ *    the load signal would otherwise sail through silently, capturing whatever the page settled on.
+ *
+ * Exported (rather than folded into `fetchRenderedHtmlOnce`) so tests can drive it against a fake
+ * `CdpPage` without spawning a real browser.
+ */
+export async function captureNavigatedPage(
+  page: CdpPage,
+  currentUrl: string,
+  options: { timeout: number; limit: number; settleMs: number }
+): Promise<BrowserFetchResult> {
+  const { timeout, limit, settleMs } = options;
+  await page.client.send('Network.setBlockedURLs', { urls: BLOCKED_ASSET_URLS }, page.sessionId);
+
+  // Record the status of each frame's first Document response so we can reject HTTP errors after
+  // the page settles. Keyed by frameId; the navigated top frame is matched via the navigate result.
+  const documentResponses = new Map<string, MainDocumentResponse>();
+  page.client.on(
+    `${page.sessionId}:Network.responseReceived`,
+    (params: {
+      frameId?: string;
+      type?: string;
+      response?: { status?: number; statusText?: string };
+    }) => {
+      const { frameId } = params;
+      const status = params.response?.status;
+      // Only record real numeric statuses: a Document event without a usable status would
+      // otherwise store NaN, which silently slips past the `>= 400` guard and the `?? 200`
+      // fallback alike, leaking a NaN into BrowserFetchResult.status (declared `number`).
+      if (params.type !== 'Document' || !frameId || typeof status !== 'number') return;
+      if (documentResponses.has(frameId)) return;
+      documentResponses.set(frameId, {
+        status,
+        statusText: params.response?.statusText ?? '',
+      });
+    }
+  );
+
+  const nav: { frameId?: string; errorText?: string } = await page.client.send(
+    'Page.navigate',
+    { url: currentUrl },
+    page.sessionId
+  );
+  // See point 1 above: prefer the safety guard's specific reason over the opaque errorText below.
+  const blockedNavigation = page.takeBlockedNavigationError();
+  if (blockedNavigation) throw blockedNavigation;
+
+  // A network-level failure (DNS, refused/closed connection, TLS) never fires a load event, so
+  // fail fast here instead of waiting out the full navigation timeout on a dead page.
+  if (nav.errorText) {
+    throw describeNavigationFailure(nav.errorText, currentUrl);
+  }
+
+  try {
+    await waitForLoad(page.client, page.sessionId, timeout, settleMs);
+  } catch (err) {
+    // See point 2 above: a blocked reason recorded during the wait outranks the generic timeout.
+    throw page.takeBlockedNavigationError() ?? err;
+  }
+
+  // See point 3 above.
+  const blockedNavigationAfterLoad = page.takeBlockedNavigationError();
+  if (blockedNavigationAfterLoad) throw blockedNavigationAfterLoad;
+
+  const mainDoc = nav.frameId ? documentResponses.get(nav.frameId) : undefined;
+  assertRenderedHttpOk(mainDoc);
+
+  const evalResult = await page.client.send(
+    'Runtime.evaluate',
+    { expression: 'document.documentElement.outerHTML', returnByValue: true },
+    page.sessionId
+  );
+
+  const html = evalResult.result?.value;
+  if (typeof html !== 'string') {
+    throw new Error('Failed to retrieve rendered HTML from browser page.');
+  }
+
+  const byteLength = Buffer.byteLength(html);
+  if (byteLength > limit) {
+    throw new Error(`Response body size limit exceeded. Rendered HTML is ${byteLength} bytes.`);
+  }
+
+  return {
+    status: mainDoc?.status ?? 200,
+    contentType: 'text/html',
+    etag: null,
+    lastModified: null,
+    finalUrl: currentUrl,
+    responseSize: byteLength,
+    content: html,
+  };
+}
+
 async function fetchRenderedHtmlOnce(
   url: string,
   options: BrowserFetchOptions = {}
@@ -555,86 +662,11 @@ async function fetchRenderedHtmlOnce(
 
   const page = await openCdpPage();
   try {
-    await page.client.send('Network.setBlockedURLs', { urls: BLOCKED_ASSET_URLS }, page.sessionId);
-
-    // Record the status of each frame's first Document response so we can reject HTTP errors after
-    // the page settles. Keyed by frameId; the navigated top frame is matched via the navigate result.
-    const documentResponses = new Map<string, MainDocumentResponse>();
-    page.client.on(
-      `${page.sessionId}:Network.responseReceived`,
-      (params: {
-        frameId?: string;
-        type?: string;
-        response?: { status?: number; statusText?: string };
-      }) => {
-        const { frameId } = params;
-        const status = params.response?.status;
-        // Only record real numeric statuses: a Document event without a usable status would
-        // otherwise store NaN, which silently slips past the `>= 400` guard and the `?? 200`
-        // fallback alike, leaking a NaN into BrowserFetchResult.status (declared `number`).
-        if (params.type !== 'Document' || !frameId || typeof status !== 'number') return;
-        if (documentResponses.has(frameId)) return;
-        documentResponses.set(frameId, {
-          status,
-          statusText: params.response?.statusText ?? '',
-        });
-      }
-    );
-
-    const nav: { frameId?: string; errorText?: string } = await page.client.send(
-      'Page.navigate',
-      { url: currentUrl },
-      page.sessionId
-    );
-    // Fast redirects can fail synchronously within Page.navigate's own response (surfacing as
-    // nav.errorText below); check the Fetch-domain safety guard first so a blocked navigation
-    // reports its specific reason (e.g. "blocked local or private target") instead of the opaque
-    // net::ERR_BLOCKED_BY_CLIENT that Chrome's own errorText would otherwise give it.
-    const blockedNavigation = page.takeBlockedNavigationError();
-    if (blockedNavigation) throw blockedNavigation;
-
-    // A network-level failure (DNS, refused/closed connection, TLS) never fires a load event, so
-    // fail fast here instead of waiting out the full navigation timeout on a dead page.
-    if (nav.errorText) {
-      throw describeNavigationFailure(nav.errorText, currentUrl);
-    }
-
-    await waitForLoad(page.client, page.sessionId, timeout, options.settleMs ?? 1000);
-
-    // A redirect mid-navigation may have been blocked by the Fetch-domain safety guard (see
-    // openCdpPage); Chrome then just commits its own error page, which would otherwise sail
-    // through as "content" below. Surface the real reason instead.
-    const blockedNavigationAfterLoad = page.takeBlockedNavigationError();
-    if (blockedNavigationAfterLoad) throw blockedNavigationAfterLoad;
-
-    const mainDoc = nav.frameId ? documentResponses.get(nav.frameId) : undefined;
-    assertRenderedHttpOk(mainDoc);
-
-    const evalResult = await page.client.send(
-      'Runtime.evaluate',
-      { expression: 'document.documentElement.outerHTML', returnByValue: true },
-      page.sessionId
-    );
-
-    const html = evalResult.result?.value;
-    if (typeof html !== 'string') {
-      throw new Error('Failed to retrieve rendered HTML from browser page.');
-    }
-
-    const byteLength = Buffer.byteLength(html);
-    if (byteLength > limit) {
-      throw new Error(`Response body size limit exceeded. Rendered HTML is ${byteLength} bytes.`);
-    }
-
-    return {
-      status: mainDoc?.status ?? 200,
-      contentType: 'text/html',
-      etag: null,
-      lastModified: null,
-      finalUrl: currentUrl,
-      responseSize: byteLength,
-      content: html,
-    };
+    return await captureNavigatedPage(page, currentUrl, {
+      timeout,
+      limit,
+      settleMs: options.settleMs ?? 1000,
+    });
   } finally {
     await page.close();
   }
