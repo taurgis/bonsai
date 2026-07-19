@@ -19,6 +19,44 @@
       "versionPolicy": "minor",
       "includePrerelease": false
     },
+    "cli-design-principles": {
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "computedHash": "37d4c8d4bdcb60f9b8595ae13042a45cdd63f5688d5e0c8d8c3474fae8078c2d",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": ".agents/skills/cli-design-principles/SKILL.md",
+      "installPath": ".agents/skills/cli-design-principles",
+      "installHash": "abc8c9a1320fb06662a3a2a22a531da6f680ef6c0b83b106628623139518d96d",
+      "sourceHash": "37d4c8d4bdcb60f9b8595ae13042a45cdd63f5688d5e0c8d8c3474fae8078c2d",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
+    "cli-output-design": {
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "computedHash": "9815767b2f0ca78bbc83d50c51b5fa08ccf23ef5f56703945df6ff32870a0804",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": ".agents/skills/cli-output-design/SKILL.md",
+      "installPath": ".agents/skills/cli-output-design",
+      "installHash": "5d49a3343efbe5ba59e323835c0b4347affed548d89445c701bcf2820c02768f",
+      "sourceHash": "9815767b2f0ca78bbc83d50c51b5fa08ccf23ef5f56703945df6ff32870a0804",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
+    },
     "code-review": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -217,6 +255,25 @@
       "sourceHash": "940d69594a628748c306d80f0ac6f7c9076f361b6c398ce4f59b0d64b74ddf33",
       "versionPolicy": "minor",
       "includePrerelease": false
+    },
+    "oclif-development": {
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "computedHash": "f389ee20de79bf8957e213e75cc725c2048082dd7fdcc99a65fb9e1c27b9c7c5",
+      "agents": [
+        "claude-code",
+        "codex",
+        "github-copilot",
+        "antigravity"
+      ],
+      "repoPath": ".agents/skills/oclif-development/SKILL.md",
+      "installPath": ".agents/skills/oclif-development",
+      "installHash": "f08e1114f7d3a50e67db2a39d8870c892c29499d8e730db67e4e3b76bf89d4fa",
+      "sourceHash": "f389ee20de79bf8957e213e75cc725c2048082dd7fdcc99a65fb9e1c27b9c7c5",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "1.0.0",
+      "installVersion": "1.0.0"
     },
     "ponytail": {
       "source": "dietrichgebert/ponytail",
