@@ -143,6 +143,54 @@ describe('inspect command unit tests', () => {
     }
   });
 
+  it('flags a miss as part of an existing multi-source note instead of suggesting a duplicate fetch', async () => {
+    // Multi-source research_notes key off topic+content, not any one URL (see
+    // docs/reference/cache-protocol.md), so a plain URL-keyed lookup always misses for every one
+    // of their source URLs even though the content already exists.
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Multi-source inspect note');
+    const imported = (await ResearchImport.run([
+      '--stdin',
+      '--topic',
+      'InspectMultiSource',
+      '--source-url',
+      'https://example.com/inspect-multi-a',
+      '--source-url',
+      'https://example.com/inspect-multi-b',
+    ])) as any;
+
+    const prevExit = process.exitCode;
+    process.exitCode = 0;
+    try {
+      const result = (await ResearchInspect.run(['https://example.com/inspect-multi-b'])) as any;
+      expect(result.status).toBe('miss');
+      expect(result.partOfExistingNote).toMatchObject({
+        cacheKey: imported.cache.key,
+        artifactType: 'research_note',
+        topic: 'InspectMultiSource',
+      });
+      expect(result.partOfExistingNote.sourceUrls).toContain('https://example.com/inspect-multi-b');
+    } finally {
+      process.exitCode = prevExit;
+      readSpy.mockRestore();
+    }
+  });
+
+  it('leaves partOfExistingNote null for a genuinely uncached URL', async () => {
+    const prevExit = process.exitCode;
+    process.exitCode = 0;
+    try {
+      const result = (await ResearchInspect.run([
+        'https://example.com/truly-never-cached-inspect',
+      ])) as any;
+      expect(result.status).toBe('miss');
+      expect(result.partOfExistingNote).toBeNull();
+    } finally {
+      process.exitCode = prevExit;
+    }
+  });
+
   it('keeps cached inspect rows when another URL fails validation in the same batch', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

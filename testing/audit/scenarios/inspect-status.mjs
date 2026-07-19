@@ -141,6 +141,34 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[1]?.metadata === null, 'miss metadata null');
   });
 
+  // A multi-source research_note keys off topic+content, not any one --source-url, so a plain
+  // URL-keyed inspect always misses for each of its source URLs. The miss must not send the caller
+  // toward a duplicate fetch — it must surface the existing note instead.
+  check('inspect miss on a multi-source note URL points at list --url, not a duplicate fetch', () => {
+    const ws = createWorkspace();
+    const urlA = 'https://example.com/audit-multi-source-inspect-a';
+    const urlB = 'https://example.com/audit-multi-source-inspect-b';
+    const imported = run(
+      ['import', '--stdin', '--topic', 'AuditMultiSourceInspect', '--source-url', urlA, '--source-url', urlB, '--json'],
+      { cwd: ws.cwd, xdg: ws.xdg, input: '# Audit multi-source\n\nBody.\n' }
+    );
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const noteKey = parseJson(imported.stdout)?.data?.cache?.key;
+
+    const r = run(['inspect', urlB, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CACHE_MISS', env?.code);
+    expect(env?.data?.status === 'miss', JSON.stringify(env?.data));
+    expect(env?.data?.partOfExistingNote?.cacheKey === noteKey, JSON.stringify(env?.data));
+    expect(env?.data?.partOfExistingNote?.artifactType === 'research_note', JSON.stringify(env?.data));
+    expect(env?.suggestions?.[0] === `Find it with: bonsai list --url "${urlB}"`, env?.suggestions);
+    expect(!env?.suggestions?.[0]?.includes('Fetch and cache'), env?.suggestions);
+
+    const listed = run(['list', '--url', urlB, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(listed.stdout)?.data?.[0]?.cacheKey === noteKey, 'list --url finds the note');
+  });
+
   check('inspect single miss JSON keeps miss data payload', () => {
     const r = run(['inspect', CACHE_MISS_URL, '--json']);
     expect(r.exitCode === 1, `exit ${r.exitCode}`);

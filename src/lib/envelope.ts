@@ -87,7 +87,12 @@ export function formatErrorForJson(err: CliErrorShape): string {
   return lines.join('\n');
 }
 
-type CacheMissRow = { status?: string; normalizedUrl?: string };
+type CacheMissRow = {
+  status?: string;
+  normalizedUrl?: string;
+  /** Set by `inspect` when the URL is already a source of a different cached artifact (#T-multi). */
+  partOfExistingNote?: { cacheKey: string } | null;
+};
 
 /** Stable CLIError fields for batch failure rows (status/inspect/fetch). */
 export function cliErrorFields(
@@ -165,8 +170,15 @@ export function enrichCacheMissEnvelope(
         ? `Cache miss for ${url} and ${failures.length - 1} other URLs`
         : `Cache miss for ${url}`;
     },
+    // A URL that is already a secondary source of a different cached artifact must not be pointed
+    // at a plain fetch — that would create an unrelated duplicate entry instead of finding the
+    // note that already covers it.
     suggestions: (failures) =>
-      failures.map((m) => `Fetch and cache it first: ${bin} ${m.normalizedUrl}`),
+      failures.map((m) =>
+        m.partOfExistingNote
+          ? `Find it with: ${bin} list --url "${m.normalizedUrl}"`
+          : `Fetch and cache it first: ${bin} ${m.normalizedUrl}`
+      ),
   });
 }
 
