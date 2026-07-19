@@ -3,7 +3,7 @@ import { writeArtifactSecurely, type SecureWriteResult } from './secure-write.js
 import type { StoreRoots } from './store-roots.js';
 import type { ResearchArtifact } from './schema.js';
 
-export type ArtifactWriteKind = 'import' | 'fetch' | 'generic';
+export type ArtifactWriteKind = 'import' | 'fetch';
 
 export interface PersistArtifactResult extends SecureWriteResult {
   dryRun: boolean;
@@ -12,8 +12,7 @@ export interface PersistArtifactResult extends SecureWriteResult {
 }
 
 function redirectWarningFor(kind: ArtifactWriteKind, dryRun: boolean, secretLabel: string): string {
-  const content =
-    kind === 'import' ? 'imported content' : kind === 'fetch' ? 'page content' : 'content';
+  const content = kind === 'import' ? 'imported content' : 'page content';
   const verb = dryRun ? 'would store' : 'stored';
   return `Detected ${secretLabel} in the ${content}; ${verb} in the global cache instead of the project to avoid committing secrets.`;
 }
@@ -28,11 +27,10 @@ export function persistArtifact(opts: {
   cacheKey: string;
   artifact: ResearchArtifact;
   dryRun: boolean;
-  kind?: ArtifactWriteKind;
+  kind: ArtifactWriteKind;
   /** Fetch dry-run throwaway directory; real destination still comes from the secure write. */
   scratchDir?: string | null;
 }): PersistArtifactResult {
-  const kind = opts.kind ?? 'generic';
   const result = writeArtifactSecurely(opts.roots, opts.cacheKey, opts.artifact, {
     dryRun: opts.dryRun,
   });
@@ -43,7 +41,7 @@ export function persistArtifact(opts: {
     ...result,
     dryRun: opts.dryRun,
     redirectWarning: result.redirected
-      ? redirectWarningFor(kind, opts.dryRun, result.secretLabel!)
+      ? redirectWarningFor(opts.kind, opts.dryRun, result.secretLabel!)
       : null,
   };
 }

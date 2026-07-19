@@ -7,16 +7,6 @@ import type {
   TokenEstimate,
 } from './research/schema.js';
 
-export type CacheWriteStatus =
-  | 'imported'
-  | 'would_import'
-  | 'pruned'
-  | 'would_prune'
-  | 'set'
-  | 'would_set'
-  | 'unset'
-  | 'would_unset';
-
 export interface ConfigWriteResult {
   key: string;
   scope: 'user' | 'project';
@@ -41,7 +31,7 @@ export interface PruneWriteResult {
   files: Array<{ cacheKey: string; path: string }>;
 }
 
-export type CacheHitStatus = 'hit' | 'miss' | 'stale' | 'refreshed';
+export type CacheHitStatus = 'hit' | 'miss' | 'stale' | 'refreshed' | 'revalidated';
 export type FreshnessState = 'fresh' | 'stale_grace' | 'stale_expired' | 'none';
 export type ListFreshness = Exclude<FreshnessState, 'none'>;
 

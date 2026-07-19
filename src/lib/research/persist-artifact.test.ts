@@ -3,7 +3,6 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { persistArtifact } from './persist-artifact.js';
-import { importCacheWriteStatus, pruneWriteStatus } from '../write-status.js';
 import { resolveStoreRoots } from './store-roots.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 
@@ -72,11 +71,5 @@ describe('persistArtifact', () => {
     expect(result.redirected).toBe(true);
     expect(result.redirectWarning).toContain('would store');
     expect(result.dataDir).toBe(roots.globalRoot);
-  });
-
-  it('exposes write status helpers', () => {
-    expect(importCacheWriteStatus(true)).toBe('would_import');
-    expect(importCacheWriteStatus(false)).toBe('imported');
-    expect(pruneWriteStatus(true)).toBe('would_prune');
   });
 });

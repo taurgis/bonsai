@@ -262,10 +262,3 @@ export function buildCliErrorEnvelope(opts: {
     ref: opts.ref,
   });
 }
-
-/**
- * Formats a JSON envelope to a string with indentation.
- */
-export function formatEnvelope(parts: EnvelopeParts): string {
-  return JSON.stringify(buildEnvelope(parts), null, 2);
-}

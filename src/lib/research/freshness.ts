@@ -135,7 +135,7 @@ export function evaluateFreshness(
  * Checks if the cached entry's age exceeds the specified max-age duration.
  */
 export function checkMaxAgeExpired(
-  cached: any,
+  cached: { metadata: Pick<ResearchArtifactMetadata, 'fetched_at' | 'validated_at'> },
   currentTime: Date,
   maxAge: string | undefined
 ): boolean {

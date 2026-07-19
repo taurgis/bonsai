@@ -1,12 +1,20 @@
 import type { StorageMode } from '../config/index.js';
 import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
+import type { ResearchArtifact } from './schema.js';
 import { cliErrorFields, type CliErrorShape } from '../envelope.js';
 import { SANDBOX_EGRESS_ERROR_MARKER } from './browser.js';
 import { PROXY_TUNNEL_REJECTION_PATTERN } from './proxy.js';
 import { getArtifactPath } from './storage.js';
 
+/** Cache status as reported to users: dry-run remaps write-implying statuses to `would_*`. */
+export type ReportedCacheStatus =
+  | CacheHitStatus
+  | 'would_fetch'
+  | 'would_refresh'
+  | 'would_revalidate';
+
 /** Remap write-implying cache statuses when dry-run/read-only skipped persistence. */
-export function reportCacheStatus(status: string, dryRun: boolean): string {
+export function reportCacheStatus(status: CacheHitStatus, dryRun: boolean): ReportedCacheStatus {
   if (!dryRun) return status;
   switch (status) {
     case 'miss':
@@ -21,7 +29,7 @@ export function reportCacheStatus(status: string, dryRun: boolean): string {
 }
 
 /** Human spinner labels for reported (possibly remapped) cache statuses. */
-export const FETCH_STATUS_LABEL: Record<string, string> = {
+export const FETCH_STATUS_LABEL: Record<ReportedCacheStatus, string> = {
   hit: 'cached',
   miss: 'done',
   refreshed: 'refreshed',
@@ -39,28 +47,10 @@ export interface FetchResultInput {
   cacheKey: string;
   storageDir: string;
   storageMode: StorageMode;
-  cacheStatus: CacheHitStatus | string;
-  freshnessState: FreshnessState | string;
+  cacheStatus: CacheHitStatus;
+  freshnessState: FreshnessState;
   format: 'compressed' | 'detailed';
-  artifact: {
-    metadata: {
-      capture_method: string;
-      extraction_status: string;
-      extraction_confidence: string;
-      quality_notes: string[];
-      fetched_at: string | null;
-      validated_at: string | null;
-      stale_after: string | null;
-      artifact_type: string;
-      docs_engine: string | null;
-      docs_framework: string | null;
-      source_doc_url: string | null;
-      search_provider: string | null;
-      token_estimate: { compressed: number | null; detailed: number | null };
-    };
-    compressed: string;
-    detailed: string;
-  };
+  artifact: Pick<ResearchArtifact, 'metadata' | 'compressed' | 'detailed'>;
   redirectedToGlobal: boolean;
   dryRun: boolean;
 }

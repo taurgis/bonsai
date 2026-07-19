@@ -20,7 +20,7 @@ export interface ArgvNormalizeOptions {
 }
 
 /** Shared MISSING_COMMAND copy for flag-only argv preflight. */
-export function missingCommandDetails(
+function missingCommandDetails(
   bin: string,
   swallowed?: { flag: string; url: string } | null
 ): { message: string; code: 'MISSING_COMMAND'; suggestions: string[] } {
@@ -55,7 +55,7 @@ export const GLOBAL_BOOLEAN_FLAGS = new Set(['--read-only', '--plan']);
  * When a value-taking flag is the only "command" and its value looks like a URL, the user almost
  * certainly put the URL where the flag value belongs (e.g. `bonsai --tags https://example.com`).
  */
-export function findSwallowedUrlFlag(
+function findSwallowedUrlFlag(
   argv: readonly string[] | undefined,
   valueTakingFlags: ReadonlySet<string>
 ): { flag: string; url: string } | null {

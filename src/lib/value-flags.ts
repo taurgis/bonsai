@@ -12,35 +12,32 @@ type CommandClass = {
   baseFlags?: Record<string, FlagDef>;
 };
 
+/** Every argv token that selects this flag: long name, short char, and all aliases. */
+function flagTokens(name: string, flag: FlagDef): string[] {
+  const tokens = [`--${name}`];
+  if (flag.char) tokens.push(`-${flag.char}`);
+  const aliases = typeof flag.aliases === 'string' ? [flag.aliases] : (flag.aliases ?? []);
+  tokens.push(...aliases.map((alias) => `--${alias}`));
+  tokens.push(...(flag.charAliases ?? []).map((charAlias) => `-${charAlias}`));
+  return tokens;
+}
+
 /**
  * Derive every CLI token that consumes a following argv value from command class metadata
  * (long names, short chars, aliases). Used by argv normalization so FLAGS_WITH_VALUES cannot
  * drift from the real command surface.
  */
-export function valueTakingFlagTokens(
-  commandClasses: Iterable<CommandClass>,
-  extraBaseFlags: Record<string, FlagDef> = {}
-): Set<string> {
-  const tokens = new Set<string>();
-  for (const command of commandClasses) {
-    const flags = { ...extraBaseFlags, ...command.baseFlags, ...command.flags };
-    for (const [name, flag] of Object.entries(flags)) {
-      if (!flag || flag.type === 'boolean') continue;
-      tokens.add(`--${name}`);
-      if (flag.char) tokens.add(`-${flag.char}`);
-      const aliases = flag.aliases;
-      if (typeof aliases === 'string') tokens.add(`--${aliases}`);
-      else for (const alias of aliases ?? []) tokens.add(`--${alias}`);
-      for (const charAlias of flag.charAliases ?? []) tokens.add(`-${charAlias}`);
-    }
-  }
-  return tokens;
-}
-
-/** Narrow helper for oclif Command constructors. */
 export function valueTakingFlagTokensFromCommands(
   commands: Record<string, typeof Command>,
   extraBaseFlags: Record<string, FlagDef> = {}
 ): Set<string> {
-  return valueTakingFlagTokens(Object.values(commands) as CommandClass[], extraBaseFlags);
+  const tokens = new Set<string>();
+  for (const command of Object.values(commands) as CommandClass[]) {
+    const flags = { ...extraBaseFlags, ...command.baseFlags, ...command.flags };
+    for (const [name, flag] of Object.entries(flags)) {
+      if (!flag || flag.type === 'boolean') continue;
+      for (const token of flagTokens(name, flag)) tokens.add(token);
+    }
+  }
+  return tokens;
 }

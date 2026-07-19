@@ -16,16 +16,18 @@ import {
 } from './fetch-result.js';
 import { checkMaxAgeExpired, durationFlagError, evaluateFreshness } from './freshness.js';
 import { fetchRenderedHtml } from './browser.js';
-import { capturePage, type CaptureDeps } from './capture.js';
+import { capturePage, type CaptureDeps, type CaptureOutcome } from './capture.js';
 import { persistSectionArtifacts } from './docs/section-artifacts.js';
 import { fetchStaticHtml, fetchText } from './fetcher.js';
 import { applyAutoTags } from './keywords.js';
 import { persistArtifact } from './persist-artifact.js';
-import { createArtifactFromFetch, revalidateCache } from './revalidate.js';
-import { resolveResearchTarget } from './resolve-target.js';
-import type { LocatedArtifact } from './storage.js';
+import { createArtifactFromFetch, revalidateCache, type RevalidationResult } from './revalidate.js';
+import { resolveResearchTarget, type ResolvedResearchTarget } from './resolve-target.js';
+import type { ResearchArtifact } from './schema.js';
 import type { StoreRoots } from './store-roots.js';
-import { looksLikeSchemelessUrl } from './url.js';
+import { failInvalidUrl, type CliIo } from './cli-io.js';
+import { batchSeparator } from '../cache-view.js';
+import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
 import { detectSite } from '../../sites/index.js';
 import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/types.js';
 
@@ -35,18 +37,11 @@ const CAPTURE_DEPS: CaptureDeps = {
   fetchText: (url) => fetchText(url),
 };
 
-export interface CliIo {
-  bin: string;
-  configDir: string | undefined;
-  dataDir: string;
-  cwd: string;
-  json: boolean;
-  warn(msg: string): void;
-  log(msg: string): void;
-  error(
-    msg: string,
-    opts: { exit: number; code?: string; suggestions?: string[]; ref?: string }
-  ): never;
+/** Cache status, freshness, and artifact resolved for one URL. */
+interface ResolvedFetchArtifact {
+  cacheStatus: CacheHitStatus;
+  freshnessState: FreshnessState;
+  artifact: ResearchArtifact;
 }
 
 export interface FetchCommandSpinner {
@@ -76,6 +71,22 @@ export interface FetchCommandServiceOptions {
   spinner: FetchCommandSpinner;
 }
 
+/**
+ * Constants for one command invocation, threaded through every per-URL helper.
+ * `tmpDir` is the dry-run throwaway write dir (null outside dry-run).
+ */
+interface FetchRun {
+  flags: FetchCommandFlags;
+  io: CliIo;
+  spinner: FetchCommandSpinner;
+  currentTime: Date;
+  tmpDir: string | null;
+  summaryLevel: SummaryLevel;
+  dryRun: boolean;
+  urlCount: number;
+}
+
+/** Reject invalid duration values and contradictory flag pairs before any URL work starts. */
 export function validateFetchCommandFlags(io: CliIo, flags: FetchCommandFlags): void {
   for (const msg of [
     durationFlagError('--ttl', flags.ttl),
@@ -96,39 +107,44 @@ export function validateFetchCommandFlags(io: CliIo, flags: FetchCommandFlags): 
   }
 }
 
+/**
+ * Fetch/serve each URL against the cache and return the command's `--json` data payload
+ * (a single row, or an array for multi-URL batches with failures kept as rows).
+ */
 export async function runFetchCommandService(opts: FetchCommandServiceOptions): Promise<unknown> {
   const { dryRun, flags, io, spinner, urls } = opts;
-  const summaryLevel = loadSummaryLevel(io.configDir, io.cwd);
-  const tmpDir = dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null;
-  const currentTime = new Date();
-  const batch = urls.length > 1;
-  const ctx = { currentTime, tmpDir, summaryLevel, dryRun };
+  const run: FetchRun = {
+    flags,
+    io,
+    spinner,
+    currentTime: new Date(),
+    tmpDir: dryRun ? mkdtempSync(join(tmpdir(), 'fnr-dry-run-')) : null,
+    summaryLevel: loadSummaryLevel(io.configDir, io.cwd),
+    dryRun,
+    urlCount: urls.length,
+  };
 
   try {
     const results = [];
     for (const url of urls) {
       try {
-        results.push(
-          await fetchSingleTarget(url, ctx, { flags, io, spinner, urlCount: urls.length })
-        );
+        results.push(await fetchSingleTarget(url, run));
       } catch (err) {
-        results.push(failureRowOrRethrow(url, err, dryRun, batch, io, spinner));
+        results.push(failureRowOrRethrow(url, err, run));
       }
     }
-    return finalizeBatch(results, (r) => Boolean(r?.error));
+    return finalizeBatch(results, (row) => 'error' in row);
   } finally {
-    if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
+    if (run.tmpDir) rmSync(run.tmpDir, { recursive: true, force: true });
   }
 }
 
 async function executeCacheHit(
-  cached: any,
+  cached: ResearchArtifact,
   targetDir: string,
-  currentTime: Date,
-  summaryLevel: SummaryLevel,
-  flags: FetchCommandFlags,
-  io: CliIo
-): Promise<{ cacheStatus: any; freshnessState: any; artifact: any }> {
+  run: FetchRun
+): Promise<ResolvedFetchArtifact> {
+  const { currentTime, flags, io } = run;
   const isExpired = checkMaxAgeExpired(cached, currentTime, flags.maxAge);
   const freshnessState = isExpired
     ? 'stale_expired'
@@ -142,7 +158,7 @@ async function executeCacheHit(
     allowStale: flags.allowStale,
     ttlOverride: flags.ttl,
     rendered: flags.rendered,
-    summaryLevel,
+    summaryLevel: run.summaryLevel,
   });
 
   handleStaleRevalidationResult(io, revalResult);
@@ -156,17 +172,16 @@ async function executeCacheHit(
 
 async function executeCacheMiss(
   normalizedUrl: string,
-  currentTime: Date,
   cacheKey: string,
-  summaryLevel: SummaryLevel,
-  flags: FetchCommandFlags
-): Promise<any> {
+  run: FetchRun
+): Promise<ResearchArtifact> {
+  const { currentTime, flags, summaryLevel } = run;
   const siteModule = detectSite(normalizedUrl);
   const useRendered = flags.rendered || Boolean(siteModule?.defaults?.rendered);
 
   let fetchResult: SiteFetchResult['fetchResult'];
   let extraction: SiteFetchResult['extraction'];
-  let capture: Awaited<ReturnType<typeof capturePage>> | null = null;
+  let capture: CaptureOutcome | null = null;
   let siteFetch: SiteFetchResult | null = null;
   if (siteModule?.fetchPage) {
     // Custom site modules own their fetch/extract strategy; the generic capture path is skipped.
@@ -206,7 +221,8 @@ async function executeCacheMiss(
   return applyAutoTags(artifact);
 }
 
-function resolveArtifactTargetOrFail(io: CliIo, url: string, flags: FetchCommandFlags) {
+function resolveArtifactTargetOrFail(url: string, run: FetchRun): ResolvedResearchTarget {
+  const { flags, io } = run;
   try {
     return resolveResearchTarget({
       configDir: io.configDir,
@@ -217,67 +233,26 @@ function resolveArtifactTargetOrFail(io: CliIo, url: string, flags: FetchCommand
       lookup: !flags.force,
     });
   } catch (err) {
-    failInvalidUrl(io, url, (err as Error).message);
+    failInvalidUrl(io.error, url, (err as Error).message);
   }
-}
-
-// Single exit point matching BaseCommand.failInvalidUrl so batch rows/error envelopes stay stable.
-function failInvalidUrl(io: CliIo, url: string, message: string): never {
-  if (looksLikeSchemelessUrl(url)) {
-    io.error(message, {
-      exit: 2,
-      code: 'MISSING_URL_SCHEME',
-      suggestions: [`Use a full URL: https://${url}`],
-    });
-  }
-  io.error(`Invalid URL: ${message}`, {
-    exit: 2,
-    code: 'INVALID_URL',
-    suggestions: ['Provide a valid http:// or https:// URL.'],
-  });
 }
 
 async function resolveArtifact(
-  normalizedUrl: string,
-  cacheKey: string,
-  roots: StoreRoots,
-  tmpDir: string | null,
-  currentTime: Date,
-  located: LocatedArtifact | null,
-  summaryLevel: SummaryLevel,
-  flags: FetchCommandFlags,
-  io: CliIo
-): Promise<{
-  cacheStatus: any;
-  freshnessState: any;
-  artifact: any;
-  storageDir: string;
-  redirectedToGlobal: boolean;
-}> {
+  target: ResolvedResearchTarget,
+  run: FetchRun
+): Promise<ResolvedFetchArtifact & { storageDir: string; redirectedToGlobal: boolean }> {
+  const { cacheKey, located, normalizedUrl, roots } = target;
   if (located) {
     // Revalidate where the entry already lives; on dry-run use the throwaway dir so the cache is
     // never mutated. ponytail: revalidation rewrites in place, so a refreshed project entry that
     // gains a secret is not re-routed -- only first-time project writes are scanned.
-    const revalDir = tmpDir ?? located.dataDir;
-    const hit = await executeCacheHit(
-      located.artifact,
-      revalDir,
-      currentTime,
-      summaryLevel,
-      flags,
-      io
-    );
+    const revalDir = run.tmpDir ?? located.dataDir;
+    const hit = await executeCacheHit(located.artifact, revalDir, run);
     return { ...hit, storageDir: located.dataDir, redirectedToGlobal: false };
   }
 
-  const artifact = await executeCacheMiss(
-    normalizedUrl,
-    currentTime,
-    cacheKey,
-    summaryLevel,
-    flags
-  );
-  const { dir, redirectedToGlobal } = persistFreshArtifact(roots, tmpDir, cacheKey, artifact, io);
+  const artifact = await executeCacheMiss(normalizedUrl, cacheKey, run);
+  const { dir, redirectedToGlobal } = persistFreshArtifact(roots, cacheKey, artifact, run);
   // No entry existed at lookup, so there is no prior freshness to report. 'none' (not
   // 'stale_expired') keeps the field honest -- nothing expired; the page was simply uncached and
   // has now been fetched fresh. Mirrors the `status` command's miss reporting.
@@ -292,20 +267,19 @@ async function resolveArtifact(
 
 function persistFreshArtifact(
   roots: StoreRoots,
-  tmpDir: string | null,
   cacheKey: string,
-  artifact: any,
-  io: CliIo
+  artifact: ResearchArtifact,
+  run: FetchRun
 ): { dir: string; redirectedToGlobal: boolean } {
   const result = persistArtifact({
     roots,
     cacheKey,
     artifact,
-    dryRun: Boolean(tmpDir),
+    dryRun: Boolean(run.tmpDir),
     kind: 'fetch',
-    scratchDir: tmpDir,
+    scratchDir: run.tmpDir,
   });
-  if (result.redirectWarning) io.warn(result.redirectWarning);
+  if (result.redirectWarning) run.io.warn(result.redirectWarning);
   // Report the real would-be location, not the throwaway dir that is about to be deleted.
   return { dir: result.dataDir, redirectedToGlobal: result.redirected };
 }
@@ -314,14 +288,13 @@ function persistFreshArtifact(
 // is freshly written (T-22). Best-effort: never let chunking break the main result.
 function persistSectionsIfFresh(
   targetDir: string,
-  artifact: any,
-  currentTime: Date,
-  cacheStatus: any,
-  summaryLevel: SummaryLevel
+  artifact: ResearchArtifact,
+  cacheStatus: CacheHitStatus,
+  run: FetchRun
 ): void {
   if (cacheStatus !== 'miss' && cacheStatus !== 'refreshed') return;
   try {
-    persistSectionArtifacts(targetDir, artifact, currentTime, summaryLevel);
+    persistSectionArtifacts(targetDir, artifact, run.currentTime, run.summaryLevel);
   } catch {
     /* section generation is non-essential; ignore failures */
   }
@@ -344,17 +317,11 @@ function emitFetchError(err: unknown, url: string, io: CliIo): never {
  * Multi-URL batches keep prior successes as failure rows. Flag validation runs before this loop,
  * so every error that reaches here is per-URL -- including INVALID_URL / MISSING_URL_SCHEME.
  */
-function failureRowOrRethrow(
-  url: string,
-  err: unknown,
-  dryRun: boolean,
-  batch: boolean,
-  io: CliIo,
-  spinner: FetchCommandSpinner
-) {
+function failureRowOrRethrow(url: string, err: unknown, run: FetchRun) {
+  const { dryRun, io, spinner } = run;
   // Invalid URLs fail before ux.action.start; stopping a never-started spinner prints noise.
   if (!io.json && spinner.running()) spinner.stop('failed');
-  if (!batch) {
+  if (run.urlCount === 1) {
     if (err instanceof Errors.CLIError) throw err;
     emitFetchError(err, url, io);
   }
@@ -367,49 +334,22 @@ function failureRowOrRethrow(
   return row;
 }
 
-async function fetchSingleTarget(
-  url: string,
-  ctx: {
-    currentTime: Date;
-    tmpDir: string | null;
-    summaryLevel: SummaryLevel;
-    dryRun: boolean;
-  },
-  deps: {
-    flags: FetchCommandFlags;
-    io: CliIo;
-    spinner: FetchCommandSpinner;
-    urlCount: number;
-  }
-): Promise<any> {
-  const { currentTime, tmpDir, summaryLevel, dryRun } = ctx;
-  const { flags, io, spinner, urlCount } = deps;
-  const target = resolveArtifactTargetOrFail(io, url, flags);
-
-  const { cacheKey, located, normalizedUrl, roots } = target;
+async function fetchSingleTarget(url: string, run: FetchRun) {
+  const { dryRun, flags, io, spinner } = run;
+  const target = resolveArtifactTargetOrFail(url, run);
+  const { cacheKey, normalizedUrl, roots } = target;
 
   if (!io.json) {
     spinner.start('Fetching ' + normalizedUrl);
   }
 
   const { cacheStatus, freshnessState, artifact, storageDir, redirectedToGlobal } =
-    await resolveArtifact(
-      normalizedUrl,
-      cacheKey,
-      roots,
-      tmpDir,
-      currentTime,
-      located,
-      summaryLevel,
-      flags,
-      io
-    );
+    await resolveArtifact(target, run);
 
-  persistSectionsIfFresh(tmpDir ?? storageDir, artifact, currentTime, cacheStatus, summaryLevel);
+  persistSectionsIfFresh(run.tmpDir ?? storageDir, artifact, cacheStatus, run);
 
   if (!io.json) {
-    const reported = reportCacheStatus(cacheStatus, dryRun);
-    spinner.stop(FETCH_STATUS_LABEL[reported] ?? reported);
+    spinner.stop(FETCH_STATUS_LABEL[reportCacheStatus(cacheStatus, dryRun)]);
   }
 
   const resultData = buildFetchResultData({
@@ -432,8 +372,9 @@ async function fetchSingleTarget(
       io.log('[dry-run] Preview only — cache was not written.');
     }
     io.log(resultData.content);
-    if (urlCount > 1) {
-      io.log('\n' + '='.repeat(40) + '\n');
+    const separator = batchSeparator(run.urlCount > 1);
+    if (separator) {
+      io.log(`\n${separator}\n`);
     }
   }
 
@@ -441,10 +382,7 @@ async function fetchSingleTarget(
 }
 
 // Copies Phase 2 capability provenance from a capture outcome onto the artifact metadata.
-function applyCaptureMetadata(
-  artifact: any,
-  capture: Awaited<ReturnType<typeof capturePage>>
-): void {
+function applyCaptureMetadata(artifact: ResearchArtifact, capture: CaptureOutcome): void {
   const meta = artifact.metadata;
   meta.capture_method = capture.captureMethod;
   meta.docs_engine = capture.capabilities.docsEngine ?? null;
@@ -457,7 +395,7 @@ function applyCaptureMetadata(
   }
 }
 
-function handleStaleRevalidationResult(io: CliIo, revalResult: any): void {
+function handleStaleRevalidationResult(io: CliIo, revalResult: RevalidationResult): void {
   if (revalResult.status !== 'stale') return;
   if (revalResult.allowed) {
     io.warn(

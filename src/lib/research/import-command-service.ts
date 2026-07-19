@@ -7,28 +7,17 @@ import { buildCompressed } from './compress.js';
 import { durationFlagError, getPolicy } from './freshness.js';
 import { applyAutoTags } from './keywords.js';
 import { persistArtifact } from './persist-artifact.js';
-import { importCacheWriteStatus } from '../write-status.js';
 import { sanitizePromptInjection } from './prompt-injection.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 import { getArtifactPath } from './storage.js';
 import { loadStoreRoots, type StoreRoots } from './store-roots.js';
 import { estimateTokens } from './token-estimate.js';
 import { deriveCacheKey } from './cache-key.js';
-import { looksLikeSchemelessUrl, normalizeUrl } from './url.js';
+import { normalizeUrl } from './url.js';
+import { failInvalidUrl, type CliIo } from './cli-io.js';
 
 const INPUT_LIMIT_BYTES = 1024 * 1024;
 const STDIN_TIMEOUT_MS = 1000;
-
-export interface CliIo {
-  bin: string;
-  configDir: string | undefined;
-  dataDir: string;
-  cwd: string;
-  json: boolean;
-  warn(msg: string): void;
-  log(msg: string): void;
-  error(msg: string, opts: { exit: number; code?: string; suggestions?: string[] }): never;
-}
 
 export interface ImportCommandFileStat {
   isFile(): boolean;
@@ -37,7 +26,7 @@ export interface ImportCommandFileStat {
 
 export interface ImportCommandInputHooks {
   stdinIsInteractive(): boolean;
-  readStdin(limitBytes?: number): Promise<string>;
+  readStdin(limitBytes: number): Promise<string>;
   fsExistsSync(filePath: string): boolean;
   fsStatSync(filePath: string): ImportCommandFileStat;
   fsReadFileSync(filePath: string): string;
@@ -59,14 +48,6 @@ export interface ImportCommandArgs {
   url?: string;
 }
 
-export interface ImportCommandServiceOptions {
-  args: ImportCommandArgs;
-  flags: ImportCommandFlags;
-  dryRun: boolean;
-  io: CliIo;
-  input: ImportCommandInputHooks;
-}
-
 export interface PreparedImportCommand {
   args: ImportCommandArgs;
   artifact: ResearchArtifact;
@@ -78,7 +59,7 @@ export interface PreparedImportCommand {
   sourceUrls: string[];
 }
 
-export function validateImportCommandRequest(
+function validateImportCommandRequest(
   args: ImportCommandArgs,
   flags: ImportCommandFlags,
   io: CliIo
@@ -88,14 +69,13 @@ export function validateImportCommandRequest(
 
   const hasSingle = Boolean(args.url);
   const hasMulti = flags.sourceUrls.length > 0;
-  validateSourceMode(hasSingle, hasMulti, flags.sourceUrls, flags, io);
+  validateSourceMode(hasSingle, hasMulti, flags, io);
 }
 
-export async function runImportCommandService(opts: ImportCommandServiceOptions): Promise<unknown> {
-  const prepared = await prepareImportCommandService(opts);
-  return finishImportCommandService(prepared, opts.dryRun, opts.io);
-}
-
+/**
+ * Validate the request, read and validate the input content, and build the artifact — everything
+ * up to (but excluding) the cache write, so the command can resolve dry-run mode in between.
+ */
 export async function prepareImportCommandService(opts: {
   args: ImportCommandArgs;
   flags: ImportCommandFlags;
@@ -113,16 +93,16 @@ export async function prepareImportCommandService(opts: {
   const singleNormalizedUrl = hasSingle ? sourceUrls[0] || '' : '';
   const cacheKey = deriveImportCacheKey(hasSingle, singleNormalizedUrl, sourceUrls, flags);
 
-  const artifact = buildImportArtifact(
+  const artifact = buildImportArtifact({
     hasSingle,
-    args.url,
+    singleUrl: args.url,
     singleNormalizedUrl,
     sourceUrls,
     cacheKey,
     rawInput,
     flags,
-    io
-  );
+    io,
+  });
 
   const roots = loadStoreRoots({
     configDir: io.configDir,
@@ -143,6 +123,7 @@ export async function prepareImportCommandService(opts: {
   };
 }
 
+/** Persist (or dry-run preview) a prepared import and return the command's `--json` data payload. */
 export function finishImportCommandService(
   prepared: PreparedImportCommand,
   dryRun: boolean,
@@ -185,7 +166,7 @@ export function finishImportCommandService(
     dryRun,
     cache: {
       key: cacheKey,
-      status: importCacheWriteStatus(dryRun),
+      status: dryRun ? 'would_import' : 'imported',
       freshness: 'fresh',
       path: storagePath,
       storage: roots.mode,
@@ -233,7 +214,6 @@ function stdinImportSuggestions(bin: string): string[] {
 function validateSourceMode(
   hasSingle: boolean,
   hasMulti: boolean,
-  _multiUrls: string[],
   flags: ImportCommandFlags,
   io: CliIo
 ): void {
@@ -277,11 +257,7 @@ function validateSourceMode(
   }
 }
 
-async function readStdinWithGuard(
-  input: ImportCommandInputHooks,
-  io: CliIo,
-  limitBytes: number = INPUT_LIMIT_BYTES
-): Promise<string> {
+async function readStdinWithGuard(input: ImportCommandInputHooks, io: CliIo): Promise<string> {
   if (input.stdinIsInteractive()) {
     io.error('No data piped to --stdin.', {
       exit: 2,
@@ -293,7 +269,7 @@ async function readStdinWithGuard(
   let rawInput = '';
   try {
     rawInput = await Promise.race([
-      input.readStdin(limitBytes),
+      input.readStdin(INPUT_LIMIT_BYTES),
       new Promise<string>((_, reject) =>
         setTimeout(() => reject(new Error('STDIN_TIMEOUT')), STDIN_TIMEOUT_MS)
       ),
@@ -418,26 +394,11 @@ function getSourceUrls(
     } catch (err) {
       // Shared exit point: a forgotten scheme reports MISSING_URL_SCHEME like every other command,
       // while genuinely malformed input stays INVALID_URL.
-      failInvalidUrl(io, u, (err as Error).message);
+      failInvalidUrl(io.error, u, (err as Error).message);
     }
   });
   // Deduplicate after normalization so repeated --source-url values do not inflate the key.
   return hasMulti ? [...new Set(normalized)].sort() : normalized;
-}
-
-function failInvalidUrl(io: CliIo, url: string, message: string): never {
-  if (looksLikeSchemelessUrl(url)) {
-    io.error(message, {
-      exit: 2,
-      code: 'MISSING_URL_SCHEME',
-      suggestions: [`Use a full URL: https://${url}`],
-    });
-  }
-  io.error(`Invalid URL: ${message}`, {
-    exit: 2,
-    code: 'INVALID_URL',
-    suggestions: ['Provide a valid http:// or https:// URL.'],
-  });
 }
 
 function deriveImportCacheKey(
@@ -453,16 +414,18 @@ function deriveImportCacheKey(
   return createHash('sha256').update(combinedString).digest('hex');
 }
 
-function buildImportArtifact(
-  hasSingle: boolean,
-  singleUrl: string | undefined,
-  singleNormalizedUrl: string,
-  sourceUrls: string[],
-  cacheKey: string,
-  rawInput: string,
-  flags: ImportCommandFlags,
-  io: CliIo
-): ResearchArtifact {
+function buildImportArtifact(opts: {
+  hasSingle: boolean;
+  singleUrl: string | undefined;
+  singleNormalizedUrl: string;
+  sourceUrls: string[];
+  cacheKey: string;
+  rawInput: string;
+  flags: ImportCommandFlags;
+  io: CliIo;
+}): ResearchArtifact {
+  const { hasSingle, singleUrl, singleNormalizedUrl, sourceUrls, cacheKey, rawInput, flags, io } =
+    opts;
   const currentTime = new Date();
   const ttl = flags.ttl || null;
   const { freshWindowMs } = getPolicy(flags.tier, ttl);

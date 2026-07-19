@@ -3,7 +3,6 @@ import { ConfigCommand, configScopeFlags } from './base.js';
 import { KEY_META, validKeysHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
 import { persistConfigPatch } from '../../lib/config-persist.js';
-import { configWriteStatus } from '../../lib/write-status.js';
 import type { ConfigWriteResult } from '../../lib/cli-result-types.js';
 
 export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
@@ -76,13 +75,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     const dryRun = this.effectiveDryRun(this.flags['dry-run']);
     if (dryRun) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would set ${keyArg} = ${formatted} (${scope})`);
-      return {
-        key: keyArg,
-        value: parsed,
-        scope,
-        dryRun: true,
-        status: configWriteStatus(true, 'set'),
-      };
+      return { key: keyArg, value: parsed, scope, dryRun: true, status: 'would_set' };
     }
 
     const persisted = persistConfigPatch({
@@ -103,13 +96,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
     }
 
     if (!this.jsonEnabled()) this.log(`Set ${keyArg} = ${formatted} (${scope})`);
-    return {
-      key: keyArg,
-      value: parsed,
-      scope,
-      dryRun: false,
-      status: configWriteStatus(false, 'set'),
-    };
+    return { key: keyArg, value: parsed, scope, dryRun: false, status: 'set' };
   }
 }
 

@@ -82,6 +82,9 @@ export interface FetchResult {
   content: string;
 }
 
+/** The fetched-page fields artifact building consumes — FetchResult minus the transport status. */
+export type FetchedContent = Omit<FetchResult, 'status'>;
+
 export function looksLikeHtml(text: string): boolean {
   const trimmed = text.trimStart().toLowerCase();
   return (

@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 import { getSiteModuleById } from '../../sites/index.js';
 import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/types.js';
-import { fetchStaticHtml } from './fetcher.js';
-import { extractHtmlContent } from './extract.js';
+import { fetchStaticHtml, type FetchedContent, type FetchResult } from './fetcher.js';
+import { extractHtmlContent, type ExtractionResult } from './extract.js';
 import { writeArtifact } from './storage.js';
 import { evaluateFreshness, getPolicy } from './freshness.js';
 import { buildCompressed } from './compress.js';
@@ -24,8 +24,8 @@ function buildMetadata(
   url: string,
   normalizedUrl: string,
   cacheKey: string,
-  fetchResult: any,
-  extraction: any,
+  fetchResult: FetchedContent,
+  extraction: ExtractionResult,
   tier: 'stable' | 'standard' | 'volatile',
   ttl: string | null,
   currentTime: Date,
@@ -83,7 +83,7 @@ function buildErrorArtifact(
   url: string,
   normalizedUrl: string,
   cacheKey: string,
-  fetchResult: Parameters<typeof createArtifactFromFetch>[3],
+  fetchResult: FetchedContent,
   tier: 'stable' | 'standard' | 'volatile',
   ttl: string | null,
   currentTime: Date,
@@ -128,20 +128,8 @@ export function createArtifactFromFetch(
   url: string,
   normalizedUrl: string,
   cacheKey: string,
-  fetchResult: {
-    contentType: string | null;
-    etag: string | null;
-    lastModified: string | null;
-    finalUrl: string;
-    responseSize: number;
-    content: string;
-  },
-  extraction: {
-    title: string;
-    detailedMarkdown: string;
-    confidence: 'high' | 'medium' | 'low';
-    qualityNotes: string[];
-  },
+  fetchResult: FetchedContent,
+  extraction: ExtractionResult,
   tier: 'stable' | 'standard' | 'volatile',
   ttl: string | null,
   currentTime: Date,
@@ -207,8 +195,8 @@ function preserveUserMetadata(
 function persistRefreshedArtifact(
   dataDir: string,
   meta: ResearchArtifactMetadata,
-  fetchResult: Parameters<typeof createArtifactFromFetch>[3],
-  extraction: Parameters<typeof createArtifactFromFetch>[4],
+  fetchResult: FetchedContent,
+  extraction: ExtractionResult,
   currentTime: Date,
   options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel },
   siteFetch?: SiteFetchResult
@@ -238,7 +226,7 @@ function persistRefreshedArtifact(
 async function handleRevalidateResponse(
   dataDir: string,
   existing: ResearchArtifact,
-  fetchResult: any,
+  fetchResult: FetchResult,
   currentTime: Date,
   options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel }
 ): Promise<RevalidationResult> {

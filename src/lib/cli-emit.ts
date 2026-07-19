@@ -11,9 +11,17 @@ export interface JsonEnvelopeParts {
   ref?: string;
 }
 
-/** Pure envelope builder — no I/O. */
-export function buildJsonEnvelope(parts: JsonEnvelopeParts): Record<string, unknown> {
-  return buildEnvelope({
+/** Print the envelope as pretty JSON on stdout (the machine-readable channel). */
+export function printJsonEnvelope(envelope: Record<string, unknown>): void {
+  console.log(JSON.stringify(envelope, null, 2));
+}
+
+/**
+ * For BaseCommand.toErrorJson: write error lines to stderr and return the envelope object
+ * (oclif prints the return value to stdout).
+ */
+export function writeJsonErrorStderr(parts: JsonEnvelopeParts): Record<string, unknown> {
+  const envelope = buildEnvelope({
     command: parts.command,
     ok: parts.ok,
     exitCode: parts.exitCode,
@@ -23,27 +31,6 @@ export function buildJsonEnvelope(parts: JsonEnvelopeParts): Record<string, unkn
     suggestions: parts.suggestions,
     ref: parts.ref,
   });
-}
-
-export function printJsonEnvelope(envelope: Record<string, unknown>): void {
-  console.log(JSON.stringify(envelope, null, 2));
-}
-
-/** Write stderr (if any) + stdout JSON, set exitCode, and exit. */
-export function writeJsonAndExit(envelope: Record<string, unknown>, exitCode: number): never {
-  process.exitCode = exitCode;
-  const message = String(envelope.stderr ?? '');
-  if (message) process.stderr.write(`${message}\n`);
-  printJsonEnvelope(envelope);
-  process.exit();
-}
-
-/**
- * For BaseCommand.toErrorJson: write error lines to stderr and return the envelope object
- * (oclif prints the return value to stdout).
- */
-export function writeJsonErrorStderr(parts: JsonEnvelopeParts): Record<string, unknown> {
-  const envelope = buildJsonEnvelope(parts);
   if (parts.stderr) process.stderr.write(`${parts.stderr}\n`);
   return envelope;
 }
@@ -54,14 +41,14 @@ export interface PreflightExit {
   envelope: Record<string, unknown>;
 }
 
-/** Print a preflight usage/error result (JSON or human) and exit. */
+/** Print a preflight usage/error result (stderr + JSON envelope, or oclif-style human error) and exit. */
 export function exitWithPreflight(result: PreflightExit): never {
-  if (result.json) {
-    writeJsonAndExit(result.envelope, result.exitCode);
-  }
   process.exitCode = result.exitCode;
   const message = String(result.envelope.stderr ?? '');
-  if (message) {
+  if (result.json) {
+    if (message) process.stderr.write(`${message}\n`);
+    printJsonEnvelope(result.envelope);
+  } else if (message) {
     console.error(` ›   Error: ${message.replaceAll('\n', '\n ›   ')}`);
   }
   process.exit();

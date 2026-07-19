@@ -4,7 +4,6 @@ import { enrichRowErrorEnvelope } from '../lib/envelope.js';
 import {
   runFetchCommandService,
   validateFetchCommandFlags,
-  type CliIo,
   type FetchCommandFlags,
 } from '../lib/research/fetch-command-service.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
@@ -100,19 +99,6 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
    */
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
     return enrichRowErrorEnvelope(this.baseSuccessJson(data), data);
-  }
-
-  private cliIo(): CliIo {
-    return {
-      bin: this.config.bin,
-      configDir: this.config.configDir,
-      dataDir: this.config.dataDir,
-      cwd: process.cwd(),
-      json: this.jsonEnabled(),
-      warn: (msg) => void this.warn(msg),
-      log: (msg) => this.log(msg),
-      error: (msg, opts) => this.error(msg, opts),
-    };
   }
 
   private serviceFlags(): FetchCommandFlags {

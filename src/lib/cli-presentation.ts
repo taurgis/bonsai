@@ -2,31 +2,27 @@ import { colors } from './color.js';
 
 const HUMAN_LABEL_WIDTH = 25;
 
-export const CLI_FLAG_DESCRIPTION_FRAGMENTS = {
-  durationExamples: 'e.g. "2h", "7d", "6m"',
-  freshnessTierPolicy: 'freshness tier policy',
-  topic: 'topic',
-  storageSecretScope: 'secrets always stored globally',
-  taxonomicTags: 'taxonomic tags',
-  filterTags: 'tags',
-  repeatable: 'can be repeated',
-} as const;
+// Repeated verbatim across several flag descriptions; single-use wording lives inline below.
+const DURATION_EXAMPLES = 'e.g. "2h", "7d", "6m"';
+const SECRET_STORAGE_NOTE = 'secrets always stored globally';
 
+/** Shared flag/help copy so identical flags read identically across commands. */
 export const CLI_FLAG_DESCRIPTIONS = {
-  freshnessTierPolicy: CLI_FLAG_DESCRIPTION_FRAGMENTS.freshnessTierPolicy,
-  statusFreshnessTierPolicy: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.freshnessTierPolicy} to evaluate; when omitted, uses the cached entry's own tier`,
-  fetchTtl: `TTL duration for freshness (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
-  importTtl: `TTL duration for imported note freshness (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
-  statusTtl: `TTL duration to evaluate freshness (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
-  maxAge: `maximum cache age to accept (${CLI_FLAG_DESCRIPTION_FRAGMENTS.durationExamples})`,
-  fetchStorage: `override where this result is cached (${CLI_FLAG_DESCRIPTION_FRAGMENTS.storageSecretScope})`,
-  importStorage: `override where this note is cached (${CLI_FLAG_DESCRIPTION_FRAGMENTS.storageSecretScope})`,
-  fetchTopic: `main research ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} for metadata`,
-  importTopic: `main ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} for this research note`,
-  filterTopic: `exact ${CLI_FLAG_DESCRIPTION_FRAGMENTS.topic} (case-insensitive)`,
-  fetchTags: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.taxonomicTags} for this research (${CLI_FLAG_DESCRIPTION_FRAGMENTS.repeatable})`,
-  importTags: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.taxonomicTags} (${CLI_FLAG_DESCRIPTION_FRAGMENTS.repeatable})`,
-  filterTags: `${CLI_FLAG_DESCRIPTION_FRAGMENTS.filterTags} to require (must match all)`,
+  freshnessTierPolicy: 'freshness tier policy',
+  statusFreshnessTierPolicy:
+    "freshness tier policy to evaluate; when omitted, uses the cached entry's own tier",
+  fetchTtl: `TTL duration for freshness (${DURATION_EXAMPLES})`,
+  importTtl: `TTL duration for imported note freshness (${DURATION_EXAMPLES})`,
+  statusTtl: `TTL duration to evaluate freshness (${DURATION_EXAMPLES})`,
+  maxAge: `maximum cache age to accept (${DURATION_EXAMPLES})`,
+  fetchStorage: `override where this result is cached (${SECRET_STORAGE_NOTE})`,
+  importStorage: `override where this note is cached (${SECRET_STORAGE_NOTE})`,
+  fetchTopic: 'main research topic for metadata',
+  importTopic: 'main topic for this research note',
+  filterTopic: 'exact topic (case-insensitive)',
+  fetchTags: 'taxonomic tags for this research (can be repeated)',
+  importTags: 'taxonomic tags (can be repeated)',
+  filterTags: 'tags to require (must match all)',
   format: 'output format',
   readOnly:
     '(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE',
@@ -38,7 +34,7 @@ export const CLI_FLAG_DESCRIPTIONS = {
 
 export type HumanField = readonly [label: string, value: string];
 
-export function formatHumanLabel(label: string): string {
+function formatHumanLabel(label: string): string {
   const text = `${label}:`;
   return colors.cyan(text.padEnd(Math.max(HUMAN_LABEL_WIDTH, text.length)));
 }

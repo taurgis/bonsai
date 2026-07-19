@@ -3,7 +3,6 @@ import { ConfigCommand, configScopeFlags } from './base.js';
 import { validKeysHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
 import { persistConfigPatch } from '../../lib/config-persist.js';
-import { configWriteStatus } from '../../lib/write-status.js';
 import type { ConfigWriteResult } from '../../lib/cli-result-types.js';
 
 export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
@@ -47,7 +46,7 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
     const dryRun = this.effectiveDryRun(this.flags['dry-run']);
     if (dryRun) {
       if (!this.jsonEnabled()) this.log(`[dry-run] Would unset ${key} (${scope})`);
-      return { key, scope, dryRun: true, status: configWriteStatus(true, 'unset') };
+      return { key, scope, dryRun: true, status: 'would_unset' };
     }
 
     const persisted = persistConfigPatch({
@@ -68,6 +67,6 @@ export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
     }
 
     if (!this.jsonEnabled()) this.log(`Unset ${key} (${scope})`);
-    return { key, scope, dryRun: false, status: configWriteStatus(false, 'unset') };
+    return { key, scope, dryRun: false, status: 'unset' };
   }
 }
