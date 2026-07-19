@@ -54,6 +54,8 @@ logs/
 .cursor/*
 !.cursor/rules/
 !.cursor/rules/**
+!.cursor/agents/
+!.cursor/agents/**
 
 # Agent specific local paths
 .gemini/
