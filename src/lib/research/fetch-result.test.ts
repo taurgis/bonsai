@@ -44,7 +44,6 @@ describe('buildFetchResultData', () => {
 
   it('reports would_fetch and dryRun on a previewed miss', () => {
     const result = buildFetchResultData({
-      bin: 'bonsai',
       url: 'https://example.com',
       normalizedUrl: 'https://example.com/',
       cacheKey: 'abc',
@@ -66,7 +65,6 @@ describe('buildFetchResultData', () => {
 describe('buildFetchFailureResult', () => {
   it('prefers structured error fields over fallback guidance', () => {
     const row = buildFetchFailureResult({
-      bin: 'bonsai',
       url: 'https://example.com',
       dryRun: true,
       err: { message: 'boom', code: 'FETCH_FAILED', suggestions: ['retry'] },
