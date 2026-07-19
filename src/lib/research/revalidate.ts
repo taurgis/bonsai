@@ -5,6 +5,9 @@ import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/type
 import { fetchStaticHtml, type FetchedContent, type FetchResult } from './fetcher.js';
 import { extractHtmlContent, type ExtractionResult } from './extract.js';
 import { writeArtifact } from './storage.js';
+// ponytail: in-place revalidation uses writeArtifact (not writeArtifactSecurely). First-time
+// project writes scan+redirect secrets; refreshing an existing entry stays on its current path
+// (see resolveArtifact in fetch-command-service.ts). Upgrade: secret re-scan on refresh if needed.
 import { evaluateFreshness, resolveFreshnessPolicy } from './freshness.js';
 import { buildCompressed } from './compress.js';
 import type { SummaryLevel } from '../config/schema.js';

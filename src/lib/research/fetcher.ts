@@ -9,7 +9,7 @@ const DEFAULT_FETCH_TIMEOUT_MS = 10_000;
 const DEFAULT_BODY_LIMIT_BYTES = 2 * 1024 * 1024;
 const DEFAULT_MAX_REDIRECTS = 5;
 const HTTP_NOT_MODIFIED = 304;
-const REDIRECT_STATUS_CODES = [301, 302, 303, 307, 308] as const;
+const REDIRECT_STATUS_CODES = new Set([301, 302, 303, 307, 308]);
 
 // Runs one fetch attempt with its own fresh AbortController/timeout, so that when `doFetch` makes
 // a second attempt (the proxy fallback below) it gets the full timeout budget rather than
@@ -287,7 +287,7 @@ async function fetchWithRedirects(
       timeout
     );
 
-    if ((REDIRECT_STATUS_CODES as readonly number[]).includes(res.status)) {
+    if (REDIRECT_STATUS_CODES.has(res.status)) {
       redirectCount++;
       if (redirectCount > maxRedirects) {
         throw new Error(`Too many redirects. Exceeded limit of ${maxRedirects}.`);
