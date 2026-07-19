@@ -242,5 +242,21 @@ export default function register(harness, fixtures) {
       expect(env?.data?.sourceDocUrl === `${url}.md`, `sourceDocUrl ${env?.data?.sourceDocUrl}`);
       expect(env?.data?.content?.includes('Hybrid'), 'content mentions Hybrid');
     });
+
+    check('fetch Salesforce Help article via b2c-developer-tooling Markdown mirror twin (AUDIT_NETWORK)', () => {
+      // B2C Commerce Help articles' id (cc.<slug>.htm) maps to a Markdown file the officially
+      // published b2c-developer-tooling project mirrors at .../help/<category>/<slug>.md. The site
+      // module probes it before the browser and must record the mirror's URL as provenance.
+      const url =
+        'https://help.salesforce.com/s/articleView?id=cc.b2c_inventory_list_object_import_export.htm&type=5';
+      const mirrorUrl =
+        'https://salesforcecommercecloud.github.io/b2c-developer-tooling/help/help-admin/b2c_inventory_list_object_import_export.md';
+      const r = run([url, '--json'], { timeout: 90000 });
+      expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+      const env = parseJson(r.stdout);
+      expect(env?.data?.source?.captureMethod === 'route_markdown', `captureMethod ${env?.data?.source?.captureMethod}`);
+      expect(env?.data?.sourceDocUrl === mirrorUrl, `sourceDocUrl ${env?.data?.sourceDocUrl}`);
+      expect(env?.data?.content?.includes('Inventory List'), 'content mentions Inventory List');
+    });
   }
 }

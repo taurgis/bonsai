@@ -27,9 +27,11 @@ filename and the reason two slightly different URLs reuse the same entry.
 How the content was obtained: `static_fetch` (plain HTTP GET, the default),
 `browser_fallback` (rendered in a headless browser, used for `--rendered` and
 some [site modules](/reference/site-modules)), `agent_supplied` (handed in via
-[`import`](/how-to/importing-synthesis)), `route_markdown` (the page's
-machine-readable `.md` route, when one is published), or `github_source` (raw
-source fetched from the page's GitHub edit link).
+[`import`](/how-to/importing-synthesis)), `route_markdown` (a machine-readable
+`.md` twin of the page — usually on the same host, but for a couple of
+[site modules](/reference/site-modules) it's a third-party mirror on a
+different, documented host), or `github_source` (raw source fetched from the
+page's GitHub edit link).
 
 ### Compressed vs. detailed
 

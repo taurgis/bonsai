@@ -89,6 +89,10 @@ export interface SiteFetchResult {
     content: string;
   };
   extraction: ExtractionResult; // { title, detailedMarkdown, confidence, qualityNotes }
+  // Optional provenance: set when the module resolved content from somewhere
+  // other than a straight render of the page (e.g. a Markdown twin route).
+  captureMethod?: CaptureMethod; // e.g. 'route_markdown', 'browser_fallback'
+  sourceDocUrl?: string;
 }
 ```
 
@@ -170,7 +174,7 @@ site_module_id: string | null;
 
 | `id` | Domains | Custom behavior |
 | --- | --- | --- |
-| `salesforce` | `help.salesforce.com` | `fetchPage`, `rendered: true`. |
+| `salesforce` | `help.salesforce.com` | `fetchPage` (b2c-developer-tooling Markdown mirror twin first, rendered fallback), `rendered: true`. |
 | `salesforce-developer` | `developer.salesforce.com` | `fetchPage` (route `.md` twin first, rendered fallback), `rendered: true`. |
 | `tanstack` | `tanstack.com` | None. Relies on the generic source-resolution path that prefers a page's GitHub Markdown source (keeping fenced code intact), so it deliberately does **not** force `rendered`. |
 
@@ -196,15 +200,39 @@ export const salesforce: SiteModule = {
 };
 ```
 
-- **`fetchPage`** renders the article, targets Help's content containers
-  (e.g. `c-hc-documentation-article`, `.markdown-content`), strips Help-only
-  chrome (the article-feedback widget, in-page table of contents, breadcrumbs,
-  screen-reader-only text), and normalizes Coveo's internal
-  `/help_doccontent?id=…` links to the canonical `/s/articleView?id=…` page.
+- **`fetchPage`** first normalizes Coveo's internal `/help_doccontent?id=…`
+  links to the canonical `/s/articleView?id=…` page, then probes the
+  **Salesforce B2C Developer Tooling** project's Markdown mirror (a GA,
+  officially published project under the `SalesforceCommerceCloud` GitHub
+  org — its docs/MCP/CLI `docs` tool bundles the same content). B2C Commerce
+  Help articles' `id` query param follows a stable `cc.<slug>.htm` pattern,
+  and that `<slug>` matches a file the mirror publishes at
+  `https://salesforcecommercecloud.github.io/b2c-developer-tooling/help/<category>/<slug>.md`
+  for one of two categories, `help-admin` (import/export, jobs,
+  replication, security, Account Manager, permissions, logs, inventory ops)
+  or `help-merchant` (catalogs, products, promotions, search, content,
+  analytics, SEO). There is no public index of which slugs exist or which
+  category owns a given slug — that mapping ships inside the
+  b2c-developer-tooling CLI's bundled package, not as a fetchable file — so
+  the module derives the slug from the URL and probes both categories in
+  turn, validating each response as strictly as the Developer twin (below):
+  `Content-Type: text/markdown`, redirect chain ending on the mirror's host
+  over https, non-HTML/non-error body, and at least 100 characters of
+  extracted text (a thinner response reads as a rollout stub, not a real
+  article). A validated twin replaces the ~45 s browser render with one
+  static request and is recorded with `capture_method: route_markdown` plus
+  the mirror's `.md` URL in `source_doc_url`.
+- When no article `id` matches the `cc.<slug>.htm` pattern, or neither
+  category's twin validates (the mirror only covers a curated subset of Help
+  content), **`fetchPage`** falls back to rendering the article and targeting
+  Help's content containers (e.g. `c-hc-documentation-article`,
+  `.markdown-content`), stripping Help-only chrome (the article-feedback
+  widget, in-page table of contents, breadcrumbs, screen-reader-only text).
 
 Example URLs it owns:
 
 ```
+https://help.salesforce.com/s/articleView?id=cc.b2c_inventory_list_object_import_export.htm&type=5   ← Markdown mirror twin
 https://help.salesforce.com/s/articleView?id=sf.users_about.htm&type=5
 https://help.salesforce.com/help_doccontent?id=sf.query.htm   → normalized to /s/articleView
 ```
@@ -227,13 +255,14 @@ export const salesforceDeveloper: SiteModule = {
   URL: `/docs/<cloud>/<book>/guide/<article>[.html]` also serves
   `<article>.md` with `Content-Type: text/markdown`. The module derives that
   URL, fetches it statically, and validates it strictly (markdown content
-  type, same host after redirects, non-HTML/non-error body) before trusting
-  it — unsupported articles 404, and `atlas.*` books answer the `.md` route
-  with an HTTP 200 HTML shell. A validated twin replaces the ~45 s browser
-  render with a single request, keeps code fences and admonitions intact, and
-  is recorded with `capture_method: route_markdown` plus the `.md` URL in
-  `source_doc_url`. Unresolvable `::include{…}` snippet directives are
-  stripped, with a quality note.
+  type, same host after redirects, non-HTML/non-error body, at least 100
+  characters of extracted text) before trusting it — unsupported articles
+  404, and `atlas.*` books answer the `.md` route with an HTTP 200 HTML
+  shell. A validated twin replaces the ~45 s browser render with a single
+  request, keeps code fences and admonitions intact, and is recorded with
+  `capture_method: route_markdown` plus the `.md` URL in `source_doc_url`.
+  Unresolvable `::include{…}` snippet directives are stripped, with a
+  quality note.
 - When no twin validates, **`fetchPage`** falls back to rendering the page
   and reading content out of Developer's web components
   (`doc-content-layout`, `doc-amf-reference`, …). Its capture step also

@@ -64,3 +64,44 @@ export function validateTextArtifact(body: string): ArtifactValidation {
   if (looksLikeErrorPage(trimmed)) return { ok: false, reason: 'body looks like an error page' };
   return { ok: true };
 }
+
+const MARKDOWN_CONTENT_TYPE = 'text/markdown';
+
+/** The subset of a fetch response a Markdown-twin probe needs to validate. */
+export interface MarkdownTwinResponse {
+  contentType: string | null;
+  finalUrl: string;
+  content: string;
+}
+
+/**
+ * Validates a probed `.md`-route response as a trustworthy Markdown twin, the shared trust
+ * contract behind both the developer.salesforce.com and help.salesforce.com twin probes: the
+ * server must label it `text/markdown`, the redirect chain must land on the expected host over
+ * https (never a plain-http downgrade or an on-path host), and the body must pass
+ * {@link validateTextArtifact} (non-empty, non-HTML, not a soft-error page). A 200 HTML "not
+ * found" shell — the most common false positive for a `.md` probe — fails the content-type check
+ * before the body is even inspected.
+ *
+ * @param res - The probe response's content-type, final URL after redirects, and body.
+ * @param allowedHost - Hostname the redirect chain must land on (compared case-insensitively).
+ * @returns True when the response is a trustworthy Markdown twin.
+ */
+export function isValidatedMarkdownTwin(res: MarkdownTwinResponse, allowedHost: string): boolean {
+  if (!res.content) return false;
+  const mediaType = (res.contentType?.split(';')[0] ?? '').trim().toLowerCase();
+  if (mediaType !== MARKDOWN_CONTENT_TYPE) return false;
+  let finalUrl: URL;
+  try {
+    finalUrl = new URL(res.finalUrl);
+  } catch {
+    return false;
+  }
+  if (
+    finalUrl.protocol !== 'https:' ||
+    finalUrl.hostname.toLowerCase() !== allowedHost.toLowerCase()
+  ) {
+    return false;
+  }
+  return validateTextArtifact(res.content).ok;
+}

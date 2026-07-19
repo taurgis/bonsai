@@ -1,6 +1,5 @@
-import { fetchText, type FetchResult } from '../../lib/research/fetcher.js';
-import { validateTextArtifact } from '../../lib/research/docs/validate.js';
-import { extractFromSource } from '../../lib/research/docs/markdown-source.js';
+import { fetchText } from '../../lib/research/fetcher.js';
+import { probeMarkdownTwin, type TwinBodyTransform } from '../markdown-twin.js';
 import type { SiteFetchResult } from '../types.js';
 
 // developer.salesforce.com now publishes a Markdown twin for supported doc articles (the
@@ -11,11 +10,10 @@ import type { SiteFetchResult } from '../types.js';
 //
 // Coverage is rolling out per doc set, so the probe result is only a candidate (T-19/T-24):
 // unsupported articles 404, and atlas.* books answer the .md route with an HTTP 200 HTML SPA
-// shell — which makes the strict content-type + body validation below load-bearing, not
-// defensive garnish.
+// shell — which makes the strict content-type + body validation in probeMarkdownTwin
+// load-bearing, not defensive garnish.
 
 const DEVELOPER_HOST = 'developer.salesforce.com';
-const MARKDOWN_CONTENT_TYPE = 'text/markdown';
 
 // Salesforce's WAF answers 403 unless the User-Agent LEADS with a recognized HTTP-tool token
 // (curl/wget/python-requests pass; bare product names and browser UAs on a non-browser TLS stack
@@ -77,48 +75,20 @@ export function stripIncludeDirectives(md: string): { body: string; dropped: num
   return { body, dropped };
 }
 
-// A probe response counts as the Markdown twin only when the server labels it text/markdown AND
-// the redirect chain ended on https at the developer host AND the body validates as non-HTML,
-// non-error text. Atlas shells fail the content-type check; non-2xx statuses already threw in
-// the fetcher (the probe sends no conditional headers, so a 304 can't occur either).
-function isMarkdownResponse(res: FetchResult): boolean {
-  if (!res.content) return false;
-  const mediaType = (res.contentType?.split(';')[0] ?? '').trim().toLowerCase();
-  if (mediaType !== MARKDOWN_CONTENT_TYPE) return false;
-  let finalUrl: URL;
-  try {
-    finalUrl = new URL(res.finalUrl);
-  } catch {
-    return false;
-  }
-  // Scheme matters, not just host: a redirect hop downgrading to plain http would let an on-path
-  // response be cached as the trusted twin.
-  if (finalUrl.protocol !== 'https:' || finalUrl.hostname.toLowerCase() !== DEVELOPER_HOST) {
-    return false;
-  }
-  return validateTextArtifact(res.content).ok;
+function stripIncludesForTwin(raw: string): TwinBodyTransform {
+  const { body, dropped } = stripIncludeDirectives(raw);
+  if (dropped === 0) return { body };
+  return {
+    body,
+    qualityNote: `${dropped} ::include directive(s) removed (shared snippets are not published on the .md route)`,
+  };
 }
-
-// A real twin is a small static file that answers fast; anything slower should mean "no twin,
-// fall back now" instead of stacking the fetcher's default 10s on top of the browser render.
-const PROBE_TIMEOUT_MS = 4_000;
-
-// The browser path refuses to cache captures under this floor (MIN_CONTAINER_CHARS); a twin that
-// thin is a rollout stub, and falling back gives the rendered page a chance to do better.
-const MIN_TWIN_CHARS = 100;
 
 /**
  * Injectable HTTP fetcher used by `fetchDeveloperRouteMarkdown`. The default is `fetchText`;
  * tests inject a fixture fetcher to avoid real network calls.
- *
- * @param url - Absolute URL to fetch.
- * @param options - Optional request headers and timeout in milliseconds.
- * @returns A `FetchResult` from the HTTP layer.
  */
-export type RouteMarkdownFetcher = (
-  url: string,
-  options?: { headers?: Record<string, string>; timeoutMs?: number }
-) => Promise<FetchResult>;
+export type RouteMarkdownFetcher = typeof fetchText;
 
 /**
  * Probes the derived `.md` route for a developer doc URL. Returns a complete SiteFetchResult
@@ -136,34 +106,10 @@ export async function fetchDeveloperRouteMarkdown(
   const candidate = deriveMarkdownUrl(url);
   if (!candidate) return null;
 
-  let res: FetchResult;
-  try {
-    res = await fetcher(candidate, { headers: PROBE_HEADERS, timeoutMs: PROBE_TIMEOUT_MS });
-  } catch {
-    return null;
-  }
-  if (!isMarkdownResponse(res)) return null;
-
-  const { body, dropped } = stripIncludeDirectives(res.content);
-  const extraction = extractFromSource(body, res.finalUrl);
-  if (extraction.detailedMarkdown.length < MIN_TWIN_CHARS) return null;
-  if (dropped > 0) {
-    extraction.qualityNotes = [
-      ...(extraction.qualityNotes ?? []),
-      `${dropped} ::include directive(s) removed (shared snippets are not published on the .md route)`,
-    ];
-  }
-  return {
-    fetchResult: {
-      contentType: res.contentType,
-      etag: res.etag,
-      lastModified: res.lastModified,
-      finalUrl: res.finalUrl,
-      responseSize: res.responseSize,
-      content: res.content,
-    },
-    extraction,
-    captureMethod: 'route_markdown',
-    sourceDocUrl: res.finalUrl,
-  };
+  return probeMarkdownTwin([candidate], {
+    allowedHost: DEVELOPER_HOST,
+    fetcher,
+    headers: PROBE_HEADERS,
+    transformBody: stripIncludesForTwin,
+  });
 }

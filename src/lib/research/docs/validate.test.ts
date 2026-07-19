@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { looksLikeErrorPage, isSameDocsOrigin, validateTextArtifact } from './validate.js';
+import {
+  looksLikeErrorPage,
+  isSameDocsOrigin,
+  validateTextArtifact,
+  isValidatedMarkdownTwin,
+} from './validate.js';
 
 const FIXTURES = join(import.meta.dirname, '__fixtures__');
 const load = (name: string) => readFileSync(join(FIXTURES, name), 'utf8');
@@ -56,5 +61,52 @@ describe('validateTextArtifact', () => {
       ok: false,
       reason: 'body looks like an error page',
     });
+  });
+});
+
+describe('isValidatedMarkdownTwin', () => {
+  const HOST = 'example.com';
+  const twin = (overrides: Partial<Parameters<typeof isValidatedMarkdownTwin>[0]> = {}) => ({
+    contentType: 'text/markdown; charset=utf-8',
+    finalUrl: `https://${HOST}/doc.md`,
+    content: '# Title\n\nEnough body text to clear the minimum length check for validation.\n',
+    ...overrides,
+  });
+
+  it('accepts a same-host https response labeled text/markdown with a real body', () => {
+    expect(isValidatedMarkdownTwin(twin(), HOST)).toBe(true);
+  });
+
+  it('rejects a non-markdown content type (e.g. an HTML shell)', () => {
+    expect(isValidatedMarkdownTwin(twin({ contentType: 'text/html; charset=utf-8' }), HOST)).toBe(
+      false
+    );
+  });
+
+  it('rejects a redirect that left the allowed host', () => {
+    expect(isValidatedMarkdownTwin(twin({ finalUrl: 'https://evil.example/doc.md' }), HOST)).toBe(
+      false
+    );
+  });
+
+  it('rejects a redirect that downgraded to plain http on the allowed host', () => {
+    expect(isValidatedMarkdownTwin(twin({ finalUrl: `http://${HOST}/doc.md` }), HOST)).toBe(false);
+  });
+
+  it('rejects an empty body', () => {
+    expect(isValidatedMarkdownTwin(twin({ content: '' }), HOST)).toBe(false);
+  });
+
+  it('rejects a body that is HTML despite a markdown content type', () => {
+    expect(
+      isValidatedMarkdownTwin(
+        twin({ content: '<!DOCTYPE html><html><body>disguised</body></html>' }),
+        HOST
+      )
+    ).toBe(false);
+  });
+
+  it('compares the allowed host case-insensitively', () => {
+    expect(isValidatedMarkdownTwin(twin(), HOST.toUpperCase())).toBe(true);
   });
 });
