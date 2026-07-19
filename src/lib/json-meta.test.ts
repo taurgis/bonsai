@@ -13,9 +13,7 @@ describe('tryJsonMetaOutput', () => {
     expect(result).not.toBeNull();
     expect(result!.exitCode).toBe(0);
     expect(result!.envelope).toMatchObject({ ok: true, exitCode: 0 });
-    expect(result!.envelope.data).toEqual(
-      expect.objectContaining({ help: expect.any(String) })
-    );
+    expect(result!.envelope.data).toEqual(expect.objectContaining({ help: expect.any(String) }));
   });
 
   it('returns a success envelope for --json --version', async () => {

@@ -93,9 +93,18 @@ describe('durationFlagError', () => {
 
 describe('resolveFreshnessPolicy', () => {
   it('uses tier defaults for stable, standard, and volatile', () => {
-    expect(resolveFreshnessPolicy('stable')).toEqual({ freshWindowMs: 180 * DAY, graceWindowMs: 60 * DAY });
-    expect(resolveFreshnessPolicy('standard')).toEqual({ freshWindowMs: 30 * DAY, graceWindowMs: 14 * DAY });
-    expect(resolveFreshnessPolicy('volatile')).toEqual({ freshWindowMs: 7 * DAY, graceWindowMs: 5 * DAY });
+    expect(resolveFreshnessPolicy('stable')).toEqual({
+      freshWindowMs: 180 * DAY,
+      graceWindowMs: 60 * DAY,
+    });
+    expect(resolveFreshnessPolicy('standard')).toEqual({
+      freshWindowMs: 30 * DAY,
+      graceWindowMs: 14 * DAY,
+    });
+    expect(resolveFreshnessPolicy('volatile')).toEqual({
+      freshWindowMs: 7 * DAY,
+      graceWindowMs: 5 * DAY,
+    });
   });
 
   it('applies a TTL override and scales grace proportionally per tier', () => {
@@ -105,9 +114,13 @@ describe('resolveFreshnessPolicy', () => {
       graceWindowMs: Math.floor(60 * DAY * (14 / 30)),
     });
     // stable scaling uses 60/180.
-    expect(resolveFreshnessPolicy('stable', '90d').graceWindowMs).toBe(Math.floor(90 * DAY * (60 / 180)));
+    expect(resolveFreshnessPolicy('stable', '90d').graceWindowMs).toBe(
+      Math.floor(90 * DAY * (60 / 180))
+    );
     // volatile scaling uses 5/7.
-    expect(resolveFreshnessPolicy('volatile', '14d').graceWindowMs).toBe(Math.floor(14 * DAY * (5 / 7)));
+    expect(resolveFreshnessPolicy('volatile', '14d').graceWindowMs).toBe(
+      Math.floor(14 * DAY * (5 / 7))
+    );
   });
 
   it('ignores a null/empty ttl override and keeps tier defaults', () => {

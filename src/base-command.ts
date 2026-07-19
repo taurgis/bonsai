@@ -1,7 +1,13 @@
 import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
 import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
-import { enrichErrorForDisplay, resolveExitCode, prepareCliError, EXIT_OK, EXIT_STALE_SERVED } from './lib/cli-error-policy.js';
+import {
+  enrichErrorForDisplay,
+  resolveExitCode,
+  prepareCliError,
+  EXIT_OK,
+  EXIT_STALE_SERVED,
+} from './lib/cli-error-policy.js';
 import { buildEnvelope, enrichCacheMissEnvelope, enrichRowErrorEnvelope } from './lib/envelope.js';
 import { enrichParseError } from './lib/parse-error-ux.js';
 import {

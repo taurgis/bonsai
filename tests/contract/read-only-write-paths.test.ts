@@ -4,14 +4,7 @@
  * consistent would_* / dryRun vocabulary, and no artifact/index/config left behind.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import {
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-  existsSync,
-  readdirSync,
-  readFileSync,
-} from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runContract, type RunResult } from './runner.ts';
@@ -95,10 +88,9 @@ function researchFiles(dir: string): string[] {
 
 function seedProjectImport(url = HIT_URL): void {
   const file = noteFile('seed.md', '# Seed\nReadonly contract seed.\n');
-  const seeded = run(
-    ['import', url, '--file', file, '--topic', 'readonly-seed', '--json'],
-    { env: { BONSAI_STORAGE: 'project' } }
-  );
+  const seeded = run(['import', url, '--file', file, '--topic', 'readonly-seed', '--json'], {
+    env: { BONSAI_STORAGE: 'project' },
+  });
   expect(seeded.exitCode).toBe(0);
   expect(researchFiles(projectResearchDir()).some((f) => f.endsWith('.md'))).toBe(true);
 }
@@ -123,9 +115,7 @@ describe('config set/unset under effective read-only', () => {
 
     it(`config unset previews would_unset and leaves config untouched (${spelling.name})`, () => {
       // Seed a real project config first (writable run).
-      expect(
-        run(['config', 'set', 'storage', 'project', '--local', '--json']).exitCode
-      ).toBe(0);
+      expect(run(['config', 'set', 'storage', 'project', '--local', '--json']).exitCode).toBe(0);
       const before = readFileSync(join(cwd, PROJECT_CONFIG), 'utf-8');
 
       const data = parseData(
@@ -145,9 +135,7 @@ describe('config set/unset under effective read-only', () => {
 
   it('config set --read-only also leaves user-scope config untouched', () => {
     const userConfig = join(cfg, 'bonsai', 'config.json');
-    const data = parseData(
-      run(['config', 'set', 'storage', 'project', '--json', '--read-only'])
-    );
+    const data = parseData(run(['config', 'set', 'storage', 'project', '--json', '--read-only']));
     expect(data).toMatchObject({ scope: 'user', dryRun: true, status: 'would_set' });
     expect(existsSync(userConfig)).toBe(false);
   });
@@ -296,9 +284,12 @@ describe('dry-run / write-status vocabulary consistency', () => {
   it('import --json under BONSAI_PLAN_MODE uses dryRun + would_import', () => {
     const file = noteFile('vocab.md', '# Vocab\n');
     const data = parseData(
-      run(['import', 'https://example.com/ro-vocab', '--file', file, '--topic', 'vocab', '--json'], {
-        env: { BONSAI_PLAN_MODE: '1', BONSAI_STORAGE: 'project' },
-      })
+      run(
+        ['import', 'https://example.com/ro-vocab', '--file', file, '--topic', 'vocab', '--json'],
+        {
+          env: { BONSAI_PLAN_MODE: '1', BONSAI_STORAGE: 'project' },
+        }
+      )
     );
     expect(data.dryRun).toBe(true);
     expect((data.cache as { status: string }).status).toBe('would_import');

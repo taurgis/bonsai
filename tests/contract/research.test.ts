@@ -369,7 +369,6 @@ describe('CLI ergonomics and error contracts', () => {
     expect(result.stderr).toBe('');
   });
 
-
   it('import --stdin over 1 MiB fails with STDIN_TOO_LARGE and an actionable suggestion', () => {
     const oversized = 'x'.repeat(1024 * 1024 + 1);
     const result = runContract(

@@ -2,10 +2,7 @@ import { Args, Flags } from '@oclif/core';
 import { BaseCommand } from '../base-command.js';
 import { finalizeBatch, isBatchReadFailure, urlValidationErrorRow } from '../lib/batch.js';
 import { getArtifactPath } from '../lib/research/storage.js';
-import {
-  durationFlagError,
-  evaluateFreshnessWithMaxAge,
-} from '../lib/research/freshness.js';
+import { durationFlagError, evaluateFreshnessWithMaxAge } from '../lib/research/freshness.js';
 import type { ResearchArtifact } from '../lib/research/schema.js';
 import type { StatusRow } from '../lib/cli-result-types.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
