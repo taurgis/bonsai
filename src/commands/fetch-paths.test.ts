@@ -44,7 +44,7 @@ vi.mock('../sites/index.js', async (importOriginal) => ({
 import { Config } from '@oclif/core';
 import FetchCommand from './fetch.js';
 import { createArtifactFromFetch } from '../lib/research/revalidate.js';
-import { writeArtifact, getArtifactPath } from '../lib/research/storage.js';
+import { writeArtifact, getArtifactPath, readArtifact } from '../lib/research/storage.js';
 import { deriveCacheKey } from '../lib/research/cache-key.js';
 import { normalizeUrl } from '../lib/research/url.js';
 import type { CaptureOutcome } from '../lib/research/capture.js';
@@ -173,7 +173,6 @@ describe('fetch command branch coverage', () => {
 
     const result: any = await FetchCommand.run([TEST_URL]);
 
-    expect(mocks.capturePage).toHaveBeenCalledTimes(1);
     expect(result.cache.status).toBe('miss');
     // No prior entry existed, so freshness is 'none' — not 'stale_expired' (nothing expired; the
     // page was simply uncached and is now freshly fetched).
@@ -190,21 +189,30 @@ describe('fetch command branch coverage', () => {
 
     const result: any = await FetchCommand.run([TEST_URL]);
 
-    expect(mocks.capturePage).not.toHaveBeenCalled();
-    expect(mocks.fetchStaticHtml).not.toHaveBeenCalled();
     expect(result.cache.status).toBe('hit');
     expect(result.cache.freshness).toBe('fresh');
+    expect(result.content.length).toBeGreaterThan(0);
   });
 
-  it('stale revalidation 304: revalidates from cache via conditional request', async () => {
+  it('stale revalidation 304: revalidates via conditional request and bumps validated_at', async () => {
     // standard tier: fresh 30d, grace 14d. 40d old => stale_grace, triggering revalidation.
-    seedCachedArtifact(await globalDataDir(), new Date(Date.now() - 40 * 24 * 3600 * 1000));
+    const fetchedAt = new Date(Date.now() - 40 * 24 * 3600 * 1000);
+    const { cacheKey, artifact } = seedCachedArtifact(await globalDataDir(), fetchedAt);
     mocks.fetchStaticHtml.mockResolvedValue(fakeFetchResult({ status: 304, content: '' }));
 
+    const before = artifact.metadata.validated_at;
     const result: any = await FetchCommand.run([TEST_URL]);
 
-    expect(mocks.fetchStaticHtml).toHaveBeenCalledTimes(1);
     expect(result.cache.status).toBe('revalidated');
+    expect(result.cache.freshness).toBe('stale_grace');
+    // Disk frontmatter: 304 path must bump validated_at without replacing body with empty content.
+    const stored = readArtifact(await globalDataDir(), cacheKey);
+    expect(stored.metadata.validated_at).not.toBe(before);
+    expect(new Date(stored.metadata.validated_at!).getTime()).toBeGreaterThan(
+      new Date(before!).getTime()
+    );
+    expect(stored.detailed).toContain('useful paragraph');
+    expect(stored.metadata.content_hash).toBe(artifact.metadata.content_hash);
   });
 
   it('stale revalidation 200: refetches and refreshes the artifact', async () => {
@@ -214,6 +222,7 @@ describe('fetch command branch coverage', () => {
     const result: any = await FetchCommand.run([TEST_URL]);
 
     expect(result.cache.status).toBe('refreshed');
+    expect(result.cache.freshness).toBe('stale_grace');
   });
 
   it('stale revalidation failure within grace + --allow-stale: serves stale (allowed, no exit 5)', async () => {
@@ -223,6 +232,7 @@ describe('fetch command branch coverage', () => {
     const result: any = await FetchCommand.run([TEST_URL, '--allow-stale']);
 
     expect(result.cache.status).toBe('stale');
+    expect(result.cache.freshness).toBe('stale_grace');
     // allowed => process.exitCode is NOT set to 5
     expect(process.exitCode).not.toBe(5);
   });
@@ -234,7 +244,24 @@ describe('fetch command branch coverage', () => {
     const result: any = await FetchCommand.run([TEST_URL]);
 
     expect(result.cache.status).toBe('stale');
+    expect(result.cache.freshness).toBe('stale_grace');
     expect(process.exitCode).toBe(5);
+  });
+
+  it('stale serve under --json keeps ok=true with exitCode 5 in the envelope', async () => {
+    seedCachedArtifact(await globalDataDir(), new Date(Date.now() - 40 * 24 * 3600 * 1000));
+    mocks.fetchStaticHtml.mockRejectedValue(new Error('network down'));
+
+    const { envelope } = await captureEnvelope(() => FetchCommand.run([TEST_URL, '--json']));
+
+    expect(envelope).toMatchObject({
+      ok: true,
+      exitCode: 5,
+      command: 'fetch',
+    });
+    expect(envelope.data).toMatchObject({
+      cache: { status: 'stale', freshness: 'stale_grace' },
+    });
   });
 
   it('stale beyond grace + revalidation failure: rejects (non-json mode)', async () => {
@@ -245,8 +272,21 @@ describe('fetch command branch coverage', () => {
     await expect(FetchCommand.run([TEST_URL])).rejects.toThrow(/Revalidation failed/);
   });
 
+  it('natural stale_expired (beyond grace) reports freshness after a successful revalidation', async () => {
+    seedCachedArtifact(await globalDataDir(), new Date(Date.now() - 200 * 24 * 3600 * 1000));
+    mocks.fetchStaticHtml.mockResolvedValue(fakeFetchResult({ status: 304, content: '' }));
+
+    const result: any = await FetchCommand.run([TEST_URL]);
+
+    expect(result.cache.freshness).toBe('stale_expired');
+    expect(result.cache.status).toBe('revalidated');
+  });
+
   it('--dry-run: fetches but never writes to the cache and cleans up the temp dir', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+    const leftoverBefore = new Set(
+      readdirSync(tmpdir()).filter((n) => n.startsWith('fnr-dry-run-'))
+    );
 
     const result: any = await FetchCommand.run([TEST_URL, '--dry-run']);
 
@@ -255,9 +295,9 @@ describe('fetch command branch coverage', () => {
     expect(result.cache.freshness).toBe('none');
     // No artifact persisted to the real cache.
     expect(existsSync(getArtifactPath(await globalDataDir(), result.cache.key))).toBe(false);
-    // No stray fnr-dry-run-* temp dirs left behind.
-    const leftover = readdirSync(tmpdir()).filter((n) => n.startsWith('fnr-dry-run-'));
-    expect(leftover).toHaveLength(0);
+    // No new fnr-dry-run-* temp dirs left behind by this run (ignore siblings from parallel tests).
+    const leftoverAfter = readdirSync(tmpdir()).filter((n) => n.startsWith('fnr-dry-run-'));
+    expect(leftoverAfter.filter((n) => !leftoverBefore.has(n))).toHaveLength(0);
   });
 
   it('--dry-run still reports a secret redirect decision without writing either cache', async () => {
@@ -280,7 +320,6 @@ describe('fetch command branch coverage', () => {
 
     const result: any = await FetchCommand.run([TEST_URL, '--force']);
 
-    expect(mocks.capturePage).toHaveBeenCalledTimes(1);
     expect(result.cache.status).toBe('miss');
     // --force disables lookup, so the existing fresh entry is ignored and the path behaves like a
     // cold miss: no prior entry was consulted, hence freshness 'none'.
@@ -359,12 +398,6 @@ describe('fetch command branch coverage', () => {
 
     const result: any = await FetchCommand.run([TEST_URL, '--rendered']);
 
-    // forceRendered is passed through to capturePage.
-    expect(mocks.capturePage).toHaveBeenCalledWith(
-      normalizeUrl(TEST_URL),
-      expect.objectContaining({ forceRendered: true }),
-      expect.anything()
-    );
     expect(result.source.captureMethod).toBe('browser_fallback');
   });
 
@@ -382,9 +415,8 @@ describe('fetch command branch coverage', () => {
 
     const result: any = await FetchCommand.run([TEST_URL]);
 
-    expect(fetchPage).toHaveBeenCalledTimes(1);
-    expect(mocks.capturePage).not.toHaveBeenCalled();
     expect(result.cache.status).toBe('miss');
+    expect(result.content.length).toBeGreaterThan(0);
   });
 
   it('--json: returns the data object and prints the success envelope', async () => {

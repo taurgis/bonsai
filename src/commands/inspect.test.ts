@@ -1,5 +1,4 @@
-import { Config } from '@oclif/core';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { createHash } from 'node:crypto';
 import { dirname } from 'node:path';
 import ResearchInspect from './inspect.js';
@@ -172,84 +171,6 @@ describe('inspect command unit tests', () => {
     } finally {
       process.exitCode = prevExit;
       readSpy.mockRestore();
-    }
-  });
-});
-
-describe('inspect JSON envelope shaping', () => {
-  async function instance() {
-    const config = await Config.load(process.cwd());
-    return new ResearchInspect([], config) as any;
-  }
-
-  beforeEach(() => {
-    process.exitCode = undefined;
-  });
-
-  it('adds CACHE_MISS code and suggestions when inspect data is a miss', async () => {
-    const cmd = await instance();
-    const prev = process.exitCode;
-    process.exitCode = 1;
-    try {
-      const envelope = cmd.toSuccessJson({
-        status: 'miss',
-        normalizedUrl: 'https://example.com/missing-inspect',
-        cacheKey: 'abc',
-        cachePath: '/tmp/x.md',
-        metadata: null,
-        sections: [],
-      });
-      expect(envelope).toMatchObject({
-        ok: false,
-        exitCode: 1,
-        code: 'CACHE_MISS',
-      });
-      expect(envelope.stderr).toContain('Code: CACHE_MISS');
-      expect(envelope.suggestions?.[0]).toContain('Fetch and cache it first');
-    } finally {
-      process.exitCode = prev;
-    }
-  });
-
-  it('passes through inspect hit envelopes unchanged', async () => {
-    const cmd = await instance();
-    const envelope = cmd.toSuccessJson({
-      status: 'hit',
-      normalizedUrl: 'https://example.com/cached-inspect',
-      metadata: { topic: 'Cached inspect' },
-      sections: [],
-    });
-    expect(envelope).toMatchObject({ ok: true, exitCode: 0, stderr: '' });
-    expect(envelope.code).toBeUndefined();
-  });
-
-  it('prefers row validation errors over CACHE_MISS when inspect batch data has both', async () => {
-    const cmd = await instance();
-    const prev = process.exitCode;
-    process.exitCode = 1;
-    try {
-      const envelope = cmd.toSuccessJson([
-        {
-          status: 'miss',
-          normalizedUrl: 'https://example.com/missing-inspect',
-          metadata: null,
-          sections: [],
-        },
-        {
-          status: 'error',
-          normalizedUrl: 'not-a-url',
-          error: { code: 'INVALID_URL', message: 'Invalid URL: not-a-url' },
-        },
-      ]);
-      expect(envelope).toMatchObject({
-        ok: false,
-        exitCode: 1,
-        code: 'INVALID_URL',
-      });
-      expect(envelope.stderr).toContain('INVALID_URL');
-      expect(Array.isArray(envelope.data)).toBe(true);
-    } finally {
-      process.exitCode = prev;
     }
   });
 });

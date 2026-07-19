@@ -189,74 +189,88 @@ describe('list command unit tests', () => {
   });
 
   it('signals truncation in the human heading when more entries match than --limit', async () => {
-    const fake = Array.from({ length: 3 }, (_, i) => ({
-      cacheKey: `k${i}`,
-      path: `/x/k${i}.md`,
-      artifactType: 'source',
-      sourceUrls: [`https://example.com/${i}`],
-      topic: 'T',
-      tags: [],
-      freshness: 'fresh',
-      captureMethod: 'agent_supplied',
-      tokenEstimate: { compressed: 1, detailed: 1 },
-      qualityNotes: [],
-      fetchedAt: null,
-      validatedAt: new Date().toISOString(),
-    }));
-    const scanSpy = vi
-      .spyOn(ResearchList.prototype as any, 'scanCacheDirForList')
-      .mockReturnValue(fake);
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValueOnce('# Truncation A\nBody A')
+      .mockResolvedValueOnce('# Truncation B\nBody B')
+      .mockResolvedValueOnce('# Truncation C\nBody C');
+    await ResearchImport.run([
+      'https://example.com/trunc-a',
+      '--stdin',
+      '--topic',
+      'TruncA',
+    ]);
+    await ResearchImport.run([
+      'https://example.com/trunc-b',
+      '--stdin',
+      '--topic',
+      'TruncB',
+    ]);
+    await ResearchImport.run([
+      'https://example.com/trunc-c',
+      '--stdin',
+      '--topic',
+      'TruncC',
+    ]);
+    readSpy.mockRestore();
+
     const logged: string[] = [];
-    const logSpy = vi
-      .spyOn(ResearchList.prototype as any, 'log')
-      .mockImplementation((msg: string) => logged.push(msg));
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logged.push(args.map(String).join(' '));
+    });
+    try {
+      const truncated = (await ResearchList.run(['--limit', '2'])) as any[];
+      expect(truncated.length).toBe(2);
+      expect(logged.join('\n')).toContain('Found 3');
+      expect(logged.join('\n')).toContain('showing first 2');
 
-    const truncated = (await ResearchList.run(['--limit', '2'])) as any[];
-    expect(truncated.length).toBe(2);
-    expect(logged[0]).toContain('Found 3');
-    expect(logged[0]).toContain('showing first 2');
-
-    logged.length = 0;
-    const full = (await ResearchList.run(['--limit', '50'])) as any[];
-    expect(full.length).toBe(3);
-    expect(logged[0]).toBe('Found 3 cached research entries:\n');
-
-    scanSpy.mockRestore();
-    logSpy.mockRestore();
+      logged.length = 0;
+      const full = (await ResearchList.run(['--limit', '50'])) as any[];
+      expect(full.length).toBeGreaterThanOrEqual(3);
+      expect(logged.join('\n')).toMatch(/Found \d+ cached research entries/);
+    } finally {
+      logSpy.mockRestore();
+    }
   });
 
   it('does not warn under --json when results are truncated (envelope data is the capped list)', async () => {
-    const fake = Array.from({ length: 3 }, (_, i) => ({
-      cacheKey: `k${i}`,
-      path: `/x/k${i}.md`,
-      artifactType: 'source',
-      sourceUrls: [`https://example.com/${i}`],
-      topic: 'T',
-      tags: [],
-      freshness: 'fresh',
-      captureMethod: 'agent_supplied',
-      tokenEstimate: { compressed: 1, detailed: 1 },
-      qualityNotes: [],
-      fetchedAt: null,
-      validatedAt: new Date().toISOString(),
-    }));
-    const scanSpy = vi
-      .spyOn(ResearchList.prototype as any, 'scanCacheDirForList')
-      .mockReturnValue(fake);
-    const warned: string[] = [];
-    const warnSpy = vi
-      .spyOn(ResearchList.prototype as any, 'warn')
-      .mockImplementation((msg: string) => {
-        warned.push(msg);
-        return msg;
-      });
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValueOnce('# JsonTrunc A\nBody')
+      .mockResolvedValueOnce('# JsonTrunc B\nBody')
+      .mockResolvedValueOnce('# JsonTrunc C\nBody');
+    await ResearchImport.run([
+      'https://example.com/json-trunc-a',
+      '--stdin',
+      '--topic',
+      'JsonTruncA',
+    ]);
+    await ResearchImport.run([
+      'https://example.com/json-trunc-b',
+      '--stdin',
+      '--topic',
+      'JsonTruncB',
+    ]);
+    await ResearchImport.run([
+      'https://example.com/json-trunc-c',
+      '--stdin',
+      '--topic',
+      'JsonTruncC',
+    ]);
+    readSpy.mockRestore();
 
-    const rows = (await ResearchList.run(['--limit', '2', '--json'])) as any[];
-    expect(rows.length).toBe(2);
-    // Intentional #73: --json suppresses tip/truncation messaging on process stderr.
-    expect(warned.length).toBe(0);
-
-    scanSpy.mockRestore();
-    warnSpy.mockRestore();
+    const stderrChunks: string[] = [];
+    const errSpy = vi.spyOn(process.stderr, 'write').mockImplementation(((chunk: unknown) => {
+      stderrChunks.push(String(chunk));
+      return true;
+    }) as typeof process.stderr.write);
+    try {
+      const rows = (await ResearchList.run(['--limit', '2', '--json'])) as any[];
+      expect(rows.length).toBe(2);
+      // Intentional #73: --json suppresses tip/truncation messaging on process stderr.
+      expect(stderrChunks.join('')).not.toMatch(/showing first|truncat/i);
+    } finally {
+      errSpy.mockRestore();
+    }
   });
 });

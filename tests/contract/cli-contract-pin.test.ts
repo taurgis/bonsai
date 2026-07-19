@@ -386,3 +386,26 @@ describe('read-command determinism', () => {
     expect(second.stdout).toBe(first.stdout);
   });
 });
+
+describe('contract runner env scrub', () => {
+  it('does not inherit ambient BONSAI_READ_ONLY into write commands', () => {
+    const prev = process.env.BONSAI_READ_ONLY;
+    process.env.BONSAI_READ_ONLY = '1';
+    try {
+      const note = join(cwd, 'scrub-note.md');
+      writeFileSync(note, '# Scrub pin\n\nAmbient read-only must not block this write.\n', 'utf-8');
+      const imported = run(
+        ['import', 'https://example.com/contract-scrub-readonly', '--file', note, '--json'],
+        { raw: true }
+      );
+      expect(imported.exitCode).toBe(0);
+      const envelope = parseEnvelope(imported);
+      expect(envelope).toMatchObject({ ok: true, exitCode: 0 });
+      expect((envelope.data as { dryRun?: boolean }).dryRun).toBe(false);
+      expect((envelope.data as { cache?: { status?: string } }).cache?.status).toBe('imported');
+    } finally {
+      if (prev === undefined) delete process.env.BONSAI_READ_ONLY;
+      else process.env.BONSAI_READ_ONLY = prev;
+    }
+  });
+});

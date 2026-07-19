@@ -44,6 +44,10 @@ export function runContract(
   delete inherited.CI;
   delete inherited.BONSAI_STORAGE;
   delete inherited.BONSAI_SUMMARY;
+  // Ambient plan-mode harness vars must not leak into contracts that expect real writes
+  // (unlike BONSAI_STORAGE, these were previously inherited — see #74 deferred / #77).
+  delete inherited.BONSAI_READ_ONLY;
+  delete inherited.BONSAI_PLAN_MODE;
 
   const mergedEnv = { ...inherited, ...env };
   const result = spawnSync('node', [CLI_ENTRY, ...args], {
