@@ -128,6 +128,7 @@ This report rolls up every finding from tickets **#72–#78** with outcome (**fi
 | minor | `inspect --read-only` search-index pin missing (list pinned) | **fixed** in synthesis | Senior Quality Engineer #79 |
 | minor | Revalidate secret-skip undocumented at write sites | **fixed** — `ponytail:` on `revalidate.ts` | Senior Quality Engineer #79 |
 | nit | `REDIRECT_STATUS_CODES` tuple cast | **fixed** — `Set.has` | Senior Code Reviewer #79 |
+| major | `hasValidHelpTarget` CRAP≥30 (0% matched coverage) blocked coverage-backed health | **fixed** — colocated `help-preflight.test.ts` | fallow `maxCrap: 30`; #71 quality gates |
 
 ---
 
@@ -139,6 +140,7 @@ This report rolls up every finding from tickets **#72–#78** with outcome (**fi
 | Thermo-nuclear self-review | Prior #76 pass held; no new spaghetti/layers in synthesis |
 | Senior Code Reviewer (`4bc0d4b...HEAD`) | **APPROVE** — blockers/majors: none; one nit fixed |
 | Senior Quality Engineer | **Ready to close** — blockers/majors: none; minors fixed; contract **120+** green |
+| Coverage-backed fallow health | **green** — 0 functions above `maxCrap` (was 1: `hasValidHelpTarget`) |
 
 ---
 
