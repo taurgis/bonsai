@@ -157,14 +157,33 @@ Run on the #79 branch before merge:
 
 ---
 
+## Status (post-merge)
+
+Synthesis [#79](https://github.com/taurgis/bonsai/issues/79) / [PR #88](https://github.com/taurgis/bonsai/pull/88) is on `main`. Audit children #72–#79 are closed. Deferred follow-ups live under [#95](https://github.com/taurgis/bonsai/issues/95) (supersedes incomplete #89):
+
+| Issue | Title |
+| --- | --- |
+| [#90](https://github.com/taurgis/bonsai/issues/90) | Secret-scan on in-place revalidation |
+| [#91](https://github.com/taurgis/bonsai/issues/91) | Machine-readable truncation signal under `--json` |
+| [#92](https://github.com/taurgis/bonsai/issues/92) | Lift remaining internals-pinning tests to behavior seams |
+| [#93](https://github.com/taurgis/bonsai/issues/93) | JSDoc the research-pipeline export surface |
+| [#94](https://github.com/taurgis/bonsai/issues/94) | Slim fetch and import command services |
+
+**Maintainer action:** close [#71](https://github.com/taurgis/bonsai/issues/71) after accepting this report. Work follow-ups via #95; do not reopen the audit.
+
+---
+
 ## Open follow-ups (not gates for closing the audit)
 
-| Item | Sev | Notes |
+Tracked as sub-issues of [#95](https://github.com/taurgis/bonsai/issues/95):
+
+| Item | Sev | Ticket |
 | --- | --- | --- |
-| fallow CRAP>30 on four pre-existing helpers | nit | Unchanged vs pre-audit `main` |
-| Secret re-scan on in-place revalidation | minor | Tracked; intentional ponytail ceiling |
-| Soft line-count of large command services | nit | Prefer further deletion over splits |
-| Close #72 / #75 if still open | process | Work merged via #80/#81/#84; issue APIs often blocked for cloud agents |
+| Secret re-scan on in-place revalidation | minor | #90 |
+| `--json` truncation notice | minor | #91 |
+| Remaining internals-pinning test leftovers | minor/nit | #92 |
+| Research-pipeline export JSDoc | nit | #93 |
+| Slim fetch/import command services | nit | #94 |
 
 ---
 
@@ -172,4 +191,4 @@ Run on the #79 branch before merge:
 
 The CLI structural refactor is **verified closed** against the seven audit dimensions in #71. Intentional user-visible corrections (#73 streams/command id, #74 read-only index sidecar, #75 Salesforce sanitize) are changesetted and contract-pinned. Internal audits (#76–#78) preserved the external contract. Synthesis (#79) completed the mandatory review chain and recorded this rollup.
 
-**Maintainer action:** close #71 after accepting this report; leave child tickets closed via their PRs.
+**Maintainer action:** close #71 after accepting this report; leave audit child tickets closed via their PRs; use #95 for deferred work.
