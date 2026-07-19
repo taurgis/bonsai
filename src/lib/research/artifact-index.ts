@@ -31,6 +31,14 @@ export interface IndexedArtifact {
   filePath: string;
 }
 
+export interface LoadIndexedArtifactsOptions {
+  /**
+   * When false, skip writing `.search-index.json` (read-only/plan mode). Results are still
+   * computed from disk; only the derived sidecar is withheld. Defaults to true.
+   */
+  persist?: boolean;
+}
+
 // The repo writes artifacts via temp-file + rename, so every rewrite yields a new inode. Combining
 // mtime + size + ino makes any change a guaranteed cache miss even when filesystem mtime resolution
 // is coarse (HFS+/FAT) and a same-size edit lands within the same timestamp tick.
@@ -80,10 +88,16 @@ function getOrUpdateIndexEntry(
  * to skip unchanged files. Re-reads only files whose signature changed, then persists the refreshed
  * index (best-effort; a write failure never breaks callers). Corrupt/unreadable files are skipped —
  * the real read paths in storage.ts handle archiving them.
+ *
+ * Pass `{ persist: false }` under read-only/plan mode so the derived sidecar is never written.
  */
-export function loadIndexedArtifactsForDir(researchDir: string): IndexedArtifact[] {
+export function loadIndexedArtifactsForDir(
+  researchDir: string,
+  options: LoadIndexedArtifactsOptions = {}
+): IndexedArtifact[] {
   if (!existsSync(researchDir)) return [];
 
+  const persist = options.persist !== false;
   const indexPath = join(researchDir, INDEX_FILE);
   const previous = loadIndex(indexPath);
   const entries: Record<string, IndexEntry> = {};
@@ -110,7 +124,7 @@ export function loadIndexedArtifactsForDir(researchDir: string): IndexedArtifact
     changed = Object.keys(previous.entries).some((key) => !(key in entries));
   }
 
-  if (changed) {
+  if (changed && persist) {
     try {
       atomicWriteFile(indexPath, JSON.stringify({ version: INDEX_VERSION, entries }));
     } catch {
@@ -126,11 +140,14 @@ export function loadIndexedArtifactsForDir(researchDir: string): IndexedArtifact
  * key so a project entry shadows the same key in the global cache. Mirrors the dedup semantics of
  * {@link scanCacheDirs} but reads through the per-root sidecar index.
  */
-export function loadIndexedArtifacts(dataDirs: string[]): IndexedArtifact[] {
+export function loadIndexedArtifacts(
+  dataDirs: string[],
+  options: LoadIndexedArtifactsOptions = {}
+): IndexedArtifact[] {
   const seen = new Set<string>();
   const all: IndexedArtifact[] = [];
   for (const dataDir of dataDirs) {
-    for (const located of loadIndexedArtifactsForDir(join(dataDir, 'research'))) {
+    for (const located of loadIndexedArtifactsForDir(join(dataDir, 'research'), options)) {
       const key = located.artifact.metadata.cache_key;
       if (seen.has(key)) continue;
       seen.add(key);

@@ -192,15 +192,20 @@ export function locateArtifact(dataDirs: string[], key: string): LocatedArtifact
  * order and deduplicates by cache key so an entry present in an earlier root (project) shadows
  * the same key in a later root (global) — even when the callback filters it out. Composes
  * scanCacheDir so the file-format and read/parse rules stay defined in exactly one place.
+ *
+ * Pass `persistIndex: false` under read-only/plan mode so listing never creates `.search-index.json`.
  */
 export function scanCacheDirs<T>(
   dataDirs: string[],
-  fn: (artifact: ResearchArtifact, filePath: string) => T | null
+  fn: (artifact: ResearchArtifact, filePath: string) => T | null,
+  options: { persistIndex?: boolean } = {}
 ): T[] {
   const seen = new Set<string>();
   return dataDirs.flatMap((dataDir) => {
     const researchDir = join(dataDir, 'research');
-    const searchable = loadIndexedArtifactsForDir(researchDir);
+    const searchable = loadIndexedArtifactsForDir(researchDir, {
+      persist: options.persistIndex,
+    });
     return searchable
       .map(({ artifact, filePath }) => {
         const key = artifact.metadata.cache_key;
