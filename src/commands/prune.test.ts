@@ -215,6 +215,35 @@ describe('prune command unit tests', () => {
     }
   });
 
+  it('never reports PRUNE_PARTIAL_FAILURE for a dry run, even with matching candidates', async () => {
+    // A dry run always leaves prunedCount at 0 by design (nothing is deleted) — the partial-failure
+    // envelope enrichment must not mistake that no-op for a failed deletion.
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Dry-run partial-failure regression');
+    await ResearchImport.run([
+      'https://example.com/dry-run-partial-failure',
+      '--stdin',
+      '--topic',
+      'DryRunPartialFailure',
+    ]);
+    readSpy.mockRestore();
+
+    const { result, envelope } = await captureEnvelope(() =>
+      ResearchPrune.run([
+        '--url',
+        'https://example.com/dry-run-partial-failure',
+        '--dry-run',
+        '--json',
+      ])
+    );
+
+    expect(result).toMatchObject({ dryRun: true, candidateCount: 1, prunedCount: 0 });
+    expect(envelope).toMatchObject({ ok: true, exitCode: 0 });
+    expect(envelope.code).toBeUndefined();
+    expect(envelope.stderr).toBe('');
+  });
+
   it('rejects empty --older-than as INVALID_DURATION', async () => {
     await expect(ResearchPrune.run(['--older-than', '', '--dry-run'])).rejects.toThrow(
       /must not be empty/

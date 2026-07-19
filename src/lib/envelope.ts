@@ -201,6 +201,9 @@ export function enrichPrunePartialEnvelope(
   data: unknown
 ): Record<string, unknown> {
   if (!isPruneCounts(data)) return envelope;
+  // A dry run never deletes anything, so prunedCount is always 0 by design — that is a preview,
+  // not a partial failure, and must never be reported as one.
+  if (data.dryRun) return envelope;
   if (data.candidateCount <= 0 || data.prunedCount >= data.candidateCount) return envelope;
 
   const failed = data.candidateCount - data.prunedCount;
@@ -215,10 +218,16 @@ export function enrichPrunePartialEnvelope(
   };
 }
 
-function isPruneCounts(data: unknown): data is { prunedCount: number; candidateCount: number } {
+function isPruneCounts(
+  data: unknown
+): data is { prunedCount: number; candidateCount: number; dryRun: boolean } {
   if (!data || typeof data !== 'object') return false;
-  const d = data as { prunedCount?: unknown; candidateCount?: unknown };
-  return typeof d.prunedCount === 'number' && typeof d.candidateCount === 'number';
+  const d = data as { prunedCount?: unknown; candidateCount?: unknown; dryRun?: unknown };
+  return (
+    typeof d.prunedCount === 'number' &&
+    typeof d.candidateCount === 'number' &&
+    typeof d.dryRun === 'boolean'
+  );
 }
 
 /**

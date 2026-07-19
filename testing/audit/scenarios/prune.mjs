@@ -53,6 +53,31 @@ export default function register(harness, fixtures) {
     expect(env?.data?.wouldPruneCount === env?.data?.candidateCount, 'wouldPruneCount');
   });
 
+  check('prune --dry-run with matches never reports PRUNE_PARTIAL_FAILURE', () => {
+    // Regression: a dry run always leaves prunedCount at 0 by design (nothing is deleted), which the
+    // partial-failure envelope enrichment once misread as "failed to delete everything".
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-prune-dry-run-no-false-failure';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Dry-run false-failure regression\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const dryRun = run(['prune', '--url', url, '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const env = parseJson(dryRun.stdout);
+    expect(dryRun.exitCode === 0, `exit ${dryRun.exitCode}`);
+    expect(env?.ok === true, dryRun.stdout);
+    expect(env?.code === undefined, env?.code);
+    expect(env?.stderr === '', env?.stderr);
+    expect(env?.data?.candidateCount === 1, dryRun.stdout);
+    expect(env?.data?.prunedCount === 0, dryRun.stdout);
+  });
+
   check('prune --dry-run zero matches gives clean human message (no dangling colon)', () => {
     const r = run(['prune', '--older-than', '9999d', '--dry-run']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);
@@ -75,9 +100,13 @@ export default function register(harness, fixtures) {
       cwd: ws.cwd,
       xdg: ws.xdg,
     });
-    expect(parseJson(dryRun.stdout)?.data?.candidateCount === 1, dryRun.stdout);
-    expect(parseJson(dryRun.stdout)?.data?.status === 'would_prune', dryRun.stdout);
-    expect(parseJson(dryRun.stdout)?.data?.wouldPruneCount === 1, dryRun.stdout);
+    const dryRunEnv = parseJson(dryRun.stdout);
+    expect(dryRun.exitCode === 0, `dry-run exit ${dryRun.exitCode}`);
+    expect(dryRunEnv?.ok === true, dryRun.stdout);
+    expect(dryRunEnv?.code === undefined, dryRunEnv?.code);
+    expect(dryRunEnv?.data?.candidateCount === 1, dryRun.stdout);
+    expect(dryRunEnv?.data?.status === 'would_prune', dryRun.stdout);
+    expect(dryRunEnv?.data?.wouldPruneCount === 1, dryRun.stdout);
 
     const pruned = run(['prune', '--url', url, '--yes', '--json'], {
       cwd: ws.cwd,
