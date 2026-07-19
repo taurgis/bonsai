@@ -400,12 +400,37 @@ describe('fetch command branch coverage', () => {
       fakeFetchResult({ status: 200, content: secretBody, responseSize: secretBody.length })
     );
 
+    const warnSpy = vi.spyOn(FetchCommand.prototype, 'warn').mockImplementation((input) => input);
     const result: any = await FetchCommand.run([TEST_URL, '--storage', 'project']);
 
     expect(result.cache.status).toBe('refreshed');
     expect(result.cache.redirectedToGlobal).toBe(true);
     expect(existsSync(getArtifactPath(await globalDataDir(), cacheKey))).toBe(true);
     expect(existsSync(getArtifactPath(projectDir, cacheKey))).toBe(false);
+    expect(warnSpy.mock.calls.some((call) => String(call[0]).includes('global cache'))).toBe(true);
+    warnSpy.mockRestore();
+  });
+
+  it('clean project revalidation: refreshed content without secrets stays in the project cache', async () => {
+    const projectDir = join(iso.cwd, '.bonsai');
+    const { cacheKey } = seedCachedArtifact(
+      projectDir,
+      new Date(Date.now() - 40 * 24 * 3600 * 1000)
+    );
+    const cleanBody =
+      '<html><body><article>' +
+      'Refreshed documentation paragraph. '.repeat(20) +
+      '</article></body></html>';
+    mocks.fetchStaticHtml.mockResolvedValue(
+      fakeFetchResult({ status: 200, content: cleanBody, responseSize: cleanBody.length })
+    );
+
+    const result: any = await FetchCommand.run([TEST_URL, '--storage', 'project']);
+
+    expect(result.cache.status).toBe('refreshed');
+    expect(result.cache.redirectedToGlobal).toBe(false);
+    expect(existsSync(getArtifactPath(projectDir, cacheKey))).toBe(true);
+    expect(existsSync(getArtifactPath(await globalDataDir(), cacheKey))).toBe(false);
   });
 
   it('--format detailed: returns the detailed body and detailed token estimate', async () => {
