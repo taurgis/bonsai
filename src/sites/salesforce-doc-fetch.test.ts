@@ -50,7 +50,8 @@ const DOC_OPTIONS = {
  */
 function fakePage(
   captures: Array<{ html: string; title: string } | null>,
-  navResult: { errorText?: string } = {}
+  navResult: { errorText?: string } = {},
+  blockedNavigationError: Error | null = null
 ) {
   let captureCalls = 0;
   const close = vi.fn().mockResolvedValue(undefined);
@@ -73,7 +74,14 @@ function fakePage(
       return {};
     }),
   };
-  return { client, sessionId: 's1', close };
+  // Mirrors openCdpPage's real Fetch-domain safety guard: a test can preset a "blocked" reason
+  // (e.g. an SSRF redirect) that fetchSalesforceDoc must surface instead of proceeding to capture.
+  const takeBlockedNavigationError = vi.fn(() => {
+    const err = blockedNavigationError;
+    blockedNavigationError = null;
+    return err;
+  });
+  return { client, sessionId: 's1', close, takeBlockedNavigationError };
 }
 
 beforeEach(() => {
@@ -312,6 +320,25 @@ describe('fetchSalesforceDoc', () => {
     await expect(
       fetchSalesforceDoc('https://help.salesforce.com/s/articleView?id=sf.neterr.htm', DOC_OPTIONS)
     ).rejects.toThrow('Navigation failed: net::ERR_CONNECTION_TIMED_OUT');
+    expect(page.close).toHaveBeenCalledOnce();
+  });
+
+  it('throws the Fetch-domain safety guard reason instead of capturing a redirected error page (SSRF guard)', async () => {
+    // openCdpPage's Fetch-domain guard blocks a mid-navigation redirect (e.g. into a private
+    // address) before Chrome commits to it; without checking takeBlockedNavigationError this would
+    // fall through to whatever error page Chrome renders for the blocked request instead of the
+    // specific, actionable reason the guard already determined.
+    const chromeErrorInterstitial = `<h1>This site can't be reached</h1><p>${'blocked. '.repeat(30)}</p>`;
+    const page = fakePage(
+      [{ html: chromeErrorInterstitial, title: "This site can't be reached" }],
+      {},
+      new Error('IP address "127.0.0.1" is a blocked local or private target.')
+    );
+    vi.mocked(openCdpPage).mockResolvedValue(page as never);
+
+    await expect(
+      fetchSalesforceDoc('https://help.salesforce.com/s/articleView?id=sf.ssrf.htm', DOC_OPTIONS)
+    ).rejects.toThrow('IP address "127.0.0.1" is a blocked local or private target.');
     expect(page.close).toHaveBeenCalledOnce();
   });
 

@@ -3,6 +3,7 @@ import {
   buildFetchFailureResult,
   buildFetchResultData,
   describeError,
+  extractionQualityWarnings,
   fetchFailureGuidance,
   reportCacheStatus,
 } from './fetch-result.js';
@@ -200,5 +201,29 @@ describe('describeError', () => {
     a.cause = b;
     b.cause = a;
     expect(describeError(a).split(': ').length).toBeLessThanOrEqual(11);
+  });
+});
+
+describe('extractionQualityWarnings', () => {
+  it('strips the warning prefix from human-prose notes', () => {
+    expect(
+      extractionQualityWarnings([
+        'warning: extracted content is very short (less than 500 characters)',
+      ])
+    ).toEqual(['extracted content is very short (less than 500 characters)']);
+  });
+
+  it('excludes machine-only quality:* codes and plain notes', () => {
+    expect(
+      extractionQualityWarnings([
+        'readability extracted main article',
+        'quality:index-hub',
+        'auto-generated tags via keyword extraction',
+      ])
+    ).toEqual([]);
+  });
+
+  it('returns empty for no notes', () => {
+    expect(extractionQualityWarnings([])).toEqual([]);
   });
 });

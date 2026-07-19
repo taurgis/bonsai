@@ -6,6 +6,7 @@ import {
   assertRenderedHttpOk,
   buildChromeArgs,
   describeNavigationFailure,
+  describeUnsafeNavigationTarget,
   fetchRenderedHtml,
   findChromePath,
   ResponseCapture,
@@ -257,6 +258,37 @@ describe('assertRenderedHttpOk', () => {
 
   it('does not throw when no document response was observed', () => {
     expect(() => assertRenderedHttpOk(undefined)).not.toThrow();
+  });
+});
+
+// This is the guard openCdpPage's Fetch-domain interception runs against every navigated (and
+// redirected) Document request, closing the SSRF gap where a page that starts on a safe public
+// host redirects the rendered-fallback capture into a private/internal address or a non-http(s)
+// scheme — something Chrome would otherwise follow with no further safety check. IP-literal inputs
+// keep these deterministic and network-free (checkDnsSafety short-circuits DNS lookup for them).
+describe('describeUnsafeNavigationTarget', () => {
+  it('blocks a private/loopback IP target', async () => {
+    const err = await describeUnsafeNavigationTarget('http://127.0.0.1:19999/');
+    expect(err?.message).toContain('blocked local or private target');
+  });
+
+  it('allows a safe public IP target', async () => {
+    expect(await describeUnsafeNavigationTarget('http://8.8.8.8/')).toBeNull();
+  });
+
+  it('blocks a non-http(s) scheme, e.g. a redirect to file:', async () => {
+    const err = await describeUnsafeNavigationTarget('file:///etc/passwd');
+    expect(err?.message).toContain('Unsupported protocol "file:"');
+  });
+
+  it('blocks a redirect target carrying embedded credentials', async () => {
+    const err = await describeUnsafeNavigationTarget('http://user:pass@example.com/');
+    expect(err?.message).toContain('usernames or passwords');
+  });
+
+  it('blocks an unparseable URL', async () => {
+    const err = await describeUnsafeNavigationTarget('not a url');
+    expect(err?.message).toContain('Could not parse');
   });
 });
 

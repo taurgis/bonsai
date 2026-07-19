@@ -274,6 +274,11 @@ export interface CdpPage {
   client: CdpClient;
   sessionId: string;
   close: () => Promise<void>;
+  /**
+   * Returns (and clears) the reason the most recent navigation request was blocked by the
+   * per-hop safety guard installed in {@link openCdpPage}, or `null` if none was blocked.
+   */
+  takeBlockedNavigationError: () => Error | null;
 }
 
 /** Status line of the main-frame document response, captured from Network.responseReceived. */
@@ -294,14 +299,46 @@ export function assertRenderedHttpOk(mainDoc: MainDocumentResponse | undefined):
   }
 }
 
+interface FetchRequestPausedEvent {
+  requestId: string;
+  request: { url: string };
+}
+
 /**
- * Spawns a headless Chrome, attaches a flat CDP session, and enables the Page, Network,
- * and Runtime domains. The caller drives navigation and must call close() when finished.
+ * Validates a navigated (or redirected) Document request against the same scheme/credentials/DNS
+ * safety `normalizeUrl` and `fetchWithRedirects` enforce per hop in url.ts/fetcher.ts. Chrome
+ * follows redirects internally with no hook back into that check, so a page that starts on a safe
+ * public host could otherwise redirect a rendered-fallback capture into a private/internal address
+ * (SSRF) or a non-http(s) scheme (e.g. `file:`) that the static fetcher would have rejected outright.
+ */
+export async function describeUnsafeNavigationTarget(url: string): Promise<Error | null> {
+  let normalized: string;
+  try {
+    normalized = normalizeUrl(url);
+  } catch (err) {
+    return err as Error;
+  }
+  try {
+    await checkDnsSafety(new URL(normalized).hostname);
+    return null;
+  } catch (err) {
+    return err as Error;
+  }
+}
+
+/**
+ * Spawns a headless Chrome, attaches a flat CDP session, and enables the Page, Network, Runtime,
+ * and Fetch domains. Fetch domain interception guards every Document-type request (the initial
+ * navigation and each subsequent redirect) with {@link describeUnsafeNavigationTarget} before
+ * Chrome is allowed to send it; a blocked request's reason is recorded and can be read back via
+ * the returned page's `takeBlockedNavigationError()`. The caller drives navigation and must call
+ * close() when finished.
  */
 export async function openCdpPage(): Promise<CdpPage> {
   const chromePath = findChromePath();
   const { chromeProcess, wsUrl } = await spawnChrome(chromePath);
   const client = new CdpClient(wsUrl);
+  let blockedNavigationError: Error | null = null;
 
   try {
     await client.connect();
@@ -312,6 +349,25 @@ export async function openCdpPage(): Promise<CdpPage> {
     await client.send('Network.enable', {}, sessionId);
     await client.send('Runtime.enable', {}, sessionId);
     await client.send('Network.setUserAgentOverride', { userAgent: DEFAULT_USER_AGENT }, sessionId);
+    await client.send(
+      'Fetch.enable',
+      { patterns: [{ urlPattern: '*', resourceType: 'Document', requestStage: 'Request' }] },
+      sessionId
+    );
+    client.on(`${sessionId}:Fetch.requestPaused`, (params: FetchRequestPausedEvent) => {
+      void (async () => {
+        const { requestId, request } = params;
+        const blockReason = await describeUnsafeNavigationTarget(request.url);
+        if (blockReason) {
+          blockedNavigationError = blockReason;
+          await client
+            .send('Fetch.failRequest', { requestId, errorReason: 'BlockedByClient' }, sessionId)
+            .catch(() => {});
+          return;
+        }
+        await client.send('Fetch.continueRequest', { requestId }, sessionId).catch(() => {});
+      })();
+    });
 
     const close = async (): Promise<void> => {
       try {
@@ -320,7 +376,12 @@ export async function openCdpPage(): Promise<CdpPage> {
       client.close();
       chromeProcess.kill('SIGKILL');
     };
-    return { client, sessionId, close };
+    const takeBlockedNavigationError = (): Error | null => {
+      const err = blockedNavigationError;
+      blockedNavigationError = null;
+      return err;
+    };
+    return { client, sessionId, close, takeBlockedNavigationError };
   } catch (err) {
     client.close();
     chromeProcess.kill('SIGKILL');
@@ -525,6 +586,13 @@ async function fetchRenderedHtmlOnce(
       { url: currentUrl },
       page.sessionId
     );
+    // Fast redirects can fail synchronously within Page.navigate's own response (surfacing as
+    // nav.errorText below); check the Fetch-domain safety guard first so a blocked navigation
+    // reports its specific reason (e.g. "blocked local or private target") instead of the opaque
+    // net::ERR_BLOCKED_BY_CLIENT that Chrome's own errorText would otherwise give it.
+    const blockedNavigation = page.takeBlockedNavigationError();
+    if (blockedNavigation) throw blockedNavigation;
+
     // A network-level failure (DNS, refused/closed connection, TLS) never fires a load event, so
     // fail fast here instead of waiting out the full navigation timeout on a dead page.
     if (nav.errorText) {
@@ -532,6 +600,12 @@ async function fetchRenderedHtmlOnce(
     }
 
     await waitForLoad(page.client, page.sessionId, timeout, options.settleMs ?? 1000);
+
+    // A redirect mid-navigation may have been blocked by the Fetch-domain safety guard (see
+    // openCdpPage); Chrome then just commits its own error page, which would otherwise sail
+    // through as "content" below. Surface the real reason instead.
+    const blockedNavigationAfterLoad = page.takeBlockedNavigationError();
+    if (blockedNavigationAfterLoad) throw blockedNavigationAfterLoad;
 
     const mainDoc = nav.frameId ? documentResponses.get(nav.frameId) : undefined;
     assertRenderedHttpOk(mainDoc);
