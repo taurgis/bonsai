@@ -1,36 +1,70 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { join } from 'node:path';
 import ResearchList from './list.js';
 import ResearchImport from './import.js';
-import * as storage from '../lib/research/storage.js';
+import { writeArtifact } from '../lib/research/storage.js';
+import type { ResearchArtifact, ResearchArtifactMetadata } from '../lib/research/schema.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
-// Minimal active artifact whose freshness resolves to 'fresh' (validated just now, standard tier).
-function fakeArtifact(cacheKey: string, artifactType: string): any {
-  return {
-    metadata: {
-      status: 'active',
-      artifact_type: artifactType,
-      cache_key: cacheKey,
-      source_urls: [`https://example.com/${cacheKey}`],
-      topic: null,
-      tags: [],
-      tier: 'standard',
-      ttl: null,
-      token_estimate: { compressed: 1, detailed: 1 },
-      quality_notes: [],
-      fetched_at: null,
-      validated_at: new Date().toISOString(),
-      capture_method: 'static_fetch',
-    },
+const PAGE_KEY = 'a'.repeat(64);
+const SECTION_KEY = 'b'.repeat(64);
+const INDEX_KEY = 'c'.repeat(64);
+
+/** Minimal on-disk artifact for list filter/exclusion pins (real scanCacheDirs path). */
+function makeListArtifact(
+  key: string,
+  overrides: Partial<ResearchArtifactMetadata> = {}
+): ResearchArtifact {
+  const now = new Date().toISOString();
+  const meta: ResearchArtifactMetadata = {
+    schema_version: 1,
+    artifact_type: 'source',
+    source_url: `https://example.com/${key.slice(0, 8)}`,
+    source_urls: [`https://example.com/${key.slice(0, 8)}`],
+    normalized_url: `https://example.com/${key.slice(0, 8)}`,
+    cache_key: key,
+    topic: null,
+    tags: [],
+    format_available: ['compressed', 'detailed'],
+    tier: 'standard',
+    ttl: null,
+    fetched_at: now,
+    validated_at: now,
+    stale_after: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString(),
+    capture_method: 'static_fetch',
+    extraction_status: 'extracted',
+    extraction_confidence: 'high',
+    quality_notes: [],
+    supplied_at: null,
+    supplied_by: null,
+    etag: null,
+    last_modified: null,
+    content_hash: 'hash',
+    token_estimate: { compressed: 1, detailed: 1 },
+    status: 'active',
+    site_module_id: null,
+    docs_engine: null,
+    docs_framework: null,
+    source_doc_url: null,
+    search_provider: null,
+    parent_cache_key: null,
+    section_anchor: null,
+    section_heading_path: null,
+    ...overrides,
   };
+  return { metadata: meta, summary: 's', compressed: 'c', detailed: 'd', provenance: 'p' };
 }
 
 describe('list command unit tests', () => {
-  useIsolatedCache();
+  const iso = useIsolatedCache();
 
   beforeEach(() => {
     vi.restoreAllMocks();
   });
+
+  function projectDir(): string {
+    return join(iso.cwd, '.bonsai');
+  }
 
   it('lists and filters cached items successfully using seeded data', async () => {
     const readSpy = vi
@@ -152,15 +186,28 @@ describe('list command unit tests', () => {
   });
 
   it('excludes section sub-artifacts so a chunked page does not flood the listing', async () => {
-    // Drive the real list callback over a page-level source plus one of its section children.
-    const artifacts = [fakeArtifact('page', 'source'), fakeArtifact('page#sec', 'section')];
-    vi.spyOn(storage, 'scanCacheDirs').mockImplementation((_roots: string[], fn: any) =>
-      artifacts.map((a) => fn(a, `/x/${a.metadata.cache_key}.md`)).filter((x) => x !== null)
+    // Real on-disk scan: page source + section child under project storage (no scanCacheDirs mock).
+    process.env.BONSAI_STORAGE = 'project';
+    writeArtifact(
+      projectDir(),
+      PAGE_KEY,
+      makeListArtifact(PAGE_KEY, { artifact_type: 'source', topic: 'Page' })
+    );
+    writeArtifact(
+      projectDir(),
+      SECTION_KEY,
+      makeListArtifact(SECTION_KEY, {
+        artifact_type: 'section',
+        topic: 'Section',
+        parent_cache_key: PAGE_KEY,
+        section_anchor: 'sec',
+        section_heading_path: 'Sec',
+      })
     );
 
     const result = (await ResearchList.run([])) as any[];
     expect(result.some((r) => r.artifactType === 'section')).toBe(false);
-    expect(result.map((r) => r.cacheKey)).toEqual(['page']);
+    expect(result.map((r) => r.cacheKey)).toEqual([PAGE_KEY]);
   });
 
   it('returns an empty list when nothing matches the filter', async () => {
@@ -169,12 +216,16 @@ describe('list command unit tests', () => {
   });
 
   it('exposes every schema capture method / artifact type as a filter (no enum drift)', async () => {
-    // The flag option lists derive from CAPTURE_METHODS / ARTIFACT_TYPES, so a route_markdown page
-    // (the common case for doc sites) and index hubs are filterable — they previously parse-errored.
-    const idx = fakeArtifact('hub', 'index');
-    idx.metadata.capture_method = 'route_markdown';
-    vi.spyOn(storage, 'scanCacheDirs').mockImplementation((_roots: string[], fn: any) =>
-      [idx].map((a) => fn(a, `/x/${a.metadata.cache_key}.md`)).filter((x) => x !== null)
+    // Seed a route_markdown index hub on disk so list filters hit real scanCacheDirs.
+    process.env.BONSAI_STORAGE = 'project';
+    writeArtifact(
+      projectDir(),
+      INDEX_KEY,
+      makeListArtifact(INDEX_KEY, {
+        artifact_type: 'index',
+        capture_method: 'route_markdown',
+        topic: 'Hub',
+      })
     );
 
     expect(((await ResearchList.run(['--capture-method', 'route_markdown'])) as any[]).length).toBe(
@@ -194,24 +245,9 @@ describe('list command unit tests', () => {
       .mockResolvedValueOnce('# Truncation A\nBody A')
       .mockResolvedValueOnce('# Truncation B\nBody B')
       .mockResolvedValueOnce('# Truncation C\nBody C');
-    await ResearchImport.run([
-      'https://example.com/trunc-a',
-      '--stdin',
-      '--topic',
-      'TruncA',
-    ]);
-    await ResearchImport.run([
-      'https://example.com/trunc-b',
-      '--stdin',
-      '--topic',
-      'TruncB',
-    ]);
-    await ResearchImport.run([
-      'https://example.com/trunc-c',
-      '--stdin',
-      '--topic',
-      'TruncC',
-    ]);
+    await ResearchImport.run(['https://example.com/trunc-a', '--stdin', '--topic', 'TruncA']);
+    await ResearchImport.run(['https://example.com/trunc-b', '--stdin', '--topic', 'TruncB']);
+    await ResearchImport.run(['https://example.com/trunc-c', '--stdin', '--topic', 'TruncC']);
     readSpy.mockRestore();
 
     const logged: string[] = [];
