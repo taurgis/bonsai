@@ -34,6 +34,8 @@ function dropDataImages(document: any): void {
 
 /**
  * Strips decorative docs chrome and base64 images from the document in place before extraction.
+ *
+ * @param document - linkedom Document object to mutate.
  */
 export function cleanDocsChrome(document: any): void {
   for (const selector of CHROME_SELECTORS) removeMatching(document, selector);

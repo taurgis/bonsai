@@ -4,6 +4,7 @@ import { fetchDeveloperPage } from './fetch-page.js';
 // developer.salesforce.com docs (guides + API reference) render client-side inside web
 // components, so content lives in shadow DOM — a fundamentally different extraction strategy
 // than help.salesforce.com (see ../salesforce).
+/** Site module for developer.salesforce.com: forces rendered capture and applies the shadow-DOM Lightning Web Runtime (LWR) fetcher. */
 export const salesforceDeveloper: SiteModule = {
   id: 'salesforce-developer',
   name: 'Salesforce Developer',

@@ -5,9 +5,8 @@ import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/type
 import { fetchStaticHtml, type FetchedContent, type FetchResult } from './fetcher.js';
 import { extractHtmlContent, type ExtractionResult } from './extract.js';
 import { writeArtifact } from './storage.js';
-// ponytail: in-place revalidation uses writeArtifact (not writeArtifactSecurely). First-time
-// project writes scan+redirect secrets; refreshing an existing entry stays on its current path
-// (see resolveArtifact in fetch-command-service.ts). Upgrade: secret re-scan on refresh if needed.
+import { persistArtifact } from './persist-artifact.js';
+import type { StoreRoots } from './store-roots.js';
 import { evaluateFreshness, resolveFreshnessPolicy } from './freshness.js';
 import { buildCompressed } from './compress.js';
 import type { SummaryLevel } from '../config/schema.js';
@@ -15,6 +14,16 @@ import { applyAutoTags } from './keywords.js';
 import { estimateTokens } from './token-estimate.js';
 import { fetchRenderedHtml } from './browser.js';
 import { looksLikeErrorPage } from './docs/validate.js';
+
+/**
+ * When set, project-located revalidation writes reuse {@link persistArtifact} (secret-scan +
+ * redirect) so a refresh cannot leave credentials in a committable project cache (#90).
+ */
+export interface RevalidateSecureWrite {
+  roots: StoreRoots;
+  dryRun?: boolean;
+  scratchDir?: string | null;
+}
 
 /** Result of conditional revalidation or a full refresh when validators miss. */
 export interface RevalidationResult {
@@ -26,6 +35,46 @@ export interface RevalidationResult {
   allowed?: boolean;
   /** Revalidation failure message when status is `stale`. */
   error?: string;
+  /** Data dir the write landed in (or would land in under dry-run), when a write ran. */
+  storageDir?: string;
+  /** True when a project refresh was redirected to global due to a detected secret. */
+  redirectedToGlobal?: boolean;
+  /** Secret-redirect warning for stderr, or null/undefined when none. */
+  redirectWarning?: string | null;
+}
+
+type RevalidateOptions = {
+  allowStale: boolean;
+  ttlOverride?: string | null;
+  rendered?: boolean;
+  summaryLevel: SummaryLevel;
+  /** Present only when the live entry is in the project cache. */
+  secure?: RevalidateSecureWrite;
+};
+
+function persistRevalidated(
+  dataDir: string,
+  key: string,
+  artifact: ResearchArtifact,
+  secure: RevalidateSecureWrite | undefined
+): Pick<RevalidationResult, 'storageDir' | 'redirectedToGlobal' | 'redirectWarning'> {
+  if (secure) {
+    const result = persistArtifact({
+      roots: secure.roots,
+      cacheKey: key,
+      artifact,
+      dryRun: Boolean(secure.dryRun),
+      kind: 'fetch',
+      scratchDir: secure.scratchDir,
+    });
+    return {
+      storageDir: result.dataDir,
+      redirectedToGlobal: result.redirected,
+      redirectWarning: result.redirectWarning,
+    };
+  }
+  writeArtifact(dataDir, key, artifact);
+  return { storageDir: dataDir, redirectedToGlobal: false, redirectWarning: null };
 }
 
 function buildMetadata(input: {
@@ -39,8 +88,17 @@ function buildMetadata(input: {
   currentTime: Date;
   compressed: string;
 }): ResearchArtifactMetadata {
-  const { url, normalizedUrl, cacheKey, fetchResult, extraction, tier, ttl, currentTime, compressed } =
-    input;
+  const {
+    url,
+    normalizedUrl,
+    cacheKey,
+    fetchResult,
+    extraction,
+    tier,
+    ttl,
+    currentTime,
+    compressed,
+  } = input;
   const contentHash = createHash('sha256').update(extraction.detailedMarkdown).digest('hex');
   const staleAfterTime = new Date(currentTime);
   const { freshWindowMs } = resolveFreshnessPolicy(tier, ttl);
@@ -225,7 +283,7 @@ function persistRefreshedArtifact(
   fetchResult: FetchedContent,
   extraction: ExtractionResult,
   currentTime: Date,
-  options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel },
+  options: RevalidateOptions,
   siteFetch?: SiteFetchResult
 ): RevalidationResult {
   const refreshed = createArtifactFromFetch({
@@ -246,8 +304,8 @@ function persistRefreshedArtifact(
   // Back-fill keyword tags when the carried-over set is empty (e.g. an artifact first cached before
   // auto-tagging, or one originally stored without tags), so refreshing keeps it searchable.
   applyAutoTags(refreshed);
-  writeArtifact(dataDir, meta.cache_key, refreshed);
-  return { status: 'refreshed', artifact: refreshed };
+  const write = persistRevalidated(dataDir, meta.cache_key, refreshed, options.secure);
+  return { status: 'refreshed', artifact: refreshed, ...write };
 }
 
 async function handleRevalidateResponse(
@@ -255,7 +313,7 @@ async function handleRevalidateResponse(
   existing: ResearchArtifact,
   fetchResult: FetchResult,
   currentTime: Date,
-  options: { ttlOverride?: string | null; rendered?: boolean; summaryLevel: SummaryLevel }
+  options: RevalidateOptions
 ): Promise<RevalidationResult> {
   const meta = existing.metadata;
 
@@ -273,8 +331,8 @@ async function handleRevalidateResponse(
     staleAfterTime.setTime(staleAfterTime.getTime() + freshWindowMs);
     updated.metadata.stale_after = staleAfterTime.toISOString();
 
-    writeArtifact(dataDir, meta.cache_key, updated);
-    return { status: 'revalidated', artifact: updated };
+    const write = persistRevalidated(dataDir, meta.cache_key, updated, options.secure);
+    return { status: 'revalidated', artifact: updated, ...write };
   }
 
   const extraction = extractHtmlContent(fetchResult.content, fetchResult.finalUrl);
@@ -289,12 +347,7 @@ export async function revalidateCache(
   dataDir: string,
   existing: ResearchArtifact,
   currentTime: Date,
-  options: {
-    allowStale: boolean;
-    ttlOverride?: string | null;
-    rendered?: boolean;
-    summaryLevel: SummaryLevel;
-  }
+  options: RevalidateOptions
 ): Promise<RevalidationResult> {
   const meta = existing.metadata;
 

@@ -4,7 +4,11 @@ import type { CaptureMethod } from '../lib/research/schema.js';
 
 // Shape a site module's fetchPage must return — the same inputs createArtifactFromFetch
 // consumes, so a custom fetch slots into the generic caching pipeline unchanged.
-/** Result returned by a site module's custom `fetchPage` implementation. */
+/**
+ * Result returned by a site module's custom `fetchPage` implementation.
+ * Carries the raw fetch metadata, the extracted Markdown, and optional provenance fields
+ * (`captureMethod`, `sourceDocUrl`) so the cache pipeline can record how the content was obtained.
+ */
 export interface SiteFetchResult {
   fetchResult: FetchedContent;
   extraction: ExtractionResult;
@@ -41,7 +45,10 @@ export function applySiteFetchProvenance(
   }
 }
 
-/** Registered site-specific fetch/extract strategy for a domain family. */
+/** Registered site-specific fetch/extract strategy for a domain family.
+ * `defaults.rendered` ORs with the user's `--rendered` flag; a missing or false value is a safe default.
+ * When `fetchPage` is absent, callers use the generic fetch/extract pipeline.
+ */
 export interface SiteModule {
   id: string;
   name: string;

@@ -82,6 +82,21 @@ describe('writeArtifactSecurely', () => {
     expect(existsSync(getArtifactPath(roots.writeRoot, KEY_A))).toBe(false);
   });
 
+  it('on redirect, archives and removes any existing project copy so it cannot shadow global', () => {
+    // First-time project writes never leave a project file; revalidation redirect must clear one.
+    const roots = resolveStoreRoots('project', globalDir, cwd);
+    writeArtifact(roots.writeRoot, KEY_A, makeArtifact(KEY_A, 'clean docs'));
+    expect(existsSync(getArtifactPath(roots.writeRoot, KEY_A))).toBe(true);
+
+    const secret = 'token ghp_' + 'a'.repeat(36);
+    const res = writeArtifactSecurely(roots, KEY_A, makeArtifact(KEY_A, secret));
+    expect(res.redirected).toBe(true);
+    expect(existsSync(getArtifactPath(globalDir, KEY_A))).toBe(true);
+    expect(existsSync(getArtifactPath(roots.writeRoot, KEY_A))).toBe(false);
+    // Project→global lookup must resolve the redirected global copy, not a leftover project shadow.
+    expect(locateArtifact(roots.readRoots, KEY_A)?.dataDir).toBe(globalDir);
+  });
+
   it('does not scan in global mode (global is already safe)', () => {
     const roots = resolveStoreRoots('global', globalDir, cwd);
     const res = writeArtifactSecurely(roots, KEY_A, makeArtifact(KEY_A, 'sk-' + 'x'.repeat(32)));

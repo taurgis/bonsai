@@ -326,6 +326,30 @@ first, then truncated to `--limit`.
 ]
 ```
 
+When more entries match than `--limit`, the envelope also includes a top-level
+`truncation` object (and `data` remains the capped array). Absence of `truncation`
+means the result set was not capped:
+
+```json
+{
+  "schemaVersion": 1,
+  "command": "list",
+  "ok": true,
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "",
+  "data": [ /* at most --limit rows */ ],
+  "truncation": {
+    "totalMatched": 12,
+    "shown": 2,
+    "limit": 2
+  }
+}
+```
+
+Under `--json`, truncation is never mirrored as a process-stderr tip — the
+envelope field is the stable agent signal.
+
 ---
 
 ## 6. `prune`

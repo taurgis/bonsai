@@ -21,7 +21,11 @@ import { persistSectionArtifacts } from './docs/section-artifacts.js';
 import { fetchStaticHtml, fetchText } from './fetcher.js';
 import { applyAutoTags } from './keywords.js';
 import { persistArtifact } from './persist-artifact.js';
-import { createArtifactFromFetch, revalidateCache } from './revalidate.js';
+import {
+  createArtifactFromFetch,
+  revalidateCache,
+  type RevalidateSecureWrite,
+} from './revalidate.js';
 import { resolveResearchTarget, type ResolvedResearchTarget } from './resolve-target.js';
 import type { ResearchArtifact } from './schema.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
@@ -145,8 +149,9 @@ export async function runFetchCommandService(opts: FetchCommandServiceOptions): 
 async function executeCacheHit(
   cached: ResearchArtifact,
   targetDir: string,
-  run: FetchRun
-): Promise<ResolvedFetchArtifact> {
+  run: FetchRun,
+  secure?: RevalidateSecureWrite
+): Promise<ResolvedFetchArtifact & { storageDir?: string; redirectedToGlobal: boolean }> {
   const { currentTime, flags, io } = run;
   const freshnessState = evaluateFreshnessWithMaxAge(cached, currentTime, {
     ttl: flags.ttl,
@@ -154,7 +159,7 @@ async function executeCacheHit(
   });
 
   if (freshnessState === 'fresh') {
-    return { cacheStatus: 'hit', freshnessState, artifact: cached };
+    return { cacheStatus: 'hit', freshnessState, artifact: cached, redirectedToGlobal: false };
   }
 
   const revalidationResult = await revalidateCache(targetDir, cached, currentTime, {
@@ -162,6 +167,7 @@ async function executeCacheHit(
     ttlOverride: flags.ttl,
     rendered: flags.rendered,
     summaryLevel: run.summaryLevel,
+    secure,
   });
 
   if (revalidationResult.status === 'stale') {
@@ -171,11 +177,14 @@ async function executeCacheHit(
     );
     if (!revalidationResult.allowed) process.exitCode = EXIT_STALE_SERVED;
   }
+  if (revalidationResult.redirectWarning) io.warn(revalidationResult.redirectWarning);
 
   return {
     cacheStatus: revalidationResult.status,
     freshnessState,
     artifact: revalidationResult.artifact,
+    storageDir: revalidationResult.storageDir,
+    redirectedToGlobal: Boolean(revalidationResult.redirectedToGlobal),
   };
 }
 
@@ -237,11 +246,21 @@ async function resolveArtifact(
   const { cacheKey, located, normalizedUrl, roots } = target;
   if (located) {
     // Revalidate where the entry already lives; on dry-run use the throwaway dir so the cache is
-    // never mutated. ponytail: revalidation rewrites in place, so a refreshed project entry that
-    // gains a secret is not re-routed -- only first-time project writes are scanned.
+    // never mutated. Project-located entries reuse persistArtifact (secret-scan + redirect) so a
+    // refresh that gains a credential cannot stay in the committable project cache (#90).
     const revalDir = run.tmpDir ?? located.dataDir;
-    const hit = await executeCacheHit(located.artifact, revalDir, run);
-    return { ...hit, storageDir: located.dataDir, redirectedToGlobal: false };
+    const projectLocated = located.dataDir === roots.writeRoot && roots.mode === 'project';
+    const secure: RevalidateSecureWrite | undefined = projectLocated
+      ? { roots, dryRun: Boolean(run.tmpDir), scratchDir: run.tmpDir }
+      : undefined;
+    const hit = await executeCacheHit(located.artifact, revalDir, run, secure);
+    return {
+      cacheStatus: hit.cacheStatus,
+      freshnessState: hit.freshnessState,
+      artifact: hit.artifact,
+      storageDir: hit.storageDir ?? located.dataDir,
+      redirectedToGlobal: hit.redirectedToGlobal,
+    };
   }
 
   const artifact = await executeCacheMiss(normalizedUrl, cacheKey, run);

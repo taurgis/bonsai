@@ -29,8 +29,8 @@ export function resultListHeading(total: number, shown: number, labels: ResultLi
 }
 
 /**
- * One-line truncation notice for stderr, or null when nothing was cut. Used under --json, where the
- * stdout heading is suppressed and an agent would otherwise get no signal that results were capped.
+ * One-line truncation notice for stderr, or null when nothing was cut. Available for human-mode
+ * tips; `list --json` surfaces truncation via the envelope `truncation` field instead (#91).
  */
 export function truncationNotice(
   total: number,

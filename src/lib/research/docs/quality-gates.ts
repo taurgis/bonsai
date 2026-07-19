@@ -6,6 +6,7 @@ import { looksLikeErrorPage } from './validate.js';
 // whether a page is a navigation hub rather than an article, so the pipeline can mark it as an
 // `index` artifact.
 
+/** Quality analysis result: stable `quality:*` codes and an index-hub detection flag. */
 export interface QualitySignals {
   codes: string[];
   isIndexHub: boolean;
@@ -54,6 +55,10 @@ function hasCollapsedCode(markdown: string): boolean {
 /**
  * Analyzes extracted Markdown and returns stable quality codes plus an index/hub flag. `markdown`
  * is the detailed representation; `title` helps the error-page heuristic on short pages.
+ *
+ * @param markdown - Detailed Markdown text to analyze.
+ * @param title - Page title used to strengthen the error-page heuristic on short pages.
+ * @returns Stable `quality:*` codes and `isIndexHub` flag.
  */
 export function analyzeMarkdownQuality(markdown: string, title = ''): QualitySignals {
   const codes: string[] = [];
