@@ -370,6 +370,38 @@ describe('CLI ergonomics and error contracts', () => {
   });
 
 
+  it('import --stdin over 1 MiB fails with STDIN_TOO_LARGE and an actionable suggestion', () => {
+    const oversized = 'x'.repeat(1024 * 1024 + 1);
+    const result = runContract(
+      ['import', 'https://example.com/stdin-too-large', '--stdin', '--json'],
+      {
+        input: oversized,
+        env: { BONSAI_STORAGE: 'project' },
+        raw: true,
+        timeout: 60000,
+      }
+    );
+    expect(result.exitCode).toBe(1);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope).toMatchObject({
+      ok: false,
+      exitCode: 1,
+      code: 'STDIN_TOO_LARGE',
+    });
+    expect(envelope.stderr).toMatch(/stdin size limit exceeded/i);
+    expect(String(envelope.suggestions?.join(' ') ?? envelope.stderr)).toMatch(/1 MiB/);
+  });
+
+  it('normalizes hostile URL args on inspect (traversal, fragment, mixed-case, default port)', () => {
+    const result = runContract(['inspect', 'HTTPS://Example.com:443/foo/../docs#frag', '--json'], {
+      raw: true,
+      env: { BONSAI_STORAGE: 'project' },
+    });
+    expect(result.exitCode).toBe(1);
+    const envelope = JSON.parse(result.stdout);
+    expect(envelope.data.normalizedUrl).toBe('https://example.com/docs');
+  });
+
   it('a malformed URL reports an actionable error without stuttering "Invalid URL"', () => {
     const result = runContract(['inspect', 'notaurl']);
     expect(result.exitCode).toBe(2);

@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { persistArtifact } from './persist-artifact.js';
+import { deriveCacheKey } from './cache-key.js';
 import { resolveStoreRoots } from './store-roots.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 
@@ -71,5 +72,31 @@ describe('persistArtifact', () => {
     expect(result.redirected).toBe(true);
     expect(result.redirectWarning).toContain('would store');
     expect(result.dataDir).toBe(roots.globalRoot);
+  });
+
+  it('secret-scans project writes for every capture_method provenance (fails if scan unhooked)', () => {
+    const roots = resolveStoreRoots('project', globalDir, cwd);
+    const secret = 'token ghp_' + 'a'.repeat(36);
+    const methods = [
+      'static_fetch',
+      'browser_fallback',
+      'route_markdown',
+      'github_source',
+      'agent_supplied',
+    ] as const;
+    for (const method of methods) {
+      const key = deriveCacheKey(`https://example.com/${method}`);
+      const artifact = makeArtifact(key, secret);
+      artifact.metadata.capture_method = method;
+      const result = persistArtifact({
+        roots,
+        cacheKey: key,
+        artifact,
+        dryRun: true,
+        kind: method === 'agent_supplied' ? 'import' : 'fetch',
+      });
+      expect(result.redirected, method).toBe(true);
+      expect(result.secretLabel, method).toBeTruthy();
+    }
   });
 });

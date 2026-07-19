@@ -7,6 +7,7 @@ import {
 } from '../lib/research/browser.js';
 import { checkDnsSafety } from '../lib/research/fetcher.js';
 import { htmlToMarkdown } from '../lib/research/markdown.js';
+import { sanitizePromptInjection } from '../lib/research/prompt-injection.js';
 import { contentMetrics, contentRicherThan } from '../lib/research/regression.js';
 import type { ExtractionResult } from '../lib/research/extract.js';
 import type { SiteFetchResult } from './types.js';
@@ -403,6 +404,9 @@ function buildSalesforceFetchResult(
   detailedMarkdown: string,
   qualityNotes: string[]
 ): SiteFetchResult {
+  // Same untrusted-HTML → Markdown path as extractHtmlContent: sanitize before the artifact
+  // is built so site-module browser captures cannot skip the shared prompt-injection guard.
+  const sanitizedMarkdown = sanitizePromptInjection(detailedMarkdown);
   return {
     fetchResult: {
       contentType: 'text/html',
@@ -414,8 +418,8 @@ function buildSalesforceFetchResult(
     },
     extraction: {
       title: title || url,
-      detailedMarkdown,
-      confidence: confidenceFor(detailedMarkdown.length),
+      detailedMarkdown: sanitizedMarkdown,
+      confidence: confidenceFor(sanitizedMarkdown.length),
       qualityNotes,
     },
     // Rendered capture is this fetcher's only strategy; reporting it lets a refresh overwrite

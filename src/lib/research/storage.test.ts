@@ -9,6 +9,7 @@ import {
   hasArtifact,
   findArtifact,
 } from './storage.js';
+import { deriveCacheKey } from './cache-key.js';
 import type { ResearchArtifact } from './schema.js';
 
 describe('cache storage filesystem management', () => {
@@ -57,6 +58,26 @@ describe('cache storage filesystem management', () => {
   it('rejects path traversal attempts in cache keys', () => {
     expect(() => getArtifactPath('/tmp', '../traversal')).toThrow(/Invalid cache key/);
     expect(() => getArtifactPath('/tmp', 'abc/def')).toThrow(/Invalid cache key/);
+  });
+
+  it('keeps a traversal-shaped URL write inside the store root (hash-only path)', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-traversal-'));
+    try {
+      const hostile = 'https://EXAMPLE.com:443/../../etc/passwd#escape';
+      const key = deriveCacheKey(hostile);
+      writeArtifact(tempDir, key, {
+        ...sampleArtifact,
+        metadata: { ...sampleArtifact.metadata, cache_key: key },
+      });
+      const artifactPath = getArtifactPath(tempDir, key);
+      const root = tempDir.split('\\').join('/');
+      const normalized = artifactPath.split('\\').join('/');
+      expect(normalized).toBe(`${root}/research/${key}.md`);
+      expect(normalized).not.toContain('etc/passwd');
+      expect(readdirSync(join(tempDir, 'research'))).toEqual([`${key}.md`]);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   it('resolves correct artifact path under data directory', () => {
