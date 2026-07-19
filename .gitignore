@@ -41,6 +41,7 @@ logs/
 !.agents/rules/
 .agents/rules/*
 !.agents/rules/development.md
+!.agents/rules/review-agents.md
 .claude/*
 !.claude/skills/
 !.claude/skills/**
@@ -49,13 +50,25 @@ logs/
 !.claude/rules/generated/
 .claude/rules/generated/*
 !.claude/rules/generated/development.md
+!.claude/rules/generated/review-agents.md
+!.claude/agents/
+.claude/agents/*
+!.claude/agents/AGENT_ALIASES.md
+!.claude/agents/business-analyst.md
+!.claude/agents/senior-code-reviewer.md
+!.claude/agents/senior-qa-engineer.md
 .cursor/*
 !.cursor/rules/
 .cursor/rules/*
 !.cursor/rules/development.mdc
-.github/agents/
+!.cursor/rules/review-agents.mdc
+.github/agents/*
+!.github/agents/business-analyst.agent.md
+!.github/agents/senior-code-reviewer.agent.md
+!.github/agents/senior-qa-engineer.agent.md
 .github/instructions/*
 !.github/instructions/development.instructions.md
+!.github/instructions/review-agents.instructions.md
 
 # Agent specific local paths
 .gemini/
