@@ -1,5 +1,9 @@
 # Agent Instructions
 
+## Reporting style
+
+When reporting information to the user, be extremely concise — sacrifice grammar for concision.
+
 This repository builds Bonsai, a standalone oclif CLI published as `@taurgis/bonsai` with a `bonsai` binary. Bonsai turns the manual docs research workflow into reusable local research cache commands for agents.
 
 ## Read first
