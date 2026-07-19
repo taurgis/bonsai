@@ -1,11 +1,40 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Config } from '@oclif/core';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import ResearchPrune from './prune.js';
 import ResearchImport from './import.js';
 import { existsSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
+import { readArtifact, writeArtifact } from '../lib/research/storage.js';
+
+/** Capture --json envelope from console.log (oclif logJson). */
+async function captureEnvelope(
+  fn: () => Promise<unknown>
+): Promise<{ result: unknown; envelope: Record<string, unknown> }> {
+  const writes: string[] = [];
+  const spy = vi
+    .spyOn(console, 'log')
+    .mockImplementation((...args: unknown[]) => void writes.push(args.map(String).join(' ')));
+  try {
+    const result = await fn();
+    return { result, envelope: JSON.parse(writes.join('\n').trim()) };
+  } finally {
+    spy.mockRestore();
+  }
+}
+
+function ageArtifactOnDisk(
+  cachePath: string,
+  cacheKey: string,
+  fetchedAt: string,
+  validatedAt: string
+): void {
+  // cache.path is `<dataDir>/research/<key>.md` — readArtifact wants the store dataDir.
+  const dataDir = dirname(dirname(cachePath));
+  const artifact = readArtifact(dataDir, cacheKey);
+  artifact.metadata.fetched_at = fetchedAt;
+  artifact.metadata.validated_at = validatedAt;
+  writeArtifact(dataDir, cacheKey, artifact);
+}
 
 describe('prune command unit tests', () => {
   useIsolatedCache();
@@ -60,7 +89,6 @@ describe('prune command unit tests', () => {
       .mockResolvedValueOnce('# React Cache Notes\nDetailed notes')
       .mockResolvedValueOnce('# Old Volatile changelog\nChangelog notes');
 
-    // Seed two items
     const reactImport = (await ResearchImport.run([
       'https://example.com/react-prune-test',
       '--stdin',
@@ -78,17 +106,19 @@ describe('prune command unit tests', () => {
       '--tier',
       'volatile',
     ])) as any;
+    readSpy.mockRestore();
 
     expect(existsSync(reactImport.cache.path)).toBe(true);
     expect(existsSync(volatileImport.cache.path)).toBe(true);
 
-    const shouldPruneSpy = vi
-      .spyOn(ResearchPrune.prototype as any, 'shouldPrune')
-      .mockImplementation((meta: any) => {
-        return meta.cache_key === volatileImport.cache.key;
-      });
+    // Age only the volatile entry past --older-than 30d; leave the stable entry fresh.
+    ageArtifactOnDisk(
+      volatileImport.cache.path,
+      volatileImport.cache.key,
+      '2026-01-01T00:00:00.000Z',
+      '2026-01-01T00:00:00.000Z'
+    );
 
-    // 1. Dry run
     const dryRunResult = (await ResearchPrune.run(['--older-than', '30d', '--dry-run'])) as any;
 
     expect(dryRunResult.dryRun).toBe(true);
@@ -99,7 +129,6 @@ describe('prune command unit tests', () => {
     expect(dryRunResult.files[0].cacheKey).toBe(volatileImport.cache.key);
     expect(existsSync(volatileImport.cache.path)).toBe(true);
 
-    // 2. Actual prune
     const pruneResult = (await ResearchPrune.run(['--older-than', '30d', '--yes'])) as any;
 
     expect(pruneResult.dryRun).toBe(false);
@@ -110,9 +139,6 @@ describe('prune command unit tests', () => {
     expect(pruneResult.files[0].cacheKey).toBe(volatileImport.cache.key);
     expect(existsSync(volatileImport.cache.path)).toBe(false);
     expect(existsSync(reactImport.cache.path)).toBe(true);
-
-    readSpy.mockRestore();
-    shouldPruneSpy.mockRestore();
   });
 
   it('covers shouldPrune and filters by artifact-type directly', async () => {
@@ -121,7 +147,6 @@ describe('prune command unit tests', () => {
       .mockResolvedValueOnce('# Import Note\nDetail note')
       .mockResolvedValueOnce('# Source Scraped Note\nScraped note');
 
-    // Seed one research_note (multi-source import creates research_note)
     const note = (await ResearchImport.run([
       '--stdin',
       '--topic',
@@ -132,7 +157,6 @@ describe('prune command unit tests', () => {
       'volatile',
     ])) as any;
 
-    // Seed one source
     const source = (await ResearchImport.run([
       'https://example.com/direct-source-url',
       '--stdin',
@@ -141,11 +165,11 @@ describe('prune command unit tests', () => {
       '--tier',
       'volatile',
     ])) as any;
+    readSpy.mockRestore();
 
     expect(existsSync(note.cache.path)).toBe(true);
     expect(existsSync(source.cache.path)).toBe(true);
 
-    // Dry run filtering by artifact-type research_note. This runs real shouldPrune!
     const dryRunResult = (await ResearchPrune.run([
       '--artifact-type',
       'research_note',
@@ -156,15 +180,11 @@ describe('prune command unit tests', () => {
     const candidateKeys = dryRunResult.files.map((f: any) => f.cacheKey);
     expect(candidateKeys).toContain(note.cache.key);
     expect(candidateKeys).not.toContain(source.cache.key);
-
-    readSpy.mockRestore();
   });
 
   it('reports the actual deleted count, not the candidate count, when an unlink fails', async () => {
     // Two candidates whose files do not exist, so every unlinkSync throws and nothing is deleted.
-    // The JSON envelope must report prunedCount=0 (actual) while candidateCount stays at 2, so an
-    // agent branching on prunedCount is never told a failed prune succeeded. Exit code is 1 so
-    // exit-only callers also see the partial failure.
+    // Observe the PRUNE_PARTIAL_FAILURE envelope via --json (stdout), not private toSuccessJson.
     const prevExit = process.exitCode;
     process.exitCode = 0;
     const candidatesSpy = vi
@@ -173,30 +193,21 @@ describe('prune command unit tests', () => {
         { cacheKey: 'missing-a', path: '/nonexistent/missing-a.md', topic: null, url: null },
         { cacheKey: 'missing-b', path: '/nonexistent/missing-b.md', topic: null, url: null },
       ]);
-    // Swallow the per-file failure warnings so the test output stays clean.
     const warnSpy = vi.spyOn(ResearchPrune.prototype as any, 'warn').mockImplementation(() => '');
 
     try {
-      const result = (await ResearchPrune.run([
-        '--url',
-        'https://example.com/missing-prune',
-        '--yes',
-      ])) as any;
+      const { result, envelope } = await captureEnvelope(() =>
+        ResearchPrune.run(['--url', 'https://example.com/missing-prune', '--yes', '--json'])
+      );
 
-      expect(result.candidateCount).toBe(2);
-      expect(result.prunedCount).toBe(0);
+      expect(result).toMatchObject({ candidateCount: 2, prunedCount: 0 });
       expect(process.exitCode).toBe(1);
-
-      const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
-      const config = await Config.load(repoRoot);
-      const cmd = new ResearchPrune([], config) as any;
-      const envelope = cmd.toSuccessJson(result);
       expect(envelope).toMatchObject({
         ok: false,
         exitCode: 1,
         code: 'PRUNE_PARTIAL_FAILURE',
       });
-      expect(envelope.stderr).toContain('Failed to delete 2 of 2');
+      expect(String(envelope.stderr)).toContain('Failed to delete 2 of 2');
     } finally {
       process.exitCode = prevExit;
       candidatesSpy.mockRestore();
@@ -216,24 +227,40 @@ describe('prune command unit tests', () => {
     );
   });
 
-  it('treats --inactive as last-validation idle time, distinct from --older-than content age', () => {
-    const cmd = new ResearchPrune([], {} as any) as any;
-    cmd.flags = { 'older-than': '30d', inactive: undefined };
-    const now = new Date('2026-07-01T00:00:00.000Z');
-    // Fetched 60d ago, validated yesterday → older-than matches, inactive alone would not.
-    const meta = {
-      fetched_at: '2026-05-01T00:00:00.000Z',
-      validated_at: '2026-06-30T00:00:00.000Z',
-      artifact_type: 'source',
-    };
-    expect(cmd.shouldPrune(meta, now)).toBe(true);
+  it('treats --inactive as last-validation idle time, distinct from --older-than content age', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Idle vs content age\nBody');
+    const imported = (await ResearchImport.run([
+      'https://example.com/prune-idle-vs-age',
+      '--stdin',
+      '--topic',
+      'IdleVsAge',
+    ])) as any;
+    readSpy.mockRestore();
 
-    cmd.flags = { 'older-than': undefined, inactive: '30d' };
-    // Validated yesterday → still active within a 30d idle window.
-    expect(cmd.shouldPrune(meta, now)).toBe(false);
+    // Fetched long ago, validated recently → --older-than 30d matches; --inactive 30d does not.
+    ageArtifactOnDisk(
+      imported.cache.path,
+      imported.cache.key,
+      new Date(Date.now() - 60 * 24 * 3600 * 1000).toISOString(),
+      new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString()
+    );
 
-    cmd.flags = { 'older-than': undefined, inactive: '12h' };
-    // Validated yesterday → idle ~1d exceeds 12h.
-    expect(cmd.shouldPrune(meta, now)).toBe(true);
+    const byContent = (await ResearchPrune.run(['--older-than', '30d', '--dry-run'])) as any;
+    expect(byContent.files.map((f: any) => f.cacheKey)).toContain(imported.cache.key);
+
+    const byIdleWide = (await ResearchPrune.run(['--inactive', '30d', '--dry-run'])) as any;
+    expect(byIdleWide.files.map((f: any) => f.cacheKey)).not.toContain(imported.cache.key);
+
+    // Idle beyond 12h: validated two days ago.
+    ageArtifactOnDisk(
+      imported.cache.path,
+      imported.cache.key,
+      new Date(Date.now() - 60 * 24 * 3600 * 1000).toISOString(),
+      new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
+    );
+    const byIdleNarrow = (await ResearchPrune.run(['--inactive', '12h', '--dry-run'])) as any;
+    expect(byIdleNarrow.files.map((f: any) => f.cacheKey)).toContain(imported.cache.key);
   });
 });

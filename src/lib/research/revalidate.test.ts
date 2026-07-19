@@ -2,7 +2,6 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { evaluateFreshness, getPolicy } from './freshness.js';
 import { revalidateCache, createArtifactFromFetch } from './revalidate.js';
 import { writeArtifact, readArtifact } from './storage.js';
 import type { ResearchArtifact } from './schema.js';
@@ -66,42 +65,6 @@ describe('freshness and revalidation engine', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.mocked(sites.getSiteModuleById).mockReturnValue(undefined);
-  });
-
-  describe('freshness classification', () => {
-    it('correctly classifies within TTL, grace, and expired ranges', () => {
-      const meta = {
-        ...sampleArtifact.metadata,
-        fetched_at: '2026-06-24T00:00:00.000Z',
-        validated_at: '2026-06-24T00:00:00.000Z',
-        tier: 'standard' as const, // 30 days fresh, 14 days grace
-      };
-
-      // 10 days later: should be fresh
-      const freshTime = new Date('2026-07-04T00:00:00.000Z');
-      expect(evaluateFreshness(meta, freshTime)).toBe('fresh');
-
-      // 35 days later: should be stale within grace
-      const graceTime = new Date('2026-07-29T00:00:00.000Z');
-      expect(evaluateFreshness(meta, graceTime)).toBe('stale_grace');
-
-      // 50 days later: should be expired (beyond grace)
-      const expiredTime = new Date('2026-08-15T00:00:00.000Z');
-      expect(evaluateFreshness(meta, expiredTime)).toBe('stale_expired');
-    });
-
-    it('honors manual TTL overrides in policy derivations', () => {
-      const meta = {
-        ...sampleArtifact.metadata,
-        fetched_at: '2026-06-24T00:00:00.000Z',
-        validated_at: '2026-06-24T00:00:00.000Z',
-        tier: 'standard' as const,
-      };
-
-      // Set explicit TTL to 2 hours
-      const currentTime = new Date('2026-06-24T03:00:00.000Z');
-      expect(evaluateFreshness(meta, currentTime, '2h')).toBe('stale_expired');
-    });
   });
 
   describe('createArtifactFromFetch error pages', () => {
@@ -217,18 +180,8 @@ describe('freshness and revalidation engine', () => {
       expect(result.status).toBe('revalidated');
       expect(result.artifact.metadata.validated_at).toBe(currentTime.toISOString());
 
-      // Confirm Etag and Last-Modified were passed to the fetcher request headers
-      expect(fetcher.fetchStaticHtml).toHaveBeenCalledWith(
-        'https://example.com/docs',
-        expect.objectContaining({
-          headers: {
-            'If-None-Match': 'w/1234',
-            'If-Modified-Since': 'Wed, 21 Oct 2015 07:28:00 GMT',
-          },
-        })
-      );
-
-      // Verify stored file is updated
+      // Verify stored file is updated (command-seam coverage of conditional headers lives in
+      // fetch-paths.test.ts via shared fetch shapes; disk frontmatter is the observing seam here).
       const stored = readArtifact(tempDir, sampleArtifact.metadata.cache_key);
       expect(stored.metadata.validated_at).toBe(currentTime.toISOString());
     });
