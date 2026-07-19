@@ -17,6 +17,9 @@ export interface MachineReadableResult {
 /**
  * Injectable HTTP fetcher used by the machine-readable probe functions.
  * Tests supply a fixture fetcher; production code uses `fetchText`.
+ *
+ * @param url - Absolute URL to fetch.
+ * @returns Response body, final URL after redirects, status code, and content-type header.
  */
 export type TextFetcher = (
   url: string

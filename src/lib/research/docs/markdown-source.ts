@@ -12,8 +12,6 @@ export interface ParsedFrontmatter {
   body: string;
 }
 
-// Parses a leading YAML frontmatter block (--- ... ---). Only flat scalar keys are read; nested
-// structures are ignored (we only need title/description). The block is stripped from the body.
 /**
  * Extracts the leading YAML frontmatter block from a Markdown string. Only flat scalar keys are
  * read; nested structures are silently ignored. The returned `body` has the frontmatter block

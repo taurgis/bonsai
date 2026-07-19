@@ -110,6 +110,10 @@ const MIN_TWIN_CHARS = 100;
 /**
  * Injectable HTTP fetcher used by `fetchDeveloperRouteMarkdown`. The default is `fetchText`;
  * tests inject a fixture fetcher to avoid real network calls.
+ *
+ * @param url - Absolute URL to fetch.
+ * @param options - Optional request headers and timeout in milliseconds.
+ * @returns A `FetchResult` from the HTTP layer.
  */
 export type RouteMarkdownFetcher = (
   url: string,

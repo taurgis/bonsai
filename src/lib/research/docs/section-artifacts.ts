@@ -83,6 +83,7 @@ function activeChildrenOf(dataDir: string, parentKey: string): ResearchArtifact[
  * @param currentTime - Timestamp embedded in the child artifacts.
  * @param summaryLevel - Extractive summarization level for child `compressed` fields.
  * @returns Count of active section children written to disk.
+ * @throws {Error} When `writeArtifact` rejects a path or the filesystem write fails.
  */
 export function persistSectionArtifacts(
   dataDir: string,

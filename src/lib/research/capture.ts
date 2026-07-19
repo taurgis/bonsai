@@ -40,8 +40,6 @@ export interface CaptureOutcome {
 
 const MIN_USEFUL_CHARS = 600;
 
-// A static extraction needs rendering help when it failed outright, the detector says the page is
-// an SPA/client-rendered, or the extracted article is too thin/low-confidence to be useful.
 /**
  * Returns true when the static extraction result is missing or too weak to serve as the artifact,
  * meaning the caller should attempt a rendered fallback.

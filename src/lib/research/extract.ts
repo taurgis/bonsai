@@ -78,7 +78,8 @@ function determineConfidence(textLength: number): {
  * @param html - Raw HTML of the page to extract.
  * @param finalUrl - The resolved URL after any redirects; used to resolve relative links.
  * @returns Extracted title, Markdown body, confidence level, quality notes, and index-hub flag.
- * @throws {Error} When Readability cannot parse any article content from the page.
+ * @throws {Error} When `finalUrl` is not a valid URL, or when Readability cannot parse any
+ *   article content from the page.
  */
 export function extractHtmlContent(html: string, finalUrl: string): ExtractionResult {
   const { document } = parseHTML(html);

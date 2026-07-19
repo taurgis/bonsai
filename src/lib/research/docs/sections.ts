@@ -38,7 +38,6 @@ export function headingPlainText(raw: string): string {
     .trim();
 }
 
-// GitHub-style anchor slug: lowercase, drop punctuation, spaces -> hyphens.
 /**
  * Converts plain heading text into a GitHub-compatible anchor slug: lowercase, punctuation
  * removed, spaces replaced with hyphens.
