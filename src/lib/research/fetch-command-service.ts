@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { finalizeBatch } from '../batch.js';
+import { formatErrorForJson } from '../envelope.js';
 import type { StorageMode, SummaryLevel } from '../config/index.js';
 import { loadSummaryLevel } from '../config/index.js';
 import {
@@ -323,8 +324,10 @@ function failureRowOrRethrow(url: string, err: unknown, run: FetchRun) {
     err instanceof Errors.CLIError
       ? buildFetchFailureResult({ url, dryRun, err })
       : buildFetchFailureFromCaught(io.bin, url, err, dryRun);
-  // Human batches only get the spinner "failed" label unless we echo the reason.
-  if (!io.json) io.warn(row.error.message);
+  // Human batches only get the spinner "failed" label unless we echo the reason. Mirror the
+  // single-URL error format (message + Code: + Try this:) rather than a bare message, so a row
+  // failure in a batch is exactly as actionable as it is standalone.
+  if (!io.json) io.warn(formatErrorForJson(row.error));
   return row;
 }
 

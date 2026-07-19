@@ -45,6 +45,12 @@ describe('stableErrorCodeFrom', () => {
     ).toBe('MISSING_FLAG_VALUE');
   });
 
+  it('maps the class-less "flag can only be specified once" error by its message', () => {
+    expect(stableErrorCodeFrom({ message: 'Flag --topic can only be specified once' })).toBe(
+      'DUPLICATE_FLAG'
+    );
+  });
+
   it('returns undefined when nothing maps', () => {
     expect(stableErrorCodeFrom({ message: 'boom' })).toBeUndefined();
     expect(stableErrorCodeFrom(null)).toBeUndefined();

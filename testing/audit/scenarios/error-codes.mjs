@@ -193,4 +193,16 @@ export default function register(harness) {
     expect(json.exitCode === 2, `exit ${json.exitCode}`);
     expect(env?.code === 'INVALID_DURATION', env?.code);
   });
+
+  expectCodeBothModes(
+    'repeated single-value flag carries DUPLICATE_FLAG in both modes',
+    ['list', '--limit', '10', '--limit', '20'],
+    'DUPLICATE_FLAG'
+  );
+
+  expectJsonSuggestions(
+    'repeated single-value flag has an actionable suggestion under --json',
+    ['list', '--limit', '10', '--limit', '20'],
+    'DUPLICATE_FLAG'
+  );
 }

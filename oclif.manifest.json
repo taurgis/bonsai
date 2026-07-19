@@ -107,7 +107,7 @@
           "type": "boolean"
         },
         "allow-stale": {
-          "description": "serve stale cache if revalidation fails",
+          "description": "suppress exit code 5 when stale cache is served within grace after failed revalidation",
           "name": "allow-stale",
           "allowNo": false,
           "type": "boolean"
@@ -677,7 +677,7 @@
           "required": false
         }
       },
-      "description": "Print a config value. Without --global/--local, shows the merged effective value (flag > env > project > user > default).\n\nValid keys: storage, summary.",
+      "description": "Print a config value. Without --global/--local, shows the merged effective value, in precedence order: a per-command override flag (e.g. `fetch --storage`) > env var > project file > user file > built-in default.\n\nValid keys: storage, summary.",
       "examples": [
         {
           "description": "get the effective storage mode",

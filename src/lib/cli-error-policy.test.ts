@@ -41,4 +41,13 @@ describe('cli-error-policy', () => {
     expect(err.code).toBe('MISSING_FLAG_VALUE');
     expect(err.suggestions?.[0]).toContain('bonsai fetch --help');
   });
+
+  it('maps a repeated single-value flag to DUPLICATE_FLAG with a usage suggestion', () => {
+    const err: { message: string; code?: string; suggestions?: string[] } = {
+      message: 'Flag --topic can only be specified once',
+    };
+    enrichErrorForDisplay(err, { bin: 'bonsai', command: 'fetch' });
+    expect(err.code).toBe('DUPLICATE_FLAG');
+    expect(err.suggestions?.[0]).toContain('bonsai fetch --help');
+  });
 });

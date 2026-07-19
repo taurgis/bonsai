@@ -179,17 +179,22 @@ export function getCaBundleSpkiHashes(): string[] {
 /**
  * Chrome CLI flag that trusts exactly the sandbox's injected CA(s), pinned by SPKI hash rather
  * than by disabling verification. Chromium's TLS stack (the Chrome Root Store) never reads
- * NODE_EXTRA_CA_CERTS/SSL_CERT_FILE/CURL_CA_BUNDLE the way Node/curl/Python do, so a sandbox that
- * MITMs HTTPS through its proxy (see isProxyConfigured) makes every other tool trust the proxy's
- * cert while Chrome's handshake with it fails with ERR_CERT_AUTHORITY_INVALID. This is scoped
- * narrowly to the specific CA(s) discovered via the CA bundle env vars — never
- * --ignore-certificate-errors, which would disable verification for every host, including ones
- * that have nothing to do with the sandbox's proxy. A no-op (empty array) when no proxy is
- * configured or no CA bundle is discoverable, so default Chrome trust is untouched on ordinary
- * developer machines.
+ * NODE_EXTRA_CA_CERTS/SSL_CERT_FILE/CURL_CA_BUNDLE the way Node/curl/Python do, so an environment
+ * that MITMs HTTPS makes every other tool trust that CA while Chrome's handshake with it fails
+ * with ERR_CERT_AUTHORITY_INVALID. This is scoped narrowly to the specific CA(s) discovered via
+ * the CA bundle env vars — never --ignore-certificate-errors, which would disable verification
+ * for every host, including ones that have nothing to do with the sandbox.
+ *
+ * Deliberately independent of isProxyConfigured(): some sandboxes intercept HTTPS transparently
+ * (or via a proxy Chrome reaches without an explicit --proxy-server flag) while still exporting a
+ * CA bundle env var for CLI tools to trust — HTTPS_PROXY/HTTP_PROXY and the CA bundle vars are
+ * two separate signals that usually co-occur but aren't guaranteed to. Gating on proxy detection
+ * left Chrome untrusting a CA bundle that was in fact discoverable, so it rejected every
+ * browser-rendered fetch with ERR_CERT_AUTHORITY_INVALID in that shape of environment. A no-op
+ * (empty array) when no CA bundle is discoverable, so default Chrome trust is untouched on
+ * ordinary developer machines.
  */
 export function getChromeSpkiArgs(): string[] {
-  if (!isProxyConfigured()) return [];
   const hashes = getCaBundleSpkiHashes();
   if (!hashes.length) return [];
   return [`--ignore-certificate-errors-spki-list=${hashes.join(',')}`];

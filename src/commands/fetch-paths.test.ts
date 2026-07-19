@@ -358,6 +358,23 @@ describe('fetch command branch coverage', () => {
     });
   });
 
+  it('batch with an invalid URL row: warns with the same Code/Try this as the single-URL error', async () => {
+    mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+    const warnSpy = vi.spyOn(FetchCommand.prototype, 'warn').mockImplementation((input) => input);
+
+    const result: any = await FetchCommand.run([TEST_URL, 'not-a-valid-url']);
+
+    expect(Array.isArray(result)).toBe(true);
+    const failureRow = result.find((row: any) => row.error);
+    expect(failureRow.error.code).toBe('INVALID_URL');
+    const warnedMessage = String(
+      warnSpy.mock.calls.find((call) => String(call[0]).includes('INVALID_URL'))?.[0]
+    );
+    expect(warnedMessage).toContain('Code: INVALID_URL');
+    expect(warnedMessage).toContain('Try this:');
+    warnSpy.mockRestore();
+  });
+
   it('--storage project: writes to the project .bonsai cache under cwd', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
 

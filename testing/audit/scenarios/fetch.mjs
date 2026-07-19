@@ -185,6 +185,16 @@ export default function register(harness, fixtures) {
     );
   });
 
+  // A batch row failure must be exactly as actionable as the same error standalone: Code: and
+  // Try this: lines, not just a bare message (the single-URL form already includes both).
+  check('fetch multi-URL human mode row failure includes Code and Try this', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url, 'not-a-url'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('Code: INVALID_URL'), r.stderr);
+    expect(r.stderr.includes('Try this:'), r.stderr);
+  });
+
   check('fetch --force --allow-stale is CONFLICTING_FLAGS', () => {
     const r = run(['https://example.com', '--force', '--allow-stale', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
