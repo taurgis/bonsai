@@ -3,19 +3,37 @@ import type { ResearchArtifactMetadata } from './schema.js';
 const HOUR_MS = 3600 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 
+/** Calendar multipliers used when parsing duration units (`w`/`m`/`y`). */
+const DAYS_PER_WEEK = 7;
+const DAYS_PER_MONTH = 30;
+const DAYS_PER_YEAR = 365;
+
+/** Default freshness windows by tier (days). Grace is the additional serve-stale window. */
+const STANDARD_FRESH_DAYS = 30;
+const STANDARD_GRACE_DAYS = 14;
+const STABLE_FRESH_DAYS = 180;
+const STABLE_GRACE_DAYS = 60;
+const VOLATILE_FRESH_DAYS = 7;
+const VOLATILE_GRACE_DAYS = 5;
+
 /** Shared unit hint for parse failures and empty-duration rejection. */
 const DURATION_FORMAT_HINT =
   `Use a whole number plus a unit: ` +
   `h (hours), d (days), w (weeks), m (months), or y (years), e.g. '2h', '7d', '6m'.`;
 
+/** Fresh and grace windows derived from a tier and optional TTL override. */
 export interface FreshnessPolicy {
   freshWindowMs: number;
   graceWindowMs: number;
 }
 
 /**
- * Parses simple TTL duration strings to milliseconds. The unit `m` is months (not minutes); the
- * smallest unit is hours, since sub-hour cache lifespans are not meaningful for research artifacts.
+ * Parses a TTL/duration string into milliseconds.
+ * The unit `m` means months (not minutes); the smallest unit is hours.
+ *
+ * @param ttl - Whole number plus unit (`h`/`d`/`w`/`m`/`y`).
+ * @returns Duration in milliseconds.
+ * @throws {Error} When the format is invalid or the duration is zero.
  */
 export function parseTtlToMs(ttl: string): number {
   const match = ttl.match(/^(\d+)([hdwmy])$/);
@@ -25,35 +43,36 @@ export function parseTtlToMs(ttl: string): number {
     // Invalid TTL format" stutter.
     throw new Error(`Duration "${ttl}" is not a valid format. ${DURATION_FORMAT_HINT}`);
   }
-  const val = parseInt(match[1] || '', 10);
+  const amount = parseInt(match[1] || '', 10);
   const unit = match[2] || '';
 
   // Zero-length durations would match every entry (age >= 0) and turn prune filters into a wipe.
-  if (val === 0) {
+  if (amount === 0) {
     throw new Error(`Duration "${ttl}" must be greater than zero.`);
   }
 
   switch (unit) {
     case 'h':
-      return val * HOUR_MS;
+      return amount * HOUR_MS;
     case 'd':
-      return val * DAY_MS;
+      return amount * DAY_MS;
     case 'w':
-      return val * 7 * DAY_MS;
+      return amount * DAYS_PER_WEEK * DAY_MS;
     case 'm':
-      return val * 30 * DAY_MS;
+      return amount * DAYS_PER_MONTH * DAY_MS;
     case 'y':
-      return val * 365 * DAY_MS;
+      return amount * DAYS_PER_YEAR * DAY_MS;
     default:
       return 0;
   }
 }
 
 /**
- * Validate a duration-valued flag. Returns an actionable error message that names the
- * offending flag when the value is malformed, or null when the flag is absent or valid.
- * Callers map a non-null message onto `this.error(msg, { exit: 2 })`, so every command
- * reports the same parse failure while naming the exact flag the user passed.
+ * Validate a duration-valued flag.
+ *
+ * @param flag - Flag token for the error message (e.g. `--ttl`).
+ * @param value - Raw flag value, or `undefined` when omitted.
+ * @returns Actionable error message, or `null` when absent/valid.
  */
 export function durationFlagError(flag: string, value: string | undefined): string | null {
   // Absent is fine; empty/whitespace is almost always a shell-quoting mistake and must not
@@ -71,21 +90,26 @@ export function durationFlagError(flag: string, value: string | undefined): stri
 }
 
 /**
- * Derives the active freshness policy based on the tier and optional TTL override.
+ * Derives the active freshness policy from a tier and optional TTL override.
+ * When a TTL override is set, grace scales proportionally to the tier's default ratio.
+ *
+ * @param tier - Freshness tier (`stable` / `standard` / `volatile`).
+ * @param ttlOverride - Optional TTL string replacing the tier's fresh window.
+ * @returns Fresh and grace windows in milliseconds.
  */
-export function getPolicy(
+export function resolveFreshnessPolicy(
   tier: 'stable' | 'standard' | 'volatile',
   ttlOverride?: string | null
 ): FreshnessPolicy {
-  let freshWindowMs = 30 * DAY_MS;
-  let graceWindowMs = 14 * DAY_MS;
+  let freshWindowMs = STANDARD_FRESH_DAYS * DAY_MS;
+  let graceWindowMs = STANDARD_GRACE_DAYS * DAY_MS;
 
   if (tier === 'stable') {
-    freshWindowMs = 180 * DAY_MS;
-    graceWindowMs = 60 * DAY_MS;
+    freshWindowMs = STABLE_FRESH_DAYS * DAY_MS;
+    graceWindowMs = STABLE_GRACE_DAYS * DAY_MS;
   } else if (tier === 'volatile') {
-    freshWindowMs = 7 * DAY_MS;
-    graceWindowMs = 5 * DAY_MS;
+    freshWindowMs = VOLATILE_FRESH_DAYS * DAY_MS;
+    graceWindowMs = VOLATILE_GRACE_DAYS * DAY_MS;
   }
 
   if (ttlOverride) {
@@ -102,6 +126,12 @@ export function getPolicy(
  * Evaluates the freshness status of a cached artifact.
  * `ttlOverride` / `tierOverride` let status (and similar read-only checks) evaluate "what if"
  * policies without mutating the stored metadata. When omitted, the artifact's own tier/TTL win.
+ *
+ * @param meta - Artifact metadata providing timestamps, tier, and stored TTL.
+ * @param currentTime - Clock used for age calculation.
+ * @param ttlOverride - Optional TTL replacing the stored TTL for this evaluation.
+ * @param tierOverride - Optional tier replacing the stored tier for this evaluation.
+ * @returns `fresh`, `stale_grace`, or `stale_expired`.
  */
 export function evaluateFreshness(
   meta: ResearchArtifactMetadata,
@@ -113,7 +143,7 @@ export function evaluateFreshness(
   const validated = meta.validated_at ? new Date(meta.validated_at).getTime() : 0;
   const baseTime = Math.max(fetched, validated);
 
-  const { freshWindowMs, graceWindowMs } = getPolicy(
+  const { freshWindowMs, graceWindowMs } = resolveFreshnessPolicy(
     tierOverride ?? meta.tier,
     ttlOverride || meta.ttl
   );
@@ -129,7 +159,12 @@ export function evaluateFreshness(
 }
 
 /**
- * Checks if the cached entry's age exceeds the specified max-age duration.
+ * Checks whether the cached entry's age exceeds the specified max-age duration.
+ *
+ * @param cached - Artifact (or metadata bag) with fetch/validate timestamps.
+ * @param currentTime - Clock used for age calculation.
+ * @param maxAge - Duration string, or `undefined` to skip the check.
+ * @returns `true` when max-age is set and exceeded.
  */
 export function checkMaxAgeExpired(
   cached: { metadata: Pick<ResearchArtifactMetadata, 'fetched_at' | 'validated_at'> },
@@ -148,7 +183,13 @@ export function checkMaxAgeExpired(
 
 /**
  * Freshness for a cached artifact, applying `--max-age` before the tier/TTL windows.
- * Returns `stale_expired` when max-age is exceeded; otherwise delegates to `evaluateFreshness`.
+ *
+ * @param cached - Artifact with full metadata.
+ * @param currentTime - Clock used for age calculation.
+ * @param options.ttl - Optional TTL override.
+ * @param options.maxAge - Optional max-age duration; when exceeded returns `stale_expired`.
+ * @param options.tier - Optional tier override.
+ * @returns `fresh`, `stale_grace`, or `stale_expired`.
  */
 export function evaluateFreshnessWithMaxAge(
   cached: { metadata: ResearchArtifactMetadata },

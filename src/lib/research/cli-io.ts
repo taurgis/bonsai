@@ -1,3 +1,4 @@
+import { EXIT_USAGE } from '../cli-error-policy.js';
 import { looksLikeSchemelessUrl } from './url.js';
 
 /** Options accepted by {@link CliIo.error} — the subset of oclif's `this.error` options Bonsai uses. */
@@ -30,6 +31,9 @@ export interface CliIo {
  * everywhere; truly unparseable input stays INVALID_URL.
  *
  * @param error - `this.error` (oclif) or `io.error`; must not return.
+ * @param url - Raw URL string the user supplied.
+ * @param message - Human-readable failure message.
+ * @returns Never — always exits via `error`.
  */
 export function failInvalidUrl(
   error: (msg: string, opts: CliErrorOptions) => never,
@@ -38,13 +42,13 @@ export function failInvalidUrl(
 ): never {
   if (looksLikeSchemelessUrl(url)) {
     error(message, {
-      exit: 2,
+      exit: EXIT_USAGE,
       code: 'MISSING_URL_SCHEME',
       suggestions: [`Use a full URL: https://${url}`],
     });
   }
   error(`Invalid URL: ${message}`, {
-    exit: 2,
+    exit: EXIT_USAGE,
     code: 'INVALID_URL',
     suggestions: ['Provide a valid http:// or https:// URL.'],
   });

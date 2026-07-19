@@ -1,12 +1,13 @@
 import { Config } from '@oclif/core';
 import { positionalArgvTokens } from './argv.js';
+import { EXIT_USAGE } from './cli-error-policy.js';
 import { VALUE_TAKING_FLAG_TOKENS } from './cli-flag-manifest.js';
 import { buildCliErrorEnvelope } from './envelope.js';
 import { buildCommandNotFoundDetails } from '../hooks/command-not-found/suggest.js';
 
 /** Always an envelope — human and JSON share one formatted stderr (Code + Try this). */
 export type UnknownHelpResult = {
-  exitCode: 2;
+  exitCode: typeof EXIT_USAGE;
   envelope: Record<string, unknown>;
   json: boolean;
 };
@@ -62,7 +63,7 @@ export async function tryUnknownHelpOutput(
   const attemptedId = commandId(tokens);
   const details = buildCommandNotFoundDetails(attemptedId, [...argv], config);
   return {
-    exitCode: 2,
+    exitCode: EXIT_USAGE,
     json: argv.includes('--json'),
     envelope: buildCliErrorEnvelope({
       command: details.command,

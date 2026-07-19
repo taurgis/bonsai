@@ -28,6 +28,7 @@ import type { StoreRoots } from './store-roots.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
 import { batchSeparator } from '../cache-view.js';
 import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
+import { EXIT_STALE_SERVED } from '../cli-error-policy.js';
 import { detectSite } from '../../sites/index.js';
 import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/types.js';
 
@@ -44,12 +45,14 @@ interface ResolvedFetchArtifact {
   artifact: ResearchArtifact;
 }
 
+/** Spinner port used while a fetch is in progress. */
 export interface FetchCommandSpinner {
   running(): boolean;
   start(msg: string): void;
   stop(msg?: string): void;
 }
 
+/** Parsed flags for one fetch command invocation. */
 export interface FetchCommandFlags {
   topic?: string;
   tags?: string[];
@@ -63,6 +66,7 @@ export interface FetchCommandFlags {
   storage?: StorageMode;
 }
 
+/** Inputs for {@link runFetchCommandService}. */
 export interface FetchCommandServiceOptions {
   urls: string[];
   flags: FetchCommandFlags;
@@ -154,19 +158,19 @@ async function executeCacheHit(
     return { cacheStatus: 'hit', freshnessState, artifact: cached };
   }
 
-  const revalResult = await revalidateCache(targetDir, cached, currentTime, {
+  const revalidationResult = await revalidateCache(targetDir, cached, currentTime, {
     allowStale: flags.allowStale,
     ttlOverride: flags.ttl,
     rendered: flags.rendered,
     summaryLevel: run.summaryLevel,
   });
 
-  handleStaleRevalidationResult(io, revalResult);
+  handleStaleRevalidationResult(io, revalidationResult);
 
   return {
-    cacheStatus: revalResult.status,
+    cacheStatus: revalidationResult.status,
     freshnessState,
-    artifact: revalResult.artifact,
+    artifact: revalidationResult.artifact,
   };
 }
 
@@ -285,7 +289,9 @@ function persistFreshArtifact(
 }
 
 // Long references are split into searchable/inspectable section children whenever the page artifact
-// is freshly written (T-22). Best-effort: never let chunking break the main result.
+// is freshly written (T-22).
+// ponytail: section persist is best-effort; failures are swallowed so chunking never fails the
+// parent fetch. Upgrade: surface section errors in warnings/envelope when agents need them.
 function persistSectionsIfFresh(
   targetDir: string,
   artifact: ResearchArtifact,
@@ -296,7 +302,7 @@ function persistSectionsIfFresh(
   try {
     persistSectionArtifacts(targetDir, artifact, run.currentTime, run.summaryLevel);
   } catch {
-    /* section generation is non-essential; ignore failures */
+    /* ignored — see ponytail note above */
   }
 }
 
@@ -394,11 +400,14 @@ function applyCaptureMetadata(artifact: ResearchArtifact, capture: CaptureOutcom
   }
 }
 
-function handleStaleRevalidationResult(io: CliIo, revalResult: RevalidationResult): void {
-  if (revalResult.status !== 'stale') return;
-  const exitSuffix = revalResult.allowed ? '' : ' (exit 5)';
+function handleStaleRevalidationResult(
+  io: CliIo,
+  revalidationResult: RevalidationResult
+): void {
+  if (revalidationResult.status !== 'stale') return;
+  const exitSuffix = revalidationResult.allowed ? '' : ` (exit ${EXIT_STALE_SERVED})`;
   io.warn(
-    `Serving stale content within grace period${exitSuffix}: revalidation failed (${revalResult.error}).`
+    `Serving stale content within grace period${exitSuffix}: revalidation failed (${revalidationResult.error}).`
   );
-  if (!revalResult.allowed) process.exitCode = 5;
+  if (!revalidationResult.allowed) process.exitCode = EXIT_STALE_SERVED;
 }

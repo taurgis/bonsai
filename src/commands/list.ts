@@ -15,13 +15,19 @@ import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 import type { ListRow } from '../lib/cli-result-types.js';
 
-// Listings are ordered newest-first, so the truncation word is "first"; --limit caps at 100.
-const LIST_LABELS: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
+// Listings are ordered newest-first, so the truncation word is "first"; --limit caps at this value.
+const LIST_DEFAULT_MAX_LIMIT = 100;
+const LIST_LABELS: ResultListLabels = {
+  noun: 'cached research',
+  order: 'first',
+  maxLimit: LIST_DEFAULT_MAX_LIMIT,
+};
 
 // `list` answers "what pages/notes do I have?" and deliberately omits section children (see
 // scanCacheDirForList), so `section` is not an offered filter — every other artifact type can appear.
 const LISTABLE_ARTIFACT_TYPES = ARTIFACT_TYPES.filter((type) => type !== 'section');
 
+/** List cached research artifacts by metadata filters. */
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static id = 'list';
   static summary = 'List cached research artifacts by metadata';
@@ -211,7 +217,6 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
     const results = this.scanCacheDirForList(roots.readRoots, currentTime);
 
-    // Sort by validated_at or fetched_at descending (most recent first)
     results.sort((a, b) => {
       const timeA = new Date(a.validatedAt || a.fetchedAt || 0).getTime();
       const timeB = new Date(b.validatedAt || b.fetchedAt || 0).getTime();

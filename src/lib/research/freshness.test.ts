@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   parseTtlToMs,
-  getPolicy,
+  resolveFreshnessPolicy,
   evaluateFreshness,
   checkMaxAgeExpired,
   evaluateFreshnessWithMaxAge,
@@ -91,27 +91,27 @@ describe('durationFlagError', () => {
   });
 });
 
-describe('getPolicy', () => {
+describe('resolveFreshnessPolicy', () => {
   it('uses tier defaults for stable, standard, and volatile', () => {
-    expect(getPolicy('stable')).toEqual({ freshWindowMs: 180 * DAY, graceWindowMs: 60 * DAY });
-    expect(getPolicy('standard')).toEqual({ freshWindowMs: 30 * DAY, graceWindowMs: 14 * DAY });
-    expect(getPolicy('volatile')).toEqual({ freshWindowMs: 7 * DAY, graceWindowMs: 5 * DAY });
+    expect(resolveFreshnessPolicy('stable')).toEqual({ freshWindowMs: 180 * DAY, graceWindowMs: 60 * DAY });
+    expect(resolveFreshnessPolicy('standard')).toEqual({ freshWindowMs: 30 * DAY, graceWindowMs: 14 * DAY });
+    expect(resolveFreshnessPolicy('volatile')).toEqual({ freshWindowMs: 7 * DAY, graceWindowMs: 5 * DAY });
   });
 
   it('applies a TTL override and scales grace proportionally per tier', () => {
     // standard default grace/fresh = 14/30; override fresh to 60d => grace = 60 * (14/30) = 28d.
-    expect(getPolicy('standard', '60d')).toEqual({
+    expect(resolveFreshnessPolicy('standard', '60d')).toEqual({
       freshWindowMs: 60 * DAY,
       graceWindowMs: Math.floor(60 * DAY * (14 / 30)),
     });
     // stable scaling uses 60/180.
-    expect(getPolicy('stable', '90d').graceWindowMs).toBe(Math.floor(90 * DAY * (60 / 180)));
+    expect(resolveFreshnessPolicy('stable', '90d').graceWindowMs).toBe(Math.floor(90 * DAY * (60 / 180)));
     // volatile scaling uses 5/7.
-    expect(getPolicy('volatile', '14d').graceWindowMs).toBe(Math.floor(14 * DAY * (5 / 7)));
+    expect(resolveFreshnessPolicy('volatile', '14d').graceWindowMs).toBe(Math.floor(14 * DAY * (5 / 7)));
   });
 
   it('ignores a null/empty ttl override and keeps tier defaults', () => {
-    expect(getPolicy('standard', null)).toEqual(getPolicy('standard'));
+    expect(resolveFreshnessPolicy('standard', null)).toEqual(resolveFreshnessPolicy('standard'));
   });
 });
 

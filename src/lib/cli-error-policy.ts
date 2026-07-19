@@ -5,9 +5,23 @@ import {
   type CliErrorShape,
 } from './envelope.js';
 
-/** Exit code from an oclif CLIError or plain Error — shared by process exit and JSON envelope. */
-export function exitCodeOf(err: { oclif?: { exit?: number }; exitCode?: number }): number {
-  return err?.oclif?.exit ?? err?.exitCode ?? 1;
+/** Process succeeded. */
+export const EXIT_OK = 0;
+/** Runtime / batch failure (agents treat as failed). */
+export const EXIT_RUNTIME_FAILURE = 1;
+/** Usage / validation failure (flags, URLs, missing args). */
+export const EXIT_USAGE = 2;
+/** Stale content served after failed revalidation; success envelope may still be `ok: true`. */
+export const EXIT_STALE_SERVED = 5;
+
+/**
+ * Resolves the process/envelope exit code from an oclif CLIError or plain Error.
+ *
+ * @param err - Error-like object with optional `oclif.exit` or `exitCode`.
+ * @returns Exit code; defaults to {@link EXIT_RUNTIME_FAILURE}.
+ */
+export function resolveExitCode(err: { oclif?: { exit?: number }; exitCode?: number }): number {
+  return err?.oclif?.exit ?? err?.exitCode ?? EXIT_RUNTIME_FAILURE;
 }
 
 /** Default recovery tips when a throw site set a stable code but no suggestions. */
@@ -31,6 +45,7 @@ function fallbackSuggestionsForCode(
   }
 }
 
+/** Normalized error fields shared by human pretty-print and the `--json` envelope. */
 export interface PreparedCliError {
   exitCode: number;
   code: string | undefined;
@@ -43,22 +58,27 @@ export interface PreparedCliError {
 /**
  * Normalize a thrown value into the fields humans and `--json` both need: stable code,
  * suggestions (including fallbacks), and stderr lines that mirror human pretty-print.
+ *
+ * @param err - Thrown value (Error, CLIError, or unknown).
+ * @param options.bin - CLI binary name for help suggestions.
+ * @param options.command - Command id for help suggestions.
+ * @returns Prepared fields for exit handling and envelope construction.
  */
 export function prepareCliError(
   err: unknown,
-  opts: { bin: string; command: string }
+  options: { bin: string; command: string }
 ): PreparedCliError {
   const e = err as CliErrorShape & {
     oclif?: { exit?: number };
     exitCode?: number;
     ref?: string;
   };
-  const exitCode = exitCodeOf(e);
+  const exitCode = resolveExitCode(e);
   const code = stableErrorCodeFrom(e);
   const message = typeof e?.message === 'string' ? normalizeCliErrorMessage(e.message) : undefined;
   const suggestions = e.suggestions?.length
     ? e.suggestions
-    : fallbackSuggestionsForCode(code, opts.bin, opts.command);
+    : fallbackSuggestionsForCode(code, options.bin, options.command);
   const stderr =
     message || code || suggestions?.length || e?.ref
       ? formatErrorForJson({ ...e, message, code, suggestions })
@@ -66,16 +86,22 @@ export function prepareCliError(
   return { exitCode, code, message, suggestions, ref: e.ref, stderr };
 }
 
-/** Attach stable code + fallback suggestions onto a mutable error (human pretty-print path). */
+/**
+ * Attach stable code + fallback suggestions onto a mutable error (human pretty-print path).
+ *
+ * @param err - Mutable error object receiving `code` / `suggestions`.
+ * @param options.bin - CLI binary name for help suggestions.
+ * @param options.command - Command id for help suggestions.
+ */
 export function enrichErrorForDisplay(
   err: { code?: string; suggestions?: string[]; message?: string },
-  opts: { bin: string; command: string }
+  options: { bin: string; command: string }
 ): void {
   if (!err.code) {
     const code = stableErrorCodeFrom(err);
     if (code) err.code = code;
   }
   if (err.code && !err.suggestions?.length) {
-    err.suggestions = fallbackSuggestionsForCode(err.code, opts.bin, opts.command);
+    err.suggestions = fallbackSuggestionsForCode(err.code, options.bin, options.command);
   }
 }

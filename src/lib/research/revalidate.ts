@@ -5,7 +5,7 @@ import { applySiteFetchProvenance, type SiteFetchResult } from '../../sites/type
 import { fetchStaticHtml, type FetchedContent, type FetchResult } from './fetcher.js';
 import { extractHtmlContent, type ExtractionResult } from './extract.js';
 import { writeArtifact } from './storage.js';
-import { evaluateFreshness, getPolicy } from './freshness.js';
+import { evaluateFreshness, resolveFreshnessPolicy } from './freshness.js';
 import { buildCompressed } from './compress.js';
 import type { SummaryLevel } from '../config/schema.js';
 import { applyAutoTags } from './keywords.js';
@@ -13,10 +13,15 @@ import { estimateTokens } from './token-estimate.js';
 import { fetchRenderedHtml } from './browser.js';
 import { looksLikeErrorPage } from './docs/validate.js';
 
+/** Result of conditional revalidation or a full refresh when validators miss. */
 export interface RevalidationResult {
+  /** Outcome of the revalidation attempt. */
   status: 'revalidated' | 'refreshed' | 'stale';
+  /** Artifact to serve (updated, refreshed, or the prior stale entry). */
   artifact: ResearchArtifact;
+  /** When status is `stale`, whether serving stale content is allowed. */
   allowed?: boolean;
+  /** Revalidation failure message when status is `stale`. */
   error?: string;
 }
 
@@ -35,7 +40,7 @@ function buildMetadata(input: {
     input;
   const contentHash = createHash('sha256').update(extraction.detailedMarkdown).digest('hex');
   const staleAfterTime = new Date(currentTime);
-  const { freshWindowMs } = getPolicy(tier, ttl);
+  const { freshWindowMs } = resolveFreshnessPolicy(tier, ttl);
   staleAfterTime.setTime(staleAfterTime.getTime() + freshWindowMs);
 
   return {
@@ -137,7 +142,10 @@ interface CreateArtifactFromFetchInput {
 }
 
 /**
- * Helper to construct a ResearchArtifact from a fresh HTML fetch.
+ * Construct a ResearchArtifact from a fresh HTML fetch (or error-page marker).
+ *
+ * @param input - URL, fetch result, extraction, tier/TTL, clock, and summary level.
+ * @returns A ready-to-persist research artifact.
  */
 export function createArtifactFromFetch(input: CreateArtifactFromFetchInput): ResearchArtifact {
   const {
@@ -258,7 +266,7 @@ async function handleRevalidateResponse(
     };
 
     const staleAfterTime = new Date(currentTime);
-    const { freshWindowMs } = getPolicy(meta.tier, options.ttlOverride || meta.ttl);
+    const { freshWindowMs } = resolveFreshnessPolicy(meta.tier, options.ttlOverride || meta.ttl);
     staleAfterTime.setTime(staleAfterTime.getTime() + freshWindowMs);
     updated.metadata.stale_after = staleAfterTime.toISOString();
 

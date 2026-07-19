@@ -1,5 +1,6 @@
 import { Config, Help, toConfiguredId } from '@oclif/core';
 import { positionalArgvTokens } from './argv.js';
+import { EXIT_OK, EXIT_RUNTIME_FAILURE } from './cli-error-policy.js';
 import { VALUE_TAKING_FLAG_TOKENS } from './cli-flag-manifest.js';
 import { buildEnvelope } from './envelope.js';
 
@@ -56,11 +57,11 @@ export async function tryJsonMetaOutput(
 
     if (argv.includes('--version')) {
       return {
-        exitCode: 0,
+        exitCode: EXIT_OK,
         envelope: buildEnvelope({
           command: config.bin,
           ok: true,
-          exitCode: 0,
+          exitCode: EXIT_OK,
           stderr: '',
           data: {
             version: config.version,
@@ -76,11 +77,11 @@ export async function tryJsonMetaOutput(
     const helpText = stripAnsi(help.lines.join('\n').trimEnd());
 
     return {
-      exitCode: 0,
+      exitCode: EXIT_OK,
       envelope: buildEnvelope({
         command: envelopeCommandId(config, argv),
         ok: true,
-        exitCode: 0,
+        exitCode: EXIT_OK,
         stderr: '',
         data: { help: helpText },
       }),
@@ -88,11 +89,11 @@ export async function tryJsonMetaOutput(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return {
-      exitCode: 1,
+      exitCode: EXIT_RUNTIME_FAILURE,
       envelope: buildEnvelope({
         command: 'bonsai',
         ok: false,
-        exitCode: 1,
+        exitCode: EXIT_RUNTIME_FAILURE,
         stderr: message,
         data: null,
         code: 'META_RENDER_FAILED',

@@ -9,6 +9,7 @@ import {
 } from '../lib/research/import-command-service.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 
+/** Import research notes from a file or stdin. */
 export default class ResearchImport extends BaseCommand<typeof ResearchImport> {
   static id = 'import';
   static summary = 'Import agent-supplied Markdown into cache';

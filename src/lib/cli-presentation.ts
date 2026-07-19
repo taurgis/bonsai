@@ -32,6 +32,7 @@ export const CLI_FLAG_DESCRIPTIONS = {
   pruneArtifactType: 'artifact type to prune, including section children',
 } as const;
 
+/** One human-readable label/value pair for CLI stdout. */
 export type HumanField = readonly [label: string, value: string];
 
 function formatHumanLabel(label: string): string {
@@ -39,10 +40,23 @@ function formatHumanLabel(label: string): string {
   return colors.cyan(text.padEnd(Math.max(HUMAN_LABEL_WIDTH, text.length)));
 }
 
+/**
+ * Format one cyan-padded label/value line for human CLI output.
+ *
+ * @param label - Field label (without trailing colon).
+ * @param value - Field value.
+ * @returns A single formatted line.
+ */
 export function formatHumanField(label: string, value: string): string {
   return `${formatHumanLabel(label)} ${value}`;
 }
 
+/**
+ * Format many label/value lines for human CLI output.
+ *
+ * @param fields - Label/value pairs.
+ * @returns Formatted lines in the same order.
+ */
 export function formatHumanFields(fields: readonly HumanField[]): string[] {
   return fields.map(([label, value]) => formatHumanField(label, value));
 }
