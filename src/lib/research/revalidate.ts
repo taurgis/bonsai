@@ -124,7 +124,7 @@ function buildErrorArtifact(input: {
   };
 }
 
-export interface CreateArtifactFromFetchInput {
+interface CreateArtifactFromFetchInput {
   url: string;
   normalizedUrl: string;
   cacheKey: string;
