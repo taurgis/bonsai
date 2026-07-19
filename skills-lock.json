@@ -733,6 +733,24 @@
     }
   },
   "instructions": {
+    ".github/instructions/development.instructions.md": {
+      "source": "/home/user/bonsai",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/development.instructions.md",
+      "installPath": ".github/instructions/development.instructions.md",
+      "computedHash": "9384b0933597e727d6fc06f47068375eedea8625fd1970c6d3d7880b0c44c64c",
+      "agents": [
+        "claude-code",
+        "github-copilot",
+        "codex",
+        "cursor",
+        "antigravity"
+      ],
+      "installHash": "9384b0933597e727d6fc06f47068375eedea8625fd1970c6d3d7880b0c44c64c",
+      "sourceHash": "9384b0933597e727d6fc06f47068375eedea8625fd1970c6d3d7880b0c44c64c",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
     ".github/instructions/post-feature-code-review.instructions.md": {
       "source": "Forward-Services-NV/forward-nexus-projects",
       "sourceType": "github",
