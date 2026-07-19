@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectSecret, scanArtifactForSecret } from './secret-scan.js';
+import { detectSecret, scanArtifactForSecret, stripSecrets } from './secret-scan.js';
 import type { ResearchArtifact } from './schema.js';
 
 describe('detectSecret', () => {
@@ -50,5 +50,27 @@ describe('scanArtifactForSecret', () => {
       'credential assignment'
     );
     expect(scanArtifactForSecret(artifact({}))).toBeNull();
+  });
+});
+
+describe('stripSecrets', () => {
+  it('removes every matched secret shape, leaving surrounding prose intact', () => {
+    const cases: Array<[string, RegExp]> = [
+      ['AWS key AKIAIOSFODNN7EXAMPLE was here', /AKIA/],
+      ['token ghp_' + 'a'.repeat(36) + ' leaked', /ghp_/],
+      ['key AIzaSyA1234567890abcdefghijklmnopqrstuv used', /AIza/],
+      ['use sk-' + 'x'.repeat(32) + ' now', /sk-/],
+    ];
+    for (const [text, pattern] of cases) {
+      const stripped = stripSecrets(text);
+      expect(stripped).not.toMatch(pattern);
+      expect(detectSecret(stripped)).toBeNull();
+    }
+  });
+
+  it('leaves ordinary text untouched', () => {
+    expect(stripSecrets('Install the package and import the client.')).toBe(
+      'Install the package and import the client.'
+    );
   });
 });

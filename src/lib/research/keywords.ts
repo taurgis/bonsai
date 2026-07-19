@@ -4,6 +4,7 @@
 // stopwords. Upgrade path: swap in RAKE/YAKE or an LLM pass behind the same extractKeywords() API.
 
 import type { ResearchArtifact } from './schema.js';
+import { stripSecrets } from './secret-scan.js';
 
 const AUTO_TAG_NOTE = 'auto-generated tags via keyword extraction';
 
@@ -157,7 +158,10 @@ export function tokenize(text: string): string[] {
 }
 
 function cleanNoise(text: string): string {
-  return text
+  // Strip secrets before code fences/URLs so a credential embedded in either still gets caught —
+  // and before tokenize() lowercases/splits the text, which would hide case-sensitive or
+  // underscore-anchored secret patterns (AKIA…, ghp_…, AIza…) from detection.
+  return stripSecrets(text)
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`[^`]*`/g, ' ')
     .replace(/https?:\/\/\S+/g, ' ');
