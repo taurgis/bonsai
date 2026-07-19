@@ -212,7 +212,7 @@ describe('research contract tests', () => {
     const envelope = JSON.parse(result.stdout);
     expect(envelope).toMatchObject({
       schemaVersion: 1,
-      command: 'bonsai',
+      command: 'fetch',
       ok: false,
       exitCode: 2,
       stdout: '',
