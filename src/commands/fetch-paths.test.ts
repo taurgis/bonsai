@@ -382,6 +382,32 @@ describe('fetch command branch coverage', () => {
     expect(existsSync(getArtifactPath(join(iso.cwd, '.bonsai'), result.cache.key))).toBe(false);
   });
 
+  it('secret-redirect on revalidation: refreshing a project entry that gains a secret moves it to global', async () => {
+    // AUDIT_71_FINAL / #75 deferred: in-place revalidation used to skip secret redirect. A stale
+    // project entry whose refreshed body now carries a credential must leave the project cache.
+    const projectDir = join(iso.cwd, '.bonsai');
+    const { cacheKey } = seedCachedArtifact(
+      projectDir,
+      new Date(Date.now() - 40 * 24 * 3600 * 1000)
+    );
+    expect(existsSync(getArtifactPath(projectDir, cacheKey))).toBe(true);
+
+    const secretBody =
+      '<html><body><article>config AKIAIOSFODNN7EXAMPLE ' +
+      'Refreshed documentation paragraph. '.repeat(20) +
+      '</article></body></html>';
+    mocks.fetchStaticHtml.mockResolvedValue(
+      fakeFetchResult({ status: 200, content: secretBody, responseSize: secretBody.length })
+    );
+
+    const result: any = await FetchCommand.run([TEST_URL, '--storage', 'project']);
+
+    expect(result.cache.status).toBe('refreshed');
+    expect(result.cache.redirectedToGlobal).toBe(true);
+    expect(existsSync(getArtifactPath(await globalDataDir(), cacheKey))).toBe(true);
+    expect(existsSync(getArtifactPath(projectDir, cacheKey))).toBe(false);
+  });
+
   it('--format detailed: returns the detailed body and detailed token estimate', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
 

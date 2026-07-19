@@ -47,7 +47,8 @@ export function getArtifactPath(dataDir: string, key: string): string {
 }
 
 function processFileForLookup(file: string, dir: string, key: string): ResearchArtifact | null {
-  if (!file.endsWith('.md') || file.includes('.tmp')) {
+  // Same file filter as scanCacheDir — superseded/corrupt/tmp archives must not resolve as active.
+  if (!isResearchFile(file)) {
     return null;
   }
 
