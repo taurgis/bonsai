@@ -43,7 +43,8 @@ logs/
 !.claude/skills/**
 .cursor/
 .github/agents/
-.github/instructions/
+.github/instructions/*
+!.github/instructions/development.instructions.md
 
 # Agent specific local paths
 .gemini/

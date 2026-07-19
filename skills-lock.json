@@ -463,7 +463,10 @@
       "computedHash": "2ee5886565dabc8b144766951193b5bffdce0ad5feb608cf128b88e0c9a38092",
       "agents": [
         "claude-code",
-        "github-copilot"
+        "github-copilot",
+        "codex",
+        "cursor",
+        "antigravity"
       ],
       "repoPath": "skills/ponytail/SKILL.md",
       "installPath": ".agents/skills/ponytail",
