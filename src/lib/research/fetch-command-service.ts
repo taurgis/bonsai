@@ -109,7 +109,8 @@ export function validateFetchCommandFlags(io: CliIo, flags: FetchCommandFlags): 
       exit: 2,
       code: 'CONFLICTING_FLAGS',
       suggestions: [
-        'Use --force to fetch fresh content, or omit --force when you want --allow-stale fallback.',
+        'Use --force to fetch fresh content, or omit --force if you want a stale entry served ' +
+          'within grace (with --allow-stale suppressing the exit-5 signal).',
       ],
     });
   }
