@@ -6,12 +6,37 @@ import {
   maxFuzzyDistance,
   pluralize,
   resultListHeading,
+  sanitizeForTerminal,
   truncationNotice,
   type ResultListLabels,
 } from './text.js';
 
+const ESC = String.fromCharCode(27);
+
 const LIST: ResultListLabels = { noun: 'cached research', order: 'first', maxLimit: 100 };
 const SEARCH: ResultListLabels = { noun: 'matching cached research', order: 'top', maxLimit: 50 };
+
+describe('sanitizeForTerminal', () => {
+  it('strips ANSI escape sequences so a cached topic cannot recolor the terminal', () => {
+    const malicious = `${ESC}[31mRED${ESC}[0m`;
+    expect(sanitizeForTerminal(malicious)).toBe('[31mRED[0m');
+  });
+
+  it('strips other C0/C1 control characters (e.g. bell, backspace)', () => {
+    const bell = String.fromCharCode(7);
+    const backspace = String.fromCharCode(8);
+    expect(sanitizeForTerminal(`safe${bell}text${backspace}`)).toBe('safetext');
+  });
+
+  it('collapses embedded newlines and tabs to a space instead of stripping them', () => {
+    expect(sanitizeForTerminal('a\nb\tc\rd')).toBe('a b c d');
+  });
+
+  it('leaves ordinary printable and unicode text untouched', () => {
+    expect(sanitizeForTerminal('React Hooks')).toBe('React Hooks');
+    expect(sanitizeForTerminal('日本語トピック 🎉')).toBe('日本語トピック 🎉');
+  });
+});
 
 describe('pluralize', () => {
   it('selects singular only for a count of 1', () => {

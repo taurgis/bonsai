@@ -8,7 +8,12 @@ import {
   CAPTURE_METHODS,
   type ResearchArtifactMetadata,
 } from '../lib/research/schema.js';
-import { NO_TOPIC_LABEL, resultListHeading, type ResultListLabels } from '../lib/text.js';
+import {
+  NO_TOPIC_LABEL,
+  resultListHeading,
+  sanitizeForTerminal,
+  type ResultListLabels,
+} from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
 import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
@@ -175,7 +180,9 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     if (this.jsonEnabled()) return;
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);
     finalResults.forEach((res, index) => {
-      const topicStr = res.topic ? colors.cyan(res.topic) : colors.gray(NO_TOPIC_LABEL);
+      const topicStr = res.topic
+        ? colors.cyan(sanitizeForTerminal(res.topic))
+        : colors.gray(NO_TOPIC_LABEL);
       const keyStr = colors.bold(res.cacheKey);
       this.log(`${index + 1}. [${topicStr}] Key: ${keyStr}`);
 

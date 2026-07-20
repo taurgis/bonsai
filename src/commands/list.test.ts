@@ -132,6 +132,33 @@ describe('list command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('strips ANSI escape codes from a cached topic before printing it to the terminal', async () => {
+    const esc = String.fromCharCode(27);
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValueOnce('# Injected\nBody');
+    await ResearchImport.run([
+      'https://example.com/ansi-topic-test',
+      '--stdin',
+      '--topic',
+      `${esc}[31mRED${esc}[0m`,
+    ]);
+    readSpy.mockRestore();
+
+    const logged: string[] = [];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logged.push(args.map(String).join(' '));
+    });
+    try {
+      await ResearchList.run(['--url', 'https://example.com/ansi-topic-test']);
+      const output = logged.join('\n');
+      expect(output).not.toContain(esc);
+      expect(output).toContain('[31mRED[0m');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
   it('fails if limit is out of bounds', async () => {
     const runPromise1 = ResearchList.run(['--limit', '200']);
     await expect(runPromise1).rejects.toThrow(/Limit must be between 1 and 100/);

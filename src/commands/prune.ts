@@ -7,7 +7,7 @@ import { scanCacheDir } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { parseTtlToMs } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES, type ResearchArtifactMetadata } from '../lib/research/schema.js';
-import { NO_TOPIC_LABEL, pluralize } from '../lib/text.js';
+import { NO_TOPIC_LABEL, pluralize, sanitizeForTerminal } from '../lib/text.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
 import { pruneFlagError } from '../lib/prune-flags.js';
 import { colors } from '../lib/color.js';
@@ -167,8 +167,11 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
             colors.yellow(`[Dry Run] Found ${count} research cache ${noun} that would be pruned:\n`)
           );
           filesToPrune.forEach((f) => {
+            const topicStr = f.topic
+              ? colors.cyan(sanitizeForTerminal(f.topic))
+              : colors.gray(NO_TOPIC_LABEL);
             this.log(
-              `- [${f.topic ? colors.cyan(f.topic) : colors.gray(NO_TOPIC_LABEL)}] Key: ${colors.bold(f.cacheKey)} (${colors.gray(f.url || 'Imported note')})`
+              `- [${topicStr}] Key: ${colors.bold(f.cacheKey)} (${colors.gray(f.url || 'Imported note')})`
             );
           });
         }

@@ -1,6 +1,25 @@
 /** Display label when an artifact has no topic — not a filterable topic value. */
 export const NO_TOPIC_LABEL = '(no topic)';
 
+// Unicode "Control" category (C0 + C1) covers ANSI/terminal escape sequences: the ESC control
+// character that starts them is a member, so stripping this category is what keeps injected
+// control bytes from reaching a real terminal. Exported so `prompt-injection.ts`'s
+// multi-line-content variant (which preserves tab/newline/CR) shares this one definition.
+export const CONTROL_CHAR_PATTERN = /\p{Cc}/gu;
+
+/**
+ * Strip ANSI escape codes and other control characters from a cached metadata string before it
+ * reaches a human-readable terminal line. Fields like `topic` and section headings can originate
+ * from fetched web content or agent-supplied notes — both untrusted per the repo's trust-boundary
+ * rules — so a value containing raw escape bytes must never be echoed as-is to a TTY. Newlines and
+ * tabs collapse to a single space rather than being stripped outright, so injected content can't
+ * fake extra output lines while still being removed. JSON output is unaffected: `JSON.stringify`
+ * already escapes control characters, so this only needs to run on the human-readable path.
+ */
+export function sanitizeForTerminal(value: string): string {
+  return value.replace(/[\t\n\r]/g, ' ').replace(CONTROL_CHAR_PATTERN, '');
+}
+
 /**
  * Pick the singular or plural noun for a count so human-readable output stays grammatical
  * ("1 entry" / "2 entries"). English has irregular plurals, so the plural is passed explicitly

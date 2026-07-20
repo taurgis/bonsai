@@ -110,6 +110,62 @@ describe('inspect command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('strips ANSI escape codes from topic and section headings before printing them', async () => {
+    const esc = String.fromCharCode(27);
+    const injectedTopic = `${esc}[31mRED${esc}[0m`;
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# ANSI Parent');
+    const imp = (await ResearchImport.run([
+      'https://example.com/cached-inspect-ansi',
+      '--stdin',
+      '--topic',
+      injectedTopic,
+    ])) as any;
+
+    // A section heading is derived from fetched page content (untrusted), so it needs the same
+    // sanitization as an explicitly-flagged topic — exercise both paths in the same test.
+    const dataDir = dirname(dirname(imp.cache.path));
+    const parentKey = imp.cache.key;
+    const parent = readArtifact(dataDir, parentKey);
+    const sectionKey = createHash('sha256')
+      .update(parentKey + 'ansi-section')
+      .digest('hex');
+    writeArtifact(dataDir, sectionKey, {
+      ...parent,
+      metadata: {
+        ...parent.metadata,
+        cache_key: sectionKey,
+        artifact_type: 'section',
+        parent_cache_key: parentKey,
+        status: 'active',
+        section_anchor: `${esc}[31manchor${esc}[0m`,
+        section_heading_path: `${esc}[31mHeading${esc}[0m`,
+      },
+    });
+
+    const logged: string[] = [];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logged.push(args.map(String).join(' '));
+    });
+    try {
+      const result = (await ResearchInspect.run([
+        'https://example.com/cached-inspect-ansi',
+      ])) as any;
+      // The stored metadata/JSON payload keeps the raw value — only the human-readable render sanitizes.
+      expect(result.metadata.topic).toBe(injectedTopic);
+
+      const output = logged.join('\n');
+      expect(output).not.toContain(esc);
+      expect(output).toContain('[31mRED[0m');
+      expect(output).toContain('[31mHeading[0m');
+      expect(output).toContain('[31manchor[0m');
+    } finally {
+      logSpy.mockRestore();
+      readSpy.mockRestore();
+    }
+  });
+
   it('keeps cached inspect rows when another URL misses in the same batch', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

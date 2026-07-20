@@ -133,4 +133,20 @@ describe('sanitizePromptInjection', () => {
     expect(sanitized).toContain('[Removed potentially unsafe agent instruction]');
     expect(sanitized).not.toContain('Ignore previous instructions');
   });
+
+  it('strips ANSI escape codes embedded in fetched content before it is ever stored', () => {
+    const esc = String.fromCharCode(27);
+    const sanitized = sanitizePromptInjection(`Hello ${esc}[31mRED${esc}[0m world.`);
+
+    expect(sanitized).not.toContain(esc);
+    expect(sanitized).toBe('Hello [31mRED[0m world.');
+  });
+
+  it('strips other control bytes (bell, backspace) but keeps tab/newline Markdown structure', () => {
+    const bell = String.fromCharCode(7);
+    const sanitized = sanitizePromptInjection(`# Title\n\nBody${bell} text\twith a tab.`);
+
+    expect(sanitized).not.toContain(bell);
+    expect(sanitized).toBe('# Title\n\nBody text\twith a tab.');
+  });
 });
