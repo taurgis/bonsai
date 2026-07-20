@@ -155,6 +155,39 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('strips ANSI escape codes from the multi-source topic printed on import success', async () => {
+    const esc = String.fromCharCode(27);
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Multi ANSI');
+
+    const logged: string[] = [];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logged.push(args.map(String).join(' '));
+    });
+    try {
+      const result = (await ResearchImport.run([
+        '--stdin',
+        '--topic',
+        `${esc}[31mRED${esc}[0m`,
+        '--source-url',
+        'https://example.com/ansi-import-a',
+        '--source-url',
+        'https://example.com/ansi-import-b',
+      ])) as any;
+
+      // Stored/JSON data keeps the raw topic; only the human-readable success message sanitizes it.
+      expect(result.topic).toBe(`${esc}[31mRED${esc}[0m`);
+
+      const output = logged.join('\n');
+      expect(output).not.toContain(esc);
+      expect(output).toContain('[31mRED[0m');
+    } finally {
+      logSpy.mockRestore();
+      readSpy.mockRestore();
+    }
+  });
+
   it('fails if invalid --ttl is provided', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

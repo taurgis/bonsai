@@ -16,6 +16,7 @@ import { deriveCacheKey } from './cache-key.js';
 import { normalizeUrl } from './url.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
 import { formatHumanFields } from '../cli-presentation.js';
+import { sanitizeForTerminal } from '../text.js';
 
 const INPUT_LIMIT_BYTES = 1024 * 1024;
 // ponytail: 1s stdin idle timeout is enough for piped agent input; raise if interactive paste
@@ -209,9 +210,12 @@ function logImportHumanSuccess(
     ['Cache Key', cacheKey],
     ['Storage Path', storagePath],
   ];
+  // The agent-supplied --topic is untrusted the same way fetched content is (it may be lifted
+  // straight from a page an agent just read), so it gets the same terminal sanitization as
+  // list/inspect/prune apply to a cached topic before printing it.
   let topic: string | undefined;
   if (!hasSingle) {
-    topic = resolvedTopic(flags)!;
+    topic = sanitizeForTerminal(resolvedTopic(flags)!);
     fields.push(['Topic', topic], ['Source URLs', sourceUrls.join(', ')]);
   }
   for (const line of formatHumanFields(fields)) io.log(line);
