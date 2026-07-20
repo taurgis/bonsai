@@ -63,6 +63,48 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'CONFLICTING_FLAGS', 'code');
   });
 
+  check('config set global+local conflict --json CONFLICTING_FLAGS', () => {
+    const r = run(['config', 'set', 'storage', 'project', '--global', '--local', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'CONFLICTING_FLAGS', 'code');
+  });
+
+  check('config unset global+local conflict --json CONFLICTING_FLAGS', () => {
+    const r = run(['config', 'unset', 'storage', '--global', '--local', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'CONFLICTING_FLAGS', 'code');
+  });
+
+  check('config list global+local conflict --json CONFLICTING_FLAGS', () => {
+    const r = run(['config', 'list', '--global', '--local', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'CONFLICTING_FLAGS', 'code');
+  });
+
+  check('config set default scope (no --local) persists for get and list', () => {
+    const ws = createWorkspace();
+    const set = run(['config', 'set', 'storage', 'project', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(set.exitCode === 0, `set exit ${set.exitCode}`);
+    const setData = parseJson(set.stdout)?.data;
+    expect(setData?.scope === 'user', `scope ${setData?.scope}`);
+
+    const get = run(['config', 'get', 'storage', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(get.stdout)?.data?.value === 'project', 'user-level value visible with no flag');
+
+    // --local reads the project file only, which the default-scope write never touched.
+    const localGet = run(['config', 'get', 'storage', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(localGet.stdout)?.data?.configured === false, 'project scope untouched');
+
+    const unset = run(['config', 'unset', 'storage', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(unset.exitCode === 0, `unset exit ${unset.exitCode}`);
+    expect(parseJson(unset.stdout)?.data?.scope === 'user', 'unset default scope');
+    const getAfterUnset = run(['config', 'get', 'storage', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(getAfterUnset.stdout)?.data?.value === 'global', 'restored to built-in default');
+  });
+
   check('config set --local persists for get and list', () => {
     const ws = createWorkspace();
     const set = run(['config', 'set', 'storage', 'project', '--local', '--json'], {

@@ -1,3 +1,5 @@
+import { ageArtifact } from '../helpers.mjs';
+
 /** inspect and status cache miss / hit behavior. */
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
@@ -291,6 +293,66 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[0]?.status === 'hit', 'first hit kept');
     expect(env?.data?.[0]?.metadata, 'hit metadata kept');
     expect(env?.data?.[1]?.error?.code === 'MISSING_URL_SCHEME', JSON.stringify(env?.data?.[1]));
+  });
+
+  // ttl=1h gives a ~28min grace window (standard tier's 14d grace scaled to the 1h override): back-date
+  // validated_at past ttl but inside that window for stale_grace, well beyond it for stale_expired.
+  check('status reports stale_grace inside the ttl+grace window, stale_expired past it', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-status-stale-grace';
+    const imported = run(['import', url, '--stdin', '--ttl', '1h', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Stale grace fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    expect(typeof path === 'string' && path.length > 0, `artifact path ${path}`);
+
+    ageArtifact(path, new Date(Date.now() - 75 * 60 * 1000).toISOString());
+    const grace = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(grace.exitCode === 0, `grace exit ${grace.exitCode}`);
+    const graceEnv = parseJson(grace.stdout);
+    expect(graceEnv?.data?.status === 'stale', `grace status ${graceEnv?.data?.status}`);
+    expect(graceEnv?.data?.freshness === 'stale_grace', `grace freshness ${graceEnv?.data?.freshness}`);
+    expect(graceEnv?.data?.action === 'would_revalidate', `grace action ${graceEnv?.data?.action}`);
+
+    ageArtifact(path, new Date(Date.now() - 100 * 24 * 3600 * 1000).toISOString());
+    const expired = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(expired.exitCode === 0, `expired exit ${expired.exitCode}`);
+    const expiredEnv = parseJson(expired.stdout);
+    expect(expiredEnv?.data?.freshness === 'stale_expired', `expired freshness ${expiredEnv?.data?.freshness}`);
+    expect(expiredEnv?.data?.action === 'would_revalidate', `expired action ${expiredEnv?.data?.action}`);
+  });
+
+  // --tier evaluates a "what if" policy without mutating the stored artifact: a page stored under
+  // the default 30d/14d standard window reads as fresh under `stable` (180d fresh) but stale_grace
+  // under an explicit `volatile` evaluation (7d fresh + 5d grace).
+  check('status --tier evaluates a what-if freshness policy without mutating the artifact', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-status-tier-what-if';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Tier what-if fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    ageArtifact(path, new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString());
+
+    const asStable = run(['status', url, '--tier', 'stable', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(asStable.stdout)?.data?.freshness === 'fresh', `stable ${asStable.stdout}`);
+
+    const asVolatile = run(['status', url, '--tier', 'volatile', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(
+      parseJson(asVolatile.stdout)?.data?.freshness === 'stale_grace',
+      `volatile ${asVolatile.stdout}`
+    );
+
+    // The override never touched the stored artifact — a plain re-check (no --tier) still reflects
+    // the artifact's own standard-tier policy (30d fresh window), so it reads fresh again.
+    const stored = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(stored.stdout)?.data?.freshness === 'fresh', `stored ${stored.stdout}`);
   });
 
   check('status and inspect CACHE_MISS messages match', () => {

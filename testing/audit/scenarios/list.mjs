@@ -146,6 +146,87 @@ export default function register(harness, fixtures) {
     expect(listed.stderr === '', `process stderr should stay clean under --json: ${listed.stderr}`);
   });
 
+  check('import then list filters by valid --artifact-type and --capture-method', () => {
+    const ws = createWorkspace();
+    const singleUrl = 'https://example.com/audit-list-artifact-type-source';
+    const imported = run(['import', singleUrl, '--stdin', '--topic', 'Artifact Type Filter', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Artifact Type Filter\n\nSingle-source fixture.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const noteUrlA = 'https://example.com/audit-list-artifact-type-note-a';
+    const noteUrlB = 'https://example.com/audit-list-artifact-type-note-b';
+    const importedNote = run(
+      [
+        'import',
+        '--stdin',
+        '--topic',
+        'Artifact Type Filter Note',
+        '--source-url',
+        noteUrlA,
+        '--source-url',
+        noteUrlB,
+        '--json',
+      ],
+      { cwd: ws.cwd, xdg: ws.xdg, input: '# Artifact Type Filter Note\n\nMulti-source fixture.\n' }
+    );
+    expect(importedNote.exitCode === 0, `import note exit ${importedNote.exitCode}`);
+
+    // Every import in this workspace is agent_supplied, so every artifact matches that capture
+    // method, but only the `source` type matches the single-URL import.
+    const sources = run(['list', '--artifact-type', 'source', '--capture-method', 'agent_supplied', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(sources.exitCode === 0, `sources exit ${sources.exitCode}`);
+    const sourceEntries = parseJson(sources.stdout)?.data;
+    expect(
+      Array.isArray(sourceEntries) && sourceEntries.every((e) => e.artifactType === 'source'),
+      `sources ${JSON.stringify(sourceEntries)}`
+    );
+    expect(sourceEntries.some((e) => e.sourceUrls.includes(singleUrl)), 'single-source entry present');
+
+    const notes = run(['list', '--artifact-type', 'research_note', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const noteEntries = parseJson(notes.stdout)?.data;
+    expect(
+      Array.isArray(noteEntries) && noteEntries.every((e) => e.artifactType === 'research_note'),
+      `notes ${JSON.stringify(noteEntries)}`
+    );
+    expect(noteEntries.some((e) => e.sourceUrls.includes(noteUrlA)), 'multi-source note present');
+
+    // static_fetch never happens in this workspace (nothing was fetched over the network), so
+    // filtering by it must come back empty rather than accidentally matching agent-supplied entries.
+    const staticFetchOnly = run(['list', '--capture-method', 'static_fetch', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(staticFetchOnly.stdout)?.data?.length === 0, 'no static_fetch entries');
+  });
+
+  check('list human mode renders numbered entries with type, freshness, and tokens', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-list-human-render';
+    const imported = run(['import', url, '--stdin', '--topic', 'Human Render', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Human Render\n\nNon-empty list rendering fixture.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const r = run(['list', '--topic', 'Human Render'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('Found 1 cached research entry:'), r.stdout.slice(0, 200));
+    expect(r.stdout.includes('1. [Human Render] Key:'), r.stdout);
+    expect(r.stdout.includes('Type: source | Freshness: fresh'), r.stdout);
+    expect(/Tokens: compressed=\d+, detailed=\d+/.test(r.stdout), r.stdout);
+    expect(r.stdout.includes(`Source URLs: ${url}`), r.stdout);
+  });
+
   check('import then list filters by source URL glob', () => {
     const ws = createWorkspace();
     const matchingUrl = 'https://example.com/audit-list-url-align-hit';

@@ -91,6 +91,9 @@ export default function register(harness, fixtures) {
     expect(env?.stderr?.includes('Code: FETCH_FAILED'), `envelope stderr: ${env?.stderr}`);
     // Intentional #73 contract: --json failures stay in the envelope only; process stderr is clean.
     expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr.slice(0, 120)}`);
+    // The troubleshooting link is a top-level envelope field, not just embedded prose.
+    expect(env?.ref === 'https://bonsai.rhino-inquisitor.com/troubleshooting', env?.ref);
+    expect(env?.stderr?.includes('Reference: https://bonsai.rhino-inquisitor.com/troubleshooting'), env?.stderr);
   });
 
   check('fetch cached URL --json clean stderr', () => {

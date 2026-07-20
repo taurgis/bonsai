@@ -1,4 +1,17 @@
 /** Shared assertions for manual CLI audit scenarios. */
+import { readFileSync, writeFileSync } from 'node:fs';
+
+/**
+ * Back-date a cached artifact's `validated_at` (and `fetched_at` when present) so freshness/age
+ * filters (status, prune) see it as aged, without needing a real fetch/revalidation round trip.
+ */
+export function ageArtifact(path, isoTimestamp) {
+  const content = readFileSync(path, 'utf8');
+  const aged = content
+    .replace(/^validated_at: .*$/m, `validated_at: ${isoTimestamp}`)
+    .replace(/^fetched_at: .*$/m, `fetched_at: ${isoTimestamp}`);
+  writeFileSync(path, aged, 'utf8');
+}
 
 export function expectNonIntegerLimitInvalid({ run, expect, parseJson }, commandArgs) {
   const r = run([...commandArgs, '--limit', 'abc', '--json']);
