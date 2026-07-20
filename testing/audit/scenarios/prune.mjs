@@ -1,3 +1,5 @@
+import { ageArtifact } from '../helpers.mjs';
+
 /** prune safety checks and duration validation. */
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
@@ -156,5 +158,94 @@ export default function register(harness, fixtures) {
     const r = run(['prune', '--older-than', '0d', '--dry-run', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     expect(parseJson(r.stdout)?.code === 'INVALID_DURATION', 'code');
+  });
+
+  check('import then prune --artifact-type only matches that type', () => {
+    const ws = createWorkspace();
+    const sourceUrl = 'https://example.com/audit-prune-artifact-type-source';
+    const importedSource = run(['import', sourceUrl, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Prune artifact-type source fixture\n',
+    });
+    expect(importedSource.exitCode === 0, `import source exit ${importedSource.exitCode}`);
+
+    const noteUrlA = 'https://example.com/audit-prune-artifact-type-note-a';
+    const noteUrlB = 'https://example.com/audit-prune-artifact-type-note-b';
+    const importedNote = run(
+      [
+        'import',
+        '--stdin',
+        '--topic',
+        'Prune Artifact Type Note',
+        '--source-url',
+        noteUrlA,
+        '--source-url',
+        noteUrlB,
+        '--json',
+      ],
+      { cwd: ws.cwd, xdg: ws.xdg, input: '# Prune artifact-type note fixture\n' }
+    );
+    expect(importedNote.exitCode === 0, `import note exit ${importedNote.exitCode}`);
+
+    // Only the research_note candidate should match; the source import must survive untouched.
+    const dryRun = run(['prune', '--artifact-type', 'research_note', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(dryRun.exitCode === 0, `dry-run exit ${dryRun.exitCode}`);
+    expect(parseJson(dryRun.stdout)?.data?.candidateCount === 1, dryRun.stdout);
+
+    const pruned = run(['prune', '--artifact-type', 'research_note', '--yes', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(pruned.exitCode === 0, `pruned exit ${pruned.exitCode}`);
+    expect(parseJson(pruned.stdout)?.data?.prunedCount === 1, pruned.stdout);
+
+    const sourceStillCached = run(['status', sourceUrl, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(sourceStillCached.stdout)?.data?.status === 'hit', 'source survives artifact-type prune');
+  });
+
+  check('import then prune --inactive filters by idle time (validated_at)', () => {
+    const ws = createWorkspace();
+    const staleUrl = 'https://example.com/audit-prune-inactive-stale';
+    const freshUrl = 'https://example.com/audit-prune-inactive-fresh';
+    const importedStale = run(['import', staleUrl, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Prune inactive stale fixture\n',
+    });
+    expect(importedStale.exitCode === 0, `import stale exit ${importedStale.exitCode}`);
+    const importedFresh = run(['import', freshUrl, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Prune inactive fresh fixture\n',
+    });
+    expect(importedFresh.exitCode === 0, `import fresh exit ${importedFresh.exitCode}`);
+
+    const stalePath = parseJson(importedStale.stdout)?.data?.cache?.path;
+    ageArtifact(stalePath, new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString());
+
+    // 14d idle threshold: only the entry validated 30 days ago is idle enough to match.
+    const dryRun = run(['prune', '--inactive', '14d', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(dryRun.exitCode === 0, `dry-run exit ${dryRun.exitCode}`);
+    const candidates = parseJson(dryRun.stdout)?.data?.files;
+    expect(candidates?.length === 1, `candidates ${JSON.stringify(candidates)}`);
+
+    const pruned = run(['prune', '--inactive', '14d', '--yes', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(pruned.exitCode === 0, `pruned exit ${pruned.exitCode}`);
+    expect(parseJson(pruned.stdout)?.data?.prunedCount === 1, pruned.stdout);
+
+    const staleGone = run(['status', staleUrl, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(staleGone.stdout)?.code === 'CACHE_MISS', 'idle entry pruned');
+    const freshSurvives = run(['status', freshUrl, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(freshSurvives.stdout)?.data?.status === 'hit', 'recently-validated entry survives');
   });
 }
