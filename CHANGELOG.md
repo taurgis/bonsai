@@ -1,5 +1,48 @@
 # @taurgis/bonsai
 
+## 3.2.2
+
+### Patch Changes
+
+- 01530d1: Fix `bonsai example.com example.org` (a scheme-less multi-URL batch-fetch typo) reporting a bare `COMMAND_NOT_FOUND` with no guidance. A single scheme-less URL already got a helpful "Did you mean `bonsai https://example.com`?" hint, but oclif folds multiple positional args into one colon-joined id before this CLI ever sees them, and that joined string fails to parse as a single URL (the colon between two hostnames reads as an invalid port) — so the hint silently stopped working for exactly the batch-fetch case it's most likely to matter for. Each folded segment is now checked individually, so this case now reports `MISSING_URL_SCHEME` with a corrected multi-URL command.
+- ee72bcc: Fix `--rendered` browser-based fetches failing with `ERR_CERT_AUTHORITY_INVALID` in sandboxed environments that export a CA bundle env var (`NODE_EXTRA_CA_CERTS`/`SSL_CERT_FILE`/`CURL_CA_BUNDLE`) without also setting `HTTPS_PROXY`/`HTTP_PROXY`. Chrome's SPKI cert pinning now activates whenever a CA bundle is discoverable, independent of proxy detection.
+- 73d17ee: Fix three CLI audit findings:
+
+  - **Content-type integrity**: a non-HTML response (JSON, PDF, binary) rejected by the static
+    fetcher no longer silently retries through the automatic rendered-browser fallback. A browser can
+    still render _something_ for those (e.g. Chrome's built-in JSON viewer), which previously got
+    cached as a high-confidence "extracted" artifact instead of surfacing the real content-type
+    error. `--rendered` still bypasses this entirely, so an informed retry remains available.
+  - **Prompt-injection sanitization**: the redaction patterns previously only matched a harmful
+    instruction at the exact start of a line or right after a handful of role-address words, so any
+    filler text placed before the instruction ("Heads up: ignore previous instructions...") bypassed
+    detection entirely. Detection now anchors per clause (split on sentence-ending punctuation), so a
+    command hidden behind an innocuous opener is still caught, while legitimate documentation that
+    merely describes an attack (e.g. "An attacker may tell the model to ignore...") is still left
+    untouched.
+  - **Multi-source note discoverability**: `inspect` on a URL that has no cache entry of its own but
+    is already a `--source-url` of an existing multi-source `research_note` no longer suggests a
+    plain fetch (which would create an unrelated duplicate entry). The miss now reports
+    `partOfExistingNote` in `--json` output and points at `bonsai list --url "<url>"` to find the
+    existing note.
+
+- 80ee19b: Align `--json` stream routing and fetch envelope command id (#73).
+
+  Under `--json`, empty-list tips and error text stay in the envelope only (no process-stderr mirror). Fetch reports `command: "fetch"` instead of the bin name.
+
+- fd1ca90: Honor read-only/plan mode for derived search-index sidecar writes: `list` and `inspect` no longer create `.search-index.json` when `--read-only`/`--plan` or `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` is active.
+- b1e3765: Sanitize prompt-injection text in Salesforce site-module browser captures, matching the shared HTML/Markdown extraction path so hostile pages cannot skip the safeguard.
+- fafb493: Close an SSRF gap where a public URL that redirects the automatic (or `--rendered`) browser-fallback capture into a private/internal address or a non-http(s) scheme (e.g. `file:`) was rendered by Chrome without the same per-hop DNS/scheme safety check the static fetcher enforces; such navigations now fail with the same "blocked local or private target" error. Also surface low-confidence extraction warnings (e.g. "extracted content is very short") on stderr for human-mode `fetch`, matching what was previously visible only via `--json`.
+- 0bb6d99: Fetch help.salesforce.com articles via Salesforce's official b2c-developer-tooling Markdown mirror (`help-admin`/`help-merchant`) when a twin is available, replacing the ~45s browser render with one static request and recording `capture_method: route_markdown`. Falls back to the existing rendered capture when no twin validates. Extracted the shared Markdown-twin probe/validate logic (previously duplicated) into `src/sites/markdown-twin.ts`, also now used by the developer.salesforce.com twin.
+- 00d4454: Surface a machine-readable `truncation` object on the `list --json` envelope when `--limit` caps results, so agents can detect partial listings without scraping stderr.
+- 8fcb0a6: Fix `prune --dry-run --json` falsely reporting `PRUNE_PARTIAL_FAILURE`.
+
+  `prune --dry-run` never deletes anything, so `prunedCount` is always `0` by design. The JSON envelope enrichment compared `prunedCount` against `candidateCount` without checking `dryRun`, so any dry-run preview with one or more matching candidates reported `ok: false`, `exitCode: 1`, and a fabricated "Failed to delete N cache entries" error — even though the actual process exit code was `0` and nothing was touched. Dry-run previews now always report a clean success envelope.
+
+- b3745fe: Scan and redirect secret-bearing content on in-place cache revalidation the same way as first-time project writes, and clear any leftover project copy so it cannot shadow the global redirect.
+- 206ff7d: Exclude secret-shaped text (API keys, tokens, credential assignments) from auto-generated tags. Previously a secret embedded in imported or fetched content could surface as a literal tag, which is shown in plain text by `list`/`inspect` output even when the artifact body was correctly routed to the non-project cache.
+- 01530d1: Fix the SSRF IP blocklist so it actually blocks the ranges the troubleshooting docs already claimed were blocked: `0.0.0.0/8` (a well-known SSRF-filter bypass that many stacks route to the loopback interface), `100.64.0.0/10` (Shared Address Space / CGNAT), and IPv6 `fc00::/7` (Unique Local Addresses, IPv6's RFC1918 equivalent). Previously only loopback, RFC1918, and link-local ranges were rejected — a URL resolving to `0.0.0.0` or a ULA address reached `checkDnsSafety` and attempted a real network connection instead of failing closed.
+
 ## 3.2.1
 
 ### Patch Changes
