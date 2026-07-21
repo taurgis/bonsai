@@ -112,6 +112,22 @@ export function createHarness() {
     }
   }
 
+  /**
+   * Reconstruct a human-printed error/warning body for substring assertions. oclif wraps long
+   * lines to the terminal width and re-prefixes every continuation line with " ›  ", which
+   * would otherwise split a checked phrase across a line break. Strips that prefix per line, then
+   * rejoins and collapses whitespace so a phrase reads as one run of text regardless of where it
+   * happened to wrap.
+   */
+  function dewrapCliMessage(text) {
+    return text
+      .split('\n')
+      .map((line) => line.replace(/^\s*›\s*/, '').trimEnd())
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   function expect(cond, msg) {
     if (!cond) throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
   }
@@ -143,6 +159,7 @@ export function createHarness() {
     check,
     expect,
     parseJson,
+    dewrapCliMessage,
     report,
     freshSandbox,
   };
