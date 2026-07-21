@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { normalizeArgv, positionalArgvTokens } from './argv.js';
-import { VALUE_TAKING_FLAG_TOKENS } from './cli-flag-manifest.js';
+import { VALUE_TAKING_FLAG_TOKENS, KNOWN_COMMAND_ROOT_TOKENS } from './cli-flag-manifest.js';
 
 describe('normalizeArgv', () => {
   const cases = [
@@ -359,11 +359,42 @@ describe('normalizeArgv', () => {
         argv: ['--version', '--json'],
       },
     },
+    {
+      name: 'colon-namespaced command id (config:get) is a command, not a URL',
+      input: ['config:get', 'storage'],
+      expected: {
+        argv: ['config:get', 'storage'],
+      },
+    },
+    {
+      name: 'colon-namespaced command with an unknown leaf still reaches command dispatch',
+      input: ['config:frobnicate'],
+      expected: {
+        argv: ['config:frobnicate'],
+      },
+    },
+    {
+      name: 'colon typo on a top-level command still reaches command dispatch',
+      input: ['list:extra'],
+      expected: {
+        argv: ['list:extra'],
+      },
+    },
+    {
+      name: 'unknown scheme-like prefix still routes to fetch for protocol validation',
+      input: ['unknownscheme:thing'],
+      expected: {
+        argv: ['fetch', 'unknownscheme:thing'],
+      },
+    },
   ];
 
   for (const tc of cases) {
     it(tc.name, () => {
-      const result = normalizeArgv(tc.input, { valueTakingFlags: VALUE_TAKING_FLAG_TOKENS });
+      const result = normalizeArgv(tc.input, {
+        valueTakingFlags: VALUE_TAKING_FLAG_TOKENS,
+        knownCommandRoots: KNOWN_COMMAND_ROOT_TOKENS,
+      });
       expect(result.argv).toEqual(tc.expected.argv);
       if (tc.expected.earlyExit) {
         expect(result.earlyExit).toEqual(tc.expected.earlyExit);
@@ -372,6 +403,16 @@ describe('normalizeArgv', () => {
       }
     });
   }
+
+  it('treats every colon token as a URL when knownCommandRoots is empty', () => {
+    // Documents the boundary: with no known roots configured, `looksLikeUrl` is the only signal,
+    // matching the pre-fix behavior instead of silently guessing at command names.
+    const result = normalizeArgv(['config:get'], {
+      valueTakingFlags: VALUE_TAKING_FLAG_TOKENS,
+      knownCommandRoots: new Set(),
+    });
+    expect(result.argv).toEqual(['fetch', 'config:get']);
+  });
 });
 
 describe('VALUE_TAKING_FLAG_TOKENS', () => {
@@ -395,5 +436,16 @@ describe('VALUE_TAKING_FLAG_TOKENS', () => {
         VALUE_TAKING_FLAG_TOKENS
       )
     ).toEqual(['fetch', 'https://example.com']);
+  });
+});
+
+describe('KNOWN_COMMAND_ROOT_TOKENS', () => {
+  it('is derived from command metadata (top-level ids, not the namespaced leaves)', () => {
+    expect(KNOWN_COMMAND_ROOT_TOKENS.has('config')).toBe(true);
+    expect(KNOWN_COMMAND_ROOT_TOKENS.has('fetch')).toBe(true);
+    expect(KNOWN_COMMAND_ROOT_TOKENS.has('list')).toBe(true);
+    expect(KNOWN_COMMAND_ROOT_TOKENS.has('status')).toBe(true);
+    expect(KNOWN_COMMAND_ROOT_TOKENS.has('javascript')).toBe(false);
+    expect(KNOWN_COMMAND_ROOT_TOKENS.has('data')).toBe(false);
   });
 });

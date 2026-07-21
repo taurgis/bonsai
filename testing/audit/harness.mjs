@@ -113,7 +113,7 @@ export function createHarness() {
   }
 
   function expect(cond, msg) {
-    if (!cond) throw new Error(msg);
+    if (!cond) throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
   }
 
   function check(name, fn) {

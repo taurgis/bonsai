@@ -7,7 +7,7 @@ import updateNotifier from 'update-notifier';
 import { createRequire } from 'node:module';
 
 import { normalizeArgv } from '../dist/lib/argv.js';
-import { VALUE_TAKING_FLAG_TOKENS } from '../dist/lib/cli-flag-manifest.js';
+import { VALUE_TAKING_FLAG_TOKENS, KNOWN_COMMAND_ROOT_TOKENS } from '../dist/lib/cli-flag-manifest.js';
 import { exitWithPreflight } from '../dist/lib/cli-emit.js';
 import { tryUnknownHelpOutput } from '../dist/lib/help-preflight.js';
 import { tryJsonMetaOutput } from '../dist/lib/json-meta.js';
@@ -23,7 +23,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // trying to resolve the bare URL as a command — which crashes with a stack trace. Rewrite
 // process.argv itself so both the run path and the help/error path agree.
 const rawArgv = process.argv.slice(2);
-const result = normalizeArgv(rawArgv, { valueTakingFlags: VALUE_TAKING_FLAG_TOKENS });
+const result = normalizeArgv(rawArgv, {
+  valueTakingFlags: VALUE_TAKING_FLAG_TOKENS,
+  knownCommandRoots: KNOWN_COMMAND_ROOT_TOKENS,
+});
 const root = __dirname + '/../';
 
 if (result.earlyExit) {
