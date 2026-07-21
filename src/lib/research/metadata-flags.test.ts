@@ -25,7 +25,9 @@ describe('metadataNewlineError', () => {
     );
   });
 
-  it('checks topic before tags when both are present and clean', () => {
-    expect(metadataNewlineError({ topic: 'Clean', tags: ['clean'] })).toBeNull();
+  it('checks topic before tags when both are dirty', () => {
+    expect(metadataNewlineError({ topic: 'bad\nbreak', tags: ['also\nbad'] })).toBe(
+      '--topic cannot contain line breaks.'
+    );
   });
 });

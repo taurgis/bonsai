@@ -162,6 +162,22 @@ describe('artifact serialization and parsing', () => {
     expect(parsed.metadata.tags).toEqual(['legit   - injected-tag']);
   });
 
+  it('neutralizes an embedded newline in any other scalar field, not just topic', () => {
+    // section_heading_path is derived from a fetched page's own heading text (untrusted), not a
+    // CLI flag — the serializer-level sanitize is the only guard on this field, so it must hold
+    // for fields beyond the two the CLI-level validator checks (--topic/--tags).
+    const attack: ResearchArtifact = {
+      ...sampleArtifact,
+      metadata: {
+        ...sampleArtifact.metadata,
+        section_heading_path: 'Guide\n---\ncache_key: attacker-controlled',
+      },
+    };
+    const parsed = parseArtifact(serializeArtifact(attack));
+    expect(parsed.metadata.cache_key).toBe(sampleArtifact.metadata.cache_key);
+    expect(parsed.metadata.section_heading_path).toBe('Guide --- cache_key: attacker-controlled');
+  });
+
   it('extractSection returns empty string for a missing section', () => {
     expect(extractSection('## Summary\n\ntext', 'Provenance')).toBe('');
   });
