@@ -253,6 +253,7 @@ export default function register(harness, fixtures) {
     const stderr = dewrapCliMessage(r.stderr);
     expect(stderr.includes('"storage"'), `stderr: ${r.stderr}`);
     expect(stderr.includes('"banana"'), `stderr: ${r.stderr}`);
+    expect(stderr.includes('Valid values: global, project'), `stderr: ${r.stderr}`);
     // The invalid key falls back to the built-in default; the sibling valid key is unaffected.
     expect(parseJson(r.stdout)?.data?.value === 'global', 'falls back to default storage');
     const summary = run(['config', 'get', 'summary', '--local', '--json'], {

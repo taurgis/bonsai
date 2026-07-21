@@ -245,39 +245,41 @@ describe('config io round-trip', () => {
 });
 
 describe('invalidConfigFileWarnings', () => {
-  it('warns once for unparseable JSON and still resolves to defaults', () => {
+  it('warns once for unparseable JSON, names the real bin, and still resolves to defaults', () => {
     writeFileSync(join(dir, USER_CONFIG_FILENAME), '{ not valid json');
-    const warnings = invalidConfigFileWarnings(dir, dir);
+    const warnings = invalidConfigFileWarnings(dir, dir, 'bonsai');
     expect(warnings).toHaveLength(1);
     expect(warnings[0]).toContain(USER_CONFIG_FILENAME);
     expect(warnings[0]).toContain('not valid JSON');
+    expect(warnings[0]).toContain('bonsai config set');
     expect(readUserConfig(dir)).toEqual({});
   });
 
-  it('warns for an invalid value in an otherwise-valid file, naming the key and value', () => {
+  it('warns for an invalid value in an otherwise-valid file, naming the key, value, and valid values', () => {
     writeFileSync(
       join(dir, PROJECT_CONFIG_FILENAME),
       JSON.stringify({ storage: 'banana', summary: 'balanced' })
     );
-    const warnings = invalidConfigFileWarnings(dir, dir);
+    const warnings = invalidConfigFileWarnings(dir, dir, 'bonsai');
     expect(warnings).toHaveLength(1);
     expect(warnings[0]).toContain('"storage"');
     expect(warnings[0]).toContain('"banana"');
     expect(warnings[0]).toContain(PROJECT_CONFIG_FILENAME);
+    expect(warnings[0]).toContain('Valid values: global, project.');
     // The invalid key is dropped, but sibling valid keys still resolve.
     expect(readProjectConfig(dir)).toEqual({ summary: 'balanced' });
   });
 
   it('warns when the top-level JSON value is not an object', () => {
     writeFileSync(join(dir, USER_CONFIG_FILENAME), '[1, 2, 3]');
-    const warnings = invalidConfigFileWarnings(dir, dir);
+    const warnings = invalidConfigFileWarnings(dir, dir, 'bonsai');
     expect(warnings).toHaveLength(1);
     expect(warnings[0]).toContain('expected a JSON object');
   });
 
   it('does not warn for a valid file, a missing file, or an unset config dir', () => {
     writeUserConfig(dir, { storage: 'project' });
-    expect(invalidConfigFileWarnings(dir, dir)).toEqual([]);
-    expect(invalidConfigFileWarnings(undefined, dir)).toEqual([]);
+    expect(invalidConfigFileWarnings(dir, dir, 'bonsai')).toEqual([]);
+    expect(invalidConfigFileWarnings(undefined, dir, 'bonsai')).toEqual([]);
   });
 });

@@ -73,7 +73,11 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     for (const warning of invalidEnvOverrideWarnings(process.env)) this.warn(warning);
     // Same signal for a corrupted or hand-edited config file: parsing silently degrades to `{}`
     // (or drops just the offending key), which would otherwise mask the problem entirely.
-    for (const warning of invalidConfigFileWarnings(this.config.configDir, process.cwd())) {
+    for (const warning of invalidConfigFileWarnings(
+      this.config.configDir,
+      process.cwd(),
+      this.config.bin
+    )) {
       this.warn(warning);
     }
   }

@@ -23,7 +23,8 @@ interface ParsedConfigFile {
 function parseConfigFile(
   filePath: string,
   raw: string,
-  scopeFlag: '--global' | '--local'
+  scopeFlag: '--global' | '--local',
+  bin: string
 ): ParsedConfigFile {
   let parsed: unknown;
   try {
@@ -33,7 +34,7 @@ function parseConfigFile(
       values: {},
       warnings: [
         `Ignoring ${filePath}: not valid JSON. Using the configured value or default instead. ` +
-          `Fix the file by hand, or overwrite it with bonsai config set <key> <value> ${scopeFlag}.`,
+          `Fix the file by hand, or overwrite it with ${bin} config set <key> <value> ${scopeFlag}.`,
       ],
     };
   }
@@ -54,8 +55,10 @@ function parseConfigFile(
     if (KEY_META[key].isValid(val)) {
       Object.assign(values, { [key]: val });
     } else {
+      const validValues = KEY_META[key].values;
+      const validValuesHint = validValues ? ` Valid values: ${validValues.join(', ')}.` : '';
       warnings.push(
-        `Ignoring "${key}" in ${filePath}: invalid value ${JSON.stringify(val)}. ` +
+        `Ignoring "${key}" in ${filePath}: invalid value ${JSON.stringify(val)}.${validValuesHint} ` +
           `Using the configured value or default instead.`
       );
     }
@@ -63,7 +66,17 @@ function parseConfigFile(
   return { values, warnings };
 }
 
-function readConfigFile(filePath: string, scopeFlag: '--global' | '--local'): ParsedConfigFile {
+// Only the "fix it" suggestion in a warning message names the binary; every value-only caller
+// below (readUserConfig/readProjectConfig, and transitively write*Config) discards warnings
+// entirely, so this default never reaches a user — it's a placeholder for an unused code path,
+// not a claim about the real bin name. invalidConfigFileWarnings passes the real `this.config.bin`.
+const DEFAULT_BIN = 'bonsai';
+
+function readConfigFile(
+  filePath: string,
+  scopeFlag: '--global' | '--local',
+  bin: string = DEFAULT_BIN
+): ParsedConfigFile {
   if (!existsSync(filePath)) return { values: {}, warnings: [] };
   let raw: string;
   try {
@@ -71,7 +84,7 @@ function readConfigFile(filePath: string, scopeFlag: '--global' | '--local'): Pa
   } catch {
     return { values: {}, warnings: [] };
   }
-  return parseConfigFile(filePath, raw, scopeFlag);
+  return parseConfigFile(filePath, raw, scopeFlag, bin);
 }
 
 export function readUserConfig(configDir: string | undefined): Partial<ConfigValues> {
@@ -88,13 +101,21 @@ export function readProjectConfig(cwd: string): Partial<ConfigValues> {
  * otherwise silently degrade to `{}` (or drop just the offending key) is never a silent surprise —
  * mirrors {@link invalidEnvOverrideWarnings} for env vars. Empty when both files are missing,
  * unreadable, or valid.
+ *
+ * @param bin - CLI binary name (`this.config.bin`) for the "fix it" suggestion in a warning.
  */
-export function invalidConfigFileWarnings(configDir: string | undefined, cwd: string): string[] {
+export function invalidConfigFileWarnings(
+  configDir: string | undefined,
+  cwd: string,
+  bin: string
+): string[] {
   const warnings: string[] = [];
   if (configDir) {
-    warnings.push(...readConfigFile(join(configDir, USER_CONFIG_FILENAME), '--global').warnings);
+    warnings.push(
+      ...readConfigFile(join(configDir, USER_CONFIG_FILENAME), '--global', bin).warnings
+    );
   }
-  warnings.push(...readConfigFile(join(cwd, PROJECT_CONFIG_FILENAME), '--local').warnings);
+  warnings.push(...readConfigFile(join(cwd, PROJECT_CONFIG_FILENAME), '--local', bin).warnings);
   return warnings;
 }
 
