@@ -13,6 +13,7 @@ export abstract class ConfigCommand<T extends typeof Command> extends BaseComman
       this.error('--global and --local are mutually exclusive.', {
         exit: 2,
         code: 'CONFLICTING_FLAGS',
+        suggestions: ['Pass --global or --local, not both.'],
       });
     }
   }

@@ -3,6 +3,7 @@ import {
   isKnownKey,
   suggestKey,
   validKeysHint,
+  keyValuesHint,
   KEY_META,
   ALL_KEYS,
   BUILT_IN_DEFAULTS,
@@ -26,6 +27,12 @@ describe('schema key guards', () => {
     expect(ALL_KEYS).toContain('summary');
     expect(BUILT_IN_DEFAULTS.storage).toBe('global');
     expect(BUILT_IN_DEFAULTS.summary).toBe('conservative');
+  });
+
+  it('lists valid keys with their accepted values for --help descriptions', () => {
+    expect(keyValuesHint()).toBe(
+      'storage (global|project), summary (conservative|balanced|aggressive)'
+    );
   });
 
   it('recognises the summary key and suggests it for a fuzzy input', () => {

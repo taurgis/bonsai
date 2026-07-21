@@ -1,6 +1,6 @@
 import { Args, Flags } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { KEY_META, validKeysHint } from '../../lib/config/index.js';
+import { KEY_META, keyValuesHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
 import { persistConfigPatch } from '../../lib/config-persist.js';
 import type { ConfigWriteResult } from '../../lib/cli-result-types.js';
@@ -10,7 +10,7 @@ export default class ConfigSet extends ConfigCommand<typeof ConfigSet> {
   static summary = 'Set a research configuration key';
   static description =
     'Persist a configuration value. Writes user-level config by default; pass --local for project-level config (.bonsai.json in cwd).\n\n' +
-    `Valid keys: ${validKeysHint()}. The inline form \`<key>=<value>\` is also accepted.`;
+    `Valid keys: ${keyValuesHint()}. The inline form \`<key>=<value>\` is also accepted.`;
 
   static examples = [
     {

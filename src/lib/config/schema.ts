@@ -71,3 +71,11 @@ export function suggestKey(input: string): ConfigKey | undefined {
 export function validKeysHint(): string {
   return ALL_KEYS.join(', ');
 }
+
+/** Valid keys with their accepted values, e.g. "storage (global|project), summary (…)", for `--help` descriptions. */
+export function keyValuesHint(): string {
+  return ALL_KEYS.map((key) => {
+    const { values } = KEY_META[key];
+    return values ? `${key} (${values.join('|')})` : key;
+  }).join(', ');
+}

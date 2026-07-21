@@ -14,6 +14,7 @@ export {
   isKnownKey,
   suggestKey,
   validKeysHint,
+  keyValuesHint,
 } from './schema.js';
 
 export {
