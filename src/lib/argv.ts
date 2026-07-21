@@ -20,6 +20,11 @@ export interface NormalizationResult {
 export interface ArgvNormalizeOptions {
   /** Tokens that consume the next argv value (`--topic`, `-t`, …). From cli-flag-manifest. */
   valueTakingFlags: ReadonlySet<string>;
+  /**
+   * Root segment of every registered command id (`config:get` → `config`). From cli-flag-manifest.
+   * A `word:` token whose root is in this set is a command (`config:get`), never a URL scheme.
+   */
+  knownCommandRoots: ReadonlySet<string>;
 }
 
 /** Shared MISSING_COMMAND copy for flag-only argv preflight. */
@@ -124,7 +129,7 @@ export function normalizeArgv(
   rawArgv: string[],
   options: ArgvNormalizeOptions
 ): NormalizationResult {
-  const { valueTakingFlags } = options;
+  const { valueTakingFlags, knownCommandRoots } = options;
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but
   // `bonsai --json list` is otherwise parsed as an unknown command named
   // "--json". Collect every --json, append one copy after the command/URL, and
@@ -154,8 +159,16 @@ export function normalizeArgv(
   // forms like `javascript:` or `data:` so fetch can reject unsupported protocols instead of oclif
   // reporting a misleading "command not found". If the invocation begins with a flag, allow common
   // flag-before-argument usage such as `bonsai --format detailed https://example.com`.
+  // Exclude tokens whose part before the first `:` names a real command (`config:get`) — oclif
+  // joins namespaced command ids with `:` regardless of the display-only topicSeparator, so those
+  // are commands, not URL schemes, and must reach normal command dispatch instead of a misleading
+  // "Invalid URL" error.
   const firstNonFlagArgIndex = firstPositionalIndex(core, valueTakingFlags);
-  const rootFetchShape = firstNonFlagArgIndex !== -1 && looksLikeUrl(core[firstNonFlagArgIndex]!);
+  const firstArg = firstNonFlagArgIndex !== -1 ? core[firstNonFlagArgIndex]! : undefined;
+  const rootFetchShape =
+    firstArg !== undefined &&
+    looksLikeUrl(firstArg) &&
+    !knownCommandRoots.has(firstArg.split(':')[0]!);
   if (rootFetchShape) {
     const url = core[firstNonFlagArgIndex]!;
     core = [

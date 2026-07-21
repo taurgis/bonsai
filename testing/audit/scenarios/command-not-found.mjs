@@ -121,4 +121,37 @@ export default function register(harness) {
     expect(env?.stderr?.includes('consumed https://example.com/docs'), env?.stderr);
     expect(env?.suggestions?.[0]?.includes('https://example.com/docs'), env?.suggestions);
   });
+
+  // oclif joins namespaced command ids with `:` regardless of the display-only `topicSeparator: ' '`
+  // config, so `config:get` (colon form) must dispatch exactly like `config get` (space form)
+  // instead of being misread as a `config:` URL scheme and routed to fetch.
+  check('colon-form namespaced command dispatches like the space form', () => {
+    const r = run(['config:get', 'storage', '--json'], { env: { BONSAI_STORAGE: 'project' } });
+    expect(r.exitCode === 0, `exit ${r.exitCode}: ${r.stderr}`);
+    const env = parseJson(r.stdout);
+    expect(env?.ok === true, JSON.stringify(env));
+    expect(env?.data?.value === 'project', JSON.stringify(env?.data));
+  });
+
+  check('colon-form namespaced command help matches the space form', () => {
+    const r = run(['help', 'config:get']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}: ${r.stderr}`);
+    expect(r.stdout.includes('Get a research configuration value'), r.stdout.slice(0, 200));
+    expect(!r.stdout.includes('Fetch and cache URL research Markdown'), r.stdout.slice(0, 200));
+  });
+
+  check('colon typo on a known command root stays a command-not-found, not an INVALID_URL', () => {
+    const r = run(['--json', 'config:frobnicate']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'COMMAND_NOT_FOUND', env?.code);
+    expect(env?.stderr?.includes('config frobnicate is not a bonsai command.'), env?.stderr);
+  });
+
+  check('unrecognized scheme-like prefix still routes to fetch for protocol validation', () => {
+    const r = run(['--json', 'javascript:alert(1)']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_URL', env?.code);
+  });
 }

@@ -10,3 +10,13 @@ export const VALUE_TAKING_FLAG_TOKENS: ReadonlySet<string> = valueTakingFlagToke
   commands,
   BaseCommand.baseFlags
 );
+
+/**
+ * Root segment of every registered command id (`config:get` → `config`). oclif joins namespaced
+ * command ids with `:` regardless of the display-only `topicSeparator` setting, so a token like
+ * `config:get` is a real command, not a URL — argv normalization checks this set before assuming
+ * `word:` is a URL scheme.
+ */
+export const KNOWN_COMMAND_ROOT_TOKENS: ReadonlySet<string> = new Set(
+  Object.keys(commands).map((id) => id.split(':')[0]!)
+);
