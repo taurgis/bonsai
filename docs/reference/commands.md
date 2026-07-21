@@ -310,7 +310,10 @@ flood the listing — find them with `inspect` (which lists a page's sections).
 | `--json`           | —     | boolean | `false` | Return the machine-readable envelope.                                                                                      |
 
 Results are sorted by `validated_at` (falling back to `fetched_at`), newest
-first, then truncated to `--limit`.
+first, then truncated to `--limit`. A whitespace-only `--topic` or `--tags`
+value is rejected as `INVALID_FLAG_VALUE` (same as an empty `--url`) rather
+than silently matching everything or nothing — almost always a shell-quoting
+mistake.
 
 ### JSON Output envelope `data` block
 
@@ -373,9 +376,9 @@ bonsai prune [flags]
 
 Two guardrails make accidental deletion hard:
 
-- At least one of `--older-than`, `--inactive`, `--artifact-type`, or `--url` is
-  **required**; running `prune` with no filter exits `2` rather than matching
-  everything.
+- At least one of `--older-than`, `--inactive`, `--artifact-type`, `--url`,
+  `--topic`, or `--tags` is **required**; running `prune` with no filter exits
+  `2` rather than matching everything.
 - The command refuses to delete unless you pass `--yes`. Use `--dry-run` first
   to see exactly what would go. `--dry-run` and `--yes` are mutually exclusive —
   passing both exits `2` (`CONFLICTING_FLAGS`) rather than guessing which you
@@ -389,6 +392,8 @@ Two guardrails make accidental deletion hard:
 | `--inactive`             | —     | duration | —       | Idle time threshold (`validated_at`, falling back to `fetched_at`), e.g. `14d`.                                           |
 | `--artifact-type`        | —     | choice   | —       | Artifact type to prune: `source`, `research_note`, `index`, or `section`. Unlike `list`, prune includes section children. |
 | `--url`                  | —     | glob     | —       | Source URL glob (case-insensitive, supports `*`).                                                                         |
+| `--topic`                | `-t`  | string   | —       | Exact topic (case-insensitive), same matching as `list --topic`.                                                          |
+| `--tags`                 | `-g`  | string   | —       | Tags to require (must match all), same matching as `list --tags`.                                                        |
 | `--dry-run`              | —     | boolean  | `false` | Preview files without deleting. Mutually exclusive with `--yes`.                                                          |
 | `--yes`                  | `-y`  | boolean  | `false` | Confirm deletion. Required for a real prune (rejected under `--read-only`).                                               |
 | `--read-only` / `--plan` | —     | boolean  | `false` | Implicit preview; mutations disabled.                                                                                     |
@@ -396,7 +401,9 @@ Two guardrails make accidental deletion hard:
 
 `--older-than` and `--inactive` are distinct: a recently revalidated but originally-old page can match
 `--older-than` while still failing `--inactive`. When some unlinks fail, `prunedCount` reports actual
-deletes and the process exits `1`.
+deletes and the process exits `1`. `--topic` and `--tags` reject a whitespace-only value with
+`INVALID_FLAG_VALUE` — an empty filter is almost always a shell-quoting mistake, not an intentional
+"match everything" or "match nothing".
 
 ### JSON Output envelope `data` block
 

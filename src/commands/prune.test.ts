@@ -271,6 +271,53 @@ describe('prune command unit tests', () => {
     expect(envelope.stderr).toBe('');
   });
 
+  it('filters candidates by --topic and --tags, matching list semantics', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValueOnce('# Keep note\nBody')
+      .mockResolvedValueOnce('# Deprecated note\nBody');
+
+    const keep = (await ResearchImport.run([
+      'https://example.com/prune-topic-keep',
+      '--stdin',
+      '--topic',
+      'Keep This',
+      '--tags',
+      'active',
+    ])) as any;
+
+    const deprecated = (await ResearchImport.run([
+      'https://example.com/prune-topic-drop',
+      '--stdin',
+      '--topic',
+      'Deprecated Guide',
+      '--tags',
+      'deprecated',
+    ])) as any;
+    readSpy.mockRestore();
+
+    const byTopic = (await ResearchPrune.run(['--topic', 'deprecated guide', '--dry-run'])) as any;
+    expect(byTopic.files.map((f: any) => f.cacheKey)).toEqual([deprecated.cache.key]);
+
+    const byTags = (await ResearchPrune.run(['--tags', 'deprecated', '--dry-run'])) as any;
+    expect(byTags.files.map((f: any) => f.cacheKey)).toEqual([deprecated.cache.key]);
+
+    const byTagsMiss = (await ResearchPrune.run(['--tags', 'active', '--dry-run'])) as any;
+    expect(byTagsMiss.files.map((f: any) => f.cacheKey)).toEqual([keep.cache.key]);
+  });
+
+  it('rejects a whitespace-only --topic filter as a likely shell-quoting mistake', async () => {
+    await expect(ResearchPrune.run(['--topic', '  ', '--dry-run'])).rejects.toThrow(
+      /--topic must be a non-empty value/
+    );
+  });
+
+  it('rejects a whitespace-only --tags filter entry', async () => {
+    await expect(
+      ResearchPrune.run(['--tags', 'react', '--tags', '  ', '--dry-run'])
+    ).rejects.toThrow(/--tags must be non-empty values/);
+  });
+
   it('rejects empty --older-than as INVALID_DURATION', async () => {
     await expect(ResearchPrune.run(['--older-than', '', '--dry-run'])).rejects.toThrow(
       /must not be empty/

@@ -127,6 +127,19 @@ export default function register(harness) {
     expect(compact(prune.stdout).includes(sharedCopy), 'prune --url copy drifted');
   });
 
+  check('list and prune share --topic/--tags filter semantics (no cleanup-by-tag gap)', () => {
+    const list = run(['list', '--help']);
+    const prune = run(['prune', '--help']);
+    const topicCopy = 'exact topic (case-insensitive)';
+    const tagsCopy = 'tags to require (must match all)';
+    expect(list.exitCode === 0, `list exit ${list.exitCode}`);
+    expect(prune.exitCode === 0, `prune exit ${prune.exitCode}`);
+    expect(compact(list.stdout).includes(topicCopy), 'list --topic copy drifted');
+    expect(compact(prune.stdout).includes(topicCopy), 'prune --topic missing/drifted');
+    expect(compact(list.stdout).includes(tagsCopy), 'list --tags copy drifted');
+    expect(compact(prune.stdout).includes(tagsCopy), 'prune --tags missing/drifted');
+  });
+
   check('config subcommand help includes inherited json and read-only flags', () => {
     for (const cmd of [
       ['config', 'get', '--help'],

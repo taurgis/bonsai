@@ -9,6 +9,7 @@ import { parseTtlToMs } from '../lib/research/freshness.js';
 import { ARTIFACT_TYPES, type ResearchArtifactMetadata } from '../lib/research/schema.js';
 import { NO_TOPIC_LABEL, pluralize, sanitizeForTerminal } from '../lib/text.js';
 import { artifactMatchesUrlFilter } from '../lib/research/url.js';
+import { matchesTopicFilter, matchesTagsFilter } from '../lib/research/metadata-filters.js';
 import { pruneFlagError } from '../lib/prune-flags.js';
 import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
@@ -19,7 +20,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
   static id = 'prune';
   static summary = 'Prune cached research artifacts';
   static description =
-    'Delete cached artifacts by content age, idle time, URL glob, or artifact type.';
+    'Delete cached artifacts by content age, idle time, URL glob, artifact type, topic, or tags.';
 
   static examples = [
     {
@@ -34,6 +35,10 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       description: 'prune entries matching a URL glob',
       command: '<%= config.bin %> prune --url "https://react.dev/*" --yes',
     },
+    {
+      description: 'prune entries tagged as deprecated',
+      command: '<%= config.bin %> prune --tags deprecated --yes',
+    },
   ];
 
   static flags = {
@@ -45,6 +50,15 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     }),
     url: Flags.string({
       description: CLI_FLAG_DESCRIPTIONS.sourceUrlGlob,
+    }),
+    topic: Flags.string({
+      char: 't',
+      description: CLI_FLAG_DESCRIPTIONS.filterTopic,
+    }),
+    tags: Flags.string({
+      char: 'g',
+      description: CLI_FLAG_DESCRIPTIONS.filterTags,
+      multiple: true,
     }),
     'artifact-type': Flags.option({
       // Prune operates on every cached file, so it can target any artifact type — including the
@@ -76,6 +90,8 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
       inactive: this.flags.inactive,
       artifactType: this.flags['artifact-type'],
       url: this.flags.url,
+      topic: this.flags.topic,
+      tags: this.flags.tags,
       dryRun: this.flags['dry-run'],
       yes: this.flags.yes,
       readOnly: this.readOnly,
@@ -90,6 +106,14 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
     }
 
     if (this.flags.url && !artifactMatchesUrlFilter(meta, this.flags.url)) {
+      return false;
+    }
+
+    if (!matchesTopicFilter(meta, this.flags.topic)) {
+      return false;
+    }
+
+    if (!matchesTagsFilter(meta, this.flags.tags)) {
       return false;
     }
 

@@ -34,6 +34,18 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
   });
 
+  check('list empty --topic is INVALID_FLAG_VALUE, not a silent "match everything"', () => {
+    const r = run(['list', '--topic', '  ', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
+  });
+
+  check('list empty --tags entry is INVALID_FLAG_VALUE, not a silent "match nothing"', () => {
+    const r = run(['list', '--tags', 'real', '--tags', '', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
+  });
+
   check('list human empty cache message', () => {
     const r = run(['list']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);

@@ -141,7 +141,7 @@ npx @taurgis/bonsai inspect <url>
 
 ### `list`
 
-List cached artifacts by metadata filters (`--topic`, `--tags`, `--freshness`, `--artifact-type`, `--capture-method`, `--limit`), newest first, without printing content.
+List cached artifacts by metadata filters (`--topic`, `--tags`, `--url`, `--freshness`, `--artifact-type`, `--capture-method`, `--limit`), newest first, without printing content.
 
 ```bash
 npx @taurgis/bonsai list [flags]
@@ -149,7 +149,7 @@ npx @taurgis/bonsai list [flags]
 
 ### `prune`
 
-Delete old or inactive cache entries. Requires a filter (`--older-than`, `--inactive`, `--artifact-type`, or `--url`) and exactly one of `--dry-run` or `--yes` (passing both is a usage error). In [read-only mode](#read-only--plan-mode), `--yes` is rejected and the safety check is implicitly satisfied by a preview.
+Delete old or inactive cache entries. Requires a filter (`--older-than`, `--inactive`, `--artifact-type`, `--url`, `--topic`, or `--tags`) and exactly one of `--dry-run` or `--yes` (passing both is a usage error). In [read-only mode](#read-only--plan-mode), `--yes` is rejected and the safety check is implicitly satisfied by a preview.
 
 ```bash
 npx @taurgis/bonsai prune --older-than 90d --dry-run
