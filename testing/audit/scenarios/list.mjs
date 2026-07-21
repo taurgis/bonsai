@@ -1,3 +1,5 @@
+import { dirname, join } from 'node:path';
+import { writeFileSync } from 'node:fs';
 import { expectNonIntegerLimitInvalid, expectSingleCachedHit } from '../helpers.mjs';
 
 /** list command filters and empty states. */
@@ -252,5 +254,33 @@ export default function register(harness, fixtures) {
     expect(Array.isArray(entries), 'list data array');
     expect(entries.length === 1, `expected one URL match, got ${entries?.length}`);
     expect(entries[0]?.sourceUrls?.includes(matchingUrl), `sourceUrls ${entries[0]?.sourceUrls}`);
+  });
+
+  check('a foreign *.md file dropped in the research dir never appears as a phantom list entry', () => {
+    // A well-formed `---`/`---` fenced file with no recognized fields (e.g. an unrelated note a user
+    // drops in the cache dir, or an incompatible-schema leftover) parses cleanly to cache_key: '' and
+    // status: 'active' rather than throwing — it must never surface as an unusable ghost row (no
+    // cache key, no source URL) that list/inspect/prune have no way to target individually.
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-list-foreign-md';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Real entry\n\nForeign-file phantom-entry regression fixture.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const researchDir = dirname(parseJson(imported.stdout)?.data?.cache?.path);
+
+    writeFileSync(
+      join(researchDir, 'my-notes.md'),
+      '---\ntitle: Unrelated personal notes\n---\n\n# Not a Bonsai artifact\n'
+    );
+
+    const listed = run(['list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(listed.exitCode === 0, `list exit ${listed.exitCode}`);
+    const entries = parseJson(listed.stdout)?.data;
+    expect(Array.isArray(entries) && entries.length === 1, `data ${JSON.stringify(entries)}`);
+    expect(entries[0]?.cacheKey, 'real entry has a usable cache key');
+    expect(entries[0]?.sourceUrls?.includes(url), `sourceUrls ${entries[0]?.sourceUrls}`);
   });
 }

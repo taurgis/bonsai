@@ -75,7 +75,12 @@ function getOrUpdateIndexEntry(
   }
 
   try {
-    const entry = { sig, artifact: parseArtifactShallow(readFileSync(filePath, 'utf-8')) };
+    const artifact = parseArtifactShallow(readFileSync(filePath, 'utf-8'));
+    // Mirrors the same guard in storage.ts's scanCacheDir: parseArtifact never throws on a foreign
+    // or garbled *.md file that merely has `---`/`---` fences, it just defaults cache_key to ''. Treat
+    // that the same as a parse failure so it's skipped rather than indexed as a phantom entry.
+    if (!artifact.metadata.cache_key) return undefined;
+    const entry = { sig, artifact };
     onChanged();
     return entry;
   } catch {

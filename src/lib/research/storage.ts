@@ -28,7 +28,13 @@ export function scanCacheDir<T>(
     if (!isResearchFile(file)) continue;
     try {
       const content = readFileSync(join(dir, file), 'utf-8');
-      const result = fn(parseArtifact(content), join(dir, file));
+      const artifact = parseArtifact(content);
+      // parseArtifact defaults unrecognized frontmatter to a valid-looking shell (cache_key: '',
+      // status: 'active'), so a foreign or otherwise-garbled *.md file with `---`/`---` fences never
+      // throws here — it would otherwise surface as a phantom entry with no usable cache key. Every
+      // artifact Bonsai itself writes always has one, so an empty cache_key means "not ours."
+      if (!artifact.metadata.cache_key) continue;
+      const result = fn(artifact, join(dir, file));
       if (result !== null) results.push(result);
     } catch {}
   }

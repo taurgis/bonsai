@@ -1,3 +1,5 @@
+import { dirname, join } from 'node:path';
+import { writeFileSync } from 'node:fs';
 import { ageArtifact } from '../helpers.mjs';
 
 /** prune safety checks and duration validation. */
@@ -247,5 +249,34 @@ export default function register(harness, fixtures) {
     expect(parseJson(staleGone.stdout)?.code === 'CACHE_MISS', 'idle entry pruned');
     const freshSurvives = run(['status', freshUrl, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(parseJson(freshSurvives.stdout)?.data?.status === 'hit', 'recently-validated entry survives');
+  });
+
+  check('a foreign *.md file dropped in the research dir is never a prune candidate', () => {
+    // prune scans with the raw scanCacheDir (not the search-index path list/inspect use), so this
+    // pins the phantom-entry exclusion on that separate code path too: a foreign well-formed-fence
+    // file must not silently count toward --artifact-type source (its default-parsed type).
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-prune-foreign-md';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Real entry\n\nForeign-file phantom prune-candidate regression fixture.\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const researchDir = dirname(parseJson(imported.stdout)?.data?.cache?.path);
+
+    writeFileSync(
+      join(researchDir, 'my-notes.md'),
+      '---\ntitle: Unrelated personal notes\n---\n\n# Not a Bonsai artifact\n'
+    );
+
+    const dryRun = run(['prune', '--artifact-type', 'source', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(dryRun.exitCode === 0, `exit ${dryRun.exitCode}`);
+    const data = parseJson(dryRun.stdout)?.data;
+    expect(data?.candidateCount === 1, `candidateCount ${data?.candidateCount}`);
+    expect(data?.files?.[0]?.cacheKey, 'candidate has a usable cache key');
   });
 }

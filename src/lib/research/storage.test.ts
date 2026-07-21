@@ -8,6 +8,7 @@ import {
   readArtifact,
   hasArtifact,
   findArtifact,
+  scanCacheDir,
 } from './storage.js';
 import { deriveCacheKey } from './cache-key.js';
 import type { ResearchArtifact } from './schema.js';
@@ -225,6 +226,31 @@ describe('cache storage filesystem management', () => {
       const files = readdirSync(researchDir);
       const corruptRenamed = files.filter((f) => f.includes('corrupt.md.corrupt'));
       expect(corruptRenamed.length).toBe(1);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('excludes a foreign *.md file with well-formed but non-Bonsai frontmatter from scanCacheDir', () => {
+    // Unlike `corrupt frontmatter content ---` above (no closing fence, throws immediately),
+    // a file with a real `---`/`---` pair but no recognized fields never throws: parseArtifact
+    // defaults the missing cache_key to '' and status to 'active', so without this guard it would
+    // surface as a phantom scanCacheDir result with no usable identity (empty cache key, no URLs).
+    const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-foreign-md-'));
+    try {
+      const researchDir = join(tempDir, 'research');
+      const fs = require('node:fs');
+      fs.mkdirSync(researchDir, { recursive: true });
+      fs.writeFileSync(
+        join(researchDir, 'my-notes.md'),
+        '---\ntitle: Unrelated personal notes\n---\n\n# Not a Bonsai artifact\n'
+      );
+
+      const key = 'abcdef123456';
+      writeArtifact(tempDir, key, sampleArtifact);
+
+      const results = scanCacheDir(researchDir, (artifact) => artifact.metadata.cache_key);
+      expect(results).toEqual([key]);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

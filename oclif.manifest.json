@@ -18,6 +18,10 @@
         {
           "description": "cache a volatile page with compressed JSON output",
           "command": "<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json"
+        },
+        {
+          "description": "fetch multiple URLs in one batch (space-separated)",
+          "command": "<%= config.bin %> https://docs.nestjs.com/ https://docs.nestjs.com/first-steps"
         }
       ],
       "flags": {
@@ -304,6 +308,10 @@
         {
           "description": "inspect cached metadata as JSON",
           "command": "<%= config.bin %> <%= command.id %> https://example.com/docs --json"
+        },
+        {
+          "description": "inspect multiple URLs in one batch (space-separated)",
+          "command": "<%= config.bin %> <%= command.id %> https://example.com/docs https://example.com/api"
         }
       ],
       "flags": {
@@ -567,6 +575,10 @@
         {
           "description": "evaluate status with a specific tier and TTL",
           "command": "<%= config.bin %> <%= command.id %> https://example.com/docs --tier volatile --ttl 2h"
+        },
+        {
+          "description": "check multiple URLs in one batch (space-separated)",
+          "command": "<%= config.bin %> <%= command.id %> https://example.com/docs https://example.com/api"
         }
       ],
       "flags": {

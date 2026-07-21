@@ -37,6 +37,21 @@ export default function register(harness) {
     expect(r.stdout.includes('(alias: --plan)'), 'missing --plan alias callout');
   });
 
+  check('fetch, status, and inspect help document multi-URL batch usage with an example', () => {
+    // fetch/status/inspect all accept `URL...` (space-separated) and are exercised in batch by the
+    // fetch/inspect-status scenarios, but nothing in --help told a first-time reader that repeating
+    // the argument is a real, supported mode rather than a USAGE-line technicality.
+    for (const [cmd, args] of [
+      ['fetch', ['help', 'fetch']],
+      ['status', ['status', '--help']],
+      ['inspect', ['inspect', '--help']],
+    ]) {
+      const r = run(args);
+      expect(r.exitCode === 0, `${cmd} exit ${r.exitCode}`);
+      expect(/batch/i.test(r.stdout), `${cmd} help should document multi-URL batch usage`);
+    }
+  });
+
   check('help fetch examples use the URL shorthand primary UX', () => {
     const r = run(['help', 'fetch']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);

@@ -170,6 +170,26 @@ describe('loadIndexedArtifacts (sidecar index)', () => {
     }
   });
 
+  it('excludes a foreign *.md file with well-formed but non-Bonsai frontmatter from the index', () => {
+    // Same phantom-entry hazard as scanCacheDir (storage.test.ts): a real `---`/`---` fence pair with
+    // no recognized fields parses cleanly to cache_key: '' rather than throwing, so without this
+    // guard `list`/`inspect` (which read through this index) would show an unusable ghost row.
+    const dir = mkdtempSync(join(tmpdir(), 'fnr-index-foreign-md-'));
+    try {
+      writeArtifact(dir, 'abc123', makeArtifact('abc123', 'Real entry.'));
+      writeFileSync(
+        join(dir, 'research', 'my-notes.md'),
+        '---\ntitle: Unrelated personal notes\n---\n\n# Not a Bonsai artifact\n'
+      );
+
+      const results = loadIndexedArtifacts([dir]);
+      expect(results).toHaveLength(1);
+      expect(results[0]!.artifact.metadata.cache_key).toBe('abc123');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('persist: false returns results without writing .search-index.json', () => {
     const dir = mkdtempSync(join(tmpdir(), 'fnr-index-nopersist-'));
     try {
