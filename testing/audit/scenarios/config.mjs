@@ -60,7 +60,11 @@ export default function register(harness, fixtures) {
   check('config global+local conflict --json CONFLICTING_FLAGS', () => {
     const r = run(['config', 'get', 'storage', '--global', '--local', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
-    expect(parseJson(r.stdout)?.code === 'CONFLICTING_FLAGS', 'code');
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'CONFLICTING_FLAGS', 'code');
+    // Every other CONFLICTING_FLAGS error in the CLI ships an actionable suggestion; the
+    // shared scope-flag guard must not be the one exception.
+    expect(env?.suggestions?.length > 0, `missing suggestions: ${JSON.stringify(env?.suggestions)}`);
   });
 
   check('config set global+local conflict --json CONFLICTING_FLAGS', () => {
@@ -215,5 +219,19 @@ export default function register(harness, fixtures) {
     const env = parseJson(r.stdout);
     expect(env?.command === 'config get', `command ${env?.command}`);
     expect(env?.data?.help?.includes('USAGE'), 'missing USAGE');
+  });
+
+  check('config subcommand --help names each key\'s accepted values', () => {
+    for (const sub of ['get', 'set', 'list', 'unset']) {
+      const r = run(['config', sub, '--json', '--help']);
+      // oclif's terminal-width word-wrap can split the description across lines, so collapse
+      // whitespace before matching instead of asserting on an exact wrapped substring.
+      const help = (parseJson(r.stdout)?.data?.help ?? '').replace(/\s+/g, ' ');
+      expect(help.includes('storage (global|project)'), `${sub} missing storage values: ${help}`);
+      expect(
+        help.includes('summary (conservative|balanced|aggressive)'),
+        `${sub} missing summary values: ${help}`
+      );
+    }
   });
 }

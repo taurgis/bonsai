@@ -1,6 +1,6 @@
 import { Args, Flags } from '@oclif/core';
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { validKeysHint } from '../../lib/config/index.js';
+import { keyValuesHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
 import { persistConfigPatch } from '../../lib/config-persist.js';
 import type { ConfigWriteResult } from '../../lib/cli-result-types.js';
@@ -8,7 +8,7 @@ import type { ConfigWriteResult } from '../../lib/cli-result-types.js';
 export default class ConfigUnset extends ConfigCommand<typeof ConfigUnset> {
   static id = 'config unset';
   static summary = 'Remove a research configuration key';
-  static description = `Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: ${validKeysHint()}.`;
+  static description = `Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: ${keyValuesHint()}.`;
 
   static examples = [
     {

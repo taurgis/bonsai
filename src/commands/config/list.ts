@@ -1,10 +1,10 @@
 import { ConfigCommand, configScopeFlags } from './base.js';
-import { formatConfigEntry, resolveConfigEntries, validKeysHint } from '../../lib/config/index.js';
+import { formatConfigEntry, resolveConfigEntries, keyValuesHint } from '../../lib/config/index.js';
 
 export default class ConfigList extends ConfigCommand<typeof ConfigList> {
   static id = 'config list';
   static summary = 'List research configuration values';
-  static description = `Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: ${validKeysHint()}.`;
+  static description = `Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: ${keyValuesHint()}.`;
 
   static examples = [
     {

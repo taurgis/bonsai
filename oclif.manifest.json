@@ -689,7 +689,7 @@
           "required": false
         }
       },
-      "description": "Print a config value. Without --global/--local, shows the merged effective value, in precedence order: a per-command override flag (e.g. `fetch --storage`) > env var > project file > user file > built-in default.\n\nValid keys: storage, summary.",
+      "description": "Print a config value. Without --global/--local, shows the merged effective value, in precedence order: a per-command override flag (e.g. `fetch --storage`) > env var > project file > user file > built-in default.\n\nValid keys: storage (global|project), summary (conservative|balanced|aggressive).",
       "examples": [
         {
           "description": "get the effective storage mode",
@@ -750,7 +750,7 @@
     "config:list": {
       "aliases": [],
       "args": {},
-      "description": "Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage, summary.",
+      "description": "Show every configuration key with its current value. Use --global/--local to show a single scope.\n\nValid keys: storage (global|project), summary (conservative|balanced|aggressive).",
       "examples": [
         {
           "description": "show all effective config values",
@@ -822,7 +822,7 @@
           "required": false
         }
       },
-      "description": "Persist a configuration value. Writes user-level config by default; pass --local for project-level config (.bonsai.json in cwd).\n\nValid keys: storage, summary. The inline form `<key>=<value>` is also accepted.",
+      "description": "Persist a configuration value. Writes user-level config by default; pass --local for project-level config (.bonsai.json in cwd).\n\nValid keys: storage (global|project), summary (conservative|balanced|aggressive). The inline form `<key>=<value>` is also accepted.",
       "examples": [
         {
           "description": "store research cache in the current project",
@@ -895,7 +895,7 @@
           "required": false
         }
       },
-      "description": "Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage, summary.",
+      "description": "Delete a key from user-level config (default) or project-level config (--local), restoring the built-in default.\n\nValid keys: storage (global|project), summary (conservative|balanced|aggressive).",
       "examples": [
         {
           "description": "remove the user-level storage setting",
