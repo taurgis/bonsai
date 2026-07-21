@@ -27,6 +27,10 @@ export default class FetchCommand extends BaseCommand<typeof FetchCommand> {
       command:
         '<%= config.bin %> https://news.ycombinator.com/ --format compressed --ttl 2h --json',
     },
+    {
+      description: 'fetch multiple URLs in one batch (space-separated)',
+      command: '<%= config.bin %> https://docs.nestjs.com/ https://docs.nestjs.com/first-steps',
+    },
   ];
 
   static strict = false;

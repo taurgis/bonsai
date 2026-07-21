@@ -67,6 +67,11 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
       command:
         '<%= config.bin %> <%= command.id %> https://example.com/docs --tier volatile --ttl 2h',
     },
+    {
+      description: 'check multiple URLs in one batch (space-separated)',
+      command:
+        '<%= config.bin %> <%= command.id %> https://example.com/docs https://example.com/api',
+    },
   ];
 
   static strict = false;

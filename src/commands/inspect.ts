@@ -31,6 +31,11 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       description: 'inspect cached metadata as JSON',
       command: '<%= config.bin %> <%= command.id %> https://example.com/docs --json',
     },
+    {
+      description: 'inspect multiple URLs in one batch (space-separated)',
+      command:
+        '<%= config.bin %> <%= command.id %> https://example.com/docs https://example.com/api',
+    },
   ];
 
   static strict = false;
