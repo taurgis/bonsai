@@ -7,6 +7,7 @@ import { artifactMatchesUrlFilter } from '../lib/research/url.js';
 import { colors } from '../lib/color.js';
 import type { ResolvedResearchTarget } from '../lib/research/resolve-target.js';
 import { formatHumanField } from '../lib/cli-presentation.js';
+import { sanitizeForTerminal } from '../lib/text.js';
 import type { ResearchArtifactMetadata } from '../lib/research/schema.js';
 import type {
   InspectExistingNoteRow,
@@ -164,7 +165,8 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       if (typeof val === 'object' && val !== null) {
         this.log(formatHumanField(key, colors.bold(JSON.stringify(val))));
       } else {
-        this.log(formatHumanField(key, colors.bold(String(val))));
+        const display = typeof val === 'string' ? sanitizeForTerminal(val) : String(val);
+        this.log(formatHumanField(key, colors.bold(display)));
       }
     }
   }
@@ -172,8 +174,10 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
   private logSections(sections: InspectSectionRow[]): void {
     this.log(colors.cyan(`--- Sections (${sections.length}) ---`));
     for (const s of sections) {
+      const headingPath = sanitizeForTerminal(s.headingPath || '');
+      const anchor = sanitizeForTerminal(s.anchor || '');
       this.log(
-        `${colors.cyan(s.headingPath || '')} [${colors.yellow(s.anchor || '')}] (${colors.magenta(String(s.tokenEstimate.detailed || 0))} tokens) ${colors.gray(s.cacheKey)}`
+        `${colors.cyan(headingPath)} [${colors.yellow(anchor)}] (${colors.magenta(String(s.tokenEstimate.detailed || 0))} tokens) ${colors.gray(s.cacheKey)}`
       );
     }
   }

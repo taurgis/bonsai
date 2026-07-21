@@ -208,6 +208,50 @@ export default function register(harness, fixtures) {
     });
   });
 
+  check('import strips ANSI escape codes from stored content', () => {
+    const esc = String.fromCharCode(27);
+    const r = run(
+      ['import', 'https://example.com/ansi-content', '--stdin', '--json'],
+      { input: `# Title\n\nHello ${esc}[31mRED${esc}[0m world.\n` }
+    );
+    expect(r.exitCode === 0, `exit ${r.exitCode}: ${r.stderr}`);
+    const env = parseJson(r.stdout);
+    expect(!env?.data?.content?.includes(esc), JSON.stringify(env?.data?.content));
+    expect(env?.data?.content?.includes('[31mRED[0m'), env?.data?.content);
+  });
+
+  check('list/inspect/prune strip ANSI escape codes from a cached topic', () => {
+    const esc = String.fromCharCode(27);
+    const ws = createWorkspace();
+    const opts = { cwd: ws.cwd, xdg: ws.xdg };
+    const imported = run(
+      [
+        'import',
+        'https://example.com/ansi-topic',
+        '--stdin',
+        '--topic',
+        `${esc}[31mRED${esc}[0m`,
+      ],
+      { ...opts, input: '# Injected\nBody\n' }
+    );
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}: ${imported.stderr}`);
+
+    const listed = run(['list', '--url', 'https://example.com/ansi-topic'], opts);
+    expect(!listed.stdout.includes(esc), JSON.stringify(listed.stdout));
+    expect(listed.stdout.includes('[31mRED[0m'), listed.stdout);
+
+    const inspected = run(['inspect', 'https://example.com/ansi-topic'], opts);
+    expect(!inspected.stdout.includes(esc), JSON.stringify(inspected.stdout));
+    expect(inspected.stdout.includes('[31mRED[0m'), inspected.stdout);
+
+    const pruned = run(
+      ['prune', '--url', 'https://example.com/ansi-topic', '--dry-run'],
+      opts
+    );
+    expect(!pruned.stdout.includes(esc), JSON.stringify(pruned.stdout));
+    expect(pruned.stdout.includes('[31mRED[0m'), pruned.stdout);
+  });
+
   check('import multi-source --json exposes sourceUrls topic and null primary url', () => {
     const r = run(
       [
@@ -253,6 +297,26 @@ export default function register(harness, fixtures) {
     expect(r.stdout.includes('Topic:'), r.stdout);
     expect(r.stdout.includes('Audit Multi Human'), r.stdout);
     expect(r.stdout.includes('list --topic'), r.stdout);
+  });
+
+  check('import strips ANSI escape codes from the multi-source topic it echoes on success', () => {
+    const esc = String.fromCharCode(27);
+    const r = run(
+      [
+        'import',
+        '--stdin',
+        '--topic',
+        `${esc}[31mRED${esc}[0m`,
+        '--source-url',
+        'https://example.com/ansi-import-tip-a',
+        '--source-url',
+        'https://example.com/ansi-import-tip-b',
+      ],
+      { input: '# Multi ANSI\n' }
+    );
+    expect(r.exitCode === 0, `exit ${r.exitCode}: ${r.stderr}`);
+    expect(!r.stdout.includes(esc), JSON.stringify(r.stdout));
+    expect(r.stdout.includes('[31mRED[0m'), r.stdout);
   });
 }
 

@@ -1,8 +1,23 @@
 import { Buffer } from 'node:buffer';
+import { CONTROL_CHAR_PATTERN } from '../text.js';
 
 const REDACTION = '[Removed potentially unsafe agent instruction]';
 
 const ZERO_WIDTH = /[\u200b-\u200f\ufeff]/g;
+// Tab/LF/CR fall inside CONTROL_CHAR_PATTERN's Unicode "Control" category too, but they are
+// legitimate Markdown whitespace, so the replacer below keeps those three and drops everything else.
+const SAFE_CONTROL_CHARS = new Set(['\t', '\n', '\r']);
+
+/**
+ * Removes ANSI escape codes and other control bytes a malicious page could embed in its visible
+ * text, while leaving Markdown-structural whitespace (tab/newline/CR) intact. Every fetch/import
+ * path renders its stored content directly to the terminal (`bonsai <url>`, cache hits, etc.), so
+ * raw control bytes surviving Readability/Turndown would replay as a terminal-injection attack on
+ * every subsequent read of the cache; this is the choke point all of those paths share.
+ */
+function stripUnsafeControlChars(text: string): string {
+  return text.replace(CONTROL_CHAR_PATTERN, (char) => (SAFE_CONTROL_CHARS.has(char) ? char : ''));
+}
 const HTML_COMMENT = /<!--[\s\S]*?-->/g;
 const BASE64_TOKEN = /(?<![A-Za-z0-9+/_-])(?:[A-Za-z0-9+/_-]{16,}={0,2})(?![A-Za-z0-9+/_-])/g;
 const HEX_TOKEN = /(?<![a-f0-9])(?:0x)?[a-f0-9]{24,}(?![a-f0-9])/gi;
@@ -204,10 +219,11 @@ function stripQuotes(span: string): string {
  * HTML comments are checked first; the body is then split on paragraph breaks and scanned line-by-line.
  *
  * @param markdown - Markdown content (possibly untrusted, sourced from fetched pages).
- * @returns Sanitized Markdown with harmful instruction blocks replaced by a redaction placeholder.
+ * @returns Sanitized Markdown with harmful instruction blocks replaced by a redaction placeholder,
+ *   and ANSI/control bytes stripped so a cached read can never replay them to a terminal.
  */
 export function sanitizePromptInjection(markdown: string): string {
-  return markdown
+  const redacted = markdown
     .replace(HTML_COMMENT, (comment) => redactBlock(comment))
     .split(/(\n{2,})/)
     .map((block) => {
@@ -220,4 +236,5 @@ export function sanitizePromptInjection(markdown: string): string {
       return lineRedacted === block ? redactBlock(block) : lineRedacted;
     })
     .join('');
+  return stripUnsafeControlChars(redacted);
 }

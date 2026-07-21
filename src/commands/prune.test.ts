@@ -141,6 +141,33 @@ describe('prune command unit tests', () => {
     expect(existsSync(reactImport.cache.path)).toBe(true);
   });
 
+  it('strips ANSI escape codes from a cached topic in the dry-run listing', async () => {
+    const esc = String.fromCharCode(27);
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValueOnce('# Injected\nBody');
+    await ResearchImport.run([
+      'https://example.com/ansi-prune-test',
+      '--stdin',
+      '--topic',
+      `${esc}[31mRED${esc}[0m`,
+    ]);
+    readSpy.mockRestore();
+
+    const logged: string[] = [];
+    const logSpy = vi
+      .spyOn(console, 'log')
+      .mockImplementation((...args: unknown[]) => void logged.push(args.map(String).join(' ')));
+    try {
+      await ResearchPrune.run(['--url', 'https://example.com/ansi-prune-test', '--dry-run']);
+      const output = logged.join('\n');
+      expect(output).not.toContain(esc);
+      expect(output).toContain('[31mRED[0m');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
   it('covers shouldPrune and filters by artifact-type directly', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')
