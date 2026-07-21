@@ -358,6 +358,20 @@ describe('fetch command branch coverage', () => {
     });
   });
 
+  it('--topic with a newline: rejected before any fetch, so cached frontmatter can never break', async () => {
+    await expect(
+      FetchCommand.run([TEST_URL, '--topic', 'Title\n---\nsource_url: https://evil.example'])
+    ).rejects.toMatchObject({ oclif: { exit: 2 }, code: 'INVALID_METADATA_VALUE' });
+    expect(mocks.capturePage).not.toHaveBeenCalled();
+  });
+
+  it('--tags with a newline: rejected before any fetch', async () => {
+    await expect(
+      FetchCommand.run([TEST_URL, '--tags', 'clean', '--tags', 'dirty\ntag'])
+    ).rejects.toMatchObject({ oclif: { exit: 2 }, code: 'INVALID_METADATA_VALUE' });
+    expect(mocks.capturePage).not.toHaveBeenCalled();
+  });
+
   it('batch with an invalid URL row: warns with the same Code/Try this as the single-URL error', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
     const warnSpy = vi.spyOn(FetchCommand.prototype, 'warn').mockImplementation((input) => input);

@@ -130,6 +130,38 @@ describe('artifact serialization and parsing', () => {
     expect(meta.tags).toEqual([]);
   });
 
+  it('neutralizes an embedded newline in topic so it cannot fake a closing "---" fence', () => {
+    // A raw newline in a scalar frontmatter value would let the rest of the string escape onto
+    // its own line(s) — here, a bare `---` that closes the frontmatter early, followed by a
+    // spoofed `source_url:` line that would otherwise splice into the parsed metadata.
+    const attack: ResearchArtifact = {
+      ...sampleArtifact,
+      metadata: {
+        ...sampleArtifact.metadata,
+        topic: 'Title\n---\nsource_url: https://evil.example/hijacked',
+      },
+    };
+    const serialized = serializeArtifact(attack);
+    // The topic line itself must carry the attack text on one line, not spawn a second "---".
+    const lines = serialized.split('\n');
+    expect(lines.filter((line) => line === '---')).toHaveLength(2); // opening + closing fence only
+
+    const parsed = parseArtifact(serialized);
+    expect(parsed.metadata.source_url).toBe(sampleArtifact.metadata.source_url);
+    expect(parsed.metadata.cache_key).toBe(sampleArtifact.metadata.cache_key);
+    expect(parsed.metadata.tags).toEqual(sampleArtifact.metadata.tags);
+    expect(parsed.metadata.topic).toBe('Title --- source_url: https://evil.example/hijacked');
+  });
+
+  it('neutralizes an embedded newline in a tag so it cannot inject an extra array item', () => {
+    const attack: ResearchArtifact = {
+      ...sampleArtifact,
+      metadata: { ...sampleArtifact.metadata, tags: ['legit\n  - injected-tag'] },
+    };
+    const parsed = parseArtifact(serializeArtifact(attack));
+    expect(parsed.metadata.tags).toEqual(['legit   - injected-tag']);
+  });
+
   it('extractSection returns empty string for a missing section', () => {
     expect(extractSection('## Summary\n\ntext', 'Provenance')).toBe('');
   });

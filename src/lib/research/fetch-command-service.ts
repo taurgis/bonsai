@@ -17,6 +17,7 @@ import {
   reportCacheStatus,
 } from './fetch-result.js';
 import { durationFlagError, evaluateFreshnessWithMaxAge } from './freshness.js';
+import { metadataNewlineError } from './metadata-flags.js';
 import { fetchRenderedHtml } from './browser.js';
 import { capturePage, type CaptureDeps, type CaptureOutcome } from './capture.js';
 import { persistSectionArtifacts } from './docs/section-artifacts.js';
@@ -102,6 +103,14 @@ export function validateFetchCommandFlags(io: CliIo, flags: FetchCommandFlags): 
     durationFlagError('--max-age', flags.maxAge),
   ]) {
     if (msg) io.error(msg, { exit: 2, code: 'INVALID_DURATION' });
+  }
+  const metadataErr = metadataNewlineError(flags);
+  if (metadataErr) {
+    io.error(metadataErr, {
+      exit: 2,
+      code: 'INVALID_METADATA_VALUE',
+      suggestions: ['Remove line breaks from the value.'],
+    });
   }
   // --force skips cache lookup; --allow-stale only applies when serving a stale entry after a
   // failed revalidation. Together they are a no-op combination that looks intentional -- reject it.
