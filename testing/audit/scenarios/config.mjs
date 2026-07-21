@@ -1,6 +1,9 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 /** config topic subcommands. */
 export default function register(harness, fixtures) {
-  const { check, run, expect, parseJson } = harness;
+  const { check, run, expect, parseJson, dewrapCliMessage } = harness;
   const { createWorkspace } = fixtures;
 
   check('config --json lists subcommands', () => {
@@ -219,6 +222,45 @@ export default function register(harness, fixtures) {
     const env = parseJson(r.stdout);
     expect(env?.command === 'config get', `command ${env?.command}`);
     expect(env?.data?.help?.includes('USAGE'), 'missing USAGE');
+  });
+
+  check('config warns on stderr for unparseable user config JSON, still succeeds', () => {
+    const ws = createWorkspace();
+    const userConfigDir = join(ws.xdg.configHome, 'bonsai');
+    mkdirSync(userConfigDir, { recursive: true });
+    writeFileSync(join(userConfigDir, 'config.json'), '{ not valid json');
+
+    const r = run(['config', 'list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const stderr = dewrapCliMessage(r.stderr);
+    expect(stderr.includes('not valid JSON'), `stderr: ${r.stderr}`);
+    expect(stderr.includes('config.json'), `stderr: ${r.stderr}`);
+    // Corruption is reported, not silently absorbed into the machine-readable envelope.
+    const env = parseJson(r.stdout);
+    expect(env?.ok === true, 'still resolves to defaults');
+    expect(!r.stdout.includes('not valid JSON'), 'warning must not leak onto stdout');
+  });
+
+  check('config warns on stderr for an invalid value in an otherwise-valid project file', () => {
+    const ws = createWorkspace();
+    writeFileSync(
+      join(ws.cwd, '.bonsai.json'),
+      JSON.stringify({ storage: 'banana', summary: 'balanced' })
+    );
+
+    const r = run(['config', 'get', 'storage', '--local', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    const stderr = dewrapCliMessage(r.stderr);
+    expect(stderr.includes('"storage"'), `stderr: ${r.stderr}`);
+    expect(stderr.includes('"banana"'), `stderr: ${r.stderr}`);
+    expect(stderr.includes('Valid values: global, project'), `stderr: ${r.stderr}`);
+    // The invalid key falls back to the built-in default; the sibling valid key is unaffected.
+    expect(parseJson(r.stdout)?.data?.value === 'global', 'falls back to default storage');
+    const summary = run(['config', 'get', 'summary', '--local', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(summary.stdout)?.data?.value === 'balanced', 'sibling valid key unaffected');
   });
 
   check('config subcommand --help names each key\'s accepted values', () => {

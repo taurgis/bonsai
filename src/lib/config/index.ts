@@ -22,6 +22,7 @@ export {
   readProjectConfig,
   writeUserConfig,
   writeProjectConfig,
+  invalidConfigFileWarnings,
   USER_CONFIG_FILENAME,
   PROJECT_CONFIG_FILENAME,
 } from './io.js';

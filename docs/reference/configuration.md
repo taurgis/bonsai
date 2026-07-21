@@ -55,3 +55,13 @@ npx @taurgis/bonsai config unset storage --local
 - **User config:** `config.json` in the OCLIF config directory for the `bonsai`
   binary.
 - **Project cache artifacts:** `.bonsai/research/` (see [Cache Protocol](/reference/cache-protocol)).
+
+## Invalid or corrupted values
+
+An unrecognized `BONSAI_STORAGE`/`BONSAI_SUMMARY` value, or a config file that
+is not valid JSON, or holds an invalid value for a known key, is never applied
+silently. Bonsai prints a warning to stderr naming the offending file, key, or
+env var, then falls back to the next layer in the precedence order above (or
+the built-in default). `--json` output is unaffected — the warning never
+appears on stdout, so scripts parsing the envelope see only the resolved
+value.

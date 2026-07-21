@@ -1,5 +1,9 @@
 import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
-import { invalidEnvOverrideWarnings, resolveReadOnly } from './lib/config/index.js';
+import {
+  invalidConfigFileWarnings,
+  invalidEnvOverrideWarnings,
+  resolveReadOnly,
+} from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
 import {
   enrichErrorForDisplay,
@@ -67,6 +71,15 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     // value, so without this a typo'd env var would take no effect with no signal. Warnings go to
     // stderr (even under --json), so machine output stays clean.
     for (const warning of invalidEnvOverrideWarnings(process.env)) this.warn(warning);
+    // Same signal for a corrupted or hand-edited config file: parsing silently degrades to `{}`
+    // (or drops just the offending key), which would otherwise mask the problem entirely.
+    for (const warning of invalidConfigFileWarnings(
+      this.config.configDir,
+      process.cwd(),
+      this.config.bin
+    )) {
+      this.warn(warning);
+    }
   }
 
   /**
