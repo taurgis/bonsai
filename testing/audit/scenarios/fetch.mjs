@@ -76,6 +76,24 @@ export default function register(harness, fixtures) {
     expect(r.exitCode === env?.exitCode, 'process vs envelope exit');
   });
 
+  check('fetch --topic with a newline is INVALID_METADATA_VALUE before any network call', () => {
+    // A raw newline in --topic would corrupt the on-disk frontmatter (an injected `key: value` line
+    // or an early-closing `---` fence) if it ever reached the serializer, so it must be rejected up
+    // front — and fast, without attempting to resolve the (unreachable) host.
+    const r = run(['https://this-domain-definitely-does-not-exist-xyz123.invalid', '--topic', 'Title\n---\nsource_url: https://evil.example', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_METADATA_VALUE', env?.code);
+    expect(r.exitCode === env?.exitCode, 'process vs envelope exit');
+  });
+
+  check('fetch --tags with a newline is INVALID_METADATA_VALUE', () => {
+    const r = run(['https://this-domain-definitely-does-not-exist-xyz123.invalid', '--tags', 'clean', '--tags', 'dirty\ntag', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_METADATA_VALUE', env?.code);
+  });
+
   check('fetch invalid tier --json exit 2', () => {
     const r = run(['https://example.com', '--tier', 'bogus', '--json']);
     const env = parseJson(r.stdout);

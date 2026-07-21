@@ -1,9 +1,20 @@
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 
+// Frontmatter is one field per line. An embedded newline in a free-form value (e.g. an
+// agent-supplied --topic or --tags) would inject a bogus extra line — at best a dropped stray
+// line, at worst a fake `key: value` pair, or a bare `---` that closes the frontmatter fence early
+// and splices the remaining metadata fields (and even the closing fence and body sections) into
+// what parseArtifact then treats as free-text content. Collapsing embedded newlines to a space
+// keeps every value confined to the single line the format requires, regardless of where the
+// string originated.
+function sanitizeFrontmatterLine(value: string): string {
+  return value.replace(/[\r\n]+/g, ' ');
+}
+
 function serializeArrayField(lines: string[], name: string, items: string[]): void {
   lines.push(`${name}:`);
   for (const item of items) {
-    lines.push(`  - ${item}`);
+    lines.push(`  - ${sanitizeFrontmatterLine(item)}`);
   }
 }
 
@@ -13,7 +24,8 @@ function serializeScalarField(
   name: string,
   value: string | number | null | undefined
 ): void {
-  lines.push(`${name}: ${value ?? ''}`);
+  const safeValue = typeof value === 'string' ? sanitizeFrontmatterLine(value) : value;
+  lines.push(`${name}: ${safeValue ?? ''}`);
 }
 
 /**

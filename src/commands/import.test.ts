@@ -199,6 +199,46 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('fails if --topic contains a newline, so cached frontmatter can never break', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Notes\n');
+
+    const runPromise = ResearchImport.run([
+      'https://example.com/topic-newline',
+      '--stdin',
+      '--topic',
+      'Title\n---\nsource_url: https://evil.example',
+    ]);
+    await expect(runPromise).rejects.toMatchObject({
+      oclif: { exit: 2 },
+      code: 'INVALID_METADATA_VALUE',
+    });
+
+    readSpy.mockRestore();
+  });
+
+  it('fails if a --tags value contains a newline', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Notes\n');
+
+    const runPromise = ResearchImport.run([
+      'https://example.com/tag-newline',
+      '--stdin',
+      '--tags',
+      'clean',
+      '--tags',
+      'dirty\ntag',
+    ]);
+    await expect(runPromise).rejects.toMatchObject({
+      oclif: { exit: 2 },
+      code: 'INVALID_METADATA_VALUE',
+    });
+
+    readSpy.mockRestore();
+  });
+
   it('fails if both single and multi-source are specified', async () => {
     const runPromise = ResearchImport.run([
       'https://example.com',
