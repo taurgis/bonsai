@@ -346,6 +346,43 @@ describe('fetch command branch coverage', () => {
     expect(result.cache.freshness).toBe('none');
   });
 
+  it('--force: preserves the previously curated topic/tags when the caller supplies none', async () => {
+    const dataDir = await globalDataDir();
+    const { cacheKey, artifact } = seedCachedArtifact(dataDir, new Date());
+    artifact.metadata.topic = 'Curated Topic';
+    artifact.metadata.tags = ['curated', 'tags'];
+    writeArtifact(dataDir, cacheKey, artifact);
+    mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+
+    const result: any = await FetchCommand.run([TEST_URL, '--force']);
+
+    const written = readArtifact(dataDir, result.cache.key);
+    expect(written?.metadata.topic).toBe('Curated Topic');
+    expect(written?.metadata.tags).toEqual(['curated', 'tags']);
+  });
+
+  it('--force: an explicit --topic/--tags overrides the previously cached values', async () => {
+    const dataDir = await globalDataDir();
+    const { cacheKey, artifact } = seedCachedArtifact(dataDir, new Date());
+    artifact.metadata.topic = 'Old Topic';
+    artifact.metadata.tags = ['old'];
+    writeArtifact(dataDir, cacheKey, artifact);
+    mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+
+    const result: any = await FetchCommand.run([
+      TEST_URL,
+      '--force',
+      '--topic',
+      'New Topic',
+      '--tags',
+      'new',
+    ]);
+
+    const written = readArtifact(dataDir, result.cache.key);
+    expect(written?.metadata.topic).toBe('New Topic');
+    expect(written?.metadata.tags).toEqual(['new']);
+  });
+
   it('--max-age expiry: a tier-fresh entry is forced stale and revalidated', async () => {
     // 2 days old: fresh by the standard tier policy, but --max-age 1d marks it expired
     // (checkMaxAgeExpired's true branch). The command reports stale_expired and runs revalidation;
@@ -501,6 +538,34 @@ describe('fetch command branch coverage', () => {
     const result: any = await FetchCommand.run([TEST_URL, '--rendered']);
 
     expect(result.source.captureMethod).toBe('browser_fallback');
+  });
+
+  it('automatic browser fallback (no --rendered): human mode notes the browser capture', async () => {
+    mocks.capturePage.mockResolvedValue(
+      fakeCapture(LONG_MARKDOWN, { captureMethod: 'browser_fallback' })
+    );
+    const logSpy = vi.spyOn(FetchCommand.prototype, 'log').mockImplementation(() => {});
+
+    await FetchCommand.run([TEST_URL]);
+
+    expect(
+      logSpy.mock.calls.some((call) => String(call[0]).includes('used browser-rendered'))
+    ).toBe(true);
+    logSpy.mockRestore();
+  });
+
+  it('--rendered: an explicitly requested browser capture skips the automatic-fallback note', async () => {
+    mocks.capturePage.mockResolvedValue(
+      fakeCapture(LONG_MARKDOWN, { captureMethod: 'browser_fallback' })
+    );
+    const logSpy = vi.spyOn(FetchCommand.prototype, 'log').mockImplementation(() => {});
+
+    await FetchCommand.run([TEST_URL, '--rendered']);
+
+    expect(
+      logSpy.mock.calls.some((call) => String(call[0]).includes('used browser-rendered'))
+    ).toBe(false);
+    logSpy.mockRestore();
   });
 
   it('low-confidence extraction: warns on stderr in human mode with the note text (no "warning:" prefix)', async () => {

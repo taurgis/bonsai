@@ -79,6 +79,10 @@ text:
 | `2`  | Usage error           | Invalid flags, missing arguments, bad `--stdin` usage, an unknown command or typo, or a URL missing its `http://`/`https://` scheme. | Re-check `--help`; supply a full URL with a scheme.                         |
 | `5`  | Offline stale warning | Remote unreachable; stale cache served from inside the grace window.                                                                 | Content is usable but unverified. Pass `--allow-stale` to exit `0` instead. |
 
+`--json`'s `ok` field stays `true` for exit code `5` (content was served, just unverified) — an
+integration that branches only on `ok` will miss the stale-serve signal. Check `exitCode` (or
+`data.cache.status`) too, not `ok` alone.
+
 ## Stable error code catalog
 
 When a failure has a stable `code`, agents should branch on `code` first and

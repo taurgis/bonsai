@@ -10,11 +10,12 @@ import {
   describeUnsafeNavigationTarget,
   fetchRenderedHtml,
   findChromePath,
+  killChromeTree,
   ResponseCapture,
   SANDBOX_EGRESS_ERROR_MARKER,
   type CdpPage,
 } from './browser.js';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { ALL_PROXY_ENV_VARS, CA_BUNDLE_ENV_VARS } from './proxy.js';
 import { hasInternetAccess } from '../../../tests/helpers/network.js';
 
@@ -208,6 +209,45 @@ describe('browser rendering unit and integration tests', () => {
         timeoutMs: 1,
       })
     ).rejects.toThrow(/timed out/i);
+  });
+});
+
+describe('killChromeTree (process-group cleanup)', () => {
+  // Asserts on the calls killChromeTree makes, not on real OS process-group delivery: some sandboxed
+  // container runtimes don't broadcast a negative-pid kill to every group member the way a plain
+  // Linux host does, which would make an end-to-end "spawn a tree, kill it, assert it's gone" test
+  // flake by environment rather than by a bug in this function.
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('sends SIGKILL to the negative pid, targeting the whole process group', () => {
+    const killSpy = vi.spyOn(process, 'kill').mockReturnValue(true);
+    const fakeProcess = { pid: 4242, kill: vi.fn() } as unknown as ReturnType<typeof spawn>;
+
+    killChromeTree(fakeProcess);
+
+    expect(killSpy).toHaveBeenCalledWith(-4242, 'SIGKILL');
+    expect(fakeProcess.kill).not.toHaveBeenCalled();
+  });
+
+  it('falls back to a direct kill when the group kill throws (already exited, or no process groups)', () => {
+    vi.spyOn(process, 'kill').mockImplementation(() => {
+      throw new Error('ESRCH');
+    });
+    const fakeProcess = { pid: 4242, kill: vi.fn() } as unknown as ReturnType<typeof spawn>;
+
+    killChromeTree(fakeProcess);
+
+    expect(fakeProcess.kill).toHaveBeenCalledWith('SIGKILL');
+  });
+
+  it('falls back to a direct kill when the process has no pid', () => {
+    const fakeProcess = { pid: undefined, kill: vi.fn() } as unknown as ReturnType<typeof spawn>;
+
+    killChromeTree(fakeProcess);
+
+    expect(fakeProcess.kill).toHaveBeenCalledWith('SIGKILL');
   });
 });
 

@@ -31,7 +31,6 @@ const LIST_DEFAULT_MAX_LIMIT = 100;
 const LIST_LABELS: ResultListLabels = {
   noun: 'cached research',
   order: 'first',
-  maxLimit: LIST_DEFAULT_MAX_LIMIT,
 };
 
 // `list` answers "what pages/notes do I have?" and deliberately omits section children (see
@@ -95,7 +94,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       description: 'capture method',
       options: CAPTURE_METHODS,
     })(),
-    limit: limitFlag(100, 50, 'result count (max 100)'),
+    limit: limitFlag(LIST_DEFAULT_MAX_LIMIT, 50, `result count (max ${LIST_DEFAULT_MAX_LIMIT})`),
   };
 
   static stdoutIsPrimaryData = true;
