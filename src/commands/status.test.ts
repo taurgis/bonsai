@@ -99,6 +99,31 @@ describe('status command unit tests', () => {
     ).rejects.toThrow(/Invalid --ttl/);
   });
 
+  it('strips ANSI escape bytes from a rejected --ttl echoed back in the human-mode message', async () => {
+    const esc = String.fromCharCode(27);
+    const err = await ResearchStatus.run([
+      'https://example.com/status-ttl-ansi',
+      '--ttl',
+      `bad${esc}[31mRED${esc}[0m`,
+    ]).catch((e) => e as Error);
+    expect((err as Error).message).not.toContain(esc);
+    expect((err as Error).message).toContain('Duration "bad[31mRED[0m" is not a valid format');
+  });
+
+  it('preserves the raw --ttl value (including control bytes) in the --json envelope', async () => {
+    const esc = String.fromCharCode(27);
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    await ResearchStatus.run([
+      'https://example.com/status-ttl-ansi-json',
+      '--ttl',
+      `bad${esc}`,
+      '--json',
+    ]).catch(() => undefined);
+    const envelope = JSON.parse(logSpy.mock.calls.map((c) => c[0]).join('\n'));
+    expect(envelope.stderr).toContain(`bad${esc}`);
+    logSpy.mockRestore();
+  });
+
   it('returns normalizedUrl and sets exit code 1 on cache miss via run', async () => {
     const prevExit = process.exitCode;
     process.exitCode = 0;

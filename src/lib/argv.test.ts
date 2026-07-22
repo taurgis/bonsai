@@ -278,6 +278,71 @@ describe('normalizeArgv', () => {
       },
     },
     {
+      // No --json here: exercises the human-mode envelope path, so it must sanitize.
+      name: 'a swallowed URL carrying ANSI/control bytes is sanitized in the human-mode message',
+      input: ['--tags', `https://example.com/\x1b[31mRED\x1b[0m`],
+      expected: {
+        argv: [],
+        earlyExit: {
+          json: false,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. --tags consumed https://example.com/[31mRED[0m as its value, so there was no URL left to fetch.\n' +
+              'Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass the URL as the command (flags after): bonsai https://example.com/[31mRED[0m\n' +
+              '* Or a named command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: [
+              'Pass the URL as the command (flags after): bonsai https://example.com/[31mRED[0m',
+              'Or a named command: bonsai list',
+            ],
+          },
+        },
+      },
+    },
+    {
+      // Same swallowed URL, but --json: keeps the ESC byte, matching BaseCommand.error()'s "raw in
+      // JSON, sanitized for humans" contract (JSON.stringify already escapes control characters).
+      name: 'a swallowed URL carrying ANSI/control bytes keeps raw fidelity under --json',
+      input: ['--tags', `https://example.com/\x1b[31mRED\x1b[0m`, '--json'],
+      expected: {
+        argv: ['--json'],
+        earlyExit: {
+          json: true,
+          exitCode: 2,
+          envelope: {
+            schemaVersion: 1,
+            command: 'bonsai',
+            ok: false,
+            exitCode: 2,
+            stdout: '',
+            stderr:
+              'Missing URL or command. --tags consumed https://example.com/\x1b[31mRED\x1b[0m as its value, so there was no URL left to fetch.\n' +
+              'Run bonsai --help for usage.\n' +
+              'Code: MISSING_COMMAND\n' +
+              'Try this:\n' +
+              '* Pass the URL as the command (flags after): bonsai https://example.com/\x1b[31mRED\x1b[0m\n' +
+              '* Or a named command: bonsai list',
+            data: null,
+            code: 'MISSING_COMMAND',
+            suggestions: [
+              'Pass the URL as the command (flags after): bonsai https://example.com/\x1b[31mRED\x1b[0m',
+              'Or a named command: bonsai list',
+            ],
+          },
+        },
+      },
+    },
+    {
       name: 'leading --read-only before a command relocates after the command',
       input: ['--read-only', 'list'],
       expected: {

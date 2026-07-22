@@ -1,5 +1,6 @@
 import { EXIT_USAGE } from './cli-error-policy.js';
 import { buildCliErrorEnvelope } from './envelope.js';
+import { sanitizeForTerminal } from './text.js';
 
 /** Result of argv normalization before oclif command dispatch. */
 export interface NormalizationResult {
@@ -83,7 +84,16 @@ function missingUsageExit(
   argv: readonly string[],
   valueTakingFlags: ReadonlySet<string>
 ): NonNullable<NormalizationResult['earlyExit']> {
-  const details = missingCommandDetails('bonsai', findSwallowedUrlFlag(argv, valueTakingFlags));
+  const swallowed = findSwallowedUrlFlag(argv, valueTakingFlags);
+  // `swallowed.url` is raw user input echoed straight back into the MISSING_COMMAND message and its
+  // "pass the URL as the command" suggestion — untrusted per the repo's trust-boundary rules, same
+  // reasoning as BaseCommand.error(). This preflight path fires before oclif ever dispatches a
+  // command, so there is no `this.jsonEnabled()` to call — but `json` is already known here, so gate
+  // on it the same way: sanitize only the human-mode message, keep `--json` byte-for-byte.
+  const details = missingCommandDetails(
+    'bonsai',
+    swallowed && !json ? { ...swallowed, url: sanitizeForTerminal(swallowed.url) } : swallowed
+  );
   return {
     exitCode: EXIT_USAGE,
     json,

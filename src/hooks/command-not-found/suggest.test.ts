@@ -142,6 +142,29 @@ describe('command_not_found hook', () => {
     expect(msg).not.toContain('Did you mean');
   });
 
+  it('strips ANSI escape bytes from an attempted id echoed back in the message', async () => {
+    const esc = String.fromCharCode(27);
+    const msg = await runHook(`frob${esc}[31mRED${esc}[0micate`);
+    expect(msg).not.toContain(esc);
+    expect(msg).toContain('frob[31mRED[0micate is not a bonsai command.');
+  });
+
+  it('collapses an embedded newline in an attempted id instead of faking an extra output line', async () => {
+    const msg = await runHook('frob\ninjected');
+    expect(msg).toBe(
+      [
+        'frob injected is not a bonsai command.',
+        'Run bonsai help for a list of available commands.',
+      ].join('\n')
+    );
+  });
+
+  it('keeps raw ANSI bytes in an attempted id under --json (BaseCommand.error()\'s "raw in JSON" contract)', async () => {
+    const esc = String.fromCharCode(27);
+    const envelope = await runJsonHook(`frob${esc}[31mRED${esc}[0micate`);
+    expect(envelope.stderr).toContain(`frob${esc}[31mRED${esc}[0micate is not a bonsai command.`);
+  });
+
   it('does not suggest unrelated commands for very short input', async () => {
     const msg = await runHook('wat');
     expect(msg).toContain('wat is not a bonsai command.');

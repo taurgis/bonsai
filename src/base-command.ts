@@ -5,6 +5,7 @@ import {
   resolveReadOnly,
 } from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
+import { sanitizeForTerminal } from './lib/text.js';
 import {
   enrichErrorForDisplay,
   resolveExitCode,
@@ -91,6 +92,44 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   public override warn(input: string | Error): string | Error {
     Errors.warn(input);
     return input;
+  }
+
+  /**
+   * Sanitize the human-readable error surface before handing off to oclif. Error text throughout
+   * this CLI routinely echoes raw user input back (a rejected URL, `--ttl`, an unknown config key)
+   * so the message stays actionable, but that value is untrusted per the repo's trust-boundary
+   * rules — the same reasoning that already strips ANSI/control bytes from cached content before
+   * terminal render (see `sanitizeForTerminal`). Left unsanitized, a value containing raw escape
+   * bytes would replay as a terminal-injection attack the moment the rejected command's own error
+   * is printed. `--json` is untouched: `JSON.stringify` already escapes control characters, and the
+   * raw value there preserves exact input for programmatic callers.
+   */
+  public override error(
+    input: string | Error,
+    options: { code?: string; exit: false } & Errors.PrettyPrintableError
+  ): void;
+  public override error(
+    input: string | Error,
+    options?: { code?: string; exit?: number } & Errors.PrettyPrintableError
+  ): never;
+  public override error(
+    input: string | Error,
+    options: { code?: string; exit?: number | false } & Errors.PrettyPrintableError = {}
+  ): void | never {
+    if (!this.jsonEnabled()) {
+      if (typeof input === 'string') input = sanitizeForTerminal(input);
+      if (options.suggestions) {
+        options = { ...options, suggestions: options.suggestions.map(sanitizeForTerminal) };
+      }
+    }
+    // Nothing in this codebase passes `exit: false` today, but the override must still accept it
+    // (oclif's own `error()` does) to stay a valid override of the base Command method. Destructure
+    // `exit` into its own binding so narrowing it to the `false` literal actually narrows the object
+    // passed to `super.error()` into each of oclif's two overloads — narrowing a property read alone
+    // (`options.exit === false`) doesn't narrow the enclosing object's type, only a local variable's.
+    const { exit, ...rest } = options;
+    if (exit === false) return super.error(input, { ...rest, exit });
+    return super.error(input, { ...rest, exit });
   }
 
   /** Whether read-only/plan mode is active for this invocation (flag OR either env var). */
