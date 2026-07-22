@@ -152,8 +152,9 @@ describe('inspect command unit tests', () => {
       const result = (await ResearchInspect.run([
         'https://example.com/cached-inspect-ansi',
       ])) as any;
-      // The stored metadata/JSON payload keeps the raw value — only the human-readable render sanitizes.
-      expect(result.metadata.topic).toBe(injectedTopic);
+      // Frontmatter serialization strips control characters outright (the cache file is plain text
+      // meant to be read directly), so the raw escape byte never survives the round trip through disk.
+      expect(result.metadata.topic).toBe('[31mRED[0m');
 
       const output = logged.join('\n');
       expect(output).not.toContain(esc);

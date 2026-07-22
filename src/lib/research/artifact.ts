@@ -1,4 +1,5 @@
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
+import { CONTROL_CHAR_PATTERN } from '../text.js';
 
 // Frontmatter is one field per line. An embedded newline in a free-form value (e.g. an
 // agent-supplied --topic or --tags) would inject a bogus extra line — at best a dropped stray
@@ -6,9 +7,13 @@ import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
 // and splices the remaining metadata fields (and even the closing fence and body sections) into
 // what parseArtifact then treats as free-text content. Collapsing embedded newlines to a space
 // keeps every value confined to the single line the format requires, regardless of where the
-// string originated.
+// string originated. Other control characters (e.g. a raw ANSI escape byte, whether from an
+// agent-supplied flag or extracted page text) are stripped outright: the cache file is plain text
+// meant to be `cat`ed or displayed by `inspect`/`list`, and an uncaught escape sequence there would
+// reach a real terminal — unlike --json output, which JSON-escapes control characters by
+// construction (see sanitizeForTerminal's doc comment in ../text.ts).
 function sanitizeFrontmatterLine(value: string): string {
-  return value.replace(/[\r\n]+/g, ' ');
+  return value.replace(/[\r\n]+/g, ' ').replace(CONTROL_CHAR_PATTERN, '');
 }
 
 function serializeArrayField(lines: string[], name: string, items: string[]): void {
