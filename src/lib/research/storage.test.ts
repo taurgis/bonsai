@@ -6,7 +6,6 @@ import {
   getArtifactPath,
   writeArtifact,
   readArtifact,
-  hasArtifact,
   findArtifact,
   scanCacheDir,
 } from './storage.js';
@@ -87,14 +86,13 @@ describe('cache storage filesystem management', () => {
     expect(normalized).toBe('/my-data-dir/research/abcde12345.md');
   });
 
-  it('writes, checks existence, and reads an artifact successfully', () => {
+  it('writes and reads an artifact successfully', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-test-'));
     try {
       const key = 'abcdef123456';
-      expect(hasArtifact(tempDir, key)).toBe(false);
+      expect(findArtifact(tempDir, key)).toBeNull();
 
       writeArtifact(tempDir, key, sampleArtifact);
-      expect(hasArtifact(tempDir, key)).toBe(true);
 
       const read = readArtifact(tempDir, key);
       expect(read).toEqual(sampleArtifact);

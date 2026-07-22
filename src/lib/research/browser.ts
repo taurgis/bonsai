@@ -173,16 +173,67 @@ export function buildChromeArgs(): string[] {
 // jobs), so this is generous enough to absorb that rather than a "typical" local startup time.
 const CHROME_STARTUP_TIMEOUT_MS = 20_000;
 
+// Node's default SIGINT/SIGTERM disposition kills the process immediately, without waiting for the
+// async `finally { page.close() }` in fetchRenderedHtmlOnce to run — so an interrupted --rendered
+// fetch otherwise abandons a whole Chrome process tree (main + zygote/gpu/renderer children). The
+// plain 'exit' event covers ordinary completion (belt-and-braces alongside close()'s own cleanup);
+// a `once` signal listener runs the same cleanup, then re-sends the signal to this process. Because
+// `once` already removed itself, that re-delivery has no listener left and Node's own default
+// disposition takes over — the process still exits with the normal 128+signum code, with no exit-code
+// bookkeeping of our own.
+const liveChromeProcesses = new Set<ChildProcess>();
+let chromeCleanupRegistered = false;
+
+function killLiveChromeProcesses(): void {
+  for (const chromeProcess of liveChromeProcesses) killChromeTree(chromeProcess);
+}
+
+function ensureChromeCleanupRegistered(): void {
+  if (chromeCleanupRegistered) return;
+  chromeCleanupRegistered = true;
+  process.once('exit', killLiveChromeProcesses);
+  for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+    process.once(signal, () => {
+      killLiveChromeProcesses();
+      process.kill(process.pid, signal);
+    });
+  }
+}
+
+/**
+ * Kill Chrome and every child process it spawned (zygote, gpu-process, renderer, crashpad).
+ * `chromeProcess.kill()` alone only signals that one PID — per Node's child_process docs, a signal
+ * sent to a child is not propagated to *that child's own* children on Linux, so Chrome's
+ * multi-process tree survives a plain kill on every rendered fetch, not just an interrupted one.
+ * Spawning with `detached: true` makes Chrome the leader of its own process group, so signaling the
+ * negative PID reaches the whole tree in one call. Falls back to a direct kill if group-kill fails
+ * (already exited, or a platform without POSIX process groups).
+ */
+export function killChromeTree(chromeProcess: ChildProcess): void {
+  if (typeof chromeProcess.pid === 'number') {
+    try {
+      process.kill(-chromeProcess.pid, 'SIGKILL');
+      return;
+    } catch {
+      // Fall through to a best-effort direct kill below.
+    }
+  }
+  chromeProcess.kill('SIGKILL');
+}
+
 async function spawnChrome(
   chromePath: string
 ): Promise<{ chromeProcess: ChildProcess; wsUrl: string }> {
-  const chromeProcess = spawn(chromePath, buildChromeArgs());
+  ensureChromeCleanupRegistered();
+  const chromeProcess = spawn(chromePath, buildChromeArgs(), { detached: true });
+  liveChromeProcesses.add(chromeProcess);
+  chromeProcess.once('exit', () => liveChromeProcesses.delete(chromeProcess));
 
   try {
     const wsUrl = await new Promise<string>((resolve, reject) => {
       let output = '';
       const timeoutId = setTimeout(() => {
-        chromeProcess.kill('SIGKILL');
+        killChromeTree(chromeProcess);
         reject(new Error('Timed out waiting for Chrome to start.'));
       }, CHROME_STARTUP_TIMEOUT_MS);
 
@@ -219,7 +270,7 @@ async function spawnChrome(
 
     return { chromeProcess, wsUrl };
   } catch (err) {
-    chromeProcess.kill('SIGKILL');
+    killChromeTree(chromeProcess);
     throw err;
   }
 }
@@ -376,7 +427,7 @@ export async function openCdpPage(): Promise<CdpPage> {
         await client.send('Target.closeTarget', { targetId });
       } catch {}
       client.close();
-      chromeProcess.kill('SIGKILL');
+      killChromeTree(chromeProcess);
     };
     const takeBlockedNavigationError = (): Error | null => {
       const err = blockedNavigationError;
@@ -386,7 +437,7 @@ export async function openCdpPage(): Promise<CdpPage> {
     return { client, sessionId, close, takeBlockedNavigationError };
   } catch (err) {
     client.close();
-    chromeProcess.kill('SIGKILL');
+    killChromeTree(chromeProcess);
     throw err;
   }
 }

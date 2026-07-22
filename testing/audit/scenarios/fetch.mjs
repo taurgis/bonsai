@@ -372,6 +372,79 @@ export default function register(harness, fixtures) {
       expect(env?.data?.source?.captureMethod === 'browser_fallback', `captureMethod ${env?.data?.source?.captureMethod}`);
     });
 
+    check('automatic rendered-browser fallback notes the browser capture in human mode (AUDIT_NETWORK)', () => {
+      // Launching Chrome is real added latency and a real dependency; a human fetching without
+      // --json had no way to learn the fallback happened. Same fixture as the captureMethod test
+      // above, asserting the human-mode side effect instead of the --json field.
+      const r = run(['https://example.com', '--force'], { timeout: 90000 });
+      expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+      expect(
+        r.stdout.includes('Note: used browser-rendered capture'),
+        `stdout: ${r.stdout.slice(0, 200)}`
+      );
+    });
+
+    check('--rendered: explicit browser request skips the automatic-fallback note (AUDIT_NETWORK)', () => {
+      const r = run(['https://example.com', '--force', '--rendered'], { timeout: 90000 });
+      expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+      expect(
+        !r.stdout.includes('Note: used browser-rendered capture'),
+        `stdout should not include the note: ${r.stdout.slice(0, 200)}`
+      );
+    });
+
+    check('--force preserves previously curated topic/tags when none are given (AUDIT_NETWORK)', () => {
+      const ws = createWorkspace();
+      // example.com 404s on any sub-path; a query string keeps this a distinct cache key while
+      // still hitting the real (200) root document.
+      const url = 'https://example.com/?fx=audit-force-metadata';
+      const seeded = run(
+        [url, '--topic', 'Audit Force Topic', '--tags', 'audit-force-tag', '--json'],
+        { cwd: ws.cwd, xdg: ws.xdg, timeout: 90000 }
+      );
+      expect(seeded.exitCode === 0, `seed exit ${seeded.exitCode} ${seeded.stderr.slice(0, 120)}`);
+
+      const refetched = run([url, '--force', '--json'], {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        timeout: 90000,
+      });
+      expect(refetched.exitCode === 0, `refetch exit ${refetched.exitCode}`);
+      const key = parseJson(seeded.stdout)?.data?.cache?.key;
+      const inspected = run(['inspect', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+      const meta = parseJson(inspected.stdout)?.data?.metadata;
+      expect(meta?.cache_key === key, 'same cache entry, not a new one');
+      expect(meta?.topic === 'Audit Force Topic', `topic ${meta?.topic}`);
+      expect(
+        Array.isArray(meta?.tags) && meta.tags.includes('audit-force-tag'),
+        `tags ${JSON.stringify(meta?.tags)}`
+      );
+    });
+
+    check('--force with new --topic/--tags overrides the previously cached values (AUDIT_NETWORK)', () => {
+      const ws = createWorkspace();
+      const url = 'https://example.com/?fx=audit-force-metadata-override';
+      const seeded = run([url, '--topic', 'Old Topic', '--tags', 'old-tag', '--json'], {
+        cwd: ws.cwd,
+        xdg: ws.xdg,
+        timeout: 90000,
+      });
+      expect(seeded.exitCode === 0, `seed exit ${seeded.exitCode}`);
+
+      const refetched = run(
+        [url, '--force', '--topic', 'New Topic', '--tags', 'new-tag', '--json'],
+        { cwd: ws.cwd, xdg: ws.xdg, timeout: 90000 }
+      );
+      expect(refetched.exitCode === 0, `refetch exit ${refetched.exitCode}`);
+      const inspected = run(['inspect', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+      const stored = parseJson(inspected.stdout)?.data?.metadata;
+      expect(stored?.topic === 'New Topic', `topic ${stored?.topic}`);
+      expect(
+        Array.isArray(stored?.tags) && stored.tags.includes('new-tag') && !stored.tags.includes('old-tag'),
+        `tags ${JSON.stringify(stored?.tags)}`
+      );
+    });
+
     check('fetch of a JSON endpoint fails with the content-type error, not a corrupted browser fallback (AUDIT_NETWORK)', () => {
       // A non-HTML response must never silently succeed via the automatic rendered-browser
       // fallback (Chrome renders a built-in JSON viewer for anything, which would extract as

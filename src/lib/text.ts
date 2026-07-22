@@ -29,14 +29,12 @@ export function pluralize(count: number, singular: string, plural: string): stri
   return count === 1 ? singular : plural;
 }
 
-/** How a command labels a result listing, so its heading and truncation notice stay consistent. */
+/** How a command labels a result listing, so its heading stays consistent. */
 export interface ResultListLabels {
   /** Noun phrase after the count, e.g. "cached research"; the "entry/entries" plural is appended. */
   noun: string;
   /** Ordering word shown when truncated: "first" (recency order) or "top" (ranked order). */
   order: 'first' | 'top';
-  /** The command's --limit ceiling, surfaced in the truncation hint. */
-  maxLimit: number;
 }
 
 /** Heading for a result listing; notes truncation inline when more matched than are shown. */
@@ -45,19 +43,6 @@ export function resultListHeading(total: number, shown: number, labels: ResultLi
   return total > shown
     ? `Found ${total} ${noun} (showing ${labels.order} ${shown}; raise --limit to see more):`
     : `Found ${total} ${noun}:`;
-}
-
-/**
- * One-line truncation notice for stderr, or null when nothing was cut. Available for human-mode
- * tips; `list --json` surfaces truncation via the envelope `truncation` field instead (#91).
- */
-export function truncationNotice(
-  total: number,
-  shown: number,
-  labels: ResultListLabels
-): string | null {
-  if (total <= shown) return null;
-  return `${total} entries matched; returning the ${labels.order} ${shown}. Raise --limit (max ${labels.maxLimit}) to see more.`;
 }
 
 /** Max edit distance for a plausible typo; scales with input length. */

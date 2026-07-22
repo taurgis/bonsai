@@ -129,17 +129,6 @@ export function findArtifact(
 }
 
 /**
- * Checks if a cached artifact exists on disk for a given cache key.
- */
-export function hasArtifact(dataDir: string, key: string): boolean {
-  try {
-    return findArtifact(dataDir, key) !== null;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Writes a ResearchArtifact to disk, creating the research storage folder if needed.
  * Writes to a temporary file first, then atomically renames it.
  * Archives the previous artifact if it exists.

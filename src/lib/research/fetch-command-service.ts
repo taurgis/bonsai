@@ -30,6 +30,7 @@ import {
   type RevalidateSecureWrite,
 } from './revalidate.js';
 import { resolveResearchTarget, type ResolvedResearchTarget } from './resolve-target.js';
+import { locateArtifact } from './storage.js';
 import type { ResearchArtifact } from './schema.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
 import { batchSeparator } from '../cache-view.js';
@@ -203,6 +204,7 @@ async function executeCacheHit(
 async function executeCacheMiss(
   normalizedUrl: string,
   cacheKey: string,
+  readRoots: string[],
   run: FetchRun
 ): Promise<ResearchArtifact> {
   const { currentTime, flags, summaryLevel } = run;
@@ -235,8 +237,13 @@ async function executeCacheMiss(
     summaryLevel,
   });
 
-  artifact.metadata.topic = flags.topic || null;
-  artifact.metadata.tags = flags.tags || [];
+  // --force bypasses the normal revalidation-hit path (it always re-fetches instead of
+  // conditionally refreshing), so this "miss" may actually be overwriting a previously curated
+  // entry. Read-only lookup, purely to carry topic/tags forward like every other refresh path
+  // (revalidate.ts's preserveUserMetadata) — explicit --topic/--tags on this call still win.
+  const priorArtifact = locateArtifact(readRoots, cacheKey, true)?.artifact ?? null;
+  artifact.metadata.topic = flags.topic || priorArtifact?.metadata.topic || null;
+  artifact.metadata.tags = flags.tags?.length ? flags.tags : (priorArtifact?.metadata.tags ?? []);
   artifact.metadata.site_module_id = siteModule?.id ?? null;
   if (capture) {
     applyCaptureMetadata(artifact, capture);
@@ -275,7 +282,7 @@ async function resolveArtifact(
     };
   }
 
-  const artifact = await executeCacheMiss(normalizedUrl, cacheKey, run);
+  const artifact = await executeCacheMiss(normalizedUrl, cacheKey, roots.readRoots, run);
   const write = persistArtifact({
     roots,
     cacheKey,
@@ -390,21 +397,57 @@ async function fetchSingleTarget(url: string, run: FetchRun) {
     dryRun,
   });
 
-  if (!io.json) {
-    if (dryRun && cacheStatus !== 'hit' && cacheStatus !== 'stale') {
-      io.log('[dry-run] Preview only — cache was not written.');
-    }
-    for (const warning of extractionQualityWarnings(resultData.source.qualityNotes)) {
-      io.warn(`${normalizedUrl}: ${warning}`);
-    }
-    io.log(resultData.content);
-    const separator = batchSeparator(run.urlCount > 1);
-    if (separator) {
-      io.log(`\n${separator}\n`);
-    }
-  }
+  logHumanFetchResult({ io, resultData, cacheStatus, dryRun, normalizedUrl, run });
 
   return resultData;
+}
+
+/** True when this run launched Chrome on its own (no --rendered flag) to capture `url`, rather than
+ * just reporting a stored artifact's capture history from an earlier run (cache 'hit'/'stale'/
+ * 'revalidated'). Human mode uses this to decide whether the browser-fallback note would be accurate. */
+function usedAutomaticBrowserFallback(
+  cacheStatus: CacheHitStatus,
+  captureMethod: string | null,
+  rendered: boolean
+): boolean {
+  const capturedThisRun = cacheStatus === 'miss' || cacheStatus === 'refreshed';
+  return capturedThisRun && captureMethod === 'browser_fallback' && !rendered;
+}
+
+/**
+ * Human-mode-only side effects for one fetch result: dry-run notice, the automatic browser-fallback
+ * note, extraction-quality warnings, the content itself, and the batch separator. No-op under
+ * `--json` (that output goes through the envelope instead).
+ */
+function logHumanFetchResult(input: {
+  io: CliIo;
+  resultData: ReturnType<typeof buildFetchResultData>;
+  cacheStatus: CacheHitStatus;
+  dryRun: boolean;
+  normalizedUrl: string;
+  run: FetchRun;
+}): void {
+  const { io, resultData, cacheStatus, dryRun, normalizedUrl, run } = input;
+  if (io.json) return;
+
+  if (dryRun && cacheStatus !== 'hit' && cacheStatus !== 'stale') {
+    io.log('[dry-run] Preview only — cache was not written.');
+  }
+  // Launching Chrome is real added latency and a real dependency that was otherwise invisible
+  // outside --json; an explicit --rendered already tells the caller a browser was used.
+  if (
+    usedAutomaticBrowserFallback(cacheStatus, resultData.source.captureMethod, run.flags.rendered)
+  ) {
+    io.log('Note: used browser-rendered capture (static content was insufficient).');
+  }
+  for (const warning of extractionQualityWarnings(resultData.source.qualityNotes)) {
+    io.warn(`${normalizedUrl}: ${warning}`);
+  }
+  io.log(resultData.content);
+  const separator = batchSeparator(run.urlCount > 1);
+  if (separator) {
+    io.log(`\n${separator}\n`);
+  }
 }
 
 // Copies Phase 2 capability provenance from a capture outcome onto the artifact metadata.
