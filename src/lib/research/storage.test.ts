@@ -231,6 +231,28 @@ describe('cache storage filesystem management', () => {
     }
   });
 
+  it('reports but does not rename a corrupt artifact when readOnly is set', () => {
+    // A read-only/plan-mode lookup (e.g. `status --read-only`) must never write to disk, even as an
+    // incidental side effect of diagnosing a corrupt cache entry it happens to encounter.
+    const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-readonly-'));
+    try {
+      const key = 'abcdef123456';
+      const researchDir = join(tempDir, 'research');
+      const fs = require('node:fs');
+      fs.mkdirSync(researchDir, { recursive: true });
+      const corruptPath = join(researchDir, 'corrupt.md');
+      fs.writeFileSync(corruptPath, 'corrupt frontmatter content ---');
+
+      const found = findArtifact(tempDir, key, true);
+      expect(found).toBeNull();
+
+      const files = readdirSync(researchDir);
+      expect(files).toEqual(['corrupt.md']);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   it('excludes a foreign *.md file with well-formed but non-Bonsai frontmatter from scanCacheDir', () => {
     // Unlike `corrupt frontmatter content ---` above (no closing fence, throws immediately),
     // a file with a real `---`/`---` pair but no recognized fields never throws: parseArtifact

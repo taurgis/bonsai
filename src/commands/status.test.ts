@@ -39,6 +39,31 @@ describe('status command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('reports a corrupt cache entry as a miss without archiving it under --read-only', async () => {
+    // status is documented as "without fetching or writing" — a corrupt entry it happens to scan
+    // while resolving the URL must not trigger the (otherwise legitimate) archive-rename side effect.
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Hello World');
+    const imported = (await ResearchImport.run([
+      'https://example.com/corrupt-readonly-status',
+      '--stdin',
+    ])) as any;
+    readSpy.mockRestore();
+
+    const { writeFileSync, readdirSync } = await import('node:fs');
+    const { dirname } = await import('node:path');
+    writeFileSync(imported.cache.path, 'no frontmatter fence at all\njust garbage');
+    const researchDir = dirname(imported.cache.path);
+
+    const result = (await ResearchStatus.run([
+      'https://example.com/corrupt-readonly-status',
+      '--read-only',
+    ])) as any;
+    expect(result.status).toBe('miss');
+    expect(readdirSync(researchDir).some((f) => f.includes('.corrupt.'))).toBe(false);
+  });
+
   it('honors explicit --tier when evaluating freshness, and omits it by default', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')

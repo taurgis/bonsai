@@ -10,6 +10,8 @@ export interface ResolveResearchTargetOptions {
   dataDir: string;
   flagOverride?: StorageMode;
   lookup?: boolean;
+  /** Read-only/plan mode: a corrupt entry hit during lookup is reported but never archived on disk. */
+  readOnly?: boolean;
   url: string;
 }
 
@@ -31,7 +33,8 @@ export function resolveResearchTarget(opts: ResolveResearchTargetOptions): Resol
   });
   return {
     cacheKey,
-    located: opts.lookup === false ? null : locateArtifact(roots.readRoots, cacheKey),
+    located:
+      opts.lookup === false ? null : locateArtifact(roots.readRoots, cacheKey, opts.readOnly),
     normalizedUrl,
     roots,
   };
