@@ -353,6 +353,10 @@ async function fetchSingleTarget(url: string, run: FetchRun) {
       url,
       flagOverride: flags.storage,
       lookup: !flags.force,
+      // `dryRun` already merges explicit --dry-run with global read-only/plan mode
+      // (BaseCommand.effectiveDryRun), so a corrupt entry hit while resolving the cache target is
+      // never archived (renamed) on disk during either kind of no-write fetch.
+      readOnly: dryRun,
     });
   } catch (err) {
     failInvalidUrl(io.error, url, (err as Error).message);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mkdtempSync, rmSync, writeFileSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, readdirSync, readFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -238,10 +238,9 @@ describe('cache storage filesystem management', () => {
     try {
       const key = 'abcdef123456';
       const researchDir = join(tempDir, 'research');
-      const fs = require('node:fs');
-      fs.mkdirSync(researchDir, { recursive: true });
+      mkdirSync(researchDir, { recursive: true });
       const corruptPath = join(researchDir, 'corrupt.md');
-      fs.writeFileSync(corruptPath, 'corrupt frontmatter content ---');
+      writeFileSync(corruptPath, 'corrupt frontmatter content ---');
 
       const found = findArtifact(tempDir, key, true);
       expect(found).toBeNull();

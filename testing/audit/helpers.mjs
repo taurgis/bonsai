@@ -1,6 +1,6 @@
 /** Shared assertions for manual CLI audit scenarios. */
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 
 /**
  * Back-date a cached artifact's `validated_at` (and `fetched_at` when present) so freshness/age
@@ -22,6 +22,17 @@ export function corruptArtifact(path) {
 /** Whether the artifact's cache directory contains a `.corrupt.<timestamp>` archive sibling. */
 export function hasArchivedCorruptSibling(path) {
   return readdirSync(dirname(path)).some((f) => f.includes('.corrupt.'));
+}
+
+/**
+ * Drop an unrelated corrupt `*.md` file into the same cache directory as `path`, without touching
+ * `path` itself. A cache lookup scans every file in the directory while resolving its own key, so
+ * this exercises the "unrelated corrupt sibling" case distinct from corrupting the looked-up entry.
+ */
+export function seedUnrelatedCorruptSibling(path) {
+  const siblingPath = join(dirname(path), 'audit-unrelated-corrupt.md');
+  writeFileSync(siblingPath, 'no frontmatter fence at all\njust garbage', 'utf8');
+  return siblingPath;
 }
 
 export function expectNonIntegerLimitInvalid({ run, expect, parseJson }, commandArgs) {
