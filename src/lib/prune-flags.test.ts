@@ -46,4 +46,26 @@ describe('pruneFlagError', () => {
   it('accepts a valid dry-run', () => {
     expect(pruneFlagError({ ...base, olderThan: '30d', dryRun: true })).toBeNull();
   });
+
+  it('accepts --topic alone as a sufficient filter', () => {
+    expect(pruneFlagError({ ...base, topic: 'React', dryRun: true })).toBeNull();
+  });
+
+  it('accepts --tags alone as a sufficient filter', () => {
+    expect(pruneFlagError({ ...base, tags: ['deprecated'], dryRun: true })).toBeNull();
+  });
+
+  it('rejects an empty --topic', () => {
+    expect(pruneFlagError({ ...base, topic: '  ', dryRun: true })?.code).toBe('INVALID_FLAG_VALUE');
+  });
+
+  it('rejects an empty --tags entry', () => {
+    expect(pruneFlagError({ ...base, tags: ['react', ''], dryRun: true })?.code).toBe(
+      'INVALID_FLAG_VALUE'
+    );
+  });
+
+  it('still requires at least one filter when --tags is passed as an empty array', () => {
+    expect(pruneFlagError({ ...base, tags: [] })?.code).toBe('MISSING_FILTER');
+  });
 });

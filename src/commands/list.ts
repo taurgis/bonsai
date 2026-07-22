@@ -16,6 +16,12 @@ import {
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
 import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
+import {
+  matchesTopicFilter,
+  matchesTagsFilter,
+  emptyTopicFilterError,
+  emptyTagsFilterError,
+} from '../lib/research/metadata-filters.js';
 import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 import type { ListRow } from '../lib/cli-result-types.js';
@@ -94,22 +100,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static stdoutIsPrimaryData = true;
 
-  private matchesTopic(meta: ResearchArtifactMetadata, topic: string | undefined): boolean {
-    if (!topic) return true;
-    return !!meta.topic && meta.topic.trim().toLowerCase() === topic.trim().toLowerCase();
-  }
-
-  private matchesTags(meta: ResearchArtifactMetadata, tags: string[] | undefined): boolean {
-    if (!tags || tags.length === 0) return true;
-    const metaTagsLower = meta.tags.map((t) => t.toLowerCase());
-    return tags.every((t) => metaTagsLower.includes(t.toLowerCase()));
-  }
-
   private matchesFilters(meta: ResearchArtifactMetadata, freshness: ListRow['freshness']): boolean {
-    if (!this.matchesTopic(meta, this.flags.topic)) {
+    if (!matchesTopicFilter(meta, this.flags.topic)) {
       return false;
     }
-    if (!this.matchesTags(meta, this.flags.tags)) {
+    if (!matchesTagsFilter(meta, this.flags.tags)) {
       return false;
     }
     if (this.flags.url && !artifactMatchesUrlFilter(meta, this.flags.url)) {
@@ -218,8 +213,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   }
 
   async run(): Promise<ListRow[]> {
-    const urlErr = emptyUrlFilterError(this.flags.url);
-    if (urlErr) this.error(urlErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
+    const flagErr =
+      emptyUrlFilterError(this.flags.url) ??
+      emptyTopicFilterError(this.flags.topic) ??
+      emptyTagsFilterError(this.flags.tags);
+    if (flagErr) this.error(flagErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
 
     const roots = loadStoreRoots({
       configDir: this.config.configDir,

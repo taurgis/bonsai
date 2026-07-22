@@ -243,6 +243,18 @@ describe('list command unit tests', () => {
     expect(result).toEqual([]);
   });
 
+  it('rejects a whitespace-only --topic instead of silently matching everything', async () => {
+    await expect(ResearchList.run(['--topic', '  '])).rejects.toThrow(
+      /--topic must be a non-empty value/
+    );
+  });
+
+  it('rejects a whitespace-only --tags entry instead of silently matching nothing', async () => {
+    await expect(ResearchList.run(['--tags', 'react', '--tags', ''])).rejects.toThrow(
+      /--tags must be non-empty values/
+    );
+  });
+
   it('exposes every schema capture method / artifact type as a filter (no enum drift)', async () => {
     // Seed a route_markdown index hub on disk so list filters hit real scanCacheDirs.
     // BONSAI_STORAGE restored by useIsolatedCache afterEach.

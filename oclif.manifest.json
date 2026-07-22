@@ -466,7 +466,7 @@
     "prune": {
       "aliases": [],
       "args": {},
-      "description": "Delete cached artifacts by content age, idle time, URL glob, or artifact type.",
+      "description": "Delete cached artifacts by content age, idle time, URL glob, artifact type, topic, or tags.",
       "examples": [
         {
           "description": "preview pruning entries older than 30 days",
@@ -479,6 +479,10 @@
         {
           "description": "prune entries matching a URL glob",
           "command": "<%= config.bin %> prune --url \"https://react.dev/*\" --yes"
+        },
+        {
+          "description": "prune entries tagged as deprecated",
+          "command": "<%= config.bin %> prune --tags deprecated --yes"
         }
       ],
       "flags": {
@@ -517,6 +521,22 @@
           "name": "url",
           "hasDynamicHelp": false,
           "multiple": false,
+          "type": "option"
+        },
+        "topic": {
+          "char": "t",
+          "description": "exact topic (case-insensitive)",
+          "name": "topic",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "tags": {
+          "char": "g",
+          "description": "tags to require (must match all)",
+          "name": "tags",
+          "hasDynamicHelp": false,
+          "multiple": true,
           "type": "option"
         },
         "artifact-type": {

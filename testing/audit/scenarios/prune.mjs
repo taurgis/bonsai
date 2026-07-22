@@ -47,6 +47,83 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
   });
 
+  check('prune empty --topic is INVALID_FLAG_VALUE, not a silent no-op filter', () => {
+    const r = run(['prune', '--topic', '  ', '--dry-run', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
+  });
+
+  check('prune empty --tags entry is INVALID_FLAG_VALUE, not a silent zero-match filter', () => {
+    const r = run(['prune', '--tags', 'real', '--tags', '', '--dry-run', '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_FLAG_VALUE', 'code');
+  });
+
+  check('prune --topic alone satisfies MISSING_FILTER', () => {
+    const r = run(['prune', '--topic', 'Some Topic', '--dry-run', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+  });
+
+  check('prune --tags alone satisfies MISSING_FILTER', () => {
+    const r = run(['prune', '--tags', 'deprecated', '--dry-run', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+  });
+
+  check('import then prune --topic only matches that topic (list/prune filter parity)', () => {
+    const ws = createWorkspace();
+    const keepUrl = 'https://example.com/audit-prune-topic-keep';
+    const dropUrl = 'https://example.com/audit-prune-topic-drop';
+    run(['import', keepUrl, '--stdin', '--topic', 'Prune Topic Keep', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Keep\n\nStays cached.\n',
+    });
+    run(['import', dropUrl, '--stdin', '--topic', 'Prune Topic Drop', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Drop\n\nGets pruned.\n',
+    });
+
+    const dryRun = run(['prune', '--topic', 'prune topic drop', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const files = parseJson(dryRun.stdout)?.data?.files;
+    expect(dryRun.exitCode === 0, `dry-run exit ${dryRun.exitCode}`);
+    expect(files?.length === 1, `expected one prune candidate, got ${files?.length}`);
+
+    run(['prune', '--topic', 'prune topic drop', '--yes', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const dropGone = run(['status', dropUrl, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(dropGone.stdout)?.code === 'CACHE_MISS', 'topic-filtered entry pruned');
+    const keepSurvives = run(['status', keepUrl, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(keepSurvives.stdout)?.data?.status === 'hit', 'other topic survives');
+  });
+
+  check('import then prune --tags requires every tag to match', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-prune-tags-match';
+    run(['import', url, '--stdin', '--tags', 'react', '--tags', 'deprecated', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Tagged fixture\n\nHas two tags.\n',
+    });
+
+    const partial = run(['prune', '--tags', 'react', '--tags', 'vue', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(
+      parseJson(partial.stdout)?.data?.candidateCount === 0,
+      'a tag the entry lacks must not match'
+    );
+
+    const both = run(['prune', '--tags', 'react', '--tags', 'deprecated', '--dry-run', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    expect(parseJson(both.stdout)?.data?.candidateCount === 1, 'matching every tag finds the entry');
+  });
+
   check('prune --dry-run --older-than 30d --json ok', () => {
     const r = run(['prune', '--older-than', '30d', '--dry-run', '--json']);
     const env = parseJson(r.stdout);

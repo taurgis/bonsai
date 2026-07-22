@@ -1,5 +1,6 @@
 import { emptyUrlFilterError } from './research/url.js';
 import { durationFlagError } from './research/freshness.js';
+import { emptyTopicFilterError, emptyTagsFilterError } from './research/metadata-filters.js';
 
 /**
  * Pure prune-flag policy. Returns a usage/safety error descriptor, or null when flags are valid.
@@ -24,6 +25,8 @@ export interface PruneFlagInput {
   inactive?: string;
   artifactType?: string;
   url?: string;
+  topic?: string;
+  tags?: string[];
   dryRun: boolean;
   yes: boolean;
   readOnly: boolean;
@@ -33,17 +36,22 @@ export interface PruneFlagInput {
 function missingFilterError(input: PruneFlagInput): PruneFlagError | null {
   // Treat an explicitly passed empty string as "filter was attempted" so `--older-than ''`
   // is not misreported as MISSING_FILTER (durationError rejects it as INVALID_DURATION).
+  // `tags` is the one array-valued flag here: oclif never parses a bare `--tags` into `[]` (a
+  // multiple string flag requires a value per occurrence), so a non-empty array is the correct
+  // "was this filter attempted" test, mirroring the `!== undefined` check used for every scalar flag.
   if (
     input.olderThan !== undefined ||
     input.inactive !== undefined ||
     input.artifactType !== undefined ||
-    input.url !== undefined
+    input.url !== undefined ||
+    input.topic !== undefined ||
+    (input.tags?.length ?? 0) > 0
   ) {
     return null;
   }
   return {
     message:
-      'Must specify at least one pruning filter: --older-than, --inactive, --artifact-type, or --url.',
+      'Must specify at least one pruning filter: --older-than, --inactive, --artifact-type, --url, --topic, or --tags.',
     code: 'MISSING_FILTER',
     suggestions: [`Preview age-based pruning: ${input.bin} prune --older-than 30d --dry-run`],
   };
@@ -77,11 +85,15 @@ function mutationSafetyError(input: PruneFlagInput): PruneFlagError | null {
   if (!input.readOnly && !input.dryRun && !input.yes) {
     const olderThanPart = input.olderThan ? ` --older-than ${input.olderThan}` : '';
     const urlPart = input.url ? ` --url "${input.url}"` : '';
+    const topicPart = input.topic ? ` --topic "${input.topic}"` : '';
+    const tagsPart = (input.tags ?? []).map((tag) => ` --tags "${tag}"`).join('');
     return {
       message:
         'Safety check: use --yes to confirm pruning, or --dry-run to preview files that would be deleted.',
       code: 'SAFETY_CHECK_REQUIRED',
-      suggestions: [`Preview first: ${input.bin} prune --dry-run${olderThanPart}${urlPart}`],
+      suggestions: [
+        `Preview first: ${input.bin} prune --dry-run${olderThanPart}${urlPart}${topicPart}${tagsPart}`,
+      ],
     };
   }
   return null;
@@ -104,8 +116,11 @@ function durationError(input: PruneFlagInput): PruneFlagError | null {
  * @returns Error descriptor for `this.error`, or `null`.
  */
 export function pruneFlagError(input: PruneFlagInput): PruneFlagError | null {
-  const urlErr = emptyUrlFilterError(input.url);
-  if (urlErr) return { message: urlErr, code: 'INVALID_FLAG_VALUE' };
+  const flagValueErr =
+    emptyUrlFilterError(input.url) ??
+    emptyTopicFilterError(input.topic) ??
+    emptyTagsFilterError(input.tags);
+  if (flagValueErr) return { message: flagValueErr, code: 'INVALID_FLAG_VALUE' };
 
   // Duration before missing-filter so `--older-than ''` reports INVALID_DURATION, not MISSING_FILTER.
   return durationError(input) ?? missingFilterError(input) ?? mutationSafetyError(input);
