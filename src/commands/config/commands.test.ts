@@ -143,6 +143,22 @@ describe('config get', () => {
     await expect(ConfigGet.run(['zzzzz'])).rejects.toThrow(/Unknown config key/);
   });
 
+  it('strips ANSI escape bytes from an unknown key echoed back in the human-mode message', async () => {
+    const esc = String.fromCharCode(27);
+    const err = await ConfigGet.run([`foo${esc}[31mRED${esc}[0m`]).catch((e) => e as Error);
+    expect((err as Error).message).not.toContain(esc);
+    expect((err as Error).message).toContain('Unknown config key: "foo[31mRED[0m"');
+  });
+
+  it('preserves the raw unknown key (including control bytes) in the --json envelope', async () => {
+    const esc = String.fromCharCode(27);
+    const lines = await captureLog(() =>
+      ConfigGet.run([`foo${esc}[31m`, '--json']).catch(() => undefined)
+    );
+    const envelope = JSON.parse(lines.join('\n').trim());
+    expect(envelope.stderr).toContain(`foo${esc}[31m`);
+  });
+
   it('emits the envelope under --json', async () => {
     const lines = await captureLog(() => ConfigGet.run(['storage', '--json']));
     const envelope = JSON.parse(lines.join('\n').trim());

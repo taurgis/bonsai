@@ -1,5 +1,5 @@
 import { type Hook, type Interfaces, toConfiguredId } from '@oclif/core';
-import { closestMatch, maxFuzzyDistance } from '../../lib/text.js';
+import { closestMatch, maxFuzzyDistance, sanitizeForTerminal } from '../../lib/text.js';
 import { writeCommandNotFoundJson } from '../../lib/cli-emit.js';
 import { looksLikeSchemelessUrl } from '../../lib/research/url.js';
 
@@ -123,7 +123,7 @@ function missingUrlSchemeDetails(
 }
 
 export function buildCommandNotFoundDetails(
-  id: string,
+  rawId: string,
   argv: string[] | undefined,
   config: Interfaces.Config
 ): {
@@ -133,6 +133,17 @@ export function buildCommandNotFoundDetails(
   message: string;
   suggestions?: string[];
 } {
+  // The attempted id is raw user input echoed straight back into this error's message and
+  // suggestions — untrusted per the repo's trust-boundary rules, same reasoning as
+  // BaseCommand.error(). Sanitize once, up front, so every derived value below (segments, the
+  // display-only "attempted" string, a bare-URL correction) is already safe; a real command/topic id
+  // never contains control bytes, so this only affects input that could never have matched one
+  // anyway. Gate on jsonMode exactly like BaseCommand.error() does, so `--json` keeps
+  // byte-for-byte fidelity — this hook fires before a Command instance exists, so there's no
+  // `jsonEnabled()` to call, but the same boolean is cheap to compute directly from argv.
+  const jsonMode = isJsonMode(argv);
+  const id = jsonMode ? rawId : sanitizeForTerminal(rawId);
+
   // Match against every loaded command id — including hidden ones that stay invokable
   // (`fetch`, plugin internals). Root `--help` hides them; typo recovery should not.
   const commandIds = config.commandIDs;
