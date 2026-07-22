@@ -1,4 +1,4 @@
-import { ageArtifact } from '../helpers.mjs';
+import { ageArtifact, corruptArtifact, hasArchivedCorruptSibling } from '../helpers.mjs';
 
 /** inspect and status cache miss / hit behavior. */
 export default function register(harness, fixtures) {
@@ -353,6 +353,86 @@ export default function register(harness, fixtures) {
     // the artifact's own standard-tier policy (30d fresh window), so it reads fresh again.
     const stored = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(parseJson(stored.stdout)?.data?.freshness === 'fresh', `stored ${stored.stdout}`);
+  });
+
+  // Multi-URL CACHE_MISS collapses extra rows into "and N other URL(s)" — must read correctly for
+  // exactly one extra row too, not just the >1 plural case.
+  check('status multi-URL CACHE_MISS singularizes "1 other URL" for exactly two misses', () => {
+    const r = run(
+      ['status', 'https://example.com/audit-cache-miss-singular-a', 'https://example.com/audit-cache-miss-singular-b', '--json'],
+    );
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.stderr?.includes('and 1 other URL') && !env.stderr.includes('1 other URLs'), env?.stderr);
+  });
+
+  check('status multi-URL CACHE_MISS pluralizes "N other URLs" for three or more misses', () => {
+    const r = run([
+      'status',
+      'https://example.com/audit-cache-miss-plural-a',
+      'https://example.com/audit-cache-miss-plural-b',
+      'https://example.com/audit-cache-miss-plural-c',
+      '--json',
+    ]);
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.stderr?.includes('and 2 other URLs'), env?.stderr);
+  });
+
+  // status/inspect are documented as read-only ("without fetching or writing"); a corrupt cache
+  // entry encountered while resolving the URL must be reported but never archived (renamed) on disk
+  // when --read-only/--plan is active, since that rename is itself a filesystem write.
+  check('status --read-only reports a corrupt cache entry without archiving it', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-corrupt-readonly-status';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Corrupt read-only fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    corruptArtifact(path);
+
+    const r = run(['status', url, '--read-only', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(r.stdout)?.data?.status === 'miss', r.stdout);
+    expect(!hasArchivedCorruptSibling(path), 'corrupt file must not be archived under --read-only');
+  });
+
+  check('inspect --read-only reports a corrupt cache entry without archiving it', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-corrupt-readonly-inspect';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Corrupt read-only fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    corruptArtifact(path);
+
+    const r = run(['inspect', url, '--read-only', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(r.stdout)?.data?.status === 'miss', r.stdout);
+    expect(!hasArchivedCorruptSibling(path), 'corrupt file must not be archived under --read-only');
+  });
+
+  // Without --read-only, corruption recovery is unchanged: the corrupt file is still archived so a
+  // future lookup does not keep tripping over it.
+  check('status without --read-only still archives a corrupt cache entry', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-corrupt-writable-status';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Corrupt writable fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    corruptArtifact(path);
+
+    const r = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(r.stdout)?.data?.status === 'miss', r.stdout);
+    expect(hasArchivedCorruptSibling(path), 'corrupt file should be archived without --read-only');
   });
 
   check('status and inspect CACHE_MISS messages match', () => {

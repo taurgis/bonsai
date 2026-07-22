@@ -52,7 +52,12 @@ export function getArtifactPath(dataDir: string, key: string): string {
   return join(dataDir, 'research', `${key}.md`);
 }
 
-function processFileForLookup(file: string, dir: string, key: string): ResearchArtifact | null {
+function processFileForLookup(
+  file: string,
+  dir: string,
+  key: string,
+  readOnly: boolean
+): ResearchArtifact | null {
   // Same file filter as scanCacheDir — superseded/corrupt/tmp archives must not resolve as active.
   if (!isResearchFile(file)) {
     return null;
@@ -70,12 +75,16 @@ function processFileForLookup(file: string, dir: string, key: string): ResearchA
     console.warn(
       `Warning: Corrupt research artifact found at "${filePath}": ${(err as Error).message}`
     );
-    try {
-      const corruptPath = `${filePath}.corrupt.${Date.now()}`;
-      renameSync(filePath, corruptPath);
-      console.warn(`Archived corrupt artifact to "${corruptPath}"`);
-    } catch (archiveErr) {
-      console.error(`Failed to archive corrupt artifact: ${(archiveErr as Error).message}`);
+    // Archiving renames the file on disk — a write a read-only/plan-mode lookup (e.g. `status`,
+    // `inspect --read-only`) must never perform, even incidentally while diagnosing a corrupt entry.
+    if (!readOnly) {
+      try {
+        const corruptPath = `${filePath}.corrupt.${Date.now()}`;
+        renameSync(filePath, corruptPath);
+        console.warn(`Archived corrupt artifact to "${corruptPath}"`);
+      } catch (archiveErr) {
+        console.error(`Failed to archive corrupt artifact: ${(archiveErr as Error).message}`);
+      }
     }
   }
   return null;
@@ -84,9 +93,14 @@ function processFileForLookup(file: string, dir: string, key: string): ResearchA
 /**
  * Scans the research storage directory, reading metadata of all valid markdown files
  * to find the active artifact for the given cache key with the newest validated_at timestamp.
- * If a corrupt artifact is found, it is skipped and archived as corrupt.
+ * If a corrupt artifact is found, it is skipped and archived as corrupt — unless `readOnly` is set,
+ * in which case it is only reported, never renamed on disk.
  */
-export function findArtifact(dataDir: string, key: string): ResearchArtifact | null {
+export function findArtifact(
+  dataDir: string,
+  key: string,
+  readOnly = false
+): ResearchArtifact | null {
   const dir = join(dataDir, 'research');
   if (!existsSync(dir)) {
     return null;
@@ -97,7 +111,7 @@ export function findArtifact(dataDir: string, key: string): ResearchArtifact | n
 
   const files = readdirSync(dir);
   for (const file of files) {
-    const artifact = processFileForLookup(file, dir, key);
+    const artifact = processFileForLookup(file, dir, key, readOnly);
     if (!artifact) {
       continue;
     }
@@ -184,9 +198,13 @@ export interface LocatedArtifact {
  * returning the first match along with where it lives. Implements the project→global
  * read fallback: a missing project entry still resolves against the global cache.
  */
-export function locateArtifact(dataDirs: string[], key: string): LocatedArtifact | null {
+export function locateArtifact(
+  dataDirs: string[],
+  key: string,
+  readOnly = false
+): LocatedArtifact | null {
   for (const dataDir of dataDirs) {
-    const artifact = findArtifact(dataDir, key);
+    const artifact = findArtifact(dataDir, key, readOnly);
     if (artifact) {
       return { artifact, dataDir, path: getArtifactPath(dataDir, key) };
     }

@@ -194,6 +194,26 @@ describe('fetch command branch coverage', () => {
     expect(result.content.length).toBeGreaterThan(0);
   });
 
+  it('--read-only: resolving the target does not archive an unrelated corrupt cache file', async () => {
+    // findArtifact scans every file in the research dir while resolving the target's own cache key,
+    // so an unrelated corrupt entry it happens to pass over must not be archived (a disk write)
+    // during a read-only/dry-run lookup. Seed a normal fresh hit so this fetch never touches the
+    // network, then drop a corrupt sibling file into the same directory.
+    const dataDir = await globalDataDir();
+    seedCachedArtifact(dataDir, new Date());
+    const { mkdirSync, writeFileSync } = await import('node:fs');
+    const researchDir = join(dataDir, 'research');
+    mkdirSync(researchDir, { recursive: true });
+    const corruptPath = join(researchDir, 'unrelated-corrupt.md');
+    writeFileSync(corruptPath, 'no frontmatter fence at all\njust garbage');
+
+    const result: any = await FetchCommand.run([TEST_URL, '--read-only']);
+
+    expect(result.cache.status).toBe('hit');
+    expect(existsSync(corruptPath)).toBe(true);
+    expect(readdirSync(researchDir).some((f) => f.includes('.corrupt.'))).toBe(false);
+  });
+
   it('stale revalidation 304: revalidates via conditional request and bumps validated_at', async () => {
     // standard tier: fresh 30d, grace 14d. 40d old => stale_grace, triggering revalidation.
     const fetchedAt = new Date(Date.now() - 40 * 24 * 3600 * 1000);

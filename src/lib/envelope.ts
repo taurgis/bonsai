@@ -1,4 +1,5 @@
 import { EXIT_RUNTIME_FAILURE } from './cli-error-policy.js';
+import { pluralize } from './text.js';
 
 /** Fields oclif attaches to CLIError that human pretty-print surfaces but JSON mode must mirror. */
 export interface CliErrorShape {
@@ -166,8 +167,9 @@ export function enrichCacheMissEnvelope(
     exitCode: EXIT_RUNTIME_FAILURE,
     message: (first, failures) => {
       const url = first.normalizedUrl ?? '';
-      return failures.length > 1
-        ? `Cache miss for ${url} and ${failures.length - 1} other URLs`
+      const otherCount = failures.length - 1;
+      return otherCount > 0
+        ? `Cache miss for ${url} and ${otherCount} other ${pluralize(otherCount, 'URL', 'URLs')}`
         : `Cache miss for ${url}`;
     },
     // A URL that is already a secondary source of a different cached artifact must not be pointed
@@ -196,9 +198,14 @@ export function enrichRowErrorEnvelope(
       return (row as { error?: CliErrorShape }).error ?? null;
     },
     code: (first) => first.code ?? 'FETCH_FAILED',
-    message: (first, failures) =>
-      (first.message ?? '') +
-      (failures.length > 1 ? `\n…and ${failures.length - 1} other URL failure(s)` : ''),
+    message: (first, failures) => {
+      const otherCount = failures.length - 1;
+      const suffix =
+        otherCount > 0
+          ? `\n…and ${otherCount} other URL ${pluralize(otherCount, 'failure', 'failures')}`
+          : '';
+      return (first.message ?? '') + suffix;
+    },
     suggestions: (failures) => failures[0]?.suggestions,
     ref: (first) => first.ref,
     exitCode: EXIT_RUNTIME_FAILURE,

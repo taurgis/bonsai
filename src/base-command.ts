@@ -197,6 +197,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         configDir: this.config.configDir,
         cwd: process.cwd(),
         dataDir: this.config.dataDir,
+        readOnly: this.readOnly,
         url,
         ...extra,
       });

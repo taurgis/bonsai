@@ -187,4 +187,44 @@ describe('enrichCacheMissEnvelope / enrichRowErrorEnvelope', () => {
     expect(enriched.stderr).toContain('dns');
     expect(enriched.data).toBe(data);
   });
+
+  it('singularizes "1 other URL" instead of "1 other URLs" for exactly two misses', () => {
+    const data = [
+      { status: 'miss', normalizedUrl: 'https://a.example/' },
+      { status: 'miss', normalizedUrl: 'https://b.example/' },
+    ];
+    const enriched = enrichCacheMissEnvelope({ ok: true, exitCode: 0, data }, data, 'bonsai');
+    expect(enriched.stderr).toContain('Cache miss for https://a.example/ and 1 other URL');
+    expect(enriched.stderr).not.toContain('1 other URLs');
+  });
+
+  it('pluralizes "N other URLs" for three or more misses', () => {
+    const data = [
+      { status: 'miss', normalizedUrl: 'https://a.example/' },
+      { status: 'miss', normalizedUrl: 'https://b.example/' },
+      { status: 'miss', normalizedUrl: 'https://c.example/' },
+    ];
+    const enriched = enrichCacheMissEnvelope({ ok: true, exitCode: 0, data }, data, 'bonsai');
+    expect(enriched.stderr).toContain('Cache miss for https://a.example/ and 2 other URLs');
+  });
+
+  it('singularizes "1 other URL failure" for exactly two row errors', () => {
+    const data = [
+      { error: { code: 'INVALID_URL', message: 'bad a' } },
+      { error: { code: 'INVALID_URL', message: 'bad b' } },
+    ];
+    const enriched = enrichRowErrorEnvelope({ ok: true, exitCode: 0, data }, data);
+    expect(enriched.stderr).toContain('1 other URL failure');
+    expect(enriched.stderr).not.toContain('1 other URL failures');
+  });
+
+  it('pluralizes "N other URL failures" for three or more row errors', () => {
+    const data = [
+      { error: { code: 'INVALID_URL', message: 'bad a' } },
+      { error: { code: 'INVALID_URL', message: 'bad b' } },
+      { error: { code: 'INVALID_URL', message: 'bad c' } },
+    ];
+    const enriched = enrichRowErrorEnvelope({ ok: true, exitCode: 0, data }, data);
+    expect(enriched.stderr).toContain('2 other URL failures');
+  });
 });

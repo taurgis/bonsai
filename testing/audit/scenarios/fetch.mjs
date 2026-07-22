@@ -1,5 +1,5 @@
 /** URL shorthand fetch command (root bonsai <url>). */
-import { ageArtifact } from '../helpers.mjs';
+import { ageArtifact, seedUnrelatedCorruptSibling, hasArchivedCorruptSibling } from '../helpers.mjs';
 
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
@@ -178,6 +178,46 @@ export default function register(harness, fixtures) {
     const hitEnv = parseJson(hit.stdout);
     expect(hitEnv?.data?.dryRun === true, 'hit dryRun');
     expect(hitEnv?.data?.cache?.status === 'hit', hitEnv?.data?.cache?.status);
+  });
+
+  // fetch resolves its cache target via the same lookup chain as status/inspect; that lookup scans
+  // every file in the research dir, so an unrelated corrupt entry it passes over must not be
+  // archived (a disk write) during a --dry-run/--read-only fetch. Seed a normal cached hit so this
+  // never needs the network, and drop the corrupt file in as an unrelated sibling.
+  check('fetch --read-only does not archive an unrelated corrupt cache file', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-fetch-readonly-corrupt-sibling';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Audit fetch read-only corrupt sibling\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    const siblingPath = seedUnrelatedCorruptSibling(path);
+
+    const r = run([url, '--read-only', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
+    expect(parseJson(r.stdout)?.data?.cache?.status === 'hit', r.stdout);
+    expect(!hasArchivedCorruptSibling(siblingPath), 'must not archive under --read-only');
+  });
+
+  check('fetch --dry-run does not archive an unrelated corrupt cache file', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-fetch-dryrun-corrupt-sibling';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Audit fetch dry-run corrupt sibling\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    const siblingPath = seedUnrelatedCorruptSibling(path);
+
+    const r = run([url, '--dry-run', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr}`);
+    expect(parseJson(r.stdout)?.data?.cache?.status === 'hit', r.stdout);
+    expect(!hasArchivedCorruptSibling(siblingPath), 'must not archive under --dry-run');
   });
 
   check('fetch multi-URL keeps hit data when a later URL fails', () => {

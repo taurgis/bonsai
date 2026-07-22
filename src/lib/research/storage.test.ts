@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mkdtempSync, rmSync, writeFileSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, readdirSync, readFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -226,6 +226,27 @@ describe('cache storage filesystem management', () => {
       const files = readdirSync(researchDir);
       const corruptRenamed = files.filter((f) => f.includes('corrupt.md.corrupt'));
       expect(corruptRenamed.length).toBe(1);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('reports but does not rename a corrupt artifact when readOnly is set', () => {
+    // A read-only/plan-mode lookup (e.g. `status --read-only`) must never write to disk, even as an
+    // incidental side effect of diagnosing a corrupt cache entry it happens to encounter.
+    const tempDir = mkdtempSync(join(tmpdir(), 'fnr-storage-readonly-'));
+    try {
+      const key = 'abcdef123456';
+      const researchDir = join(tempDir, 'research');
+      mkdirSync(researchDir, { recursive: true });
+      const corruptPath = join(researchDir, 'corrupt.md');
+      writeFileSync(corruptPath, 'corrupt frontmatter content ---');
+
+      const found = findArtifact(tempDir, key, true);
+      expect(found).toBeNull();
+
+      const files = readdirSync(researchDir);
+      expect(files).toEqual(['corrupt.md']);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

@@ -1,5 +1,6 @@
 /** Shared assertions for manual CLI audit scenarios. */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 /**
  * Back-date a cached artifact's `validated_at` (and `fetched_at` when present) so freshness/age
@@ -11,6 +12,27 @@ export function ageArtifact(path, isoTimestamp) {
     .replace(/^validated_at: .*$/m, `validated_at: ${isoTimestamp}`)
     .replace(/^fetched_at: .*$/m, `fetched_at: ${isoTimestamp}`);
   writeFileSync(path, aged, 'utf8');
+}
+
+/** Overwrite a cached artifact with content that fails frontmatter parsing (no `---` fences). */
+export function corruptArtifact(path) {
+  writeFileSync(path, 'no frontmatter fence at all\njust garbage', 'utf8');
+}
+
+/** Whether the artifact's cache directory contains a `.corrupt.<timestamp>` archive sibling. */
+export function hasArchivedCorruptSibling(path) {
+  return readdirSync(dirname(path)).some((f) => f.includes('.corrupt.'));
+}
+
+/**
+ * Drop an unrelated corrupt `*.md` file into the same cache directory as `path`, without touching
+ * `path` itself. A cache lookup scans every file in the directory while resolving its own key, so
+ * this exercises the "unrelated corrupt sibling" case distinct from corrupting the looked-up entry.
+ */
+export function seedUnrelatedCorruptSibling(path) {
+  const siblingPath = join(dirname(path), 'audit-unrelated-corrupt.md');
+  writeFileSync(siblingPath, 'no frontmatter fence at all\njust garbage', 'utf8');
+  return siblingPath;
 }
 
 export function expectNonIntegerLimitInvalid({ run, expect, parseJson }, commandArgs) {
