@@ -1,6 +1,8 @@
 /** import command validation and stdin/file modes. */
+import { readFileSync } from 'node:fs';
+
 export default function register(harness, fixtures) {
-  const { check, run, expect, parseJson } = harness;
+  const { check, run, expect, parseJson, dewrapCliMessage } = harness;
   const { createWorkspace, writeNote } = fixtures;
 
   check('import empty stdin exit 2', () => {
@@ -275,6 +277,54 @@ export default function register(harness, fixtures) {
     );
     expect(!pruned.stdout.includes(esc), JSON.stringify(pruned.stdout));
     expect(pruned.stdout.includes('[31mRED[0m'), pruned.stdout);
+  });
+
+  check('import strips ANSI escape codes from the on-disk cache file, not just terminal printing', () => {
+    // The frontmatter serializer (not just the human-mode print path) must drop the raw escape byte:
+    // this .md is plain text meant to be read directly (cat, an editor, another tool), and a raw
+    // control byte reaching a real terminal there is a terminal-injection risk print-time
+    // sanitization alone cannot close.
+    const esc = String.fromCharCode(27);
+    const r = run(
+      ['import', 'https://example.com/ansi-on-disk', '--stdin', '--topic', `${esc}[31mRED${esc}[0m`, '--json'],
+      { input: '# Injected\nBody\n' }
+    );
+    expect(r.exitCode === 0, `exit ${r.exitCode}: ${r.stderr}`);
+    const path = parseJson(r.stdout)?.data?.cache?.path;
+    const onDisk = readFileSync(path, 'utf8');
+    expect(!onDisk.includes(esc), 'raw ESC byte must not reach the cache file');
+    expect(onDisk.includes('topic: [31mRED[0m'), onDisk.split('\n').find((l) => l.startsWith('topic:')));
+  });
+
+  check('import redirects a project-storage secret to global on the actual (non-dry-run) write', () => {
+    const ws = createWorkspace();
+    const opts = { cwd: ws.cwd, xdg: ws.xdg };
+    run(['config', 'set', 'storage', 'project', '--local', '--json'], opts);
+    const url = 'https://example.com/audit-import-secret-redirect';
+
+    const imported = run(['import', url, '--stdin', '--json'], {
+      ...opts,
+      input: 'token ghp_' + 'a'.repeat(36),
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}: ${imported.stderr}`);
+    const env = parseJson(imported.stdout);
+    expect(env?.data?.dryRun === false, 'not a dry-run');
+    expect(env?.data?.cache?.redirectedToGlobal === true, JSON.stringify(env?.data?.cache));
+    // oclif wraps long warning lines at terminal width, re-prefixing continuations with " › " —
+    // dewrap before a substring check that spans a likely wrap point.
+    const warning = dewrapCliMessage(imported.stderr);
+    expect(warning.includes('GitHub token'), warning);
+    expect(warning.includes('stored in the global cache instead of the project'), warning);
+
+    // The artifact must actually land under the global XDG data dir, not the project cwd.
+    const path = env?.data?.cache?.path;
+    expect(path?.startsWith(ws.xdg.dataHome), `path escaped global root: ${path}`);
+    expect(!path?.startsWith(ws.cwd), `path should not be under the project cwd: ${path}`);
+    expect(readFileSync(path, 'utf8').includes('ghp_'), 'secret content actually persisted globally');
+
+    // A subsequent lookup from the same project workspace must resolve via the global fallback.
+    const status = run(['status', url, '--json'], opts);
+    expect(parseJson(status.stdout)?.data?.status === 'hit', 'resolves via global fallback');
   });
 
   check('import multi-source --json exposes sourceUrls topic and null primary url', () => {

@@ -205,7 +205,9 @@ function notModifiedResult(res: Response, currentUrl: string): FetchResult {
 
 function assertOk(res: Response): void {
   if (!res.ok) {
-    throw new Error(`Fetch failed with status ${res.status} ${res.statusText}`);
+    // statusText is often empty (e.g. HTTP/2 responses carry no reason phrase); trim so a
+    // reasonless status never leaves a dangling trailing space, matching browser.ts's assertOk.
+    throw new Error(`Fetch failed with status ${res.status} ${res.statusText}`.trimEnd());
   }
 }
 

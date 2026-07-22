@@ -1,4 +1,6 @@
 /** URL shorthand fetch command (root bonsai <url>). */
+import { ageArtifact } from '../helpers.mjs';
+
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
   const { createWorkspace, networkEnabled } = fixtures;
@@ -236,6 +238,57 @@ export default function register(harness, fixtures) {
     expect(r.stderr.includes('Try this:'), r.stderr);
   });
 
+  // Seeds a project-free cache entry via `import` (no network), then back-dates it past its
+  // standard-tier fresh window (30d) but inside grace (+14d) so a revalidation attempt is required.
+  // The URL itself is the reserved `.invalid` TLD, so the revalidation's real network call fails
+  // fast and deterministically (DNS) with no AUDIT_NETWORK gate needed — same fixture pattern as
+  // the multi-URL DNS-failure checks above.
+  function seedStaleGraceEntry(url) {
+    const ws = createWorkspace();
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Stale grace fixture\n\nContent revalidation will fail to refresh.\n',
+    });
+    expect(imported.exitCode === 0, `seed import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    // Standard tier: 30d fresh + 14d grace. 40 days back lands past fresh, inside grace.
+    ageArtifact(path, new Date(Date.now() - 40 * 24 * 3600 * 1000).toISOString());
+    return ws;
+  }
+
+  check('fetch of a stale_grace entry whose revalidation fails serves stale with exit 5', () => {
+    const url = 'https://this-domain-definitely-does-not-exist-xyz123.invalid/stale-grace-exit5';
+    const ws = seedStaleGraceEntry(url);
+
+    const status = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(parseJson(status.stdout)?.data?.freshness === 'stale_grace', 'seeded as stale_grace');
+
+    const r = run([url, '--json'], { cwd: ws.cwd, xdg: ws.xdg, timeout: 60000 });
+    expect(r.exitCode === 5, `exit ${r.exitCode} ${r.stderr.slice(0, 200)}`);
+    const env = parseJson(r.stdout);
+    expect(env?.exitCode === 5, `envelope exitCode ${env?.exitCode}`);
+    expect(env?.ok === true, 'stale-but-served is still ok');
+    expect(env?.data?.cache?.status === 'stale', env?.data?.cache?.status);
+    expect(env?.data?.content?.includes('revalidation will fail'), 'stale content still returned');
+    // The stale-serve notice is a warning, not an error: it only ever reaches real stderr
+    // (BaseCommand.warn()'s always-visible-on-stderr override), never the envelope's `stderr` field,
+    // which carries error text only and stays empty on this "ok: true" result.
+    expect(r.stderr.includes('Serving stale content within grace period (exit 5)'), r.stderr);
+  });
+
+  check('fetch of a stale_grace entry with --allow-stale suppresses exit 5', () => {
+    const url = 'https://this-domain-definitely-does-not-exist-xyz123.invalid/stale-grace-allow';
+    const ws = seedStaleGraceEntry(url);
+
+    const r = run([url, '--allow-stale', '--json'], { cwd: ws.cwd, xdg: ws.xdg, timeout: 60000 });
+    expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 200)}`);
+    const env = parseJson(r.stdout);
+    expect(env?.data?.cache?.status === 'stale', env?.data?.cache?.status);
+    expect(r.stderr.includes('Serving stale content within grace period:'), r.stderr);
+    expect(!r.stderr.includes('(exit 5)'), 'allow-stale drops the exit-5 suffix');
+  });
+
   check('fetch --force --allow-stale is CONFLICTING_FLAGS', () => {
     const r = run(['https://example.com', '--force', '--allow-stale', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
@@ -268,6 +321,15 @@ export default function register(harness, fixtures) {
       expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
       expect(r.stderr.includes('extracted content is very short'), r.stderr);
       expect(!r.stderr.includes('warning:'), `prefix should be stripped: ${r.stderr}`);
+    });
+
+    check('fetch of a thin static page auto-retries via the rendered browser fallback (AUDIT_NETWORK)', () => {
+      // No --rendered flag: capturePage decides on its own that example.com's thin static extraction
+      // is insufficient and retries through headless Chrome. capture_method must record that it did.
+      const r = run(['https://example.com', '--json'], { timeout: 90000 });
+      expect(r.exitCode === 0, `exit ${r.exitCode} ${r.stderr.slice(0, 120)}`);
+      const env = parseJson(r.stdout);
+      expect(env?.data?.source?.captureMethod === 'browser_fallback', `captureMethod ${env?.data?.source?.captureMethod}`);
     });
 
     check('fetch of a JSON endpoint fails with the content-type error, not a corrupted browser fallback (AUDIT_NETWORK)', () => {

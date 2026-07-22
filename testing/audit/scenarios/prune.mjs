@@ -356,4 +356,38 @@ export default function register(harness, fixtures) {
     expect(data?.candidateCount === 1, `candidateCount ${data?.candidateCount}`);
     expect(data?.files?.[0]?.cacheKey, 'candidate has a usable cache key');
   });
+
+  check('prune combines --older-than, --topic, and --tags as AND, not OR', () => {
+    const ws = createWorkspace();
+    const opts = { cwd: ws.cwd, xdg: ws.xdg };
+
+    function seed(urlSuffix, topic) {
+      const r = run(
+        ['import', `https://example.com/audit-prune-and-${urlSuffix}`, '--stdin', '--json', '--topic', topic, '--tags', 'keep'],
+        { ...opts, input: `# ${urlSuffix} fixture\n` }
+      );
+      expect(r.exitCode === 0, `seed ${urlSuffix} exit ${r.exitCode}`);
+      return parseJson(r.stdout)?.data?.cache;
+    }
+
+    // Matches every filter: old, right topic, right tag.
+    const matchesAll = seed('matches-all', 'Match Topic');
+    ageArtifact(matchesAll.path, new Date(Date.now() - 40 * 24 * 3600 * 1000).toISOString());
+
+    // Right topic and tag, but too young for --older-than.
+    seed('too-young', 'Match Topic');
+
+    // Old enough and right tag, but the wrong topic.
+    const wrongTopic = seed('wrong-topic', 'Other Topic');
+    ageArtifact(wrongTopic.path, new Date(Date.now() - 40 * 24 * 3600 * 1000).toISOString());
+
+    const dryRun = run(
+      ['prune', '--older-than', '30d', '--topic', 'Match Topic', '--tags', 'keep', '--dry-run', '--json'],
+      opts
+    );
+    expect(dryRun.exitCode === 0, `exit ${dryRun.exitCode}`);
+    const data = parseJson(dryRun.stdout)?.data;
+    expect(data?.candidateCount === 1, `candidateCount ${data?.candidateCount}: ${JSON.stringify(data?.files)}`);
+    expect(data?.files?.[0]?.cacheKey === matchesAll.key, `expected ${matchesAll.key}, got ${JSON.stringify(data?.files)}`);
+  });
 }

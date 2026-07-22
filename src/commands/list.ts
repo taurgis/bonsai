@@ -95,7 +95,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       description: 'capture method',
       options: CAPTURE_METHODS,
     })(),
-    limit: limitFlag(100, 50, 'result count (default 50, max 100)'),
+    limit: limitFlag(100, 50, 'result count (max 100)'),
   };
 
   static stdoutIsPrimaryData = true;

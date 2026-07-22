@@ -444,7 +444,7 @@
           "type": "option"
         },
         "limit": {
-          "description": "result count (default 50, max 100)",
+          "description": "result count (max 100)",
           "name": "limit",
           "default": 50,
           "hasDynamicHelp": false,

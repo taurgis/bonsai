@@ -178,6 +178,30 @@ describe('artifact serialization and parsing', () => {
     expect(parsed.metadata.section_heading_path).toBe('Guide --- cache_key: attacker-controlled');
   });
 
+  it('collapses an embedded tab in a scalar field to a space, like newline/CR, instead of deleting it', () => {
+    // Tab is Markdown whitespace, not an attack vector like a raw ANSI escape byte -- deleting it
+    // outright (as a blanket control-character strip would) silently merges adjacent words instead
+    // of just neutralizing the frontmatter-corruption risk newline/CR pose.
+    const attack: ResearchArtifact = {
+      ...sampleArtifact,
+      metadata: { ...sampleArtifact.metadata, topic: 'foo\tbar' },
+    };
+    const parsed = parseArtifact(serializeArtifact(attack));
+    expect(parsed.metadata.topic).toBe('foo bar');
+  });
+
+  it('strips a raw ANSI escape byte from a scalar field so it never reaches the on-disk cache file', () => {
+    const esc = String.fromCharCode(27);
+    const attack: ResearchArtifact = {
+      ...sampleArtifact,
+      metadata: { ...sampleArtifact.metadata, topic: `Evil${esc}[31mRed${esc}[0mTopic` },
+    };
+    const serialized = serializeArtifact(attack);
+    expect(serialized).not.toContain(esc);
+    const parsed = parseArtifact(serialized);
+    expect(parsed.metadata.topic).toBe('Evil[31mRed[0mTopic');
+  });
+
   it('extractSection returns empty string for a missing section', () => {
     expect(extractSection('## Summary\n\ntext', 'Provenance')).toBe('');
   });
