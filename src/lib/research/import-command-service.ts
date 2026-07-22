@@ -85,9 +85,9 @@ export async function prepareImportCommandService(opts: {
 
   const ttlErr = durationFlagError('--ttl', flags.ttl);
   if (ttlErr) io.error(ttlErr, { exit: 2, code: 'INVALID_DURATION' });
-  const metadataErr = metadataNewlineError(flags);
-  if (metadataErr) {
-    io.error(metadataErr, {
+  const newlineErr = metadataNewlineError(flags);
+  if (newlineErr) {
+    io.error(newlineErr, {
       exit: 2,
       code: 'INVALID_METADATA_VALUE',
       suggestions: ['Remove line breaks from the value.'],
