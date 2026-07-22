@@ -46,8 +46,8 @@ bonsai <url> [flags]
 
 | Flag            | Short | Type     | Default      | Description                                                                                                                     |
 | --------------- | ----- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `--topic`       | `-t`  | string   | `null`       | Main research topic for metadata.                                                                                               |
-| `--tags`        | `-g`  | string   | `[]`         | taxonomic tags (can be repeated).                                                                                               |
+| `--topic`       | `-t`  | string   | `null`       | Main research topic for metadata (max 200 chars).                                                                                |
+| `--tags`        | `-g`  | string   | `[]`         | taxonomic tags (can be repeated, max 100 chars each).                                                                           |
 | `--format`      | `-f`  | choice   | `compressed` | Output format: `compressed` or `detailed`.                                                                                      |
 | `--tier`        | —     | choice   | `standard`   | Freshness tier logic: `stable`, `standard`, or `volatile`.                                                                      |
 | `--ttl`         | `-l`  | duration | `null`       | TTL duration for freshness (e.g. "2h", "7d", "6m").                                                                             |
@@ -128,8 +128,8 @@ bonsai import [url] [flags]
 - `--dry-run`: Validate the import without writing (also implied by global `--read-only` / `--plan`).
 - `--source-url`: Source URLs for multi-source import (repeatable).
 - `--input-format`: Input content format (`detailed` or `compressed`). Defaults to `detailed`.
-- `--topic`: Main topic. **Required** for multi-source import.
-- `--tags`: Taxonomic tags (repeatable).
+- `--topic`: Main topic (max 200 chars). **Required** for multi-source import.
+- `--tags`: Taxonomic tags (repeatable, max 100 chars each).
 - `--tier`: Freshness tier policy (`stable`, `standard`, or `volatile`).
 - `--ttl`: TTL duration for imported note freshness (e.g. "2h", "7d", "6m").
 - `--storage`: Storage mode (`global` or `project`). Override the configured cache location for this import. Notes containing secrets are always stored globally and never written to a project cache.

@@ -96,6 +96,22 @@ export default function register(harness, fixtures) {
     expect(env?.code === 'INVALID_METADATA_VALUE', env?.code);
   });
 
+  check('fetch --topic over 200 chars is INVALID_METADATA_VALUE before any network call', () => {
+    // Unbounded here would still round-trip through frontmatter, but a single very long topic
+    // wraps a `list` heading line across dozens of terminal rows — cap it at the flag boundary.
+    const r = run(['https://this-domain-definitely-does-not-exist-xyz123.invalid', '--topic', 'a'.repeat(201), '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_METADATA_VALUE', env?.code);
+  });
+
+  check('fetch --tags value over 100 chars is INVALID_METADATA_VALUE', () => {
+    const r = run(['https://this-domain-definitely-does-not-exist-xyz123.invalid', '--tags', 'b'.repeat(101), '--json']);
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_METADATA_VALUE', env?.code);
+  });
+
   check('fetch invalid tier --json exit 2', () => {
     const r = run(['https://example.com', '--tier', 'bogus', '--json']);
     const env = parseJson(r.stdout);

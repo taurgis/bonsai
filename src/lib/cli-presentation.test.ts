@@ -25,13 +25,19 @@ describe('CLI presentation helpers', () => {
     expect(CLI_FLAG_DESCRIPTIONS.importStorage).toBe(
       'override where this note is cached (secrets always stored globally)'
     );
-    expect(CLI_FLAG_DESCRIPTIONS.fetchTopic).toBe('main research topic for metadata');
-    expect(CLI_FLAG_DESCRIPTIONS.importTopic).toBe('main topic for this research note');
+    expect(CLI_FLAG_DESCRIPTIONS.fetchTopic).toBe(
+      'main research topic for metadata (max 200 chars)'
+    );
+    expect(CLI_FLAG_DESCRIPTIONS.importTopic).toBe(
+      'main topic for this research note (max 200 chars)'
+    );
     expect(CLI_FLAG_DESCRIPTIONS.filterTopic).toBe('exact topic (case-insensitive)');
     expect(CLI_FLAG_DESCRIPTIONS.fetchTags).toBe(
-      'taxonomic tags for this research (can be repeated)'
+      'taxonomic tags for this research (can be repeated, max 100 chars each)'
     );
-    expect(CLI_FLAG_DESCRIPTIONS.importTags).toBe('taxonomic tags (can be repeated)');
+    expect(CLI_FLAG_DESCRIPTIONS.importTags).toBe(
+      'taxonomic tags (can be repeated, max 100 chars each)'
+    );
     expect(CLI_FLAG_DESCRIPTIONS.filterTags).toBe('tags to require (must match all)');
     expect(CLI_FLAG_DESCRIPTIONS.format).toBe('output format');
     expect(CLI_FLAG_DESCRIPTIONS.readOnly).toBe(

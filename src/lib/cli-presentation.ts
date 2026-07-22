@@ -1,4 +1,5 @@
 import { colors } from './color.js';
+import { MAX_TAG_LENGTH, MAX_TOPIC_LENGTH } from './research/metadata-flags.js';
 
 const HUMAN_LABEL_WIDTH = 25;
 
@@ -17,11 +18,11 @@ export const CLI_FLAG_DESCRIPTIONS = {
   maxAge: `maximum cache age to accept (${DURATION_EXAMPLES})`,
   fetchStorage: `override where this result is cached (${SECRET_STORAGE_NOTE})`,
   importStorage: `override where this note is cached (${SECRET_STORAGE_NOTE})`,
-  fetchTopic: 'main research topic for metadata',
-  importTopic: 'main topic for this research note',
+  fetchTopic: `main research topic for metadata (max ${MAX_TOPIC_LENGTH} chars)`,
+  importTopic: `main topic for this research note (max ${MAX_TOPIC_LENGTH} chars)`,
   filterTopic: 'exact topic (case-insensitive)',
-  fetchTags: 'taxonomic tags for this research (can be repeated)',
-  importTags: 'taxonomic tags (can be repeated)',
+  fetchTags: `taxonomic tags for this research (can be repeated, max ${MAX_TAG_LENGTH} chars each)`,
+  importTags: `taxonomic tags (can be repeated, max ${MAX_TAG_LENGTH} chars each)`,
   filterTags: 'tags to require (must match all)',
   format: 'output format',
   readOnly:
