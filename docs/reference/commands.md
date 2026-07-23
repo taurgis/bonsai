@@ -32,6 +32,13 @@ Bonsai keeps a few asymmetries because they match agent workflows:
   appear on an explicit `bonsai list`, and `--json`/`--toon` output stays a
   clean envelope either way. `bonsai help`, `--help`, and `-h` are unaffected
   and remain the explicit command reference.
+- `setup`'s default scope is the opposite of `config set`/`config unset`'s.
+  `setup <agent>` writes to the project by default (`--global` opts into a
+  user-level install), while `config set`/`config unset` write to the
+  user-level file by default (`--local` opts into the project file). `setup`
+  defaults to project because a shared hook is the common case for a team
+  repo; `config` defaults to user because storage mode is usually a personal
+  preference, not something to commit for everyone.
 
 ---
 

@@ -139,6 +139,8 @@ Agents working in this codebase or utilizing Bonsai must run the compiled CLI co
 - **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
 - **List Database**: `node bin/cli.mjs list [filters] [--json]`
 - **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
+- **Ambient Session Context**: `node bin/cli.mjs context [--json]`
+- **Install Session-Start Hook**: `node bin/cli.mjs setup <claude-code|codex> [--global] [--dry-run] [--json]`
 
 Published standalone usage is `npx @taurgis/bonsai <url>` or `bonsai <url>` after installation. Do not document bare `npx bonsai` unless an unscoped npm shim is actually published.
 
@@ -148,6 +150,7 @@ Intentional CLI asymmetries to preserve:
 - `status --tier` has no default; omitting it evaluates freshness against the cached artifact's stored tier.
 - `list --artifact-type` omits `section` so listings stay page-level; `prune --artifact-type` includes `section` so cleanup can target every artifact type.
 - Short flags are command-local (`-f` is fetch format but import file; `-g` is tags on cache commands but global scope on config commands). Check command help before reusing short flags.
+- `setup <agent>` defaults to project scope (`--global` opts into user-level), the opposite of `config set`/`config unset`'s user-level default (`--local` opts into project) — a shared hook is the common per-repo case, while storage mode is usually a personal preference.
 
 ### Browser-Rendered Extraction (`--rendered`)
 
