@@ -222,6 +222,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       warn: (msg) => void this.warn(msg),
       log: (msg) => this.log(msg),
       error: (msg, opts) => this.error(msg, opts),
+      errorRow: (msg, opts) => this.error(msg, { ...opts, exit: false }),
     };
   }
 

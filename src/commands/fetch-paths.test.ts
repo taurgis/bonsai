@@ -445,20 +445,24 @@ describe('fetch command branch coverage', () => {
     expect(mocks.capturePage).not.toHaveBeenCalled();
   });
 
-  it('batch with an invalid URL row: warns with the same Code/Try this as the single-URL error', async () => {
+  it('batch with an invalid URL row: renders as an Error (not a Warning) with the same Code/Try this as the single-URL error', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
     const warnSpy = vi.spyOn(FetchCommand.prototype, 'warn').mockImplementation((input) => input);
+    const stderrSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
     const result: any = await FetchCommand.run([TEST_URL, 'not-a-valid-url']);
 
     expect(Array.isArray(result)).toBe(true);
     const failureRow = result.find((row: any) => row.error);
     expect(failureRow.error.code).toBe('INVALID_URL');
-    const warnedMessage = String(
-      warnSpy.mock.calls.find((call) => String(call[0]).includes('INVALID_URL'))?.[0]
-    );
-    expect(warnedMessage).toContain('Code: INVALID_URL');
-    expect(warnedMessage).toContain('Try this:');
+    const rendered = stderrSpy.mock.calls.map((call) => String(call[0])).join('');
+    expect(rendered).toContain('Error:');
+    expect(rendered).toContain('Code: INVALID_URL');
+    expect(rendered).toContain('Try this:');
+    // A row failure still fails the batch (exit code, JSON `ok: false`) — it must never be
+    // rendered through `warn`, which reads as "noted but not fatal".
+    expect(warnSpy.mock.calls.some((call) => String(call[0]).includes('INVALID_URL'))).toBe(false);
+    stderrSpy.mockRestore();
     warnSpy.mockRestore();
   });
 

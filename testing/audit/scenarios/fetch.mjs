@@ -294,6 +294,16 @@ export default function register(harness, fixtures) {
     expect(r.stderr.includes('Try this:'), r.stderr);
   });
 
+  // A row failure still fails the whole batch (exit 1, JSON ok:false) so it must render as an
+  // Error, never a Warning — "Warning" reads as non-fatal even though the command exits non-zero.
+  check('fetch multi-URL human mode row failure renders as Error, not Warning', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url, 'not-a-url'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('Error: Invalid URL'), r.stderr);
+    expect(!r.stderr.includes('Warning: Invalid URL'), r.stderr);
+  });
+
   // Seeds a project-free cache entry via `import` (no network), then back-dates it past its
   // standard-tier fresh window (30d) but inside grace (+14d) so a revalidation attempt is required.
   // The URL itself is the reserved `.invalid` TLD, so the revalidation's real network call fails
