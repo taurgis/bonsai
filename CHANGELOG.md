@@ -1,5 +1,82 @@
 # @taurgis/bonsai
 
+## 4.0.0
+
+### Major Changes
+
+- bccddde: **Breaking:** `list`'s default `--json`/`--toon` output contract changes — existing scripts or
+  agents that parse the previous 12-field row or read `envelope.truncation` must update (see below).
+
+  Closes four more gaps from an [AXI](https://github.com/kunchenguid/axi) agent-experience audit
+  (following `--toon` and next-step tips):
+
+  - **Content first**: running `bonsai` with no arguments at all now shows live cache data (the same
+    as `bonsai list`) instead of oclif's default root help. `bonsai help`, `--help`, and `-h` are
+    unaffected and remain the explicit path to the command reference.
+  - **Definitive empty states**: `list --json`/`--toon` now always includes a top-level `summary`
+    object with an explicit `empty` boolean, so a zero-result `data: []` is never ambiguous.
+  - **Pre-computed aggregates**: that same `summary` object reports `total`, `shown`, `limit`,
+    `truncated`, and a `byFreshness` breakdown (`fresh`/`stale_grace`/`stale_expired`) over every
+    matched entry — a cache-wide count without a second round trip. This replaces the old
+    conditionally-present `truncation` object.
+  - **Minimal default schema**: `list`'s default row is now the 4 fields an agent needs to judge
+    relevance and act next (`sourceUrls`, `topic`, `freshness`, `tokenEstimate`) instead of all 12
+    metadata fields. Pass `--full` to get every field (cache key, path, artifact type, tags, capture
+    method, quality notes, timestamps) as before.
+
+### Minor Changes
+
+- 3e1cd1c: Manual CLI audit fix: `prune` had no way to delete cached entries by `--topic` or `--tags`, even though `list` could filter on both — the only workaround was an age or URL-glob filter, which doesn't help when entries share a topic/tag across unrelated URLs. `prune` now accepts `--topic`/`--tags` with the exact same matching semantics, flag characters, and help text as `list`.
+
+  Also fixes an inconsistency in `list`'s existing filters: an empty `--topic` silently matched every entry (a no-op filter) while an empty `--tags` entry silently matched none, and neither warned. Both now reject with `INVALID_FLAG_VALUE`, the same way an empty `--url` glob already does — an empty filter value is almost always a shell-quoting mistake, not an intentional "match everything" or "match nothing". This validation now applies to `prune`'s new `--topic`/`--tags` flags too.
+
+- 53359ba: Adds `--toon`, an opt-in alternative to `--json` that encodes the identical envelope as
+  [TOON](https://toonformat.dev/) (Token-Oriented Object Notation) instead of JSON — roughly 40%
+  fewer tokens on mixed-structure data, per the format's own published benchmarks. `--toon` and
+  `--json` are mutually exclusive: passing both fails fast with `CONFLICTING_FLAGS` (exit 2)
+  rather than silently preferring one.
+
+  Also adds contextual "next step" tips to successful human-mode output on `fetch`, `status`,
+  `inspect`, and `prune` — mirroring the existing `Try this:` pattern already used on errors and
+  cache misses. A fresh `status` hit points at `inspect` for full metadata, a stale hit points at
+  re-fetching to revalidate, a successful `fetch` points at `inspect`, and a `prune --dry-run` with
+  matches points at `--yes`. Tips are suppressed under `--json`/`--toon` (the envelope's `data` is
+  self-describing) and never appear on stdout, so they never corrupt `bonsai <url> > out.md`-style
+  redirection.
+
+### Patch Changes
+
+- a69a40a: Manual CLI audit fixes for the `config` command family:
+
+  - `bonsai config get/set/list/unset --help` now names each key's accepted values (`storage (global|project), summary (conservative|balanced|aggressive)`) instead of just the bare key names, so the values are discoverable without triggering an error first.
+  - The `--global`/`--local` mutual-exclusion error (`CONFLICTING_FLAGS`) now includes an actionable suggestion, matching every other `CONFLICTING_FLAGS` error in the CLI.
+
+- 4217b04: Manual CLI audit fixes:
+
+  - `fetch --force` no longer discards a previously curated `--topic`/`--tags` when the refetch omits them — it now carries the prior values forward, matching every other refresh path (natural revalidation already preserved them via `preserveUserMetadata`). An explicit `--topic`/`--tags` on the `--force` call still overrides the stored values as before.
+  - `--rendered` fetches no longer leak Chrome's process tree (zygote, gpu-process, renderer, crashpad) when the CLI is interrupted mid-fetch (SIGINT/SIGTERM) or even on ordinary completion. Chrome is now spawned as the leader of its own process group and the whole group is killed on cleanup, and a process-level signal handler guarantees cleanup runs before the CLI exits on a signal.
+  - A fetch that automatically falls back to browser-rendered capture (no `--rendered` flag; the static extraction was insufficient) now prints a one-line human-mode note (`Note: used browser-rendered capture (static content was insufficient).`), since launching Chrome is real added latency and a real dependency that was previously invisible outside `--json`. An explicit `--rendered` still says nothing extra, since the caller already knows.
+
+- ace0862: Manual CLI audit fix:
+
+  - `fetch`/`import` now reject a `--topic` over 200 characters or a `--tags` value over 100 characters with `INVALID_METADATA_VALUE`, the same way an embedded line break is already rejected. Previously an unbounded value was accepted and stored verbatim, which made a single oversized topic/tag wrap a `list` heading line across dozens of terminal rows. `--help` for `fetch`/`import` now documents both caps.
+
+- 280af49: Manual CLI audit fixes:
+
+  - `status`/`inspect` no longer archive (rename) a corrupt cache file on disk when `--read-only`/`--plan` or `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` is active, and `fetch` no longer does it during a `--dry-run` or read-only preview. Encountering a corrupt entry during a URL lookup still warns on stderr, but the rename is itself a filesystem write, which `status` in particular documents as never happening ("Check cache status without fetching or writing"). Outside of read-only/dry-run, the existing archive-and-recover behavior is unchanged. (`import` never hit this code path and was unaffected.)
+  - Multi-URL batch messages ("Cache miss for X and N other URLs", "...and N other URL failures") now read grammatically for exactly one extra row ("1 other URL"/"1 other URL failure") instead of always pluralizing ("1 other URLs").
+
+- e1b65dc: Manual CLI audit fix: a config file (`config.json` or `.bonsai.json`) that is not valid JSON, or holds an invalid value for a known key, was silently ignored during resolution — the CLI fell back to the built-in default with no signal, unlike an invalid `BONSAI_STORAGE`/`BONSAI_SUMMARY` env var, which already warns. Bonsai now prints the same kind of warning to stderr (never stdout, so `--json` output is unaffected) naming the file and, when applicable, the offending key and value.
+- e1cd6f1: Document multi-URL batch usage in `--help`: `fetch` (URL shorthand), `status`, and `inspect` all accept space-separated `URL...` and already return per-URL results with partial-failure handling, but no `--help` example demonstrated it — a reader would have to notice the `URL...` ellipsis in the USAGE line and infer oclif's convention. Each command's examples now include one multi-URL invocation.
+- a427e85: Close a second terminal-escape-injection gap, this time in validation error text rather than cached content: raw ANSI/control bytes in a rejected `--ttl`/`--max-age`/`--older-than`/`--inactive`, an unknown `config` key or invalid value, an unparseable URL, or an unrecognized command replayed unstripped into the human-readable error message that echoes the value back for context. `BaseCommand.error()` now sanitizes the message and suggestions on the human-mode render path before handing off to oclif (the `command_not_found` hook and the argv-level "swallowed a URL as a flag value" usage error sanitize their own echoed value at the same point, since both fire before a command instance exists). `--json` output is untouched: `JSON.stringify` already escapes control characters, so the envelope keeps the value's exact fidelity.
+- e1cd6f1: Fix `list`, `inspect`, and `prune` surfacing a phantom cache entry for any foreign `*.md` file dropped into the research cache directory. `parseArtifact` defaults unrecognized frontmatter to a valid-looking shell (`cache_key: ''`, `status: 'active'`) instead of throwing, so a file that merely has `---`/`---` fences but no Bonsai fields — an unrelated note, a stray README, a different tool's output — was previously treated as a real, "active" cached artifact: it showed up in `list` and matched `prune --artifact-type source` with no usable cache key or source URL to target it individually. Both scan paths (`scanCacheDir`, used by `prune`, and the `.search-index.json` sidecar loader, used by `list`/`inspect`) now exclude any parsed artifact with an empty `cache_key`, matching the same "not ours" signal `findArtifact`'s single-key lookup already relied on.
+- a7f9ccf: Manual CLI audit fix: a per-URL failure in a multi-URL `fetch`, `status`, or `inspect` batch (e.g. `bonsai https://ok.example https://blocked.example`) now renders as an `Error:` in human-readable output, matching the same failure standalone. Previously it was demoted to `Warning:` purely to avoid aborting the rest of the batch, which misleadingly read as non-fatal even though the row still fails the command (non-zero exit code, `ok: false`/error code in `--json`). The row still doesn't abort the batch — it now uses oclif's non-throwing `error(..., { exit: false })` renderer instead of `warn`, which prints the identical `Error: … / Code: … / Try this: …` block without stopping the loop. A genuine cache-miss row on `status`/`inspect` still renders as `Warning:`, since that's merely informational, not a failure of the lookup itself.
+
+  The same mislabeling existed in `prune`: a single entry that fails to delete (e.g. a permission error) still flips the whole command to exit 1, but was reported as `Warning: Failed to delete cache file ...`. It now renders as `Error:` too, while the remaining prune candidates still get processed.
+
+- db06d2d: Close a frontmatter-corruption gap: an agent-supplied `--topic` or `--tags` value containing a raw newline was stored verbatim into the cached artifact's YAML-style frontmatter, which is one field per line. A newline could inject a bogus extra line — at worst a spoofed `key: value` pair, or a bare `---` that closed the frontmatter fence early and spliced the rest of the metadata (and even body sections) into what the parser then treated as free text, silently losing `tags`, `capture_method`, `content_hash`, `token_estimate`, and other fields. `fetch`/`import` now reject a `--topic`/`--tags` value containing a line break with a new `INVALID_METADATA_VALUE` error before any cache write is attempted, and the frontmatter serializer itself collapses embedded newlines to a space as defense in depth for any other caller.
+- e285e83: Close a terminal-escape-injection gap: raw ANSI/control bytes embedded in a fetched or imported page's visible text (or in an agent-supplied `--topic`, or in a page's Markdown headings used for section chunking) survived untouched into cached content and metadata, then replayed verbatim to the terminal on every later `bonsai <url>`, `list`, `inspect`, `prune --dry-run`, or even the multi-source `import` success message itself. Fetched/imported content is now stripped of unsafe control bytes at the same choke point that already redacts embedded prompt-injection instructions (`sanitizePromptInjection`), and human-readable `topic`/section-heading rendering strips them again at display time as defense in depth. `--json` output was never affected (`JSON.stringify` already escapes control characters).
+
 ## 3.2.2
 
 ### Patch Changes
