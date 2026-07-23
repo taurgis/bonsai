@@ -256,9 +256,12 @@ export default function register(harness, fixtures) {
     expect(env?.data?.[1]?.error?.code === 'INVALID_URL', JSON.stringify(env?.data?.[1]));
   });
 
-  // A batch row failure must be exactly as actionable as the same error standalone: Code: and
-  // Try this: lines, not just a bare warning message.
-  check('status multi-URL human mode row failure includes Code and Try this', () => {
+  // A batch row failure must be exactly as actionable as the same error standalone (Code: and Try
+  // this: lines, not just a bare message), and must render as an Error, never a Warning — a row
+  // failure still fails the whole batch (exit 1, JSON ok:false/CACHE_MISS-or-error code), so
+  // "Warning" would misleadingly read as non-fatal next to the genuinely informational cache-miss
+  // warning on the same line above it.
+  check('status multi-URL human mode row failure renders as Error with Code and Try this', () => {
     const ws = createWorkspace();
     const hitUrl = 'https://example.com/audit-status-batch-invalid-human';
     const imported = run(['import', hitUrl, '--stdin', '--json'], {
@@ -270,6 +273,8 @@ export default function register(harness, fixtures) {
 
     const r = run(['status', hitUrl, 'not-a-url'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('Error: Invalid URL'), r.stderr);
+    expect(!r.stderr.includes('Warning: Invalid URL'), r.stderr);
     expect(r.stderr.includes('Code: INVALID_URL'), r.stderr);
     expect(r.stderr.includes('Try this:'), r.stderr);
   });

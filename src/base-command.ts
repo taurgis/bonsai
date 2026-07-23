@@ -13,12 +13,7 @@ import {
   EXIT_OK,
   EXIT_STALE_SERVED,
 } from './lib/cli-error-policy.js';
-import {
-  buildEnvelope,
-  enrichCacheMissEnvelope,
-  enrichRowErrorEnvelope,
-  formatErrorForJson,
-} from './lib/envelope.js';
+import { buildEnvelope, enrichCacheMissEnvelope, enrichRowErrorEnvelope } from './lib/envelope.js';
 import { enrichParseError } from './lib/parse-error-ux.js';
 import {
   resolveResearchTarget,
@@ -122,11 +117,12 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         options = { ...options, suggestions: options.suggestions.map(sanitizeForTerminal) };
       }
     }
-    // Nothing in this codebase passes `exit: false` today, but the override must still accept it
-    // (oclif's own `error()` does) to stay a valid override of the base Command method. Destructure
-    // `exit` into its own binding so narrowing it to the `false` literal actually narrows the object
-    // passed to `super.error()` into each of oclif's two overloads — narrowing a property read alone
-    // (`options.exit === false`) doesn't narrow the enclosing object's type, only a local variable's.
+    // `exit: false` is oclif's non-throwing error render (see `errorRow` on the CliIo port and
+    // `mapUrlsAllowingBatchErrors`/prune's per-row failures, all of which route through here for the
+    // same terminal-injection sanitization above). Destructure `exit` into its own binding so
+    // narrowing it to the `false` literal actually narrows the object passed to `super.error()` into
+    // each of oclif's two overloads — narrowing a property read alone (`options.exit === false`)
+    // doesn't narrow the enclosing object's type, only a local variable's.
     const { exit, ...rest } = options;
     if (exit === false) return super.error(input, { ...rest, exit });
     return super.error(input, { ...rest, exit });
@@ -222,6 +218,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       warn: (msg) => void this.warn(msg),
       log: (msg) => this.log(msg),
       error: (msg, opts) => this.error(msg, opts),
+      errorRow: (msg, opts) => this.error(msg, { ...opts, exit: false }),
     };
   }
 
@@ -293,9 +290,11 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         results.push(fn(url));
       } catch (err) {
         if (!batch || !(err instanceof Errors.CLIError)) throw err;
-        // Mirror the single-URL error format (message + Code: + Try this:) rather than a bare
-        // message, so a row failure in a batch is exactly as actionable as it is standalone.
-        if (!this.jsonEnabled()) this.warn(formatErrorForJson(err));
+        // Render with the same "Error:" formatting as a single-URL failure (this.error's exit:false
+        // form prints the CLIError's own message/Code/Try this and returns instead of throwing) rather
+        // than this.warn, since a row failure still fails the command overall (status/inspect batch
+        // exit code, JSON ok:false) and should never read as merely a warning.
+        if (!this.jsonEnabled()) this.error(err, { exit: false });
         results.push(failureRow(url, err));
       }
     }

@@ -22,6 +22,13 @@ export interface CliIo {
   warn(msg: string): void;
   log(msg: string): void;
   error(msg: string, opts: CliErrorOptions): never;
+  /**
+   * Print one row of a batch failure with the same "Error: … / Code: … / Try this: …" rendering as
+   * {@link error}, but without exiting the process — a batch (`fetch url1 url2`) must keep
+   * processing the remaining rows after one fails. Using `warn` for this mislabels a real failure
+   * as non-fatal even though the row still flips the command's exit code and JSON `ok` to false.
+   */
+  errorRow(msg: string, opts: Omit<CliErrorOptions, 'exit'>): void;
 }
 
 /**

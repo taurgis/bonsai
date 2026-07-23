@@ -157,7 +157,12 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
         unlinkSync(f.path);
         prunedCount++;
       } catch (err) {
-        this.warn(`Failed to delete cache file ${f.path}: ${(err as Error).message}`);
+        // A failed unlink still flips the command to exit 1 (see the caller's comment), so it must
+        // render as an Error, not a Warning — this.error's exit:false form prints the same "Error: …"
+        // line and returns instead of throwing, so the remaining candidates still get processed.
+        this.error(`Failed to delete cache file ${f.path}: ${(err as Error).message}`, {
+          exit: false,
+        });
       }
     }
     return prunedCount;

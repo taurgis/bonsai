@@ -3,7 +3,6 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { finalizeBatch } from '../batch.js';
-import { formatErrorForJson } from '../envelope.js';
 import type { StorageMode, SummaryLevel } from '../config/index.js';
 import { loadSummaryLevel } from '../config/index.js';
 import {
@@ -350,10 +349,17 @@ function failureRowOrRethrow(url: string, err: unknown, run: FetchRun) {
     err instanceof Errors.CLIError
       ? buildFetchFailureResult({ url, dryRun, err })
       : buildFetchFailureFromCaught(io.bin, url, err, dryRun);
-  // Human batches only get the spinner "failed" label unless we echo the reason. Mirror the
-  // single-URL error format (message + Code: + Try this:) rather than a bare message, so a row
-  // failure in a batch is exactly as actionable as it is standalone.
-  if (!io.json) io.warn(formatErrorForJson(row.error));
+  // Human batches only get the spinner "failed" label unless we echo the reason. Render it with
+  // the same "Error:" formatting as a single-URL failure (io.errorRow reuses oclif's own
+  // exit:false renderer) rather than io.warn, since a row failure still fails the command overall
+  // and should never read as merely a warning.
+  if (!io.json) {
+    io.errorRow(row.error.message, {
+      code: row.error.code,
+      suggestions: row.error.suggestions,
+      ref: row.error.ref,
+    });
+  }
   return row;
 }
 

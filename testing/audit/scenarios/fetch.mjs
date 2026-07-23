@@ -284,12 +284,16 @@ export default function register(harness, fixtures) {
     );
   });
 
-  // A batch row failure must be exactly as actionable as the same error standalone: Code: and
-  // Try this: lines, not just a bare message (the single-URL form already includes both).
-  check('fetch multi-URL human mode row failure includes Code and Try this', () => {
+  // A batch row failure must be exactly as actionable as the same error standalone (Code: and Try
+  // this: lines, not just a bare message), and must render as an Error, never a Warning — a row
+  // failure still fails the whole batch (exit 1, JSON ok:false), so "Warning" would misleadingly
+  // read as non-fatal.
+  check('fetch multi-URL human mode row failure renders as Error with Code and Try this', () => {
     const { ws, url } = seedFetchCache();
     const r = run([url, 'not-a-url'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    expect(r.stderr.includes('Error: Invalid URL'), r.stderr);
+    expect(!r.stderr.includes('Warning: Invalid URL'), r.stderr);
     expect(r.stderr.includes('Code: INVALID_URL'), r.stderr);
     expect(r.stderr.includes('Try this:'), r.stderr);
   });
