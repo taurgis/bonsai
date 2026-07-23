@@ -230,6 +230,16 @@ describe('fetch command branch coverage', () => {
       expect(warnSpy.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
         expect.stringContaining('--format detailed')
       );
+
+      // A page short enough that compression can't shrink it (below the summarizer's token floor,
+      // no links/images to strip): format is still 'compressed', but nothing was actually truncated.
+      warnSpy.mockClear();
+      mocks.capturePage.mockResolvedValue(fakeCapture('# Guide\n\nShort content.'));
+      const shortCompressed: any = await FetchCommand.run([TEST_URL, '--force']);
+      expect(shortCompressed.detailedTokenEstimate).toBe(shortCompressed.tokenEstimate);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
+        expect.stringContaining('--format detailed')
+      );
     } finally {
       warnSpy.mockRestore();
     }

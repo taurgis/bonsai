@@ -25,7 +25,7 @@ import {
   emptyTopicFilterError,
   emptyTagsFilterError,
 } from '../lib/research/metadata-filters.js';
-import { colors } from '../lib/color.js';
+import { colors, FRESHNESS_COLOR } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
 import type { ListRow, ListRowMinimal, ListSummary } from '../lib/cli-result-types.js';
 
@@ -226,13 +226,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       const keyStr = colors.bold(res.cacheKey);
       this.log(`${index + 1}. [${topicStr}] Key: ${keyStr}`);
 
-      const freshnessColorMap: Record<ListRow['freshness'], (t: string) => string> = {
-        fresh: colors.green,
-        stale_grace: colors.yellow,
-        stale_expired: colors.red,
-      };
-      const freshnessColor = freshnessColorMap[res.freshness];
-      const freshnessStr = freshnessColor(res.freshness);
+      const freshnessStr = FRESHNESS_COLOR[res.freshness](res.freshness);
 
       this.log(`   Type: ${colors.bold(res.artifactType)} | Freshness: ${freshnessStr}`);
       this.log(

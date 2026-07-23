@@ -7,11 +7,11 @@ const spec: SessionStartHookSpec = {
   matcher: 'startup|resume|clear|compact',
   command: 'bonsai context',
   timeout: 10,
-  markerSuffix: 'context',
+  managedBy: 'bonsai',
 };
 
 describe('planSessionStartHookInstall', () => {
-  it('creates a new hook file from scratch', () => {
+  it('creates a new hook file from scratch, tagging the handler as Bonsai-managed', () => {
     const plan = planSessionStartHookInstall(null, spec);
     expect(plan.status).toBe('installed');
     expect(JSON.parse(plan.content)).toEqual({
@@ -19,7 +19,9 @@ describe('planSessionStartHookInstall', () => {
         SessionStart: [
           {
             matcher: spec.matcher,
-            hooks: [{ type: 'command', command: 'bonsai context', timeout: 10 }],
+            hooks: [
+              { type: 'command', command: 'bonsai context', timeout: 10, managedBy: 'bonsai' },
+            ],
           },
         ],
       },
@@ -57,6 +59,7 @@ describe('planSessionStartHookInstall', () => {
     expect(repaired.status).toBe('repaired');
     const parsed = JSON.parse(repaired.content);
     expect(parsed.hooks.SessionStart[0].hooks[0].command).toBe('node "/new/path/cli.mjs" context');
+    expect(parsed.hooks.SessionStart[0].hooks[0].managedBy).toBe('bonsai');
     expect(parsed.hooks.SessionStart[0].matcher).toBe(spec.matcher);
   });
 
@@ -75,13 +78,17 @@ describe('planSessionStartHookInstall', () => {
     expect(parsed.hooks.SessionStart[0].hooks[0].command).toBe('./load-context.sh');
   });
 
-  it('does not mistake a command that merely ends with the marker substring for a Bonsai entry', () => {
-    // "load_context" ends with the letters "context" but is not the marker *word* — a naive
-    // substring `.endsWith('context')` check would wrongly claim (and later overwrite) this.
+  it('does not mistake an untagged hook for a Bonsai entry even when its command ends in the same word', () => {
+    // A user's own hook (no `managedBy` tag) that happens to end in " context" — e.g. a wrapped
+    // command like `echo ready && bonsai context` — must never be identified as Bonsai's own entry
+    // by command text alone. Only the explicit `managedBy` tag does that now.
     const existing = JSON.stringify({
       hooks: {
         SessionStart: [
-          { matcher: 'startup', hooks: [{ type: 'command', command: './load_context' }] },
+          {
+            matcher: 'startup',
+            hooks: [{ type: 'command', command: 'echo ready && bonsai context' }],
+          },
         ],
       },
     });
@@ -89,7 +96,9 @@ describe('planSessionStartHookInstall', () => {
     expect(plan.status).toBe('installed');
     const parsed = JSON.parse(plan.content);
     expect(parsed.hooks.SessionStart).toHaveLength(2);
-    expect(parsed.hooks.SessionStart[0].hooks[0].command).toBe('./load_context');
+    expect(parsed.hooks.SessionStart[0].hooks[0].command).toBe('echo ready && bonsai context');
+    expect(parsed.hooks.SessionStart[0].hooks[0].managedBy).toBeUndefined();
+    expect(parsed.hooks.SessionStart[1].hooks[0].managedBy).toBe('bonsai');
   });
 
   it('throws InvalidHookFileError on malformed JSON rather than overwriting it', () => {

@@ -1,7 +1,8 @@
-import { Command, Flags, toConfiguredId } from '@oclif/core';
+import { Command, toConfiguredId } from '@oclif/core';
 import { BaseCommand } from '../../base-command.js';
 import { isKnownKey, suggestKey, validKeysHint } from '../../lib/config/index.js';
 import type { ConfigKey, ConfigScope } from '../../lib/config/index.js';
+import { assertScopeFlagsExclusive, scopeFlags } from '../../lib/scope-flags.js';
 
 /**
  * Shared base for the four `config` subcommands: the mutually-exclusive
@@ -9,13 +10,7 @@ import type { ConfigKey, ConfigScope } from '../../lib/config/index.js';
  */
 export abstract class ConfigCommand<T extends typeof Command> extends BaseCommand<T> {
   protected assertScopeFlagsExclusive(global?: boolean, local?: boolean): void {
-    if (global && local) {
-      this.error('--global and --local are mutually exclusive.', {
-        exit: 2,
-        code: 'CONFLICTING_FLAGS',
-        suggestions: ['Pass --global or --local, not both.'],
-      });
-    }
+    assertScopeFlagsExclusive(this.error.bind(this), global, local);
   }
 
   /** `--local` writes/reads the project file; otherwise the user-level file. */
@@ -68,13 +63,4 @@ export abstract class ConfigCommand<T extends typeof Command> extends BaseComman
 }
 
 /** Build the `--global`/`--local` scope-flag pair with per-command descriptions. */
-export function configScopeFlags(descriptions: { global: string; local: string }) {
-  return {
-    global: Flags.boolean({ char: 'g', description: descriptions.global }),
-    local: Flags.boolean({
-      description: descriptions.local,
-      aliases: ['project'],
-      charAliases: ['p'],
-    }),
-  };
-}
+export const configScopeFlags = scopeFlags;

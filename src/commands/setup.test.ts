@@ -102,6 +102,16 @@ describe('setup command', () => {
     });
   });
 
+  it('suggests "claude-code" for the short prefix typo "claude", beyond plain edit-distance', async () => {
+    // "claude" is a prefix of "claude-code" but its Levenshtein distance (5) exceeds the general
+    // fuzzy threshold for a 6-character input (3) — a prefix check is required to catch this.
+    await expect(Setup.run(['claude'])).rejects.toMatchObject({
+      oclif: { exit: 2 },
+      code: 'UNKNOWN_AGENT',
+      message: expect.stringContaining('Did you mean "claude-code"'),
+    });
+  });
+
   it('gives a targeted, non-guessing message for opencode', async () => {
     await expect(Setup.run(['opencode'])).rejects.toMatchObject({
       oclif: { exit: 2 },

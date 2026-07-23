@@ -730,6 +730,9 @@
           "aliases": [
             "project"
           ],
+          "charAliases": [
+            "p"
+          ],
           "description": "install to the project config (default; explicit form of the default)",
           "name": "local",
           "allowNo": false,

@@ -2,14 +2,8 @@ import { BaseCommand } from '../base-command.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { buildContextDashboard } from '../lib/research/context-dashboard.js';
 import { NO_TOPIC_LABEL, formatTip, pluralize, sanitizeForTerminal } from '../lib/text.js';
-import { colors } from '../lib/color.js';
+import { colors, FRESHNESS_COLOR } from '../lib/color.js';
 import type { ContextDashboard } from '../lib/cli-result-types.js';
-
-const FRESHNESS_COLOR: Record<'fresh' | 'stale_grace' | 'stale_expired', (t: string) => string> = {
-  fresh: colors.green,
-  stale_grace: colors.yellow,
-  stale_expired: colors.red,
-};
 
 /**
  * Compact, directory-scoped cache summary (AXI principle 7: ambient session-start context).

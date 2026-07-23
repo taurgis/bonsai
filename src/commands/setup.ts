@@ -8,7 +8,8 @@ import { resolveBinCommand } from '../lib/setup/bin-command.js';
 import {
   SETUP_AGENTS,
   SETUP_AGENT_TARGETS,
-  SETUP_HOOK_MARKER_SUFFIX,
+  SETUP_HOOK_COMMAND_SUFFIX,
+  SETUP_HOOK_MANAGED_BY,
 } from '../lib/setup/agents.js';
 import {
   InvalidHookFileError,
@@ -16,10 +17,26 @@ import {
   type HookInstallPlan,
 } from '../lib/setup/hook-file-io.js';
 import { closestMatch, maxFuzzyDistance } from '../lib/text.js';
+import { assertScopeFlagsExclusive, scopeFlags } from '../lib/scope-flags.js';
 import type { SetupAgent, SetupResult } from '../lib/cli-result-types.js';
 
 function isSetupAgent(value: string): value is SetupAgent {
   return (SETUP_AGENTS as readonly string[]).includes(value);
+}
+
+/**
+ * Nearest known agent for a typo'd `agentArg`, or `null` if nothing plausible matches. Checks a
+ * prefix relationship first (either direction) so a short, valid-looking typo like `claude` for
+ * `claude-code` is caught even though its edit distance to the full name exceeds the general
+ * Levenshtein threshold; falls back to edit distance for closer misspellings like `codexx`.
+ */
+function suggestAgent(agentArg: string): SetupAgent | null {
+  const prefixMatch = SETUP_AGENTS.find(
+    (agent) => agent.startsWith(agentArg) || agentArg.startsWith(agent)
+  );
+  if (prefixMatch) return prefixMatch;
+  // closestMatch's candidates are exactly SETUP_AGENTS, so any non-null result is a SetupAgent.
+  return closestMatch(agentArg, SETUP_AGENTS, maxFuzzyDistance(agentArg)) as SetupAgent | null;
 }
 
 /** Maps a plan outcome to the reported status, remapping write outcomes to `would_*` under dry-run. */
@@ -77,13 +94,9 @@ export default class Setup extends BaseCommand<typeof Setup> {
   };
 
   static flags = {
-    global: Flags.boolean({
-      char: 'g',
-      description: 'install to the user-level config instead of the project (default: project)',
-    }),
-    local: Flags.boolean({
-      description: 'install to the project config (default; explicit form of the default)',
-      aliases: ['project'],
+    ...scopeFlags({
+      global: 'install to the user-level config instead of the project (default: project)',
+      local: 'install to the project config (default; explicit form of the default)',
     }),
     'dry-run': Flags.boolean({
       description: 'preview the install without writing anything',
@@ -95,8 +108,6 @@ export default class Setup extends BaseCommand<typeof Setup> {
 
   private assertKnownAgent(agentArg: string): asserts agentArg is SetupAgent {
     if (isSetupAgent(agentArg)) return;
-    const suggestion = closestMatch(agentArg, SETUP_AGENTS, maxFuzzyDistance(agentArg));
-    const hint = suggestion ? ` Did you mean "${suggestion}"?` : '';
     if (agentArg === 'opencode') {
       this.error(
         'OpenCode is not supported by `setup` yet: its plugin hook signature for injecting ' +
@@ -105,6 +116,8 @@ export default class Setup extends BaseCommand<typeof Setup> {
         { exit: 2, code: 'UNKNOWN_AGENT', suggestions: [`Use one of: ${SETUP_AGENTS.join(', ')}`] }
       );
     }
+    const suggestion = suggestAgent(agentArg);
+    const hint = suggestion ? ` Did you mean "${suggestion}"?` : '';
     this.error(
       `Unknown agent: "${agentArg}".${hint} Supported agents: ${SETUP_AGENTS.join(', ')}.`,
       {
@@ -117,20 +130,10 @@ export default class Setup extends BaseCommand<typeof Setup> {
     );
   }
 
-  private assertScopeFlagsExclusive(): void {
-    if (this.flags.global && this.flags.local) {
-      this.error('--global and --local are mutually exclusive.', {
-        exit: 2,
-        code: 'CONFLICTING_FLAGS',
-        suggestions: ['Pass --global or --local, not both.'],
-      });
-    }
-  }
-
   async run(): Promise<SetupResult> {
     const agentArg = this.args.agent;
     this.assertKnownAgent(agentArg);
-    this.assertScopeFlagsExclusive();
+    assertScopeFlagsExclusive(this.error.bind(this), this.flags.global, this.flags.local);
 
     const target = SETUP_AGENT_TARGETS[agentArg];
     const scope: SetupResult['scope'] = this.flags.global ? 'user' : 'project';
@@ -138,7 +141,7 @@ export default class Setup extends BaseCommand<typeof Setup> {
     const path = join(root, target.relativePath);
 
     const binCommand = resolveBinCommand(process.argv[1] ?? this.config.bin);
-    const command = `${binCommand} ${SETUP_HOOK_MARKER_SUFFIX}`;
+    const command = `${binCommand} ${SETUP_HOOK_COMMAND_SUFFIX}`;
 
     const existingContent = existsSync(path) ? readFileSync(path, 'utf-8') : null;
     let plan;
@@ -148,7 +151,7 @@ export default class Setup extends BaseCommand<typeof Setup> {
         matcher: target.matcher,
         command,
         timeout: target.timeout,
-        markerSuffix: SETUP_HOOK_MARKER_SUFFIX,
+        managedBy: SETUP_HOOK_MANAGED_BY,
       });
     } catch (err) {
       if (err instanceof InvalidHookFileError) {

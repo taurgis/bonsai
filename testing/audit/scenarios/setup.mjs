@@ -74,6 +74,31 @@ export default function register(harness, fixtures) {
     expect(readFileSync(path, 'utf-8') === before, 'file untouched on no-op re-run');
   });
 
+  check('setup repairs a stale command in place without touching an unrelated hook already in the file', () => {
+    const ws = createWorkspace();
+    run(['setup', 'claude-code', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const path = join(ws.cwd, '.claude', 'settings.json');
+    const seeded = JSON.parse(readFileSync(path, 'utf-8'));
+    // Add a hand-authored, unrelated hook alongside Bonsai's, then go stale to force a repair.
+    seeded.hooks.PreToolUse = [{ matcher: 'Bash', hooks: [{ type: 'command', command: 'echo hi' }] }];
+    seeded.hooks.SessionStart[0].hooks[0].command = 'node "/old/stale/path.mjs" context';
+    writeFileSync(path, JSON.stringify(seeded));
+
+    const r = run(['setup', 'claude-code', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const data = parseJson(r.stdout)?.data;
+    expect(data?.status === 'repaired', `status ${data?.status}`);
+    const written = JSON.parse(readFileSync(path, 'utf-8'));
+    expect(
+      !written.hooks.SessionStart[0].hooks[0].command.includes('/old/stale/path.mjs'),
+      `command ${written.hooks.SessionStart[0].hooks[0].command}`
+    );
+    expect(
+      JSON.stringify(written.hooks.PreToolUse) ===
+        JSON.stringify([{ matcher: 'Bash', hooks: [{ type: 'command', command: 'echo hi' }] }]),
+      `PreToolUse ${JSON.stringify(written.hooks.PreToolUse)}`
+    );
+  });
+
   check('setup --dry-run previews without writing anything', () => {
     const ws = createWorkspace();
     const r = run(['setup', 'claude-code', '--dry-run', '--json'], { cwd: ws.cwd, xdg: ws.xdg });

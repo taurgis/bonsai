@@ -3,6 +3,8 @@ interface HookHandler {
   type: string;
   command: string;
   timeout?: number;
+  /** Set to `spec.managedBy` on every handler Bonsai installs; absent on anyone else's. */
+  managedBy?: string;
   [extra: string]: unknown;
 }
 
@@ -22,11 +24,12 @@ export interface SessionStartHookSpec {
   command: string;
   timeout: number;
   /**
-   * Suffix a `command` string must end with to be recognized as Bonsai's own entry (rather than
-   * some unrelated hook a user already configured). All of Bonsai's setup-installed commands end
-   * in `context`, so that's what identifies "this is ours" for idempotent repair.
+   * Tag stamped on the installed handler (e.g. `"bonsai"`) so a later run can find *this exact*
+   * entry to repair or leave alone, without guessing from `command` text — a user's own hook could
+   * otherwise end in the same word Bonsai's command does (e.g. a wrapped `... && bonsai context`)
+   * and get silently claimed and overwritten.
    */
-  markerSuffix: string;
+  managedBy: string;
 }
 
 /** Outcome of planning a hook-file install: what changed, and the file content to persist. */
@@ -42,22 +45,8 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/**
- * Whether `command`'s trailing word is exactly `markerSuffix` — a substring match alone would
- * false-positive on an unrelated command that merely ends with the same letters (e.g. a user's own
- * `load_context` hook), silently claiming and overwriting it as Bonsai's.
- */
-function endsWithMarkerWord(command: string, markerSuffix: string): boolean {
-  const trimmed = command.trim();
-  return trimmed === markerSuffix || trimmed.endsWith(` ${markerSuffix}`);
-}
-
-function isBonsaiHandler(handler: unknown, markerSuffix: string): handler is HookHandler {
-  return (
-    isPlainObject(handler) &&
-    typeof handler.command === 'string' &&
-    endsWithMarkerWord(handler.command, markerSuffix)
-  );
+function isBonsaiHandler(handler: unknown, managedBy: string): handler is HookHandler {
+  return isPlainObject(handler) && handler.managedBy === managedBy;
 }
 
 function serialize(root: Record<string, unknown>): string {
@@ -110,7 +99,7 @@ export function planSessionStartHookInstall(
 
   for (const group of eventGroups) {
     if (!isPlainObject(group) || !Array.isArray(group.hooks)) continue;
-    const index = group.hooks.findIndex((handler) => isBonsaiHandler(handler, spec.markerSuffix));
+    const index = group.hooks.findIndex((handler) => isBonsaiHandler(handler, spec.managedBy));
     if (index === -1) continue;
 
     const existingHandler = group.hooks[index] as HookHandler;
@@ -127,7 +116,9 @@ export function planSessionStartHookInstall(
 
   eventGroups.push({
     matcher: spec.matcher,
-    hooks: [{ type: 'command', command: spec.command, timeout: spec.timeout }],
+    hooks: [
+      { type: 'command', command: spec.command, timeout: spec.timeout, managedBy: spec.managedBy },
+    ],
   });
   hooks[spec.eventName] = eventGroups;
   root.hooks = hooks;
