@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createHash } from 'node:crypto';
 import { dirname } from 'node:path';
+import { Config } from '@oclif/core';
 import ResearchInspect from './inspect.js';
 import ResearchImport from './import.js';
 import { writeArtifact, readArtifact } from '../lib/research/storage.js';
@@ -41,6 +42,30 @@ describe('inspect command unit tests', () => {
     expect(result.metadata.artifact_type).toBe('source');
 
     readSpy.mockRestore();
+  });
+
+  it('tips toward status on a cache hit in human mode, and suppresses it under --json', async () => {
+    const bin = (await Config.load()).bin;
+
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Inspect Tip Notes');
+    await ResearchImport.run(['https://example.com/inspect-tip', '--stdin']);
+    readSpy.mockRestore();
+
+    const warnSpy = vi.spyOn(ResearchInspect.prototype as any, 'warn').mockImplementation(() => '');
+    try {
+      await ResearchInspect.run(['https://example.com/inspect-tip']);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).toEqual([
+        `Tip: ${bin} status https://example.com/inspect-tip to check freshness.`,
+      ]);
+
+      warnSpy.mockClear();
+      await ResearchInspect.run(['https://example.com/inspect-tip', '--json']);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   it('rejects an invalid URL with exit 2', async () => {

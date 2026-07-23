@@ -41,6 +41,12 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "topic": {
           "char": "t",
           "description": "main research topic for metadata (max 200 chars)",
@@ -191,6 +197,12 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "stdin": {
           "description": "read Markdown from stdin",
           "name": "stdin",
@@ -330,6 +342,12 @@
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,
@@ -379,6 +397,12 @@
           ],
           "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
           "allowNo": false,
           "type": "boolean"
         },
@@ -502,6 +526,12 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "older-than": {
           "description": "content age threshold (fetched_at, else validated_at), e.g. \"30d\"",
           "name": "older-than",
@@ -618,6 +648,12 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "tier": {
           "description": "freshness tier policy to evaluate; when omitted, uses the cached entry's own tier",
           "name": "tier",
@@ -687,6 +723,12 @@
           "name": "read-only",
           "allowNo": false,
           "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,
@@ -734,6 +776,12 @@
           ],
           "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
           "allowNo": false,
           "type": "boolean"
         },
@@ -795,6 +843,12 @@
           ],
           "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
           "allowNo": false,
           "type": "boolean"
         },
@@ -870,6 +924,12 @@
           "allowNo": false,
           "type": "boolean"
         },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        },
         "global": {
           "char": "g",
           "description": "write user-level config (default)",
@@ -940,6 +1000,12 @@
           ],
           "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
           "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
           "allowNo": false,
           "type": "boolean"
         },

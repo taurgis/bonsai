@@ -184,6 +184,30 @@ describe('fetch command branch coverage', () => {
     expect(existsSync(getArtifactPath(await globalDataDir(), result.cache.key))).toBe(true);
   });
 
+  it('tips toward inspect after a successful cache write, but not on --dry-run or --json', async () => {
+    const bin = (await Config.load()).bin;
+    mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+    const warnSpy = vi.spyOn(FetchCommand.prototype as any, 'warn').mockImplementation(() => '');
+    try {
+      await FetchCommand.run([TEST_URL]);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).toContainEqual(
+        `Tip: ${bin} inspect ${normalizeUrl(TEST_URL)} for cached metadata.`
+      );
+
+      warnSpy.mockClear();
+      await FetchCommand.run([TEST_URL, '--force', '--dry-run']);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
+        expect.stringContaining('Tip:')
+      );
+
+      warnSpy.mockClear();
+      await FetchCommand.run([TEST_URL, '--force', '--json']);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
   it('cache HIT fresh: serves from cache without fetching', async () => {
     seedCachedArtifact(await globalDataDir(), new Date());
 
@@ -621,7 +645,11 @@ describe('fetch command branch coverage', () => {
 
     await FetchCommand.run([TEST_URL]);
 
-    expect(warnSpy).not.toHaveBeenCalled();
+    // The only expected stderr side effect on a clean, successful fetch is the next-step tip
+    // (see the dedicated tip test above) — no quality-warning noise alongside it.
+    expect(warnSpy.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
+      expect.stringContaining(normalizeUrl(TEST_URL) + ':')
+    );
     warnSpy.mockRestore();
   });
 

@@ -19,6 +19,22 @@ export function corruptArtifact(path) {
   writeFileSync(path, 'no frontmatter fence at all\njust garbage', 'utf8');
 }
 
+/**
+ * Undo oclif's own terminal-width word-wrapping of `Errors.warn()` output so an assertion on a long
+ * human-mode warning can match it as one continuous sentence (the message itself is unwrapped and
+ * correct; only its on-screen rendering varies by width). oclif re-prefixes every wrapped line —
+ * including the first — with a `›` bullet, so a plain whitespace collapse alone would leave that
+ * marker embedded mid-sentence; strip it per line before rejoining.
+ */
+export function flattenWhitespace(text) {
+  return text
+    .split('\n')
+    .map((line) => line.replace(/^\s*›\s*/, ''))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /** Whether the artifact's cache directory contains a `.corrupt.<timestamp>` archive sibling. */
 export function hasArchivedCorruptSibling(path) {
   return readdirSync(dirname(path)).some((f) => f.includes('.corrupt.'));

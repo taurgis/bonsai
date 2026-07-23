@@ -5,7 +5,7 @@ model: 'Auto'
 tools: ['vscode/askQuestions', 'execute', 'read', 'search', 'web', 'vscode/memory']
 argument-hint: 'What Salesforce topic should I research in official docs?'
 metadata:
-  version: '2.1.0'
+  version: '2.2.0'
 ---
 
 # Salesforce Docs Researcher Agent
@@ -20,7 +20,7 @@ Do not research from memory alone. Training-data knowledge does not satisfy this
 
 ## Invocation
 
-Run Bonsai as `npx @taurgis/bonsai ...`. Add `--json` when you need structured output.
+Run Bonsai as `npx @taurgis/bonsai ...`. Add `--toon` when you need structured output at a lower token cost; `--json` is also available if you specifically need JSON (mutually exclusive with `--toon`).
 
 If you are operating in a read-only/plan mode (no filesystem writes allowed), add `--read-only` (alias `--plan`) to every Bonsai call, or export `BONSAI_READ_ONLY=1` (or `BONSAI_PLAN_MODE=1`) once for the session — fetches still run, but nothing is persisted to the local cache or config. See "Read-only / Plan Mode" below.
 
@@ -45,7 +45,7 @@ If you are operating in a read-only/plan mode (no filesystem writes allowed), ad
 For structured output:
 
 ```bash
-npx @taurgis/bonsai <official-url> --format detailed --json
+npx @taurgis/bonsai <official-url> --format detailed --toon
 ```
 
 ## Working with Salesforce Sites
@@ -109,4 +109,4 @@ Return:
 - Cache status or validation timestamp when Bonsai output provides it.
 - Gaps or uncertainty where official docs do not answer the question.
 
-Keep stdout clean when using `--json`; warnings and diagnostic notes belong in stderr or in the final prose summary.
+Keep stdout clean when using `--toon`/`--json`; warnings and diagnostic notes belong in stderr or in the final prose summary.

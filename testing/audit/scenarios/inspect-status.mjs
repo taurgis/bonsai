@@ -1,4 +1,4 @@
-import { ageArtifact, corruptArtifact, hasArchivedCorruptSibling } from '../helpers.mjs';
+import { ageArtifact, corruptArtifact, hasArchivedCorruptSibling, flattenWhitespace } from '../helpers.mjs';
 
 /** inspect and status cache miss / hit behavior. */
 export default function register(harness, fixtures) {
@@ -438,6 +438,67 @@ export default function register(harness, fixtures) {
     const r = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(parseJson(r.stdout)?.data?.status === 'miss', r.stdout);
     expect(hasArchivedCorruptSibling(path), 'corrupt file should be archived without --read-only');
+  });
+
+  // Next-step tips (contextual disclosure): status/inspect success paths hint the next command on
+  // stderr in human mode, and stay silent under --json (the envelope's `data` is self-describing).
+  check('status human fresh hit tips toward inspect; --json stays silent', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-status-tip-fresh';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Status tip fresh fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const human = run(['status', url], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(
+      flattenWhitespace(human.stderr).includes(`Tip: bonsai inspect ${url} for full metadata.`),
+      human.stderr
+    );
+
+    const json = run(['status', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(!json.stderr.includes('Tip:'), json.stderr);
+  });
+
+  check('status human stale hit tips toward re-fetching to revalidate', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-status-tip-stale';
+    const imported = run(['import', url, '--stdin', '--ttl', '1h', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Status tip stale fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+    const path = parseJson(imported.stdout)?.data?.cache?.path;
+    ageArtifact(path, new Date(Date.now() - 75 * 60 * 1000).toISOString());
+
+    const human = run(['status', url], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(
+      flattenWhitespace(human.stderr).includes(`Tip: bonsai ${url} to revalidate.`),
+      human.stderr
+    );
+  });
+
+  check('inspect human hit tips toward status; --json stays silent', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-inspect-tip';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Inspect tip fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const human = run(['inspect', url], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(
+      flattenWhitespace(human.stderr).includes(`Tip: bonsai status ${url} to check freshness.`),
+      human.stderr
+    );
+
+    const json = run(['inspect', url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(!json.stderr.includes('Tip:'), json.stderr);
   });
 
   check('status and inspect CACHE_MISS messages match', () => {

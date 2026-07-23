@@ -33,6 +33,7 @@ import { locateArtifact } from './storage.js';
 import type { ResearchArtifact } from './schema.js';
 import { failInvalidUrl, type CliIo } from './cli-io.js';
 import { batchSeparator } from '../cache-view.js';
+import { formatTip } from '../text.js';
 import type { CacheHitStatus, FreshnessState } from '../cli-result-types.js';
 import { EXIT_STALE_SERVED } from '../cli-error-policy.js';
 import { detectSite } from '../../sites/index.js';
@@ -458,6 +459,9 @@ function logHumanFetchResult(input: {
     io.warn(`${normalizedUrl}: ${warning}`);
   }
   io.log(resultData.content);
+  if (!dryRun) {
+    io.warn(formatTip(`${io.bin} inspect ${normalizedUrl} for cached metadata.`));
+  }
   const separator = batchSeparator(run.urlCount > 1);
   if (separator) {
     io.log(`\n${separator}\n`);

@@ -58,7 +58,7 @@ function missingCommandDetails(
  * it picks a command, so `bonsai --read-only list` would otherwise treat `--read-only` as the
  * command id. Strip and re-append them after the command/URL, same pattern as `--json`.
  */
-const GLOBAL_BOOLEAN_FLAGS = new Set(['--read-only', '--plan']);
+const GLOBAL_BOOLEAN_FLAGS = new Set(['--read-only', '--plan', '--toon']);
 
 /**
  * When a value-taking flag is the only "command" and its value looks like a URL, the user almost

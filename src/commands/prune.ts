@@ -203,6 +203,7 @@ export default class ResearchPrune extends BaseCommand<typeof ResearchPrune> {
               `- [${topicStr}] Key: ${colors.bold(f.cacheKey)} (${colors.gray(f.url || 'Imported note')})`
             );
           });
+          this.tip('re-run with --yes to prune these entries.');
         }
       }
     } else {

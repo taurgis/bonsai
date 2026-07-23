@@ -58,6 +58,7 @@ bonsai <url> [flags]
 | `--rendered`    | —     | boolean  | `false`      | Force browser-rendered extraction for pages that require client-side JavaScript (e.g. SPA docs).                                |
 | `--storage`     | —     | choice   | (configured) | Override cache location for this run: `global` or `project`. Secret-bearing pages are always stored globally.                   |
 | `--read-only`   | —     | boolean  | `false`      | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
+| `--toon`        | —     | boolean  | `false`      | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                          |
 | `--json`        | —     | boolean  | `false`      | Format command response as machine-readable JSON.                                                                               |
 
 ### JSON Output Envelope Schema
@@ -134,6 +135,8 @@ bonsai import [url] [flags]
 - `--ttl`: TTL duration for imported note freshness (e.g. "2h", "7d", "6m").
 - `--storage`: Storage mode (`global` or `project`). Override the configured cache location for this import. Notes containing secrets are always stored globally and never written to a project cache.
 - `--read-only` / `--plan`: Block the write; reports `dryRun: true` and `cache.status: "would_import"`.
+- `--toon`: Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.
+- `--json`: Format command response as machine-readable JSON.
 
 Localhost and other private hosts are accepted as **cache keys** for import. Network fetches to those hosts remain blocked by the SSRF guard.
 Import stdin and file inputs are capped at 1 MiB. Oversized stdin exits `1` with `STDIN_TOO_LARGE`; oversized files exit `1` with `FILE_TOO_LARGE`. A directory passed to `--file` exits `2` with `NOT_A_FILE`.
@@ -189,12 +192,14 @@ bonsai status <url> [flags]
 
 ### Command-Line Flags
 
-| Flag        | Short | Type     | Default | Description                                                                          |
-| ----------- | ----- | -------- | ------- | ------------------------------------------------------------------------------------ |
-| `--tier`    | —     | choice   | —       | Evaluate freshness with this tier; when omitted, use the cached artifact's own tier. |
-| `--ttl`     | `-l`  | duration | —       | TTL duration to evaluate freshness (e.g. "2h", "7d", "6m").                          |
-| `--max-age` | —     | duration | —       | Maximum cache age to accept (e.g. "2h", "7d", "6m").                                 |
-| `--json`    | —     | boolean  | `false` | Machine-readable envelope.                                                           |
+| Flag          | Short | Type     | Default | Description                                                                          |
+| ------------- | ----- | -------- | ------- | ------------------------------------------------------------------------------------ |
+| `--tier`      | —     | choice   | —       | Evaluate freshness with this tier; when omitted, use the cached artifact's own tier. |
+| `--ttl`       | `-l`  | duration | —       | TTL duration to evaluate freshness (e.g. "2h", "7d", "6m").                          |
+| `--max-age`   | —     | duration | —       | Maximum cache age to accept (e.g. "2h", "7d", "6m").                                 |
+| `--read-only` | —     | boolean  | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
+| `--toon`      | —     | boolean  | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`. |
+| `--json`      | —     | boolean  | `false` | Machine-readable envelope.                                                           |
 
 ### JSON Output envelope `data` block
 
@@ -227,6 +232,14 @@ Display cached headers and frontmatter metadata for a URL.
 ```bash
 bonsai inspect <url>
 ```
+
+### Command-Line Flags
+
+| Flag          | Short | Type    | Default | Description                                                                          |
+| ------------- | ----- | ------- | ------- | ------------------------------------------------------------------------------------- |
+| `--read-only` | —     | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
+| `--toon`      | —     | boolean | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`. |
+| `--json`      | —     | boolean | `false` | Return the machine-readable envelope.                                               |
 
 ### JSON Output envelope `data` block
 
@@ -307,6 +320,8 @@ flood the listing — find them with `inspect` (which lists a page's sections).
 | `--capture-method` | —     | choice  | —       | Capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`.                |
 | `--url`            | —     | glob    | —       | Source URL glob (case-insensitive, supports `*`).                                                                          |
 | `--limit`          | —     | integer | `50`    | Cap the result count (1–100).                                                                                              |
+| `--read-only`      | —     | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
+| `--toon`           | —     | boolean | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                      |
 | `--json`           | —     | boolean | `false` | Return the machine-readable envelope.                                                                                      |
 
 Results are sorted by `validated_at` (falling back to `fetched_at`), newest
@@ -397,6 +412,7 @@ Two guardrails make accidental deletion hard:
 | `--dry-run`              | —     | boolean  | `false` | Preview files without deleting. Mutually exclusive with `--yes`.                                                          |
 | `--yes`                  | `-y`  | boolean  | `false` | Confirm deletion. Required for a real prune (rejected under `--read-only`).                                               |
 | `--read-only` / `--plan` | —     | boolean  | `false` | Implicit preview; mutations disabled.                                                                                     |
+| `--toon`                 | —     | boolean  | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                     |
 | `--json`                 | —     | boolean  | `false` | Return the machine-readable envelope.                                                                                     |
 
 `--older-than` and `--inactive` are distinct: a recently revalidated but originally-old page can match
@@ -485,6 +501,7 @@ semantics per key (same array-as-`data` shape as `list`).
 - `--local` / `--project` / `-p`: target the project-level config file (`.bonsai.json`).
 - `--dry-run`: (`set`/`unset`) show the change without writing.
 - `--read-only` / `--plan`: inherited global flag; (`set`/`unset`) preview without writing.
+- `--toon`: emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.
 - `--json`: machine-readable envelope.
 
 ### Configuration keys

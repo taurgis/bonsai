@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { Config } from '@oclif/core';
 import ResearchStatus from './status.js';
 import ResearchImport from './import.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
@@ -103,6 +104,69 @@ describe('status command unit tests', () => {
     expect(planned.action).toBe('would_revalidate');
 
     readSpy.mockRestore();
+  });
+
+  it('tips toward inspect on a fresh cache hit, and toward re-fetch on a stale hit, in human mode', async () => {
+    const bin = (await Config.load()).bin;
+
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Status Tip Notes');
+    const imported = (await ResearchImport.run([
+      'https://example.com/status-tip-fresh',
+      '--stdin',
+    ])) as any;
+    readSpy.mockRestore();
+
+    const warnSpy = vi.spyOn(ResearchStatus.prototype as any, 'warn').mockImplementation(() => '');
+    try {
+      await ResearchStatus.run(['https://example.com/status-tip-fresh']);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).toEqual([
+        `Tip: ${bin} inspect https://example.com/status-tip-fresh for full metadata.`,
+      ]);
+    } finally {
+      warnSpy.mockRestore();
+    }
+
+    const { readFileSync, writeFileSync } = await import('node:fs');
+    const aged = new Date(Date.now() - 40 * 24 * 3600 * 1000).toISOString();
+    const raw = readFileSync(imported.cache.path, 'utf8');
+    writeFileSync(
+      imported.cache.path,
+      raw
+        .replace(/validated_at: .*/, `validated_at: ${aged}`)
+        .replace(/fetched_at: .*/, `fetched_at: ${aged}`)
+        .replace(/stale_after: .*/, `stale_after: ${aged}`)
+    );
+
+    const warnSpyStale = vi
+      .spyOn(ResearchStatus.prototype as any, 'warn')
+      .mockImplementation(() => '');
+    try {
+      await ResearchStatus.run(['https://example.com/status-tip-fresh']);
+      expect(warnSpyStale.mock.calls.map((c) => String(c[0]))).toEqual([
+        `Tip: ${bin} https://example.com/status-tip-fresh to revalidate.`,
+      ]);
+    } finally {
+      warnSpyStale.mockRestore();
+    }
+  });
+
+  it('emits no tip under --json (miss, hit, or stale)', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Status Tip JSON');
+    await ResearchImport.run(['https://example.com/status-tip-json', '--stdin']);
+    readSpy.mockRestore();
+
+    const warnSpy = vi.spyOn(ResearchStatus.prototype as any, 'warn').mockImplementation(() => '');
+    try {
+      await ResearchStatus.run(['https://example.com/status-tip-json', '--json']);
+      await ResearchStatus.run(['https://example.com/status-tip-json-miss', '--json']);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   it('rejects an invalid URL with exit 2', async () => {

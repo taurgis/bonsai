@@ -10,6 +10,7 @@ import {
 } from '../lib/research/schema.js';
 import {
   NO_TOPIC_LABEL,
+  formatTip,
   resultListHeading,
   sanitizeForTerminal,
   type ResultListLabels,
@@ -208,7 +209,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       ? 'try relaxing filters, or list everything: '
       : 'populate the cache first: ';
     this.log(headline);
-    this.log(`\nTip: ${tipLead}${colors.cyan(tipCmd)}`);
+    this.log(`\n${formatTip(`${tipLead}${colors.cyan(tipCmd)}`)}`);
   }
 
   async run(): Promise<ListRow[]> {

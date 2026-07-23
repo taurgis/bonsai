@@ -294,13 +294,17 @@ describe('stream routing contract', () => {
     expect(result.stderr).toBe('');
   });
 
-  it('human status hit puts primary output on stdout and leaves stderr empty', () => {
+  it('human status hit puts primary output on stdout; the next-step tip stays on stderr', () => {
     seedCachedHit();
     const result = run(['status', HIT_URL]);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Status:');
     expect(result.stdout).toContain('hit');
-    expect(result.stderr).toBe('');
+    // Contextual next-step tips are an intentional stderr side effect on success (never stdout,
+    // so they can't corrupt piped primary output) — this pins that the primary table itself never
+    // moves off stdout, not that stderr stays silent.
+    expect(result.stdout).not.toContain('Tip:');
+    expect(result.stderr).toContain('Tip:');
   });
 
   it('human usage errors go to stderr with empty stdout', () => {

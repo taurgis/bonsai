@@ -1,11 +1,12 @@
-import { Command, Errors, Flags, Interfaces, toConfiguredId } from '@oclif/core';
+import { Command, Errors, Flags, Interfaces, toConfiguredId, ux } from '@oclif/core';
+import { encode } from '@toon-format/toon';
 import {
   invalidConfigFileWarnings,
   invalidEnvOverrideWarnings,
   resolveReadOnly,
 } from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
-import { sanitizeForTerminal } from './lib/text.js';
+import { formatTip, sanitizeForTerminal } from './lib/text.js';
 import {
   enrichErrorForDisplay,
   resolveExitCode,
@@ -21,6 +22,18 @@ import {
   type ResolvedResearchTarget,
 } from './lib/research/resolve-target.js';
 import { failInvalidUrl, type CliIo } from './lib/research/cli-io.js';
+
+/**
+ * Mirrors oclif's own `--json` argv-scan (respecting a `--` pass-through boundary) so `--toon`
+ * gets identical treatment: present in argv, regardless of parse state.
+ */
+function argvHasFlag(argv: string[], flag: string): boolean {
+  const passThroughIndex = argv.indexOf('--');
+  const flagIndex = argv.indexOf(flag);
+  return passThroughIndex === -1
+    ? flagIndex !== -1
+    : flagIndex !== -1 && flagIndex < passThroughIndex;
+}
 
 /**
  * Shared base for every Bonsai command. Enables oclif's native `--json` flag,
@@ -43,6 +56,10 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
       default: false,
       description: CLI_FLAG_DESCRIPTIONS.readOnly,
     }),
+    toon: Flags.boolean({
+      default: false,
+      description: CLI_FLAG_DESCRIPTIONS.toon,
+    }),
   };
 
   flags!: Interfaces.InferredFlags<T['flags']>;
@@ -63,6 +80,18 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     this.args = args as Interfaces.InferredArgs<T['args']>;
     this.parsedArgv = argv as string[];
 
+    // --json and --toon both claim the machine-output seat; picking one silently over the other
+    // would surprise a caller who set both by mistake, so reject the combination outright. Reuses
+    // the existing CONFLICTING_FLAGS code (not a new one) — the catalog already documents it as the
+    // one code for "choose one of the mutually exclusive options", regardless of which flags.
+    if (this.flags?.['json'] && this.flags?.['toon']) {
+      this.error('Cannot combine --json and --toon: pick one output format.', {
+        exit: 2,
+        code: 'CONFLICTING_FLAGS',
+        suggestions: ['Pass only one of --json or --toon'],
+      });
+    }
+
     // Surface a set-but-invalid BONSAI_* override once per run. Resolution silently drops such a
     // value, so without this a typo'd env var would take no effect with no signal. Warnings go to
     // stderr (even under --json), so machine output stays clean.
@@ -76,6 +105,35 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     )) {
       this.warn(warning);
     }
+  }
+
+  /**
+   * Treat `--toon` as machine mode too, so every existing `!this.jsonEnabled()` human-output branch
+   * across every command (table rendering, tips, empty-state guidance) is suppressed under `--toon`
+   * for free, exactly as it already is under `--json`.
+   */
+  public override jsonEnabled(): boolean {
+    // Mirrors oclif's own enableJsonFlag guard (every command in this CLI sets it, but the base
+    // class's contract shouldn't silently break if a future command ever opts out).
+    return (
+      super.jsonEnabled() ||
+      (Boolean(this.ctor?.enableJsonFlag) && argvHasFlag(this.argv, '--toon'))
+    );
+  }
+
+  /**
+   * Real `--json` keeps oclif's own colorized-JSON rendering untouched (zero regression risk).
+   * `--toon` (and no real `--json`) re-encodes the identical envelope as TOON instead — same data,
+   * ~40% fewer tokens for callers who opted in.
+   */
+  protected override logJson(json: unknown): void {
+    if (super.jsonEnabled()) {
+      super.logJson(json);
+      return;
+    }
+    // this.log() no-ops whenever jsonEnabled() is true (by design, everywhere else in this CLI) —
+    // ux.stdout writes directly, matching how oclif's own default logJson bypasses that guard too.
+    ux.stdout(encode(json));
   }
 
   /**
@@ -126,6 +184,16 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     const { exit, ...rest } = options;
     if (exit === false) return super.error(input, { ...rest, exit });
     return super.error(input, { ...rest, exit });
+  }
+
+  /**
+   * Human-mode-only contextual next-step suggestion after a successful command, mirroring the
+   * "Try this:" pattern already used on errors. A no-op under `--json`/`--toon`: the envelope's
+   * `data` is self-describing, so machine callers get no prose.
+   */
+  protected tip(message: string): void {
+    if (this.jsonEnabled()) return;
+    this.warn(formatTip(message));
   }
 
   /** Whether read-only/plan mode is active for this invocation (flag OR either env var). */

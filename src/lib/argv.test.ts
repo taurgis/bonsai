@@ -364,6 +364,20 @@ describe('normalizeArgv', () => {
       },
     },
     {
+      name: 'leading --toon before a command relocates after the command',
+      input: ['--toon', 'list'],
+      expected: {
+        argv: ['list', '--toon'],
+      },
+    },
+    {
+      name: 'leading --toon before a URL relocates onto fetch',
+      input: ['--toon', 'https://example.com'],
+      expected: {
+        argv: ['fetch', 'https://example.com', '--toon'],
+      },
+    },
+    {
       name: 'lone --read-only triggers early human MISSING_COMMAND exit',
       input: ['--read-only'],
       expected: {
