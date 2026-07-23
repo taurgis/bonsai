@@ -132,6 +132,28 @@ export default function register(harness, fixtures) {
     expect(parseJson(r.stdout)?.code === 'INVALID_METADATA_VALUE', 'code');
   });
 
+  check('import --topic over 200 chars is INVALID_METADATA_VALUE and writes nothing', () => {
+    // Unbounded here would still round-trip through frontmatter, but a single very long topic
+    // wraps a `list` heading line across dozens of terminal rows — cap it at the flag boundary.
+    const url = 'https://example.com/audit-topic-too-long';
+    const r = run(['import', url, '--stdin', '--topic', 'a'.repeat(201), '--json'], { input: '# x\n' });
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.code === 'INVALID_METADATA_VALUE', env?.code);
+
+    const status = run(['status', url, '--json'], { cwd: r.cwd, xdg: r.xdg });
+    expect(parseJson(status.stdout)?.code === 'CACHE_MISS', 'nothing should have been written');
+  });
+
+  check('import --tags value over 100 chars is INVALID_METADATA_VALUE', () => {
+    const r = run(
+      ['import', 'https://example.com/audit-tag-too-long', '--stdin', '--tags', 'b'.repeat(101), '--json'],
+      { input: '# x\n' }
+    );
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+    expect(parseJson(r.stdout)?.code === 'INVALID_METADATA_VALUE', 'code');
+  });
+
   check('import invalid ttl --json INVALID_DURATION exit 2', () => {
     const r = run(['import', 'https://example.com/x', '--stdin', '--ttl', '5z', '--json'], {
       input: '# x\n',

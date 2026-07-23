@@ -6,7 +6,7 @@ import { loadSummaryLevel } from '../config/index.js';
 import { buildCompressed } from './compress.js';
 import { durationFlagError, resolveFreshnessPolicy } from './freshness.js';
 import { applyAutoTags } from './keywords.js';
-import { metadataNewlineError } from './metadata-flags.js';
+import { metadataLengthError, metadataNewlineError } from './metadata-flags.js';
 import { persistArtifact } from './persist-artifact.js';
 import { sanitizePromptInjection } from './prompt-injection.js';
 import type { ResearchArtifact, ResearchArtifactMetadata } from './schema.js';
@@ -85,12 +85,20 @@ export async function prepareImportCommandService(opts: {
 
   const ttlErr = durationFlagError('--ttl', flags.ttl);
   if (ttlErr) io.error(ttlErr, { exit: 2, code: 'INVALID_DURATION' });
-  const metadataErr = metadataNewlineError(flags);
-  if (metadataErr) {
-    io.error(metadataErr, {
+  const newlineErr = metadataNewlineError(flags);
+  if (newlineErr) {
+    io.error(newlineErr, {
       exit: 2,
       code: 'INVALID_METADATA_VALUE',
       suggestions: ['Remove line breaks from the value.'],
+    });
+  }
+  const lengthErr = metadataLengthError(flags);
+  if (lengthErr) {
+    io.error(lengthErr, {
+      exit: 2,
+      code: 'INVALID_METADATA_VALUE',
+      suggestions: ['Shorten the value.'],
     });
   }
   validateSourceMode(hasSingle, hasMulti, flags, io);

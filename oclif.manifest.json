@@ -43,7 +43,7 @@
         },
         "topic": {
           "char": "t",
-          "description": "main research topic for metadata",
+          "description": "main research topic for metadata (max 200 chars)",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -51,7 +51,7 @@
         },
         "tags": {
           "char": "g",
-          "description": "taxonomic tags for this research (can be repeated)",
+          "description": "taxonomic tags for this research (can be repeated, max 100 chars each)",
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,
@@ -219,7 +219,7 @@
         },
         "topic": {
           "char": "t",
-          "description": "main topic for this research note",
+          "description": "main topic for this research note (max 200 chars)",
           "name": "topic",
           "hasDynamicHelp": false,
           "multiple": false,
@@ -227,7 +227,7 @@
         },
         "tags": {
           "char": "g",
-          "description": "taxonomic tags (can be repeated)",
+          "description": "taxonomic tags (can be repeated, max 100 chars each)",
           "name": "tags",
           "hasDynamicHelp": false,
           "multiple": true,

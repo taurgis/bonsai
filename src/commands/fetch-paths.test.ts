@@ -429,6 +429,22 @@ describe('fetch command branch coverage', () => {
     expect(mocks.capturePage).not.toHaveBeenCalled();
   });
 
+  it('--topic over the length cap: rejected before any fetch, so a listing line can never wrap', async () => {
+    await expect(FetchCommand.run([TEST_URL, '--topic', 'a'.repeat(201)])).rejects.toMatchObject({
+      oclif: { exit: 2 },
+      code: 'INVALID_METADATA_VALUE',
+    });
+    expect(mocks.capturePage).not.toHaveBeenCalled();
+  });
+
+  it('--tags over the length cap: rejected before any fetch', async () => {
+    await expect(FetchCommand.run([TEST_URL, '--tags', 'b'.repeat(101)])).rejects.toMatchObject({
+      oclif: { exit: 2 },
+      code: 'INVALID_METADATA_VALUE',
+    });
+    expect(mocks.capturePage).not.toHaveBeenCalled();
+  });
+
   it('batch with an invalid URL row: warns with the same Code/Try this as the single-URL error', async () => {
     mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
     const warnSpy = vi.spyOn(FetchCommand.prototype, 'warn').mockImplementation((input) => input);

@@ -239,6 +239,25 @@ describe('import command unit tests', () => {
     readSpy.mockRestore();
   });
 
+  it('fails if --topic exceeds the length cap', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Notes\n');
+
+    const runPromise = ResearchImport.run([
+      'https://example.com/topic-too-long',
+      '--stdin',
+      '--topic',
+      'a'.repeat(201),
+    ]);
+    await expect(runPromise).rejects.toMatchObject({
+      oclif: { exit: 2 },
+      code: 'INVALID_METADATA_VALUE',
+    });
+
+    readSpy.mockRestore();
+  });
+
   it('fails if both single and multi-source are specified', async () => {
     const runPromise = ResearchImport.run([
       'https://example.com',
