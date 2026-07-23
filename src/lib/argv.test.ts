@@ -5,6 +5,14 @@ import { VALUE_TAKING_FLAG_TOKENS, KNOWN_COMMAND_ROOT_TOKENS } from './cli-flag-
 describe('normalizeArgv', () => {
   const cases = [
     {
+      // AXI "content first": bare `bonsai` shows live cache data (via `list`) instead of help.
+      name: 'truly empty argv redirects to `list` (content-first default)',
+      input: [],
+      expected: {
+        argv: ['list'],
+      },
+    },
+    {
       name: 'bare --json should trigger early JSON error exit',
       input: ['--json'],
       expected: {

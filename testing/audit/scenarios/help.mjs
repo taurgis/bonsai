@@ -3,6 +3,20 @@ export default function register(harness) {
   const { check, run, expect } = harness;
   const compact = (text) => text.replace(/\s+/g, ' ');
 
+  check('bare invocation (no args at all) shows live cache data, not help (AXI content-first)', () => {
+    const r = run([]);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(r.stdout.includes('No cached research entries found.'), 'expected empty-cache list output');
+    expect(!r.stdout.includes('COMMANDS'), 'bare invocation should not fall back to root help');
+  });
+
+  check('bare invocation still supports --json (reports as the `list` command)', () => {
+    const r = run(['--json']);
+    // A lone `--json` with nothing else is still an explicit, ambiguous MISSING_COMMAND usage
+    // error (unchanged) — only a truly empty argv gets the content-first redirect.
+    expect(r.exitCode === 2, `exit ${r.exitCode}`);
+  });
+
   check('root --help exits 0 with COMMANDS', () => {
     const r = run(['--help']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);

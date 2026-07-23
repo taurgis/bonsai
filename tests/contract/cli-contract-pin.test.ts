@@ -329,12 +329,21 @@ describe('stream routing contract', () => {
     const envelope = expectSuccessEnvelope(result, 'list');
     expect(Array.isArray(envelope.data)).toBe(true);
     expect(envelope.data).toEqual([]);
-    expect(envelope.truncation).toBeUndefined();
+    // Definitive empty state (AXI): `summary.empty` signals the zero-result case explicitly instead
+    // of leaving `data: []` ambiguous between "no matches" and some other silent-empty condition.
+    expect(envelope.summary).toEqual({
+      total: 0,
+      shown: 0,
+      limit: 50,
+      truncated: false,
+      empty: true,
+      byFreshness: { fresh: 0, stale_grace: 0, stale_expired: 0 },
+    });
     expect(result.stderr).toBe('');
     expect(result.stderr).not.toMatch(/Warning/i);
   });
 
-  it('list --json truncated by --limit surfaces envelope.truncation (no process-stderr tip)', () => {
+  it('list --json truncated by --limit surfaces envelope.summary (no process-stderr tip)', () => {
     // Seed three entries so --limit 2 must truncate.
     for (const [slug, topic] of [
       ['trunc-a', 'TruncA'],
@@ -354,7 +363,14 @@ describe('stream routing contract', () => {
     const envelope = expectSuccessEnvelope(result, 'list');
     expect(Array.isArray(envelope.data)).toBe(true);
     expect((envelope.data as unknown[]).length).toBe(2);
-    expect(envelope.truncation).toEqual({ totalMatched: 3, shown: 2, limit: 2 });
+    expect(envelope.summary).toEqual({
+      total: 3,
+      shown: 2,
+      limit: 2,
+      truncated: true,
+      empty: false,
+      byFreshness: { fresh: 3, stale_grace: 0, stale_expired: 0 },
+    });
     // Intentional #73: no process-stderr truncation tip under --json.
     expect(result.stderr).toBe('');
     expect(result.stderr).not.toMatch(/truncat|showing first/i);

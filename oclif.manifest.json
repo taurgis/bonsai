@@ -364,7 +364,7 @@
     "list": {
       "aliases": [],
       "args": {},
-      "description": "List page-level cached artifacts with source URLs, topic, tags, freshness, capture method, and token estimates.",
+      "description": "List page-level cached artifacts by source URL, topic, freshness, and token estimate. Pass --full for every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps).",
       "examples": [
         {
           "description": "list cached entries",
@@ -381,6 +381,10 @@
         {
           "description": "list entries matching a URL glob",
           "command": "<%= config.bin %> list --url \"https://react.dev/*\""
+        },
+        {
+          "description": "list every metadata field instead of the minimal default row",
+          "command": "<%= config.bin %> list --full --json"
         }
       ],
       "flags": {
@@ -474,6 +478,12 @@
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
+        },
+        "full": {
+          "description": "include every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps); default output is a minimal row (source URLs, topic, freshness, token estimate)",
+          "name": "full",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,

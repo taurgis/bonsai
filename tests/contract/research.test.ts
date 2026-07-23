@@ -63,10 +63,21 @@ describe('research contract tests', () => {
     expect(result.stdout).toContain('import');
   });
 
-  it('bonsai without URL argument exits 0 and lists top-level commands', () => {
-    const result = runContract([]);
+  it('bonsai with no arguments at all shows live cache data instead of help (AXI content-first)', () => {
+    // `list` (what bare invocation now runs) reads across every storage root, project and global —
+    // an isolated cwd alone is not enough, since a shared/real global root could still contribute
+    // entries. Fresh XDG dirs make the cache deterministically empty, unlike `--help`/`help` above
+    // which stay pinned to oclif's own root help output regardless of cache state.
+    const cwd = contractWorkspace('bonsai-contract-bare-');
+    const xdg = contractWorkspace('bonsai-contract-bare-xdg-');
+    const cfg = contractWorkspace('bonsai-contract-bare-cfg-');
+    const result = runContract([], {
+      cwd,
+      env: { BONSAI_STORAGE: 'project', XDG_DATA_HOME: xdg, XDG_CONFIG_HOME: cfg },
+    });
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('COMMANDS');
+    expect(result.stdout).toContain('No cached research entries found.');
+    expect(result.stdout).not.toContain('COMMANDS');
   });
 
   it('bonsai --json without URL or command returns a JSON usage error', () => {

@@ -48,10 +48,23 @@ The `data` block differs per command. See the [Command Reference](/reference/com
 for each command's schema. `cache.status`, `cache.freshness`, and
 `source.extractionConfidence` are the fields agents most often branch on.
 
-When `list --json` caps results with `--limit`, the envelope includes a top-level
-`truncation` object (`totalMatched`, `shown`, `limit`) while `data` stays the
-capped array. Absence of `truncation` means nothing was cut — do not scrape
-stderr for a tip (process stderr stays empty under `--json`).
+`list --json`/`--toon` always includes a top-level `summary` object alongside
+`data`: `total` (entries matched before `--limit`), `shown` (entries actually
+returned), `limit`, `truncated` (`total > shown`), `empty` (`total === 0`, an
+explicit signal so a zero-result `data: []` is never ambiguous), and
+`byFreshness` (a `fresh`/`stale_grace`/`stale_expired` count over the matched
+set) — a cache-wide aggregate without a second round trip. Do not scrape
+stderr for a truncation tip; process stderr stays empty under `--json`.
+
+`list`'s default row is intentionally minimal — `sourceUrls`, `topic`,
+`freshness`, and `tokenEstimate` — the fields needed to judge relevance and
+act next. Pass `--full` for every metadata field (cache key, path, artifact
+type, tags, capture method, quality notes, timestamps).
+
+Running `bonsai` with no arguments at all shows live cache data (equivalent to
+`bonsai list`) instead of the root help text — the CLI answers "what do I
+have?" by default. `bonsai help`, `bonsai --help`, and `-h` remain the
+explicit path to the command reference.
 
 ## TOON output
 
@@ -73,8 +86,8 @@ ok: true
 exitCode: 0
 stdout: ""
 stderr: ""
-data[1]{cacheKey,artifactType,topic,...}:
-  0f115db0...e9d7,source,Node.js URL API,...
+data[1]{sourceUrls,topic,freshness,tokenEstimate}:
+  ["https://nodejs.org/api/url.html"],Node.js URL API,fresh,...
 ```
 
 `--json` and `--toon` are mutually exclusive — passing both fails fast with

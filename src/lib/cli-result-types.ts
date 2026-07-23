@@ -41,7 +41,7 @@ export type FreshnessState = 'fresh' | 'stale_grace' | 'stale_expired' | 'none';
 /** Freshness values that appear on list rows (an entry always exists). */
 export type ListFreshness = Exclude<FreshnessState, 'none'>;
 
-/** One row in `list --json` output. */
+/** One row in `list --json` output when `--full` is passed. */
 export interface ListRow {
   cacheKey: string;
   path: string;
@@ -55,6 +55,32 @@ export interface ListRow {
   qualityNotes: string[];
   fetchedAt: string | null;
   validatedAt: string | null;
+}
+
+/**
+ * Default `list --json`/`--toon` row: the fields an agent needs to judge relevance and act next
+ * (fetch/inspect the source, gauge freshness, budget tokens) without the full metadata dump.
+ * Pass `--full` for every field on {@link ListRow}.
+ */
+export interface ListRowMinimal {
+  sourceUrls: string[];
+  topic: string | null;
+  freshness: ListFreshness;
+  tokenEstimate: TokenEstimate;
+}
+
+/** Aggregate counts attached to `list`'s envelope so agents skip extra round trips. */
+export interface ListSummary {
+  /** Entries matching the given filters, before `--limit` truncation. */
+  total: number;
+  /** Entries actually returned in `data` (after `--limit`). */
+  shown: number;
+  limit: number;
+  /** True when `total > shown`, i.e. more entries matched than `--limit` allowed through. */
+  truncated: boolean;
+  /** Explicit signal for `total === 0`, so an empty `data: []` is never ambiguous. */
+  empty: boolean;
+  byFreshness: Record<ListFreshness, number>;
 }
 
 /** Section child summary nested under an inspect hit. */

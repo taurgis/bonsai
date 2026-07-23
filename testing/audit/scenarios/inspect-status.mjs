@@ -167,7 +167,8 @@ export default function register(harness, fixtures) {
     expect(env?.suggestions?.[0] === `Find it with: bonsai list --url "${urlB}"`, env?.suggestions);
     expect(!env?.suggestions?.[0]?.includes('Fetch and cache'), env?.suggestions);
 
-    const listed = run(['list', '--url', urlB, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    // --full: cacheKey is outside the minimal default row, needed here to confirm identity.
+    const listed = run(['list', '--url', urlB, '--full', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(parseJson(listed.stdout)?.data?.[0]?.cacheKey === noteKey, 'list --url finds the note');
   });
 

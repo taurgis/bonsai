@@ -25,7 +25,7 @@ import {
 } from '../lib/research/metadata-filters.js';
 import { colors } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
-import type { ListRow } from '../lib/cli-result-types.js';
+import type { ListRow, ListRowMinimal, ListSummary } from '../lib/cli-result-types.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at this value.
 const LIST_DEFAULT_MAX_LIMIT = 100;
@@ -38,18 +38,37 @@ const LIST_LABELS: ResultListLabels = {
 // scanCacheDirForList), so `section` is not an offered filter — every other artifact type can appear.
 const LISTABLE_ARTIFACT_TYPES = ARTIFACT_TYPES.filter((type) => type !== 'section');
 
+/** Project a full row down to the default minimal shape (see {@link ListRowMinimal}). */
+function toMinimalListRow(row: ListRow): ListRowMinimal {
+  return {
+    sourceUrls: row.sourceUrls,
+    topic: row.topic,
+    freshness: row.freshness,
+    tokenEstimate: row.tokenEstimate,
+  };
+}
+
+/** Count matched rows per freshness tier for the envelope's `summary.byFreshness`. */
+function countByFreshness(rows: readonly ListRow[]): ListSummary['byFreshness'] {
+  const counts: ListSummary['byFreshness'] = { fresh: 0, stale_grace: 0, stale_expired: 0 };
+  for (const row of rows) counts[row.freshness]++;
+  return counts;
+}
+
 /** List cached research artifacts by metadata filters. */
 export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static id = 'list';
   static summary = 'List cached research artifacts by metadata';
   static description =
-    'List page-level cached artifacts with source URLs, topic, tags, freshness, capture method, and token estimates.';
+    'List page-level cached artifacts by source URL, topic, freshness, and token estimate. ' +
+    'Pass --full for every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps).';
 
   /**
-   * When `--json` results were capped by `--limit`, attached to the success envelope so agents can
-   * detect truncation without scraping prose (#91 / AUDIT_71_FINAL #73 deferred).
+   * Aggregate counts (and an explicit empty/truncation signal) attached to the success envelope so
+   * agents get a cache-wide summary without a separate round trip (AXI principles: pre-computed
+   * aggregates, definitive empty states). Always set by `run()` before it returns.
    */
-  private jsonTruncation: { totalMatched: number; shown: number; limit: number } | null = null;
+  private jsonSummary: ListSummary | null = null;
 
   static examples = [
     {
@@ -67,6 +86,10 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     {
       description: 'list entries matching a URL glob',
       command: '<%= config.bin %> list --url "https://react.dev/*"',
+    },
+    {
+      description: 'list every metadata field instead of the minimal default row',
+      command: '<%= config.bin %> list --full --json',
     },
   ];
 
@@ -96,6 +119,10 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       options: CAPTURE_METHODS,
     })(),
     limit: limitFlag(LIST_DEFAULT_MAX_LIMIT, 50, `result count (max ${LIST_DEFAULT_MAX_LIMIT})`),
+    full: Flags.boolean({
+      default: false,
+      description: CLI_FLAG_DESCRIPTIONS.listFull,
+    }),
   };
 
   static stdoutIsPrimaryData = true;
@@ -197,7 +224,10 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
   }
 
-  /** Empty-cache / no-match tip (human mode only; --json returns `data: []` with no messaging). */
+  /**
+   * Empty-cache / no-match tip (human mode only). Under `--json`/`--toon`, `data: []` is paired with
+   * `summary.empty: true` instead of prose — see {@link toSuccessJson}.
+   */
   private emitEmptyListGuidance(): void {
     if (this.jsonEnabled()) return;
     const filtered = this.hasActiveFilters();
@@ -212,7 +242,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     this.log(`\n${formatTip(`${tipLead}${colors.cyan(tipCmd)}`)}`);
   }
 
-  async run(): Promise<ListRow[]> {
+  async run(): Promise<ListRow[] | ListRowMinimal[]> {
     const flagErr =
       emptyUrlFilterError(this.flags.url) ??
       emptyTopicFilterError(this.flags.topic) ??
@@ -236,24 +266,25 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
     const finalResults = results.slice(0, this.flags.limit);
 
-    // Human heading carries truncation; --json gets an envelope `truncation` object when capped.
-    this.jsonTruncation =
-      results.length > finalResults.length
-        ? {
-            totalMatched: results.length,
-            shown: finalResults.length,
-            limit: this.flags.limit,
-          }
-        : null;
+    // Human heading carries truncation inline; --json/--toon get the same counts (plus a freshness
+    // breakdown and an explicit `empty` flag) as an always-present envelope `summary` object.
+    this.jsonSummary = {
+      total: results.length,
+      shown: finalResults.length,
+      limit: this.flags.limit,
+      truncated: results.length > finalResults.length,
+      empty: results.length === 0,
+      byFreshness: countByFreshness(results),
+    };
     this.logListResults(finalResults, results.length);
 
-    return finalResults;
+    return this.flags.full ? finalResults : finalResults.map(toMinimalListRow);
   }
 
-  /** Attach `truncation` when the returned `data` array was capped by `--limit`. */
+  /** Attach the aggregate `summary` computed in `run()` (see {@link ListSummary}). */
   protected override toSuccessJson(data: unknown): Record<string, unknown> {
     const envelope = this.baseSuccessJson(data);
-    if (!this.jsonTruncation) return envelope;
-    return { ...envelope, truncation: this.jsonTruncation };
+    if (!this.jsonSummary) return envelope;
+    return { ...envelope, summary: this.jsonSummary };
   }
 }
