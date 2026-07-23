@@ -7,6 +7,22 @@ They are examples, not an installer contract. Copy the relevant folder contents
 into the agent's native hook location and adjust paths if your repository layout
 differs.
 
+## Ambient session context (`bonsai setup`)
+
+The examples below only cover the *redirect-away-from-web-fetch* half of hook
+integration. For the complementary half — showing an agent the cache's current
+state before it does anything — run `bonsai setup <agent>` instead of copying
+files by hand. It installs (and repairs) a `SessionStart` hook that runs
+`bonsai context` at the start of every session, supporting `claude-code` and
+`codex` today. See [Ambient session
+context](https://bonsai.rhino-inquisitor.com/how-to/agent-integration#ambient-session-context)
+for the full workflow.
+
+OpenCode is not supported by `setup` yet: its plugin docs don't document a
+confirmed hook signature for injecting session-start context (closest is
+`session.created`, unconfirmed shape), so `setup` won't guess at one rather than
+ship an integration that might not work.
+
 ## What The Hooks Do
 
 The hooks deny native URL-fetch tools and return model-visible guidance like:

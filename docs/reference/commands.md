@@ -32,6 +32,13 @@ Bonsai keeps a few asymmetries because they match agent workflows:
   appear on an explicit `bonsai list`, and `--json`/`--toon` output stays a
   clean envelope either way. `bonsai help`, `--help`, and `-h` are unaffected
   and remain the explicit command reference.
+- `setup`'s default scope is the opposite of `config set`/`config unset`'s.
+  `setup <agent>` writes to the project by default (`--global` opts into a
+  user-level install), while `config set`/`config unset` write to the
+  user-level file by default (`--local` opts into the project file). `setup`
+  defaults to project because a shared hook is the common case for a team
+  repo; `config` defaults to user because storage mode is usually a personal
+  preference, not something to commit for everyone.
 
 ---
 
@@ -106,6 +113,7 @@ bonsai <url> [flags]
     },
     "format": "compressed" | "detailed",
     "tokenEstimate": 29,
+    "detailedTokenEstimate": 65,
     "content": "Cleaned article text..."
   }
 }
@@ -114,6 +122,10 @@ bonsai <url> [flags]
 `cache.freshness` reports the freshness of the entry found at lookup, so it explains why the action
 was taken (a `refreshed` result still reports the pre-fetch `stale_expired`). On a `miss` it is
 `none`: no prior entry existed, so the freshly fetched content has no prior freshness to report.
+
+`detailedTokenEstimate` is always the true `detailed`-format size, even when `format` is
+`compressed` — it equals `tokenEstimate` whenever nothing was actually truncated. See
+[Compression & Token Budgeting](/concepts/compression#knowing-how-much-detail-was-cut).
 
 ---
 
@@ -540,3 +552,91 @@ semantics per key (same array-as-`data` shape as `list`).
 | --------- | ---------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `storage` | `global`, `project`                      | `global`       | Where new research artifacts are cached.                                                                                                                       |
 | `summary` | `conservative`, `balanced`, `aggressive` | `conservative` | How aggressively the `compressed` variant condenses prose (headings, code blocks, tables, and lists are always preserved). Also settable via `BONSAI_SUMMARY`. |
+
+---
+
+## 8. `context`
+
+Compact, directory-scoped cache dashboard — total entries, a freshness breakdown, and the most
+recently touched pages. This is what `setup`-installed `SessionStart` hooks pipe into an agent's
+ambient context; see [Ambient session context](/how-to/agent-integration#ambient-session-context).
+
+### Usage
+
+```bash
+bonsai context [flags]
+```
+
+### Command-Line Flags
+
+| Flag          | Short | Type    | Default | Description                                                                                                                     |
+| ------------- | ----- | ------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `--read-only` | —     | boolean | `false` | Skip persisting the search-index sidecar for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE`. |
+| `--toon`      | —     | boolean | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                            |
+| `--json`      | —     | boolean | `false` | Format command response as machine-readable JSON.                                                                                |
+
+### JSON Output envelope `data` block
+
+```json
+{
+  "total": 3,
+  "byFreshness": { "fresh": 2, "stale_grace": 1, "stale_expired": 0 },
+  "shown": 3,
+  "entries": [
+    { "topic": "Node URL API", "sourceUrls": ["https://nodejs.org/api/url.html"], "freshness": "fresh" }
+  ]
+}
+```
+
+`entries` is capped to a small preview (5 by default); `total`/`byFreshness` always cover every
+matched artifact, so the cap never hides the true count. `total: 0` is a definitive empty state,
+not an ambiguous empty list.
+
+---
+
+## 9. `setup`
+
+Installs or repairs a `SessionStart` hook that runs `bonsai context` at the start of every agent
+session. See [Ambient session context](/how-to/agent-integration#ambient-session-context) for the
+full workflow.
+
+### Usage
+
+```bash
+bonsai setup <agent> [flags]
+```
+
+### Positional Arguments
+
+- `<agent>`: Required string. `claude-code` or `codex`.
+
+### Command-Line Flags
+
+| Flag          | Short | Type    | Default   | Description                                                                                            |
+| ------------- | ----- | ------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| `--global`    | `-g`  | boolean | `false`   | Install to the user-level hook file instead of the project (`~/.claude/settings.json` / `~/.codex/hooks.json`). |
+| `--local`     | —     | boolean | (default) | Explicit form of the project-scoped default (`.claude/settings.json` / `.codex/hooks.json` under cwd). Mutually exclusive with `--global`. |
+| `--dry-run`   | —     | boolean | `false`   | Preview the install without writing anything.                                                          |
+| `--read-only` | —     | boolean | `false`   | Preview instead of writing (alias `--plan`). Also honored via `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE`.   |
+| `--toon`      | —     | boolean | `false`   | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.  |
+| `--json`      | —     | boolean | `false`   | Format command response as machine-readable JSON.                                                      |
+
+### JSON Output envelope `data` block
+
+```json
+{
+  "agent": "claude-code",
+  "scope": "project",
+  "path": "/path/to/project/.claude/settings.json",
+  "binCommand": "bonsai",
+  "status": "installed" | "repaired" | "unchanged" | "would_install" | "would_repair",
+  "dryRun": false
+}
+```
+
+`status` is `"unchanged"` when a re-run finds an identical Bonsai-managed entry already in place
+(idempotent no-op) and `"repaired"` when one exists but its command is stale (e.g. after a
+reinstall to a new path) — either way, any other hooks already in the file are left untouched.
+
+`opencode` is not yet a supported `<agent>` value — see [Ambient session
+context](/how-to/agent-integration#ambient-session-context) for why.

@@ -35,3 +35,13 @@ export const colors = {
   gray: (t: string) => color(t, '\x1b[90m'),
   magenta: (t: string) => color(t, '\x1b[35m'),
 };
+
+/** Shared fresh/stale_grace/stale_expired → color mapping for `list` and `context`'s human output. */
+export const FRESHNESS_COLOR: Record<
+  'fresh' | 'stale_grace' | 'stale_expired',
+  (t: string) => string
+> = {
+  fresh: colors.green,
+  stale_grace: colors.yellow,
+  stale_expired: colors.red,
+};

@@ -459,6 +459,22 @@ function logHumanFetchResult(input: {
     io.warn(`${normalizedUrl}: ${warning}`);
   }
   io.log(resultData.content);
+  // AXI content-truncation: only nudge toward the escape hatch when something was actually
+  // condensed — `detailedTokenEstimate` equals `tokenEstimate` whenever `format` is already
+  // `detailed`, or when compression happened to produce no smaller result.
+  if (
+    resultData.format === 'compressed' &&
+    typeof resultData.tokenEstimate === 'number' &&
+    typeof resultData.detailedTokenEstimate === 'number' &&
+    resultData.detailedTokenEstimate > resultData.tokenEstimate
+  ) {
+    io.warn(
+      formatTip(
+        `${io.bin} ${normalizedUrl} --format detailed for the full ${resultData.detailedTokenEstimate}-token ` +
+          `version (currently showing ${resultData.tokenEstimate}).`
+      )
+    );
+  }
   if (!dryRun) {
     io.warn(formatTip(`${io.bin} inspect ${normalizedUrl} for cached metadata.`));
   }

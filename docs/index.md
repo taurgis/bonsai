@@ -37,6 +37,11 @@ features:
     details: A stable JSON envelope and deterministic exit codes let AI agents and scripts handle hits, misses, and stale content programmatically.
     link: /how-to/agent-integration
     linkText: Agent integration
+  - icon: 👋
+    title: Ambient session context
+    details: bonsai setup wires a live cache summary into your agent's own startup, so every new session already knows what's cached before anyone asks.
+    link: /how-to/agent-integration#ambient-session-context
+    linkText: Ambient session context
   - icon: 🛡️
     title: Safe by default
     details: Only http(s) URLs, an SSRF blocklist for private IP ranges, untrusted-HTML handling, and secrets kept out of the committable project cache.

@@ -61,6 +61,42 @@ describe('buildFetchResultData', () => {
     expect(result.cache.status).toBe('would_fetch');
     expect(result.content).toBe('short');
   });
+
+  it('always reports the true detailed token estimate, even for a compressed result', () => {
+    const result = buildFetchResultData({
+      url: 'https://example.com',
+      normalizedUrl: 'https://example.com/',
+      cacheKey: 'abc',
+      storageDir: '/tmp/cache',
+      storageMode: 'global',
+      cacheStatus: 'hit',
+      freshnessState: 'fresh',
+      format: 'compressed',
+      artifact,
+      redirectedToGlobal: false,
+      dryRun: false,
+    });
+    expect(result.tokenEstimate).toBe(10);
+    expect(result.detailedTokenEstimate).toBe(20);
+  });
+
+  it('reports a detailedTokenEstimate equal to tokenEstimate when detailed was requested', () => {
+    const result = buildFetchResultData({
+      url: 'https://example.com',
+      normalizedUrl: 'https://example.com/',
+      cacheKey: 'abc',
+      storageDir: '/tmp/cache',
+      storageMode: 'global',
+      cacheStatus: 'hit',
+      freshnessState: 'fresh',
+      format: 'detailed',
+      artifact,
+      redirectedToGlobal: false,
+      dryRun: false,
+    });
+    expect(result.tokenEstimate).toBe(20);
+    expect(result.detailedTokenEstimate).toBe(20);
+  });
 });
 
 describe('buildFetchFailureResult', () => {

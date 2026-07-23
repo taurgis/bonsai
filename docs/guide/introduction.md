@@ -29,6 +29,20 @@ tokens, and nondeterminism. Bonsai fetches a page **once**, normalizes and hashe
 its URL, and serves every later request from the local cache while the entry is
 still fresh. Repeated research becomes a near-instant, deterministic lookup.
 
+## Why ambient session context?
+
+A cache only helps if the agent remembers it exists. Without a nudge, a fresh
+conversation has no way to know what's already been researched — so it either
+re-fetches pages that are sitting right there, or never realizes a shortcut is
+available at all.
+
+`bonsai setup claude-code` (or `codex`) fixes that by wiring Bonsai into your
+agent's own startup sequence, so every new session opens with a short status
+line already in view — how much is cached, how fresh it is, and what was
+looked at most recently — the same way a whiteboard that updates itself beats
+asking "what did we cover last time?" at the start of every meeting. Run
+`bonsai context` any time to see that same summary on demand.
+
 ## Native web search vs Bonsai
 
 CLI agents ship with built-in web search and fetch. For many questions that is
@@ -64,11 +78,12 @@ or when a documentation host has already failed a generic fetch.
 | --- | --- | --- |
 | **Scrape and convert** | Fetches HTML, extracts the main content, sanitizes unsafe markup, and converts it to deterministic Markdown | Capturing API docs, guides, standards, and changelogs |
 | **Cache-first lookup** | Normalizes URLs to collision-resistant SHA-256 keys before fetching | Avoiding duplicate network requests and repeated research |
-| **Token budgeting** | Returns `compressed` or `detailed` Markdown variants | Fitting research into limited context windows without losing full detail |
+| **Token budgeting** | Returns `compressed` or `detailed` Markdown variants, and reports how much bigger the full version is so an agent knows exactly what it's trading away | Fitting research into limited context windows without losing full detail |
 | **Freshness tiers** | Supports `stable`, `standard`, `volatile`, custom TTLs, and stale revalidation | Handling standards differently from release notes or beta docs |
 | **Browser fallback** | Uses `--rendered` for pages that need client-side JavaScript | Capturing SPA documentation when static HTML is incomplete |
 | **[Manual import](/how-to/importing-synthesis)** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
 | **[List](/reference/commands#list)** | Filters cached entries by topic, tags, freshness, and metadata | Seeing what is already cached without reading full content |
+| **[Ambient session context](/how-to/agent-integration#ambient-session-context)** | `bonsai setup` installs a startup hook that shows a live cache summary (`bonsai context`) at the start of every agent session | Starting a new chat already knowing what's cached, without asking |
 
 ## Safe by default
 
@@ -88,5 +103,6 @@ or when a documentation host has already failed a generic fetch.
 - [Site modules](/reference/site-modules): custom capture for enterprise documentation hosts.
 - [Caching & Freshness](/concepts/caching-and-freshness): how reuse and tiers work.
 - [Compression & Token Budgeting](/concepts/compression): `compressed` vs `detailed`.
+- [Ambient session context](/how-to/agent-integration#ambient-session-context): wire the cache summary into your agent's own startup.
 - [Importing Synthesis](/how-to/importing-synthesis): cache an agent's own research.
 - [Agent Integration](/how-to/agent-integration): the JSON envelope and exit codes.

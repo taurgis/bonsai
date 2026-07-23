@@ -324,6 +324,7 @@ describe('research contract tests', () => {
         searchProvider: null,
         format: 'compressed',
         tokenEstimate: expect.any(Number),
+        detailedTokenEstimate: expect.any(Number),
         content: expect.stringContaining('This domain is for use in documentation examples'),
       },
     });

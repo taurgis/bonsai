@@ -124,3 +124,35 @@ export interface StatusRow {
   freshness: FreshnessState;
   action: 'would_fetch' | 'would_revalidate' | 'would_return_cached';
 }
+
+/** One entry in the `context` dashboard's recency-ordered preview. */
+export interface ContextDashboardEntry {
+  topic: string | null;
+  sourceUrls: string[];
+  freshness: ListFreshness;
+}
+
+/**
+ * Directory-scoped cache summary for `context` (AXI principle 7: ambient session-start context).
+ * `entries` is capped to a small preview; `total`/`byFreshness` always cover every matched
+ * artifact so the cap never hides the true count.
+ */
+export interface ContextDashboard {
+  total: number;
+  byFreshness: Record<ListFreshness, number>;
+  shown: number;
+  entries: ContextDashboardEntry[];
+}
+
+/** Agents `setup` knows how to install a SessionStart hook for. */
+export type SetupAgent = 'claude-code' | 'codex';
+
+/** Result of `setup <agent>` for the JSON envelope. */
+export interface SetupResult {
+  agent: SetupAgent;
+  scope: 'user' | 'project';
+  path: string;
+  binCommand: string;
+  status: 'installed' | 'repaired' | 'unchanged' | 'would_install' | 'would_repair';
+  dryRun: boolean;
+}
