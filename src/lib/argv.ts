@@ -146,8 +146,11 @@ export function normalizeArgv(
   // explicit path to the command reference (all of them are non-empty argv and skip this branch).
   // oclif has no built-in "default command" concept for empty argv (see oclif/oclif#277), so this
   // is a one-line argv rewrite, the same technique the URL-shorthand rewrite below already uses.
+  // The hidden `--identity` flag (AXI principle 10) tells `list` to also identify the tool (bin
+  // path, one-sentence description) before the live data — only the true bare invocation gets it,
+  // not an explicit `bonsai list`.
   if (rawArgv.length === 0) {
-    return { argv: ['list'] };
+    return { argv: ['list', '--identity'] };
   }
 
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but

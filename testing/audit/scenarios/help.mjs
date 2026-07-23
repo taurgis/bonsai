@@ -17,6 +17,28 @@ export default function register(harness) {
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
   });
 
+  check('bare invocation identifies the tool before live data (AXI consistent-help)', () => {
+    const r = run([]);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(/^bin: .+\n/.test(r.stdout), 'expected a leading "bin:" identity line');
+    expect(
+      r.stdout.includes('description: Bonsai is a standalone local research cache CLI for AI agents'),
+      'expected the package description on the second line'
+    );
+  });
+
+  check('explicit `list` does not show the bare-invocation identity header', () => {
+    const r = run(['list']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(!r.stdout.startsWith('bin: '), 'explicit `list` is not the AXI home view');
+  });
+
+  check('identity header is suppressed under --json even if --identity is set directly', () => {
+    const r = run(['list', '--identity', '--json']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(!r.stdout.includes('bin: '), '--json must stay a clean envelope, even with --identity');
+  });
+
   check('root --help exits 0 with COMMANDS', () => {
     const r = run(['--help']);
     expect(r.exitCode === 0, `exit ${r.exitCode}`);

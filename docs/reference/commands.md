@@ -25,8 +25,13 @@ Bonsai keeps a few asymmetries because they match agent workflows:
   import `--file`, and `-g` means tags on cache commands but `--global` on
   config commands. Check each command's help before reusing short flags.
 - Running `bonsai` with no arguments at all shows live cache data (the same as
-  `bonsai list`) instead of root help text. `bonsai help`, `--help`, and `-h`
-  are unaffected and remain the explicit command reference.
+  `bonsai list`) instead of root help text, preceded by a two-line identity
+  header (`bin: <path>` and `description: <one sentence>`) so an agent knows
+  what it is looking at without a separate `--help` call. The header is
+  human-mode only and specific to that true bare invocation — it does not
+  appear on an explicit `bonsai list`, and `--json`/`--toon` output stays a
+  clean envelope either way. `bonsai help`, `--help`, and `-h` are unaffected
+  and remain the explicit command reference.
 
 ---
 

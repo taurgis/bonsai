@@ -484,6 +484,12 @@
           "name": "full",
           "allowNo": false,
           "type": "boolean"
+        },
+        "identity": {
+          "hidden": true,
+          "name": "identity",
+          "allowNo": false,
+          "type": "boolean"
         }
       },
       "hasDynamicHelp": false,
@@ -1056,5 +1062,5 @@
       "stdoutIsPrimaryData": true
     }
   },
-  "version": "3.2.2"
+  "version": "4.0.0"
 }

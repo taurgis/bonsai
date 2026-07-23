@@ -192,6 +192,27 @@ describe('list command unit tests', () => {
     }
   });
 
+  it('shows the bin/description identity header only when --identity is set (AXI consistent-help)', async () => {
+    async function capturedLog(args: string[]): Promise<string> {
+      const logged: string[] = [];
+      const logSpy = vi.spyOn(console, 'log').mockImplementation((...logArgs: unknown[]) => {
+        logged.push(logArgs.map(String).join(' '));
+      });
+      try {
+        await ResearchList.run(args);
+        return logged.join('\n');
+      } finally {
+        logSpy.mockRestore();
+      }
+    }
+
+    const identityOutput = await capturedLog(['--identity']);
+    expect(identityOutput).toMatch(/^bin: .+\ndescription: .+/);
+
+    const plainOutput = await capturedLog([]);
+    expect(plainOutput).not.toContain('bin: ');
+  });
+
   it('fails if limit is out of bounds', async () => {
     const runPromise1 = ResearchList.run(['--limit', '200']);
     await expect(runPromise1).rejects.toThrow(/Limit must be between 1 and 100/);

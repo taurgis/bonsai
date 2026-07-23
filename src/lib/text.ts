@@ -1,6 +1,18 @@
 /** Display label when an artifact has no topic — not a filterable topic value. */
 export const NO_TOPIC_LABEL = '(no topic)';
 
+/**
+ * Collapse a leading home-directory prefix to `~`, matching how shells and tools like `git`
+ * display paths. Used for the home-view "bin:" identity line (AXI principle 10) so the executable
+ * path stays readable instead of a long absolute path.
+ */
+export function collapseHomeDir(path: string, homeDir: string): string {
+  if (homeDir && (path === homeDir || path.startsWith(`${homeDir}/`))) {
+    return `~${path.slice(homeDir.length)}`;
+  }
+  return path;
+}
+
 // Unicode "Control" category (C0 + C1) covers ANSI/terminal escape sequences: the ESC control
 // character that starts them is a member, so stripping this category is what keeps injected
 // control bytes from reaching a real terminal. Exported so `prompt-injection.ts`'s
