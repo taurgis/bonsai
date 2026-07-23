@@ -117,11 +117,12 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         options = { ...options, suggestions: options.suggestions.map(sanitizeForTerminal) };
       }
     }
-    // Nothing in this codebase passes `exit: false` today, but the override must still accept it
-    // (oclif's own `error()` does) to stay a valid override of the base Command method. Destructure
-    // `exit` into its own binding so narrowing it to the `false` literal actually narrows the object
-    // passed to `super.error()` into each of oclif's two overloads — narrowing a property read alone
-    // (`options.exit === false`) doesn't narrow the enclosing object's type, only a local variable's.
+    // `exit: false` is oclif's non-throwing error render (see `errorRow` on the CliIo port and
+    // `mapUrlsAllowingBatchErrors`/prune's per-row failures, all of which route through here for the
+    // same terminal-injection sanitization above). Destructure `exit` into its own binding so
+    // narrowing it to the `false` literal actually narrows the object passed to `super.error()` into
+    // each of oclif's two overloads — narrowing a property read alone (`options.exit === false`)
+    // doesn't narrow the enclosing object's type, only a local variable's.
     const { exit, ...rest } = options;
     if (exit === false) return super.error(input, { ...rest, exit });
     return super.error(input, { ...rest, exit });
