@@ -103,6 +103,10 @@ export function buildFetchResultData(input: FetchResultInput) {
       format === 'compressed'
         ? artifact.metadata.token_estimate.compressed
         : artifact.metadata.token_estimate.detailed,
+    // Always the true detailed count, even when `format` is `compressed` (AXI content-truncation
+    // principle: show the total size so the agent knows how much a `--format detailed` re-fetch
+    // would add, without a second round trip). Equals `tokenEstimate` when nothing was truncated.
+    detailedTokenEstimate: artifact.metadata.token_estimate.detailed,
     content,
   };
 }

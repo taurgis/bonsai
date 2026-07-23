@@ -39,6 +39,7 @@ shape:
     },
     "format": "compressed",
     "tokenEstimate": 29,
+    "detailedTokenEstimate": 65,
     "content": "Cleaned main content markdown text…"
   }
 }
@@ -47,6 +48,10 @@ shape:
 The `data` block differs per command. See the [Command Reference](/reference/commands)
 for each command's schema. `cache.status`, `cache.freshness`, and
 `source.extractionConfidence` are the fields agents most often branch on.
+`detailedTokenEstimate` is always the true `detailed`-format size, even on a
+`compressed` fetch — see [Compression &
+Budgeting](/concepts/compression#knowing-how-much-detail-was-cut) for how to
+use it and when the human-mode tip toward `--format detailed` appears.
 
 `list --json`/`--toon` always includes a top-level `summary` object alongside
 `data`: `total` (entries matched before `--limit`), `shown` (entries actually
@@ -148,6 +153,25 @@ text:
 integration that branches only on `ok` will miss the stale-serve signal. Check `exitCode` (or
 `data.cache.status`) too, not `ok` alone.
 
+## Output channels (and a deliberate AXI divergence)
+
+Bonsai broadly follows the [Agent eXperience Interface
+(AXI)](https://github.com/kunchenguid/axi) guidelines for agent-friendly CLIs, but diverges on one
+point on purpose: AXI's [structured-errors
+principle](https://github.com/kunchenguid/axi/blob/main/.agents/skills/axi/SKILL.md#output-channels)
+calls for errors on stdout in every mode. Bonsai does that under `--json`/`--toon` — the error
+envelope (`ok: false`, `code`, `content: null`) is the same stdout JSON/TOON shape a success
+response uses, so a machine caller never has to read two streams to get the full picture. In
+**human/text mode**, errors go to **stderr** instead, following [clig.dev's stdout-is-data,
+stderr-is-diagnostics convention](https://clig.dev/#output). Warnings (security- and
+freshness-relevant notices like a secret-routing redirect or a stale-serve) go to stderr in both
+modes — they're side effects the envelope's `ok`/`data` shouldn't be blocked on, but a caller
+should still be able to see.
+
+This is a mode-scoped divergence, not a blanket one: an agent driving Bonsai through `--json`/
+`--toon` already gets AXI's guarantee; the stderr split only applies to interactive/piped human
+terminal use, which Bonsai also has to serve well.
+
 ## Stable error code catalog
 
 When a failure has a stable `code`, agents should branch on `code` first and
@@ -169,6 +193,7 @@ mutually exclusive options", regardless of which flags conflicted.
 | `FILE_TOO_LARGE`         |                                               `1` | Import file exceeds the 1 MiB limit.                                       | Split or reduce the file.                                        |
 | `INVALID_DURATION`       |                                               `2` | Duration flag is empty, malformed, or zero.                                | Use a value like `2h`, `7d`, or `6m`.                            |
 | `INVALID_FLAG_VALUE`     |                                               `2` | Flag value not in the allowed set, or an empty URL/topic/tags filter.      | Use one of the values shown in the error.                        |
+| `INVALID_HOOK_FILE`      |                                               `1` | `setup`'s target hook file exists but isn't a single JSON object.          | Fix or remove the file by hand, then re-run `setup`.             |
 | `INVALID_LIMIT`          |                                               `2` | `--limit` is not an integer from 1 to 100.                                 | Pick an integer in range.                                        |
 | `INVALID_METADATA_VALUE` |                                               `2` | `--topic` or `--tags` contains a line break, or exceeds its length cap (200/100 chars). | Remove line breaks, or shorten the value.            |
 | `INVALID_URL`            | `2` for single URL, `1` for multi-URL row failure | URL could not be parsed or uses an unsupported scheme.                     | Provide a valid `http://` or `https://` URL.                     |
@@ -190,6 +215,7 @@ mutually exclusive options", regardless of which flags conflicted.
 | `SAFETY_CHECK_REQUIRED`  |                                               `2` | `prune` needs explicit `--dry-run` or `--yes`.                             | Preview first, then rerun with `--yes` if correct.               |
 | `STDIN_TOO_LARGE`        |                                               `1` | Import stdin exceeds the 1 MiB limit.                                      | Split or reduce the input.                                       |
 | `UNEXPECTED_ARGUMENT`    |                                               `2` | Extra positional arguments were supplied.                                  | Remove the extra argument or check usage.                        |
+| `UNKNOWN_AGENT`          |                                               `2` | `setup`'s `agent` argument isn't a supported target.                       | Use one of the agents listed in the error.                       |
 | `UNKNOWN_FLAG`           |                                               `2` | Flag is not defined for the command.                                       | Use the suggested flag or check help.                            |
 | `UNKNOWN_KEY`            |                                               `2` | Config key is not recognized.                                              | Use the suggested key or one from the valid-key list.            |
 
@@ -216,3 +242,41 @@ Agents get the most value by fetching through Bonsai once they know the official
 
 Because URLs are normalized and output is deterministic, the same request yields
 the same cache key and the same bytes, repeatable across runs and machines.
+
+## Ambient session context
+
+Everything above is on-demand: an agent has to know to call Bonsai. `bonsai setup <agent>`
+installs a `SessionStart` hook that runs `bonsai context` at the start of every session, so the
+cache's current state is visible before the agent does anything (the [AXI ambient-context
+principle](https://github.com/kunchenguid/axi/blob/main/.agents/skills/axi/SKILL.md#7-ambient-context-via-session-integrations)).
+
+```bash
+# Project-scoped (shareable via version control; the default):
+bonsai setup claude-code
+bonsai setup codex
+
+# User-level, machine-only:
+bonsai setup claude-code --global
+```
+
+`bonsai context` (what the hook runs) prints a short, directory-scoped summary — total cached
+entries, a freshness breakdown, and the most recently touched pages — capped to a handful of
+entries so the per-session cost stays small:
+
+```
+bonsai cache: 3 entries (2 fresh, 1 stale_grace, 0 stale_expired)
+- [Node URL API] fresh — https://nodejs.org/api/url.html
+- [React Suspense] fresh — https://react.dev/reference/react/Suspense
+- [Auth Guide] stale_grace — https://example.com/auth
+Tip: research a new page: bonsai <url>
+```
+
+`setup` is idempotent and self-repairing: re-running it after nothing changed is a silent no-op,
+and re-running it after Bonsai was reinstalled to a new path updates the hook's command in place,
+without touching any other hooks already in the file. Preview either behavior with
+`--dry-run --json` before writing anything.
+
+**Not yet supported: OpenCode.** AXI's own guidance recommends OpenCode's plugin system for the
+same ambient-context pattern, but OpenCode's plugin docs don't yet document a confirmed hook
+signature for injecting session-start context — `setup` won't guess at one. Passing `opencode`
+to `setup` explains this and points back here.

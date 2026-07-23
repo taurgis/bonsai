@@ -65,3 +65,17 @@ See [Configuration](/reference/configuration) for precedence rules.
   agent needs the gist and the structure. It is the default for a reason.
 - **`detailed`** when you need exact API signatures, full prose, or are about to
   quote the source verbatim.
+
+## Knowing how much detail was cut
+
+A `compressed` fetch's JSON envelope always includes `detailedTokenEstimate`
+alongside `tokenEstimate`, so an agent can see exactly how much bigger the full
+version is without a second round trip — `tokenEstimate` is what you got,
+`detailedTokenEstimate` is what `--format detailed` would return. The two are
+equal whenever nothing was actually truncated (including a `detailed` request
+itself). In human mode, a `Tip: ... --format detailed for the full N-token
+version` line appears only when there's a real gap to close — this mirrors the
+[AXI content-truncation
+principle](https://github.com/kunchenguid/axi/blob/main/.agents/skills/axi/SKILL.md#3-content-truncation):
+show the size of what's hidden, and only suggest the escape hatch when
+something was actually cut.

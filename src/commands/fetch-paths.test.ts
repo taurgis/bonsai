@@ -196,13 +196,40 @@ describe('fetch command branch coverage', () => {
 
       warnSpy.mockClear();
       await FetchCommand.run([TEST_URL, '--force', '--dry-run']);
+      // The inspect tip requires a real cached artifact, so it's suppressed on --dry-run; the
+      // truncation size-hint (below) is about the returned content itself and is unaffected by
+      // dry-run, so it may still appear.
       expect(warnSpy.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
-        expect.stringContaining('Tip:')
+        expect.stringContaining('for cached metadata')
       );
 
       warnSpy.mockClear();
       await FetchCommand.run([TEST_URL, '--force', '--json']);
       expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('tips toward --format detailed only when the compressed result was actually truncated', async () => {
+    mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+    const warnSpy = vi.spyOn(FetchCommand.prototype as any, 'warn').mockImplementation(() => '');
+    try {
+      const compressed: any = await FetchCommand.run([TEST_URL]);
+      expect(compressed.detailedTokenEstimate).toBeGreaterThan(compressed.tokenEstimate);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).toContainEqual(
+        expect.stringContaining(
+          `--format detailed for the full ${compressed.detailedTokenEstimate}-token version ` +
+            `(currently showing ${compressed.tokenEstimate})`
+        )
+      );
+
+      warnSpy.mockClear();
+      const detailed: any = await FetchCommand.run([TEST_URL, '--force', '--format', 'detailed']);
+      expect(detailed.detailedTokenEstimate).toBe(detailed.tokenEstimate);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
+        expect.stringContaining('--format detailed')
+      );
     } finally {
       warnSpy.mockRestore();
     }

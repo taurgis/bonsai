@@ -1,5 +1,54 @@
 {
   "commands": {
+    "context": {
+      "aliases": [],
+      "args": {},
+      "description": "Print a short summary of the current research cache: total entries, a freshness breakdown, and the most recently touched pages. This is what `bonsai setup` wires into a SessionStart hook, so a session starts with the cache's state already visible.",
+      "examples": [
+        {
+          "description": "preview what a SessionStart hook would show",
+          "command": "<%= config.bin %> context"
+        },
+        {
+          "description": "get the dashboard as JSON",
+          "command": "<%= config.bin %> context --json"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "context",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Show a compact cache dashboard for ambient session context",
+      "enableJsonFlag": true,
+      "stdoutIsPrimaryData": true
+    },
     "fetch": {
       "aliases": [],
       "args": {
@@ -620,6 +669,87 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Prune cached research artifacts",
+      "enableJsonFlag": true,
+      "stdoutIsPrimaryData": true
+    },
+    "setup": {
+      "aliases": [],
+      "args": {
+        "agent": {
+          "description": "agent to install the hook for (claude-code, codex)",
+          "name": "agent",
+          "required": true
+        }
+      },
+      "description": "Writes (or repairs) a SessionStart hook entry that runs `bonsai context` at the start of every session, so the agent sees the cache state before doing anything. Project-scoped by default (shareable via version control); pass --global for a user-level, machine-only install. Re-running is idempotent: an unchanged install is a no-op, and a stale executable path is repaired.",
+      "examples": [
+        {
+          "description": "install the hook for this project (Claude Code)",
+          "command": "<%= config.bin %> setup claude-code"
+        },
+        {
+          "description": "install the hook for this project (Codex)",
+          "command": "<%= config.bin %> setup codex"
+        },
+        {
+          "description": "preview a user-level install without writing anything",
+          "command": "<%= config.bin %> setup claude-code --global --dry-run --json"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "global": {
+          "char": "g",
+          "description": "install to the user-level config instead of the project (default: project)",
+          "name": "global",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "local": {
+          "aliases": [
+            "project"
+          ],
+          "description": "install to the project config (default; explicit form of the default)",
+          "name": "local",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "preview the install without writing anything",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "setup",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Install a SessionStart hook that shows live cache context",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },
