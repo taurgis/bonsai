@@ -30,10 +30,11 @@ export default function register(harness, fixtures) {
     });
     expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
 
-    const jsonResult = run(['list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    // --full so the parity check below covers a field (cacheKey) outside the minimal default row.
+    const jsonResult = run(['list', '--full', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     const jsonRow = parseJson(jsonResult.stdout)?.data?.[0];
 
-    const toonResult = run(['list', '--toon'], { cwd: ws.cwd, xdg: ws.xdg });
+    const toonResult = run(['list', '--full', '--toon'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(toonResult.exitCode === 0, `exit ${toonResult.exitCode}`);
     // TOON's own syntax proves this is a real re-encoding, not JSON under a different flag name.
     expect(toonResult.stdout.includes('data[1]'), toonResult.stdout);

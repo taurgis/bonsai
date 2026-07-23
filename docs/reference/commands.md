@@ -24,6 +24,9 @@ Bonsai keeps a few asymmetries because they match agent workflows:
 - Short flags are command-local. For example, `-f` means fetch `--format` but
   import `--file`, and `-g` means tags on cache commands but `--global` on
   config commands. Check each command's help before reusing short flags.
+- Running `bonsai` with no arguments at all shows live cache data (the same as
+  `bonsai list`) instead of root help text. `bonsai help`, `--help`, and `-h`
+  are unaffected and remain the explicit command reference.
 
 ---
 
@@ -320,6 +323,7 @@ flood the listing — find them with `inspect` (which lists a page's sections).
 | `--capture-method` | —     | choice  | —       | Capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`.                |
 | `--url`            | —     | glob    | —       | Source URL glob (case-insensitive, supports `*`).                                                                          |
 | `--limit`          | —     | integer | `50`    | Cap the result count (1–100).                                                                                              |
+| `--full`           | —     | boolean | `false` | Return every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps) instead of the minimal default row. |
 | `--read-only`      | —     | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
 | `--toon`           | —     | boolean | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                      |
 | `--json`           | —     | boolean | `false` | Return the machine-readable envelope.                                                                                      |
@@ -331,6 +335,22 @@ than silently matching everything or nothing — almost always a shell-quoting
 mistake.
 
 ### JSON Output envelope `data` block
+
+By default each row is the minimal shape an agent needs to judge relevance and
+act next — fetch/inspect the source, gauge freshness, budget tokens:
+
+```json
+[
+  {
+    "sourceUrls": ["https://example.com"],
+    "topic": "example",
+    "freshness": "fresh" | "stale_grace" | "stale_expired",
+    "tokenEstimate": { "compressed": 29, "detailed": 65 }
+  }
+]
+```
+
+Pass `--full` for every metadata field:
 
 ```json
 [
@@ -351,9 +371,9 @@ mistake.
 ]
 ```
 
-When more entries match than `--limit`, the envelope also includes a top-level
-`truncation` object (and `data` remains the capped array). Absence of `truncation`
-means the result set was not capped:
+The envelope always includes a top-level `summary` object alongside `data` —
+aggregate counts plus an explicit empty-result signal, computed over every
+matched entry (before `--limit`):
 
 ```json
 {
@@ -364,15 +384,20 @@ means the result set was not capped:
   "stdout": "",
   "stderr": "",
   "data": [ /* at most --limit rows */ ],
-  "truncation": {
-    "totalMatched": 12,
+  "summary": {
+    "total": 12,
     "shown": 2,
-    "limit": 2
+    "limit": 2,
+    "truncated": true,
+    "empty": false,
+    "byFreshness": { "fresh": 9, "stale_grace": 2, "stale_expired": 1 }
   }
 }
 ```
 
-Under `--json`, truncation is never mirrored as a process-stderr tip — the
+`empty: true` (with `total`/`shown` both `0`) is the definitive signal for "no
+matches" — never infer it from an empty `data` array alone. Under `--json`,
+none of this is ever mirrored as a process-stderr tip — the
 envelope field is the stable agent signal.
 
 ---

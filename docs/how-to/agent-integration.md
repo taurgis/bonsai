@@ -48,10 +48,23 @@ The `data` block differs per command. See the [Command Reference](/reference/com
 for each command's schema. `cache.status`, `cache.freshness`, and
 `source.extractionConfidence` are the fields agents most often branch on.
 
-When `list --json` caps results with `--limit`, the envelope includes a top-level
-`truncation` object (`totalMatched`, `shown`, `limit`) while `data` stays the
-capped array. Absence of `truncation` means nothing was cut — do not scrape
-stderr for a tip (process stderr stays empty under `--json`).
+`list --json`/`--toon` always includes a top-level `summary` object alongside
+`data`: `total` (entries matched before `--limit`), `shown` (entries actually
+returned), `limit`, `truncated` (`total > shown`), `empty` (`total === 0`, an
+explicit signal so a zero-result `data: []` is never ambiguous), and
+`byFreshness` (a `fresh`/`stale_grace`/`stale_expired` count over the matched
+set) — a cache-wide aggregate without a second round trip. Do not scrape
+stderr for a truncation tip; process stderr stays empty under `--json`.
+
+`list`'s default row is intentionally minimal — `sourceUrls`, `topic`,
+`freshness`, and `tokenEstimate` — the fields needed to judge relevance and
+act next. Pass `--full` for every metadata field (cache key, path, artifact
+type, tags, capture method, quality notes, timestamps).
+
+Running `bonsai` with no arguments at all shows live cache data (equivalent to
+`bonsai list`) instead of the root help text — the CLI answers "what do I
+have?" by default. `bonsai help`, `bonsai --help`, and `-h` remain the
+explicit path to the command reference.
 
 ## TOON output
 
@@ -73,9 +86,30 @@ ok: true
 exitCode: 0
 stdout: ""
 stderr: ""
-data[1]{cacheKey,artifactType,topic,...}:
-  0f115db0...e9d7,source,Node.js URL API,...
+data[1]:
+  - sourceUrls[1]: "https://nodejs.org/api/url.html"
+    topic: Node.js URL API
+    freshness: fresh
+    tokenEstimate:
+      compressed: 29
+      detailed: 65
+summary:
+  total: 1
+  shown: 1
+  limit: 50
+  truncated: false
+  empty: false
+  byFreshness:
+    fresh: 1
+    stale_grace: 0
+    stale_expired: 0
 ```
+
+TOON's tabular `data[N]{field,...}:` header form only applies to arrays of
+records with uniform primitive fields. `list`'s row has a nested `tokenEstimate`
+object and a `sourceUrls` array, so the encoder falls back to one indented
+mapping per row instead — the tradeoff for `--full` is the same, since every
+row there also carries `tags`, `qualityNotes`, and `tokenEstimate`.
 
 `--json` and `--toon` are mutually exclusive — passing both fails fast with
 `CONFLICTING_FLAGS` (exit `2`) rather than silently picking one.

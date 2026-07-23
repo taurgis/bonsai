@@ -140,6 +140,16 @@ export function normalizeArgv(
   options: ArgvNormalizeOptions
 ): NormalizationResult {
   const { valueTakingFlags, knownCommandRoots } = options;
+
+  // AXI "content first": a truly bare invocation (`bonsai`, no args/flags at all) shows live cache
+  // data instead of oclif's default root help — `bonsai help`, `--help`, and `-h` remain the
+  // explicit path to the command reference (all of them are non-empty argv and skip this branch).
+  // oclif has no built-in "default command" concept for empty argv (see oclif/oclif#277), so this
+  // is a one-line argv rewrite, the same technique the URL-shorthand rewrite below already uses.
+  if (rawArgv.length === 0) {
+    return { argv: ['list'] };
+  }
+
   // oclif's JSON flag is command-scoped, so `bonsai list --json` works but
   // `bonsai --json list` is otherwise parsed as an unknown command named
   // "--json". Collect every --json, append one copy after the command/URL, and
@@ -195,7 +205,7 @@ export function normalizeArgv(
 
   // Flag-only argv (`--json`, `--read-only`, `--tags https://…`) never resolves a command.
   // Exit here so command_not_found does not special-case dash-prefixed ids.
-  // Empty argv and `--help`/`--version` stay with oclif.
+  // Truly empty argv already returned above; `--help`/`--version` stay with oclif here.
   if (!helpRequested && core.length > 0 && !hasCommandToken(core, valueTakingFlags)) {
     return {
       argv: jsonMode ? ['--json'] : [],

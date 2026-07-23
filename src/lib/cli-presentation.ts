@@ -32,6 +32,8 @@ export const CLI_FLAG_DESCRIPTIONS = {
   listArtifactType:
     'artifact type; section children are omitted from list - use inspect to see them',
   pruneArtifactType: 'artifact type to prune, including section children',
+  listFull:
+    'include every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps); default output is a minimal row (source URLs, topic, freshness, token estimate)',
 } as const;
 
 /** One human-readable label/value pair for CLI stdout. */

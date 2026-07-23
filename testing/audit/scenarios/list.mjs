@@ -64,6 +64,44 @@ export default function register(harness, fixtures) {
     expect(r.stderr === '', `process stderr should stay clean under --json: ${r.stderr}`);
   });
 
+  check('list empty cache --json summary.empty is an explicit definitive-empty signal', () => {
+    const r = run(['list', '--json']);
+    const env = parseJson(r.stdout);
+    expect(env?.summary?.empty === true, `summary ${JSON.stringify(env?.summary)}`);
+    expect(env?.summary?.total === 0 && env?.summary?.shown === 0, 'summary counts zero');
+    expect(
+      env?.summary?.byFreshness?.fresh === 0 &&
+        env?.summary?.byFreshness?.stale_grace === 0 &&
+        env?.summary?.byFreshness?.stale_expired === 0,
+      `byFreshness ${JSON.stringify(env?.summary?.byFreshness)}`
+    );
+  });
+
+  check('list default --json row is the minimal 4-field shape; --full returns every field', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-list-minimal-vs-full';
+    const imported = run(['import', url, '--stdin', '--topic', 'MinimalVsFull', '--tags', 't', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Minimal vs full fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const minimal = run(['list', '--topic', 'MinimalVsFull', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const minimalRow = parseJson(minimal.stdout)?.data?.[0];
+    expect(
+      minimalRow &&
+        Object.keys(minimalRow).sort().join(',') === 'freshness,sourceUrls,tokenEstimate,topic',
+      `minimal row keys ${JSON.stringify(minimalRow && Object.keys(minimalRow))}`
+    );
+
+    const full = run(['list', '--topic', 'MinimalVsFull', '--full', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const fullRow = parseJson(full.stdout)?.data?.[0];
+    expect(fullRow?.artifactType === 'source', 'full row has artifactType');
+    expect(Array.isArray(fullRow?.tags) && fullRow.tags.includes('t'), 'full row has tags');
+    expect(typeof fullRow?.cacheKey === 'string' && fullRow.cacheKey.length > 0, 'full row has cacheKey');
+  });
+
   check('list no-match filter --json returns clean empty data with no tip anywhere', () => {
     const ws = createWorkspace();
     const imported = run(
@@ -130,7 +168,7 @@ export default function register(harness, fixtures) {
     );
   });
 
-  check('list --json limit truncation surfaces envelope.truncation, no stderr tip', () => {
+  check('list --json limit truncation surfaces envelope.summary, no stderr tip', () => {
     const ws = createWorkspace();
     for (const url of [
       'https://example.com/audit-list-limit-one',
@@ -152,10 +190,10 @@ export default function register(harness, fixtures) {
     expect(listed.exitCode === 0, `list exit ${listed.exitCode}`);
     expect(env?.data?.length === 1, `data length ${env?.data?.length}`);
     expect(env?.stdout === '', 'stdout field remains clean');
-    // Intentional #73 contract: truncation signal moved to envelope.truncation (#91), never process stderr.
+    // Intentional #73/#128 contract: truncation signal lives in envelope.summary, never process stderr.
     expect(
-      env?.truncation && env.truncation.totalMatched === 2 && env.truncation.shown === 1 && env.truncation.limit === 1,
-      `truncation ${JSON.stringify(env?.truncation)}`
+      env?.summary?.total === 2 && env.summary.shown === 1 && env.summary.limit === 1 && env.summary.truncated === true,
+      `summary ${JSON.stringify(env?.summary)}`
     );
     expect(listed.stderr === '', `process stderr should stay clean under --json: ${listed.stderr}`);
   });
@@ -189,11 +227,12 @@ export default function register(harness, fixtures) {
     expect(importedNote.exitCode === 0, `import note exit ${importedNote.exitCode}`);
 
     // Every import in this workspace is agent_supplied, so every artifact matches that capture
-    // method, but only the `source` type matches the single-URL import.
-    const sources = run(['list', '--artifact-type', 'source', '--capture-method', 'agent_supplied', '--json'], {
-      cwd: ws.cwd,
-      xdg: ws.xdg,
-    });
+    // method, but only the `source` type matches the single-URL import. --full so artifactType is
+    // present to assert on (it's outside the minimal default row).
+    const sources = run(
+      ['list', '--artifact-type', 'source', '--capture-method', 'agent_supplied', '--full', '--json'],
+      { cwd: ws.cwd, xdg: ws.xdg }
+    );
     expect(sources.exitCode === 0, `sources exit ${sources.exitCode}`);
     const sourceEntries = parseJson(sources.stdout)?.data;
     expect(
@@ -202,7 +241,7 @@ export default function register(harness, fixtures) {
     );
     expect(sourceEntries.some((e) => e.sourceUrls.includes(singleUrl)), 'single-source entry present');
 
-    const notes = run(['list', '--artifact-type', 'research_note', '--json'], {
+    const notes = run(['list', '--artifact-type', 'research_note', '--full', '--json'], {
       cwd: ws.cwd,
       xdg: ws.xdg,
     });
@@ -288,7 +327,7 @@ export default function register(harness, fixtures) {
       '---\ntitle: Unrelated personal notes\n---\n\n# Not a Bonsai artifact\n'
     );
 
-    const listed = run(['list', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const listed = run(['list', '--full', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(listed.exitCode === 0, `list exit ${listed.exitCode}`);
     const entries = parseJson(listed.stdout)?.data;
     expect(Array.isArray(entries) && entries.length === 1, `data ${JSON.stringify(entries)}`);

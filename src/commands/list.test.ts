@@ -105,8 +105,8 @@ describe('list command unit tests', () => {
       'volatile',
     ]);
 
-    // 1. List all entries
-    const listAll = (await ResearchList.run([])) as any[];
+    // 1. List all entries (--full: this test asserts on fields outside the minimal default row)
+    const listAll = (await ResearchList.run(['--full'])) as any[];
     expect(listAll).toBeDefined();
     expect(listAll.length).toBeGreaterThanOrEqual(3);
 
@@ -121,7 +121,7 @@ describe('list command unit tests', () => {
     expect(listTopic.every((x) => x.topic === 'React List Cache')).toBe(true);
 
     // 3. Filter by tags
-    const listTags = (await ResearchList.run(['--tags', 'node'])) as any[];
+    const listTags = (await ResearchList.run(['--tags', 'node', '--full'])) as any[];
     expect(listTags.length).toBeGreaterThanOrEqual(1);
     expect(listTags.every((x) => x.tags.includes('node'))).toBe(true);
 
@@ -130,6 +130,39 @@ describe('list command unit tests', () => {
     expect(listMethod.length).toBeGreaterThanOrEqual(3);
 
     readSpy.mockRestore();
+  });
+
+  it('returns a minimal 4-field row by default; --full returns every metadata field', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValueOnce('# Minimal Row Fixture\nBody.');
+    await ResearchImport.run([
+      'https://example.com/minimal-row-test',
+      '--stdin',
+      '--topic',
+      'MinimalRow',
+      '--tags',
+      'a-tag',
+    ]);
+    readSpy.mockRestore();
+
+    const [minimalRow] = (await ResearchList.run(['--topic', 'MinimalRow'])) as any[];
+    expect(Object.keys(minimalRow).sort()).toEqual(
+      ['freshness', 'sourceUrls', 'tokenEstimate', 'topic'].sort()
+    );
+
+    const [fullRow] = (await ResearchList.run(['--topic', 'MinimalRow', '--full'])) as any[];
+    expect(fullRow).toMatchObject({
+      artifactType: 'source',
+      tags: ['a-tag'],
+      topic: 'MinimalRow',
+    });
+    expect(fullRow).toHaveProperty('cacheKey');
+    expect(fullRow).toHaveProperty('path');
+    expect(fullRow).toHaveProperty('captureMethod');
+    expect(fullRow).toHaveProperty('qualityNotes');
+    expect(fullRow).toHaveProperty('fetchedAt');
+    expect(fullRow).toHaveProperty('validatedAt');
   });
 
   it('strips ANSI escape codes from a cached topic before printing it to the terminal', async () => {
@@ -233,7 +266,7 @@ describe('list command unit tests', () => {
       })
     );
 
-    const result = (await ResearchList.run([])) as any[];
+    const result = (await ResearchList.run(['--full'])) as any[];
     expect(result.some((r) => r.artifactType === 'section')).toBe(false);
     expect(result.map((r) => r.cacheKey)).toEqual([PAGE_KEY]);
   });
@@ -345,7 +378,7 @@ describe('list command unit tests', () => {
       const rows = (await ResearchList.run(['--limit', '2', '--json'])) as any[];
       expect(rows.length).toBe(2);
       // Intentional #73: --json suppresses tip/truncation messaging on process stderr.
-      // Envelope `truncation` shape is pinned at the contract seam (cli-contract-pin.test.ts).
+      // Envelope `summary` shape is pinned at the contract seam (cli-contract-pin.test.ts).
       expect(stderrChunks.join('')).not.toMatch(/showing first|truncat/i);
     } finally {
       errSpy.mockRestore();
