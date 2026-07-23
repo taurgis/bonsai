@@ -220,7 +220,9 @@ describe('prune command unit tests', () => {
         { cacheKey: 'missing-a', path: '/nonexistent/missing-a.md', topic: null, url: null },
         { cacheKey: 'missing-b', path: '/nonexistent/missing-b.md', topic: null, url: null },
       ]);
-    const warnSpy = vi.spyOn(ResearchPrune.prototype as any, 'warn').mockImplementation(() => '');
+    // A failed unlink renders via this.error(..., { exit: false }) now (Error, not Warning — see
+    // deletePruneCandidates), so mock `error` rather than `warn` to keep the test's stderr quiet.
+    const errorSpy = vi.spyOn(ResearchPrune.prototype as any, 'error').mockImplementation(() => '');
 
     try {
       const { result, envelope } = await captureEnvelope(() =>
@@ -235,10 +237,16 @@ describe('prune command unit tests', () => {
         code: 'PRUNE_PARTIAL_FAILURE',
       });
       expect(String(envelope.stderr)).toContain('Failed to delete 2 of 2');
+      expect(
+        errorSpy.mock.calls.some(
+          (call) =>
+            String(call[0]).includes('Failed to delete cache file') && call[1]?.exit === false
+        )
+      ).toBe(true);
     } finally {
       process.exitCode = prevExit;
       candidatesSpy.mockRestore();
-      warnSpy.mockRestore();
+      errorSpy.mockRestore();
     }
   });
 
