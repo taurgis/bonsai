@@ -125,8 +125,8 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       default: false,
       description: CLI_FLAG_DESCRIPTIONS.listFull,
     }),
-    // Set only by the argv rewrite for a truly bare `bonsai` invocation (see normalizeArgv), never
-    // documented for direct use — an explicit `bonsai list` is not the AXI "home view".
+    // Only ever set by the argv rewrite for a truly bare `bonsai` invocation (see normalizeArgv);
+    // hidden because it is not documented or intended for direct use.
     identity: Flags.boolean({ default: false, hidden: true }),
   };
 
@@ -202,8 +202,8 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   /**
    * Identity header for the AXI "home view" (bare `bonsai`, no args): the tool's own bin path and
    * one-sentence description, shown before the live data so an agent orients on what it's looking
-   * at without a separate `--help` round trip. Human mode only — set by the argv rewrite via the
-   * hidden `--identity` flag, never by an explicit `bonsai list`.
+   * at without a separate `--help` round trip. Human mode only — the hidden `--identity` flag is
+   * only ever set by the argv rewrite for a bare invocation; it is not documented for direct use.
    */
   private logIdentityHeader(): void {
     if (!this.flags.identity || this.jsonEnabled()) return;
