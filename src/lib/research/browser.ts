@@ -577,8 +577,11 @@ export function describeNavigationFailure(errorText: string, url: string): Error
   );
 }
 
-// Chrome can emit these on first navigation in headless CI when the cert verifier reloads mid-run.
-const TRANSIENT_NAV_ERROR_CODES = ['ERR_CERT_VERIFIER_CHANGED'];
+// ERR_CERT_VERIFIER_CHANGED: Chrome can emit this on first navigation in headless CI when the cert
+// verifier reloads mid-run. ERR_CONNECTION_CLOSED is Chromium's code for a plain remote TCP FIN
+// (net_error_list.h), which CI runners can hit as a one-off network blip against a real host
+// rather than a real block.
+const TRANSIENT_NAV_ERROR_CODES = ['ERR_CERT_VERIFIER_CHANGED', 'ERR_CONNECTION_CLOSED'];
 
 // Resource contention in CI (concurrent jobs competing for CPU/disk) can make Chrome itself fail
 // to come up in time, or die before its devtools websocket URL is printed. Neither reflects a
@@ -588,7 +591,9 @@ const TRANSIENT_CHROME_STARTUP_MESSAGES = [
   'Chrome exited prematurely',
 ];
 
-function isTransientBrowserError(err: unknown): boolean {
+// Exported so tests can assert the transient-error classification directly rather than only
+// indirectly through a live fetchRenderedHtml retry, which needs a real Chrome navigation to fail.
+export function isTransientBrowserError(err: unknown): boolean {
   const message = err instanceof Error ? err.message : String(err);
   return (
     TRANSIENT_NAV_ERROR_CODES.some((code) => message.includes(code)) ||
