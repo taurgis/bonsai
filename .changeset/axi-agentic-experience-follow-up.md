@@ -1,6 +1,9 @@
 ---
-"@taurgis/bonsai": minor
+"@taurgis/bonsai": major
 ---
+
+**Breaking:** `list`'s default `--json`/`--toon` output contract changes — existing scripts or
+agents that parse the previous 12-field row or read `envelope.truncation` must update (see below).
 
 Closes four more gaps from an [AXI](https://github.com/kunchenguid/axi) agent-experience audit
 (following `--toon` and next-step tips):
