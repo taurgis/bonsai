@@ -6,10 +6,12 @@ describe('normalizeArgv', () => {
   const cases = [
     {
       // AXI "content first": bare `bonsai` shows live cache data (via `list`) instead of help.
-      name: 'truly empty argv redirects to `list` (content-first default)',
+      // `--identity` (AXI principle 10) additionally tells `list` to identify the tool (bin path,
+      // description) before that data — only this true bare invocation gets it.
+      name: 'truly empty argv redirects to `list --identity` (content-first default)',
       input: [],
       expected: {
-        argv: ['list'],
+        argv: ['list', '--identity'],
       },
     },
     {

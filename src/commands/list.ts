@@ -1,4 +1,5 @@
 import { Flags } from '@oclif/core';
+import { homedir } from 'node:os';
 import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
@@ -10,6 +11,7 @@ import {
 } from '../lib/research/schema.js';
 import {
   NO_TOPIC_LABEL,
+  collapseHomeDir,
   formatTip,
   resultListHeading,
   sanitizeForTerminal,
@@ -123,6 +125,9 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       default: false,
       description: CLI_FLAG_DESCRIPTIONS.listFull,
     }),
+    // Only ever set by the argv rewrite for a truly bare `bonsai` invocation (see normalizeArgv);
+    // hidden because it is not documented or intended for direct use.
+    identity: Flags.boolean({ default: false, hidden: true }),
   };
 
   static stdoutIsPrimaryData = true;
@@ -194,6 +199,19 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     );
   }
 
+  /**
+   * Identity header for the AXI "home view" (bare `bonsai`, no args): the tool's own bin path and
+   * one-sentence description, shown before the live data so an agent orients on what it's looking
+   * at without a separate `--help` round trip. Human mode only — the hidden `--identity` flag is
+   * only ever set by the argv rewrite for a bare invocation; it is not documented for direct use.
+   */
+  private logIdentityHeader(): void {
+    if (!this.flags.identity || this.jsonEnabled()) return;
+    const binPath = collapseHomeDir(process.argv[1] ?? this.config.bin, homedir());
+    this.log(`bin: ${binPath}`);
+    this.log(`description: ${this.config.pjson.description ?? this.config.bin}\n`);
+  }
+
   private logListResults(finalResults: ListRow[], totalMatched: number): void {
     if (finalResults.length === 0) {
       this.emitEmptyListGuidance();
@@ -253,6 +271,8 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       emptyTopicFilterError(this.flags.topic) ??
       emptyTagsFilterError(this.flags.tags);
     if (flagErr) this.error(flagErr, { exit: 2, code: 'INVALID_FLAG_VALUE' });
+
+    this.logIdentityHeader();
 
     const roots = loadStoreRoots({
       configDir: this.config.configDir,

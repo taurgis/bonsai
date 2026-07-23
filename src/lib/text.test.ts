@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   closestMatch,
   closestOptionValues,
+  collapseHomeDir,
   levenshtein,
   maxFuzzyDistance,
   pluralize,
@@ -14,6 +15,26 @@ const ESC = String.fromCharCode(27);
 
 const LIST: ResultListLabels = { noun: 'cached research', order: 'first' };
 const SEARCH: ResultListLabels = { noun: 'matching cached research', order: 'top' };
+
+describe('collapseHomeDir', () => {
+  it('collapses a path under the home directory to ~', () => {
+    expect(collapseHomeDir('/home/user/.local/bin/bonsai', '/home/user')).toBe(
+      '~/.local/bin/bonsai'
+    );
+  });
+
+  it('collapses the home directory itself to ~', () => {
+    expect(collapseHomeDir('/home/user', '/home/user')).toBe('~');
+  });
+
+  it('leaves a path outside the home directory unchanged', () => {
+    expect(collapseHomeDir('/usr/local/bin/bonsai', '/home/user')).toBe('/usr/local/bin/bonsai');
+  });
+
+  it('does not collapse a sibling directory that merely shares the home dir as a prefix', () => {
+    expect(collapseHomeDir('/home/user2/bin/bonsai', '/home/user')).toBe('/home/user2/bin/bonsai');
+  });
+});
 
 describe('sanitizeForTerminal', () => {
   it('strips ANSI escape sequences so a cached topic cannot recolor the terminal', () => {

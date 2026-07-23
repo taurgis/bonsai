@@ -63,8 +63,12 @@ type, tags, capture method, quality notes, timestamps).
 
 Running `bonsai` with no arguments at all shows live cache data (equivalent to
 `bonsai list`) instead of the root help text — the CLI answers "what do I
-have?" by default. `bonsai help`, `bonsai --help`, and `-h` remain the
-explicit path to the command reference.
+have?" by default. That bare invocation also prints a two-line identity
+header first (`bin: <path>`, `description: <one sentence>`) so an agent
+orients on the tool itself before the data; the header is human-mode only and
+does not appear on an explicit `bonsai list` or under `--json`/`--toon`.
+`bonsai help`, `bonsai --help`, and `-h` remain the explicit path to the
+command reference.
 
 ## TOON output
 
