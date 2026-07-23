@@ -10,6 +10,7 @@ import {
   describeUnsafeNavigationTarget,
   fetchRenderedHtml,
   findChromePath,
+  isTransientBrowserError,
   killChromeTree,
   ResponseCapture,
   SANDBOX_EGRESS_ERROR_MARKER,
@@ -519,6 +520,26 @@ describe('findChromePath unit tests', () => {
       else process.env.PLAYWRIGHT_BROWSERS_PATH = originalBrowsersPath;
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe('isTransientBrowserError', () => {
+  it('treats a connection-closed navigation error as transient', () => {
+    expect(
+      isTransientBrowserError(new Error('Navigation failed: net::ERR_CONNECTION_CLOSED'))
+    ).toBe(true);
+  });
+
+  it('treats a cert-verifier-changed navigation error as transient', () => {
+    expect(
+      isTransientBrowserError(new Error('Navigation failed: net::ERR_CERT_VERIFIER_CHANGED'))
+    ).toBe(true);
+  });
+
+  it('does not treat an unrelated navigation error as transient', () => {
+    expect(
+      isTransientBrowserError(new Error('Navigation failed: net::ERR_CONNECTION_REFUSED'))
+    ).toBe(false);
   });
 });
 
