@@ -47,6 +47,8 @@ npx @taurgis/bonsai config unset storage --local
 - `--global` / `-g`: target the user-level config file (default for `set`/`unset`).
 - `--local` / `--project` / `-p`: target the project-level file (`.bonsai.json`).
 - `--dry-run`: show the change without writing.
+- `--read-only` / `--plan`: inherited global flag; (`set`/`unset`) preview without writing.
+- `--toon`: emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.
 - `--json`: machine-readable envelope.
 
 ## File locations

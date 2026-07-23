@@ -53,6 +53,33 @@ When `list --json` caps results with `--limit`, the envelope includes a top-leve
 capped array. Absence of `truncation` means nothing was cut — do not scrape
 stderr for a tip (process stderr stays empty under `--json`).
 
+## TOON output
+
+Pass `--toon` instead of `--json` to get the identical envelope — same
+`schemaVersion`, `data`, `code`, `exitCode`, all of it — encoded as
+[TOON](https://toonformat.dev/) (Token-Oriented Object Notation) instead of
+JSON. TOON is a YAML-indentation, CSV-tabular encoding built for LLM prompts;
+on mixed-structure data it runs roughly 40% fewer tokens than the equivalent
+JSON, per the format's own published benchmarks. Reach for it when a caller is
+token-constrained and doesn't need to be JSON specifically — anything that can
+`JSON.parse` an envelope can also `decode()` a TOON one with the
+[`@toon-format/toon`](https://www.npmjs.com/package/@toon-format/toon) package.
+
+```
+$ bonsai list --toon
+schemaVersion: 1
+command: list
+ok: true
+exitCode: 0
+stdout: ""
+stderr: ""
+data[1]{cacheKey,artifactType,topic,...}:
+  0f115db0...e9d7,source,Node.js URL API,...
+```
+
+`--json` and `--toon` are mutually exclusive — passing both fails fast with
+`CONFLICTING_OUTPUT_FLAGS` (exit `2`) rather than silently picking one.
+
 ## Read-only / plan mode
 
 Use `--read-only` (alias `--plan`), `BONSAI_READ_ONLY=1`, or `BONSAI_PLAN_MODE=1` when an agent
@@ -97,6 +124,7 @@ mutually exclusive options", regardless of which flags conflicted.
 | `COMMAND_NOT_FOUND`      |                                               `2` | Command or topic does not exist.                                           | Use the suggested command or run `bonsai help`.                  |
 | `CONFIG_DIR_UNAVAILABLE` |                                               `1` | User-level config directory is unavailable.                                | Use `--local` for project config.                                |
 | `CONFLICTING_FLAGS`      |                                               `2` | Mutually exclusive flags or source modes were combined.                    | Choose exactly one mode.                                         |
+| `CONFLICTING_OUTPUT_FLAGS` |                                             `2` | `--json` and `--toon` were both passed.                                    | Choose exactly one output format.                                |
 | `DUPLICATE_FLAG`         |                                               `2` | A single-value flag was passed more than once.                            | Remove the duplicate occurrence.                                 |
 | `EMPTY_INPUT`            |                                               `2` | Import input was empty.                                                    | Provide non-empty Markdown.                                      |
 | `FETCH_FAILED`           |                                               `1` | Network, HTTP, extraction, DNS, proxy, or SSRF runtime failure.            | Check the URL/network, retry later, or import manually.          |

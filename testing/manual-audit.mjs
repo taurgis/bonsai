@@ -20,6 +20,7 @@ import registerColor from './audit/scenarios/color.mjs';
 import registerErrorCodes from './audit/scenarios/error-codes.mjs';
 import registerReadOnly from './audit/scenarios/read-only.mjs';
 import registerErrorMessageSanitization from './audit/scenarios/error-message-sanitization.mjs';
+import registerToon from './audit/scenarios/toon.mjs';
 
 ensureBuilt();
 
@@ -41,6 +42,7 @@ const scenarios = [
   registerErrorCodes,
   registerReadOnly,
   registerErrorMessageSanitization,
+  registerToon,
 ];
 
 for (const register of scenarios) {

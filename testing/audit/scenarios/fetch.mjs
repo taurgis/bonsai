@@ -1,5 +1,10 @@
 /** URL shorthand fetch command (root bonsai <url>). */
-import { ageArtifact, seedUnrelatedCorruptSibling, hasArchivedCorruptSibling } from '../helpers.mjs';
+import {
+  ageArtifact,
+  seedUnrelatedCorruptSibling,
+  hasArchivedCorruptSibling,
+  flattenWhitespace,
+} from '../helpers.mjs';
 
 export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
@@ -130,6 +135,23 @@ export default function register(harness, fixtures) {
     // The troubleshooting link is a top-level envelope field, not just embedded prose.
     expect(env?.ref === 'https://bonsai.rhino-inquisitor.com/troubleshooting', env?.ref);
     expect(env?.stderr?.includes('Reference: https://bonsai.rhino-inquisitor.com/troubleshooting'), env?.stderr);
+  });
+
+  check('fetch cached URL human mode tips toward inspect on stderr', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(
+      flattenWhitespace(r.stderr).includes(`Tip: bonsai inspect ${url} for cached metadata.`),
+      r.stderr
+    );
+  });
+
+  check('fetch --dry-run gives no next-step tip (nothing was written)', () => {
+    const { ws, url } = seedFetchCache();
+    const r = run([url, '--dry-run'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(!r.stderr.includes('Tip:'), r.stderr);
   });
 
   check('fetch cached URL --json clean stderr', () => {

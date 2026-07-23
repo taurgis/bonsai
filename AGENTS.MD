@@ -40,6 +40,9 @@ Development of Bonsai happens in this repository. Keep Bonsai implementation in 
 - `BaseCommand.baseFlags` (see `src/base-command.ts`) — currently `--read-only`/`--plan` — is merged into every command automatically via `BaseCommand.init()`'s `this.parse({ ..., baseFlags: this.ctor.baseFlags })` call; no per-command `static flags` change is needed to expose a new shared flag in `--help` or at runtime.
 - Write commands (anything that persists or deletes) must call `this.effectiveDryRun(explicitDryRun)` rather than reading their own dry-run flag directly, so global read-only/plan mode (`--read-only`/`--plan`, `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE`) is honored consistently.
 - Support `--json` for agent callers and keep logs/warnings out of stdout in JSON mode.
+- Support `--toon` as an opt-in, token-cheaper alternative to `--json`: the identical envelope,
+  encoded as [TOON](https://toonformat.dev/) instead of JSON. `--json` and `--toon` are mutually
+  exclusive (`CONFLICTING_OUTPUT_FLAGS`, exit 2) — never silently prefer one over the other.
 - Return actionable errors with stable codes and suggestions.
 - Avoid interactive prompts in agent workflows. Support `--no-input` if prompts are introduced later.
 - Generate and ship `oclif.manifest.json` before publishing.

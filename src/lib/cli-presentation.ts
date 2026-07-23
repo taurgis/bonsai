@@ -27,6 +27,7 @@ export const CLI_FLAG_DESCRIPTIONS = {
   format: 'output format',
   readOnly:
     '(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE',
+  toon: 'emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json',
   sourceUrlGlob: 'source URL glob (case-insensitive, supports * wildcard)',
   listArtifactType:
     'artifact type; section children are omitted from list - use inspect to see them',

@@ -150,6 +150,7 @@ export default class ResearchInspect extends BaseCommand<typeof ResearchInspect>
       }
       this.logMetadata(cached.metadata);
       if (sections.length) this.logSections(sections);
+      this.tip(`${this.config.bin} status ${normalizedUrl} to check freshness.`);
       const sep = batchSeparator(this.parsedArgv.length > 1);
       if (sep) this.log(sep);
     }

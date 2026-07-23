@@ -140,6 +140,10 @@ export default class ResearchStatus extends BaseCommand<typeof ResearchStatus> {
       this.logStatusTable(target, artifactPath, result);
       if (result.status === 'miss') {
         this.warn(cacheMissHint(this.config.bin, normalizedUrl));
+      } else if (result.action === 'would_revalidate') {
+        this.tip(`${this.config.bin} ${normalizedUrl} to revalidate.`);
+      } else {
+        this.tip(`${this.config.bin} inspect ${normalizedUrl} for full metadata.`);
       }
     }
 

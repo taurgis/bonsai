@@ -167,6 +167,29 @@ export default function register(harness, fixtures) {
     expect(!r.stdout.includes('Found 0'), r.stdout);
   });
 
+  check('prune --dry-run with matches tips toward --yes on stderr; --json stays silent', () => {
+    const ws = createWorkspace();
+    const url = 'https://example.com/audit-prune-tip';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Prune tip fixture\n',
+    });
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const human = run(['prune', '--url', url, '--dry-run'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(human.stderr.includes('Tip: re-run with --yes to prune these entries.'), human.stderr);
+
+    const json = run(['prune', '--url', url, '--dry-run', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(!json.stderr.includes('Tip:'), json.stderr);
+  });
+
+  check('prune --dry-run zero matches gives no tip (nothing to re-run)', () => {
+    const r = run(['prune', '--older-than', '9999d', '--dry-run']);
+    expect(r.exitCode === 0, `exit ${r.exitCode}`);
+    expect(!r.stderr.includes('Tip:'), r.stderr);
+  });
+
   check('import then prune --yes removes matching entry', () => {
     const ws = createWorkspace();
     const url = 'https://example.com/audit-prune-delete';

@@ -29,6 +29,11 @@ export function pluralize(count: number, singular: string, plural: string): stri
   return count === 1 ? singular : plural;
 }
 
+/** Shared "Tip: " prefix for contextual next-step suggestions in human-mode output. */
+export function formatTip(message: string): string {
+  return `Tip: ${message}`;
+}
+
 /** How a command labels a result listing, so its heading stays consistent. */
 export interface ResultListLabels {
   /** Noun phrase after the count, e.g. "cached research"; the "entry/entries" plural is appended. */

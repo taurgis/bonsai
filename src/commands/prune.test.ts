@@ -141,6 +141,32 @@ describe('prune command unit tests', () => {
     expect(existsSync(reactImport.cache.path)).toBe(true);
   });
 
+  it('tips toward --yes when a dry run has candidates, and stays silent when it has none', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValueOnce('# Prune Tip Notes');
+    await ResearchImport.run(['https://example.com/prune-tip', '--stdin', '--topic', 'PruneTip']);
+    readSpy.mockRestore();
+
+    const warnSpy = vi.spyOn(ResearchPrune.prototype as any, 'warn').mockImplementation(() => '');
+    try {
+      await ResearchPrune.run(['--topic', 'PruneTip', '--dry-run']);
+      expect(warnSpy.mock.calls.map((c) => String(c[0]))).toEqual([
+        'Tip: re-run with --yes to prune these entries.',
+      ]);
+
+      warnSpy.mockClear();
+      await ResearchPrune.run(['--topic', 'NoSuchPruneTopic', '--dry-run']);
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockClear();
+      await ResearchPrune.run(['--topic', 'PruneTip', '--dry-run', '--json']);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
   it('strips ANSI escape codes from a cached topic in the dry-run listing', async () => {
     const esc = String.fromCharCode(27);
     const readSpy = vi
