@@ -5,21 +5,27 @@ import { join } from 'node:path';
 import Setup from './setup.js';
 import { useIsolatedCache } from '../../tests/helpers/isolated-cache.js';
 
-// `setup --global` resolves the real OS home dir via node:os#homedir(), which reads HOME on POSIX —
-// distinct from XDG_CONFIG_HOME (useIsolatedCache already redirects that for oclif's own config
-// dir, but Claude Code/Codex hook files live at a fixed `~/.claude`/`~/.codex`, not an XDG path).
-// Redirect HOME too, so a `--global` test can never touch the real developer's dotfiles.
+// `setup --global` resolves the real OS home dir via node:os#homedir(), which reads HOME on POSIX
+// but ignores it on Windows in favor of USERPROFILE — distinct from XDG_CONFIG_HOME (useIsolatedCache
+// already redirects that for oclif's own config dir, but Claude Code/Codex hook files live at a
+// fixed `~/.claude`/`~/.codex`, not an XDG path). Redirect both env vars so a `--global` test can
+// never touch the real developer's (or CI runner's) dotfiles on either platform.
 function useIsolatedHome(): { home: string } {
   const state = { home: '' };
   let prevHome: string | undefined;
+  let prevUserProfile: string | undefined;
   beforeEach(() => {
     state.home = mkdtempSync(join(tmpdir(), 'bonsai-home-'));
     prevHome = process.env.HOME;
+    prevUserProfile = process.env.USERPROFILE;
     process.env.HOME = state.home;
+    process.env.USERPROFILE = state.home;
   });
   afterEach(() => {
     if (prevHome === undefined) delete process.env.HOME;
     else process.env.HOME = prevHome;
+    if (prevUserProfile === undefined) delete process.env.USERPROFILE;
+    else process.env.USERPROFILE = prevUserProfile;
     rmSync(state.home, { recursive: true, force: true });
   });
   return state;

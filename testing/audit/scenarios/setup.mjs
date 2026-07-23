@@ -7,13 +7,14 @@ export default function register(harness, fixtures) {
   const { check, run, expect, parseJson } = harness;
   const { createWorkspace } = fixtures;
 
-  // `setup --global` resolves the real OS home dir (node:os#homedir(), i.e. $HOME on POSIX) —
-  // distinct from the XDG_CONFIG_HOME sandbox `createWorkspace()` already isolates for oclif's own
-  // config dir. Point HOME at a throwaway dir per check so a --global run can never touch the
-  // machine actually running this audit.
+  // `setup --global` resolves the real OS home dir via node:os#homedir(), which reads $HOME on
+  // POSIX but ignores it on Windows in favor of %USERPROFILE% — distinct from the XDG_CONFIG_HOME
+  // sandbox `createWorkspace()` already isolates for oclif's own config dir. Point both env vars at
+  // a throwaway dir per check so a --global run can never touch the machine actually running this
+  // audit, on either platform.
   function isolatedHomeEnv() {
     const home = mkdtempSync(join(tmpdir(), 'bonsai-audit-home-'));
-    return { home, env: { HOME: home } };
+    return { home, env: { HOME: home, USERPROFILE: home } };
   }
 
   check('context on an empty cache reports a definitive 0-entry state', () => {
