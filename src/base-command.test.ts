@@ -69,13 +69,14 @@ describe('--toon output', () => {
     expect(envelope).toMatchObject({ schemaVersion: 1, command: 'list', ok: true, exitCode: 0 });
   });
 
-  it('rejects combining --json and --toon with CONFLICTING_OUTPUT_FLAGS at exit 2', async () => {
+  it('rejects combining --json and --toon with CONFLICTING_FLAGS at exit 2', async () => {
     // --json wins jsonEnabled() here (both flags set jsonEnabled() true), so oclif's own error
     // catch logs the JSON envelope and resolves rather than rejecting — same contract as any other
-    // usage error under --json (see the CACHE_MISS envelope test above).
+    // usage error under --json (see the CACHE_MISS envelope test above). Reuses the existing
+    // CONFLICTING_FLAGS code shared by every other mutually-exclusive-flag rejection in this CLI.
     const { text } = await captureStdout(() => ResearchList.run(['--json', '--toon']));
     const envelope = JSON.parse(text);
-    expect(envelope.code).toBe('CONFLICTING_OUTPUT_FLAGS');
+    expect(envelope.code).toBe('CONFLICTING_FLAGS');
     expect(envelope.exitCode).toBe(2);
     expect(envelope.ok).toBe(false);
   });

@@ -44,8 +44,8 @@ if (jsonMeta) {
 }
 
 // Only notify after the earlyExit fast-path so the notifier never fires before
-// a usage-error envelope exits. Also skip under --json so agent callers never see stderr noise.
-if (!process.argv.includes('--json')) {
+// a usage-error envelope exits. Also skip under --json/--toon so agent callers never see stderr noise.
+if (!process.argv.includes('--json') && !process.argv.includes('--toon')) {
   updateNotifier({ pkg }).notify();
 }
 

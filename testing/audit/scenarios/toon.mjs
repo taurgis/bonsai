@@ -81,19 +81,19 @@ export default function register(harness, fixtures) {
     expect(decode(r.stdout).command === 'list', 'command id');
   });
 
-  check('--json --toon together is CONFLICTING_OUTPUT_FLAGS exit 2 (real --json wins the envelope format)', () => {
+  check('--json --toon together is CONFLICTING_FLAGS exit 2 (real --json wins the envelope format)', () => {
     const r = run(['list', '--json', '--toon']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
-    expect(env?.code === 'CONFLICTING_OUTPUT_FLAGS', env?.code);
+    expect(env?.code === 'CONFLICTING_FLAGS', env?.code);
     expect(env?.ok === false, 'ok false');
     expect(env?.stderr?.includes('Cannot combine --json and --toon'), env?.stderr);
   });
 
-  check('--toon --json together also reports CONFLICTING_OUTPUT_FLAGS regardless of flag order', () => {
+  check('--toon --json together also reports CONFLICTING_FLAGS regardless of flag order', () => {
     const r = run(['list', '--toon', '--json']);
     expect(r.exitCode === 2, `exit ${r.exitCode}`);
     const env = parseJson(r.stdout);
-    expect(env?.code === 'CONFLICTING_OUTPUT_FLAGS', env?.code);
+    expect(env?.code === 'CONFLICTING_FLAGS', env?.code);
   });
 }

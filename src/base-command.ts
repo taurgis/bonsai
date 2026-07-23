@@ -86,11 +86,13 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     this.parsedArgv = argv as string[];
 
     // --json and --toon both claim the machine-output seat; picking one silently over the other
-    // would surprise a caller who set both by mistake, so reject the combination outright.
+    // would surprise a caller who set both by mistake, so reject the combination outright. Reuses
+    // the existing CONFLICTING_FLAGS code (not a new one) — the catalog already documents it as the
+    // one code for "choose one of the mutually exclusive options", regardless of which flags.
     if (this.flags?.['json'] && this.flags?.['toon']) {
       this.error('Cannot combine --json and --toon: pick one output format.', {
         exit: 2,
-        code: 'CONFLICTING_OUTPUT_FLAGS',
+        code: 'CONFLICTING_FLAGS',
         suggestions: ['Pass only one of --json or --toon'],
       });
     }
@@ -116,7 +118,12 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
    * for free, exactly as it already is under `--json`.
    */
   public override jsonEnabled(): boolean {
-    return super.jsonEnabled() || argvHasFlag(this.argv, '--toon');
+    // Mirrors oclif's own enableJsonFlag guard (every command in this CLI sets it, but the base
+    // class's contract shouldn't silently break if a future command ever opts out).
+    return (
+      super.jsonEnabled() ||
+      (Boolean(this.ctor?.enableJsonFlag) && argvHasFlag(this.argv, '--toon'))
+    );
   }
 
   /**

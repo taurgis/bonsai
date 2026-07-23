@@ -4,7 +4,7 @@ description: 'Bonsai-backed official documentation and web research workflow. Us
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '3.1.0'
+  version: '3.2.0'
 ---
 
 # Web Research Skill
@@ -19,7 +19,7 @@ Always run Bonsai through the published npm package:
 npx @taurgis/bonsai <command> [flags]
 ```
 
-Add `--json` when you need machine-readable output for agent callers.
+Add `--toon` when you need machine-readable output for agent callers at a lower token cost; `--json` is also available if you specifically need JSON (mutually exclusive with `--toon`).
 
 If you are operating under a read-only/plan-mode harness, add `--read-only` (alias `--plan`) to every Bonsai call, or export `BONSAI_READ_ONLY=1` (or `BONSAI_PLAN_MODE=1`) once for the session. Fetches still run and return content normally; nothing is written to the local cache or config until the harness leaves plan mode. `import`, `config set`/`unset`, and `prune` all honor it too — see "Read-only / Plan Mode" below.
 
@@ -36,7 +36,7 @@ npx @taurgis/bonsai <official-url> --format detailed
 For agent callers that need structured output:
 
 ```bash
-npx @taurgis/bonsai <official-url> --format detailed --json
+npx @taurgis/bonsai <official-url> --format detailed --toon
 ```
 
 ## Source Rules

@@ -5,7 +5,7 @@
 Adds `--toon`, an opt-in alternative to `--json` that encodes the identical envelope as
 [TOON](https://toonformat.dev/) (Token-Oriented Object Notation) instead of JSON — roughly 40%
 fewer tokens on mixed-structure data, per the format's own published benchmarks. `--toon` and
-`--json` are mutually exclusive: passing both fails fast with `CONFLICTING_OUTPUT_FLAGS` (exit 2)
+`--json` are mutually exclusive: passing both fails fast with `CONFLICTING_FLAGS` (exit 2)
 rather than silently preferring one.
 
 Also adds contextual "next step" tips to successful human-mode output on `fetch`, `status`,
