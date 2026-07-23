@@ -141,7 +141,7 @@ npx @taurgis/bonsai inspect <url>
 
 ### `list`
 
-List cached artifacts by metadata filters (`--topic`, `--tags`, `--url`, `--freshness`, `--artifact-type`, `--capture-method`, `--limit`), newest first, without printing content.
+List cached artifacts by metadata filters (`--topic`, `--tags`, `--url`, `--freshness`, `--artifact-type`, `--capture-method`, `--limit`), newest first, without printing content. The default `--json`/`--toon` row is a minimal 4-field shape (`sourceUrls`, `topic`, `freshness`, `tokenEstimate`); pass `--full` for every metadata field. Running `bonsai` with no arguments at all is shorthand for `bonsai list`.
 
 ```bash
 npx @taurgis/bonsai list [flags]

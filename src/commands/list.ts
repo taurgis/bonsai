@@ -240,6 +240,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       : 'populate the cache first: ';
     this.log(headline);
     this.log(`\n${formatTip(`${tipLead}${colors.cyan(tipCmd)}`)}`);
+    // Bare `bonsai` (no args) redirects here (content-first default), so an empty, unfiltered cache
+    // is also the first thing a brand-new user sees — point at --help so command discovery isn't lost.
+    if (!filtered) {
+      this.log(formatTip(`see every command: ${colors.cyan(`${this.config.bin} --help`)}`));
+    }
   }
 
   async run(): Promise<ListRow[] | ListRowMinimal[]> {

@@ -86,9 +86,30 @@ ok: true
 exitCode: 0
 stdout: ""
 stderr: ""
-data[1]{sourceUrls,topic,freshness,tokenEstimate}:
-  ["https://nodejs.org/api/url.html"],Node.js URL API,fresh,...
+data[1]:
+  - sourceUrls[1]: "https://nodejs.org/api/url.html"
+    topic: Node.js URL API
+    freshness: fresh
+    tokenEstimate:
+      compressed: 29
+      detailed: 65
+summary:
+  total: 1
+  shown: 1
+  limit: 50
+  truncated: false
+  empty: false
+  byFreshness:
+    fresh: 1
+    stale_grace: 0
+    stale_expired: 0
 ```
+
+TOON's tabular `data[N]{field,...}:` header form only applies to arrays of
+records with uniform primitive fields. `list`'s row has a nested `tokenEstimate`
+object and a `sourceUrls` array, so the encoder falls back to one indented
+mapping per row instead — the tradeoff for `--full` is the same, since every
+row there also carries `tags`, `qualityNotes`, and `tokenEstimate`.
 
 `--json` and `--toon` are mutually exclusive — passing both fails fast with
 `CONFLICTING_FLAGS` (exit `2`) rather than silently picking one.
