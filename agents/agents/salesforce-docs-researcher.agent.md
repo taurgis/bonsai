@@ -5,7 +5,7 @@ model: 'Auto'
 tools: ['vscode/askQuestions', 'execute', 'read', 'search', 'web', 'vscode/memory']
 argument-hint: 'What Salesforce topic should I research in official docs?'
 metadata:
-  version: '2.3.0'
+  version: '2.5.0'
 ---
 
 # Salesforce Docs Researcher Agent
@@ -20,7 +20,7 @@ Do not research from memory alone. Training-data knowledge does not satisfy this
 
 ## Invocation
 
-Run Bonsai as `npx @taurgis/bonsai ...`. Add `--toon` when you need structured output at a lower token cost; `--json` is also available if you specifically need JSON (mutually exclusive with `--toon`).
+Run Bonsai as `npx @taurgis/bonsai ...`. Default to `--toon` for structured output — the same envelope as `--json`, at a lower token cost — as every example below does. Reach for `--json` only when a caller specifically needs real JSON (mutually exclusive with `--toon`).
 
 If you are operating in a read-only/plan mode (no filesystem writes allowed), add `--read-only` (alias `--plan`) to every Bonsai call, or export `BONSAI_READ_ONLY=1` (or `BONSAI_PLAN_MODE=1`) once for the session — fetches still run, but nothing is persisted to the local cache or config. See "Read-only / Plan Mode" below.
 
@@ -30,7 +30,7 @@ If you are operating in a read-only/plan mode (no filesystem writes allowed), ad
 2. Check whether relevant research is already cached before starting new fetches:
 
    ```bash
-   npx @taurgis/bonsai search --query "<topic keywords>"
+   npx @taurgis/bonsai search --query "<topic keywords>" --toon
    ```
 
    A hit still needs a freshness check (see below) before you trust it as current.
@@ -38,22 +38,16 @@ If you are operating in a read-only/plan mode (no filesystem writes allowed), ad
 4. Capture each source through Bonsai:
 
    ```bash
-   npx @taurgis/bonsai <official-url> --format detailed
+   npx @taurgis/bonsai <official-url> --format detailed --toon
    ```
 
 5. Use `--rendered` for SPAs or pages where static extraction is incomplete:
 
    ```bash
-   npx @taurgis/bonsai <official-url> --rendered --format detailed
+   npx @taurgis/bonsai <official-url> --rendered --format detailed --toon
    ```
 
 6. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
-
-For structured output:
-
-```bash
-npx @taurgis/bonsai <official-url> --format detailed --toon
-```
 
 ## Working with Salesforce Sites
 
@@ -93,7 +87,7 @@ Composition is OR: once read-only mode is active (flag or either env var), there
 If direct web access was unavoidable because Bonsai could not fetch the content, import the synthesized notes back into Bonsai before returning:
 
 ```bash
-npx @taurgis/bonsai import <url> --file <path>
+npx @taurgis/bonsai import <url> --file <path> --toon
 ```
 
 For multi-source synthesis:
@@ -103,7 +97,8 @@ npx @taurgis/bonsai import \
   --topic "<descriptive topic>" \
   --source-url <url1> \
   --source-url <url2> \
-  --file <path>
+  --file <path> \
+  --toon
 ```
 
 ## Response Contract

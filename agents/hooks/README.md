@@ -28,7 +28,7 @@ ship an integration that might not work.
 The hooks deny native URL-fetch tools and return model-visible guidance like:
 
 ```bash
-npx @taurgis/bonsai https://example.com/docs --format detailed
+npx @taurgis/bonsai https://example.com/docs --format detailed --toon
 ```
 
 Most hook systems cannot transparently replace a web-fetch tool call with a shell
@@ -67,5 +67,5 @@ that tells the agent to prefer Bonsai for URLs.
 Run Bonsai through the published npm package:
 
 ```bash
-npx @taurgis/bonsai <url> --format detailed
+npx @taurgis/bonsai <url> --format detailed --toon
 ```
