@@ -29,7 +29,7 @@ output.
 
 | Piece             | File                       | What it does                                                                                                                                                               |
 | ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Skill**         | `web-research`             | The actual workflow: discover official URLs, fetch with `--format detailed`, use `--rendered` for SPAs, import manual notes. The agent runs this whenever it needs docs.         |
+| **Skill**         | `web-research`             | The actual workflow: discover official URLs, fetch with `--format detailed`, use `--rendered` for SPAs, import manual notes, and search/list the cache by tag or keyword. The agent runs this whenever it needs docs.         |
 | **Instruction**   | `web-research`             | The always-on rule that _requires_ the agent to verify current official docs before technical changes, and says when to run the skill inline vs. delegate to the subagent. |
 | **Subagent**      | `official-docs-researcher` | A focused researcher the main agent delegates to for large or multi-source research, so verbose fetching stays out of the main context. It returns source-cited findings.  |
 | **Hook examples** | `hooks/`                   | Optional native hook configs that block one-off URL fetch tools and tell the agent to run Bonsai instead.                                                                  |

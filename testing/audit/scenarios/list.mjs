@@ -198,6 +198,66 @@ export default function register(harness, fixtures) {
     expect(listed.stderr === '', `process stderr should stay clean under --json: ${listed.stderr}`);
   });
 
+  check('list defaults --limit to 10 and suggests a copy-pasteable nextCommand when truncated', () => {
+    const ws = createWorkspace();
+    for (let i = 0; i < 12; i++) {
+      const imported = run(
+        [
+          'import',
+          `https://example.com/audit-list-default-limit-${i}`,
+          '--stdin',
+          '--topic',
+          `Audit Default Limit ${i}`,
+          '--tags',
+          'audit-default-limit-tag',
+          '--json',
+        ],
+        { cwd: ws.cwd, xdg: ws.xdg, input: `# Audit Default Limit ${i}\n\nDefault limit fixture.\n` }
+      );
+      expect(imported.exitCode === 0, `import ${i} exit ${imported.exitCode}`);
+    }
+
+    const listed = run(['list', '--tags', 'audit-default-limit-tag', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const env = parseJson(listed.stdout);
+    expect(listed.exitCode === 0, `list exit ${listed.exitCode}`);
+    expect(env?.data?.length === 10, `data length ${env?.data?.length}`);
+    expect(
+      env?.summary?.total === 12 && env.summary.shown === 10 && env.summary.limit === 10 && env.summary.truncated === true,
+      `summary ${JSON.stringify(env?.summary)}`
+    );
+    expect(
+      /list --tags audit-default-limit-tag --json --limit 12$/.test(env?.summary?.nextCommand ?? ''),
+      `nextCommand ${env?.summary?.nextCommand}`
+    );
+
+    const human = run(['list', '--tags', 'audit-default-limit-tag'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(human.exitCode === 0, `human exit ${human.exitCode}`);
+    // The tip is a stderr side effect (this.tip -> this.warn), never stdout. oclif word-wraps long
+    // lines with a continuation-bullet prefix (`›` on most terminals, `»` observed on Windows);
+    // collapse either before matching so the assertion doesn't depend on terminal width/platform.
+    const flattened = human.stderr.replace(/[›»]/g, '').replace(/\s+/g, ' ');
+    expect(
+      /see the rest: \S+ list --tags audit-default-limit-tag --limit 12/.test(flattened),
+      `human tip missing nextCommand: ${human.stderr.slice(0, 400)}`
+    );
+  });
+
+  check('list --json summary.nextCommand is null when nothing was truncated', () => {
+    const ws = createWorkspace();
+    const imported = run(
+      ['import', 'https://example.com/audit-list-no-truncation', '--stdin', '--topic', 'NoTruncation', '--json'],
+      { cwd: ws.cwd, xdg: ws.xdg, input: '# No Truncation\n\nFixture.\n' }
+    );
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const listed = run(['list', '--topic', 'NoTruncation', '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    const env = parseJson(listed.stdout);
+    expect(env?.summary?.nextCommand === null, `nextCommand ${JSON.stringify(env?.summary?.nextCommand)}`);
+  });
+
   check('import then list filters by valid --artifact-type and --capture-method', () => {
     const ws = createWorkspace();
     const singleUrl = 'https://example.com/audit-list-artifact-type-source';

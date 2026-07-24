@@ -334,10 +334,11 @@ describe('stream routing contract', () => {
     expect(envelope.summary).toEqual({
       total: 0,
       shown: 0,
-      limit: 50,
+      limit: 10,
       truncated: false,
       empty: true,
       byFreshness: { fresh: 0, stale_grace: 0, stale_expired: 0 },
+      nextCommand: null,
     });
     expect(result.stderr).toBe('');
     expect(result.stderr).not.toMatch(/Warning/i);
@@ -370,6 +371,7 @@ describe('stream routing contract', () => {
       truncated: true,
       empty: false,
       byFreshness: { fresh: 3, stale_grace: 0, stale_expired: 0 },
+      nextCommand: 'bonsai list --json --limit 3',
     });
     // Intentional #73: no process-stderr truncation tip under --json.
     expect(result.stderr).toBe('');

@@ -1,4 +1,5 @@
-import type { ResearchArtifactMetadata } from './schema.js';
+import type { ArtifactType, CaptureMethod, ResearchArtifactMetadata } from './schema.js';
+import { artifactMatchesUrlFilter } from './url.js';
 
 /** Whether an artifact's topic matches a `--topic` filter (case-insensitive exact match). */
 export function matchesTopicFilter(
@@ -41,4 +42,49 @@ export function emptyTopicFilterError(topic: string | undefined): string | undef
 export function emptyTagsFilterError(tags: string[] | undefined): string | undefined {
   if (!tags?.some((t) => t.trim() === '')) return undefined;
   return '--tags must be non-empty values (e.g. "react").';
+}
+
+/** The metadata filter flags `list` and `search` both expose, beyond content/topic search. */
+export interface CommonMetadataFilterFlags {
+  topic?: string;
+  tags?: string[];
+  url?: string;
+  artifactType?: ArtifactType;
+  captureMethod?: CaptureMethod;
+  freshness?: 'fresh' | 'stale_grace' | 'stale_expired';
+}
+
+/**
+ * Shared page-level metadata filter combinator for `list` and `search` (topic/tags/url/artifact
+ * type/capture method/freshness) — single source of truth so the two commands can never drift on
+ * what "matches the given filters" means.
+ */
+export function matchesCommonMetadataFilters(
+  meta: ResearchArtifactMetadata,
+  freshness: 'fresh' | 'stale_grace' | 'stale_expired',
+  flags: CommonMetadataFilterFlags
+): boolean {
+  if (!matchesTopicFilter(meta, flags.topic)) return false;
+  if (!matchesTagsFilter(meta, flags.tags)) return false;
+  if (flags.url && !artifactMatchesUrlFilter(meta, flags.url)) return false;
+  if (flags.artifactType && meta.artifact_type !== flags.artifactType) return false;
+  if (flags.captureMethod && meta.capture_method !== flags.captureMethod) return false;
+  if (flags.freshness && freshness !== flags.freshness) return false;
+  return true;
+}
+
+/**
+ * Whether any of the shared metadata filter flags was passed — used to pick empty-result guidance
+ * ("no matches for your filters" vs. "the cache is empty"). `search` combines this with its own
+ * `--query` check; `list` has no filters beyond these, so it uses the result directly.
+ */
+export function hasActiveMetadataFilters(flags: CommonMetadataFilterFlags): boolean {
+  return Boolean(
+    flags.topic ||
+    (flags.tags && flags.tags.length > 0) ||
+    flags.freshness ||
+    flags.artifactType ||
+    flags.captureMethod ||
+    flags.url
+  );
 }

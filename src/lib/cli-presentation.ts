@@ -1,5 +1,7 @@
 import { colors } from './color.js';
 import { MAX_TAG_LENGTH, MAX_TOPIC_LENGTH } from './research/metadata-flags.js';
+import type { TokenEstimate } from './research/schema.js';
+import { NO_TOPIC_LABEL, sanitizeForTerminal } from './text.js';
 
 const HUMAN_LABEL_WIDTH = 25;
 
@@ -34,6 +36,13 @@ export const CLI_FLAG_DESCRIPTIONS = {
   pruneArtifactType: 'artifact type to prune, including section children',
   listFull:
     'include every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps); default output is a minimal row (source URLs, topic, freshness, token estimate)',
+  searchQuery:
+    'keyword(s) to search across topic, tags, summary, and compressed content (case-insensitive); every term must match somewhere unless --match-any is set',
+  searchMatchAny: 'match any query term instead of requiring all of them (OR instead of AND)',
+  searchArtifactType:
+    'artifact type; section children are omitted from search - use inspect to see them',
+  searchFull:
+    'include every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps) alongside score/matchedFields/snippet; default output is a minimal row (source URLs, topic, freshness, token estimate, score, matchedFields, snippet)',
 } as const;
 
 /** One human-readable label/value pair for CLI stdout. */
@@ -63,4 +72,33 @@ export function formatHumanField(label: string, value: string): string {
  */
 export function formatHumanFields(fields: readonly HumanField[]): string[] {
   return fields.map(([label, value]) => formatHumanField(label, value));
+}
+
+/**
+ * The "N. [Topic] Key: <key>" header line shared by `list`/`search` human-mode row rendering —
+ * same topic coloring, ANSI-sanitization, and "(no topic)" fallback either way.
+ *
+ * @param index - Zero-based row index; displayed as `index + 1`.
+ * @param topic - The row's topic, or `null` to show {@link NO_TOPIC_LABEL}.
+ * @param cacheKey - The row's cache key.
+ * @returns A single formatted line.
+ */
+export function formatResultRowHeader(
+  index: number,
+  topic: string | null,
+  cacheKey: string
+): string {
+  const topicStr = topic ? colors.cyan(sanitizeForTerminal(topic)) : colors.gray(NO_TOPIC_LABEL);
+  const keyStr = colors.bold(cacheKey);
+  return `${index + 1}. [${topicStr}] Key: ${keyStr}`;
+}
+
+/** The "Tokens: compressed=N, detailed=N" line shared by `list`/`search` human-mode row rendering. */
+export function formatResultRowTokens(tokenEstimate: TokenEstimate): string {
+  return `   Tokens: compressed=${colors.bold(String(tokenEstimate?.compressed || 0))}, detailed=${colors.bold(String(tokenEstimate?.detailed || 0))}`;
+}
+
+/** The "Source URLs: ..." line shared by `list`/`search` human-mode row rendering. */
+export function formatResultRowSourceUrls(sourceUrls: readonly string[]): string {
+  return `   Source URLs: ${colors.gray(sourceUrls.join(', '))}\n`;
 }

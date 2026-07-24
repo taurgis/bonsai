@@ -1,10 +1,10 @@
 ---
 name: web-research
-description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when listing/pruning the local research cache, or when importing manually gathered notes.'
+description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when listing/searching/pruning the local research cache, or when importing manually gathered notes.'
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '3.2.0'
+  version: '3.5.0'
 ---
 
 # Web Research Skill
@@ -19,7 +19,7 @@ Always run Bonsai through the published npm package:
 npx @taurgis/bonsai <command> [flags]
 ```
 
-Add `--toon` when you need machine-readable output for agent callers at a lower token cost; `--json` is also available if you specifically need JSON (mutually exclusive with `--toon`).
+Default to `--toon` for structured output — the same envelope as `--json`, at a lower token cost — as every example below does. Reach for `--json` only when a caller specifically needs real JSON (mutually exclusive with `--toon`).
 
 If you are operating under a read-only/plan-mode harness, add `--read-only` (alias `--plan`) to every Bonsai call, or export `BONSAI_READ_ONLY=1` (or `BONSAI_PLAN_MODE=1`) once for the session. Fetches still run and return content normally; nothing is written to the local cache or config until the harness leaves plan mode. `import`, `config set`/`unset`, and `prune` all honor it too — see "Read-only / Plan Mode" below.
 
@@ -28,12 +28,6 @@ If you are operating under a read-only/plan-mode harness, add `--read-only` (ali
 Before creating, updating, refactoring, scaffolding, or deleting technical content, verify relevant current official documentation in the same task.
 
 When you do not yet know the official URL, discover it with your native web/search tools first. Once you have a URL, capture it through Bonsai:
-
-```bash
-npx @taurgis/bonsai <official-url> --format detailed
-```
-
-For agent callers that need structured output:
 
 ```bash
 npx @taurgis/bonsai <official-url> --format detailed --toon
@@ -54,7 +48,7 @@ Use `--format compressed` for context-budgeted reading and `--format detailed` f
 Use `--rendered` when static extraction is incomplete or the page is an SPA:
 
 ```bash
-npx @taurgis/bonsai <official-url> --rendered --format detailed
+npx @taurgis/bonsai <official-url> --rendered --format detailed --toon
 ```
 
 Never reach for direct `WebFetch` or `WebSearch` to retrieve a specific page when Bonsai can fetch it. Bonsai returns reusable Markdown and keeps it cached for future agents.
@@ -66,13 +60,13 @@ If direct web access was unavoidable because of authentication, browser interact
 Single-source import:
 
 ```bash
-npx @taurgis/bonsai import <url> --file path/to/notes.md
+npx @taurgis/bonsai import <url> --file path/to/notes.md --toon
 ```
 
 Stdin import:
 
 ```bash
-echo "# My Synthesis Note" | npx @taurgis/bonsai import <url> --stdin
+echo "# My Synthesis Note" | npx @taurgis/bonsai import <url> --stdin --toon
 ```
 
 Multi-source synthesis:
@@ -82,7 +76,8 @@ npx @taurgis/bonsai import \
   --topic "<descriptive topic>" \
   --source-url <url1> \
   --source-url <url2> \
-  --file path/to/synthesized-notes.md
+  --file path/to/synthesized-notes.md \
+  --toon
 ```
 
 ## Cache Operations
@@ -90,26 +85,40 @@ npx @taurgis/bonsai import \
 Check status without fetching:
 
 ```bash
-npx @taurgis/bonsai status <url>
+npx @taurgis/bonsai status <url> --toon
 ```
 
 Inspect stored metadata:
 
 ```bash
-npx @taurgis/bonsai inspect <url>
+npx @taurgis/bonsai inspect <url> --toon
 ```
 
-List cached entries by metadata:
+List cached entries by metadata. Prefer `--toon` for agent callers — same data as `--json`, fewer
+tokens:
 
 ```bash
-npx @taurgis/bonsai list --tags node
+npx @taurgis/bonsai list --tags node --toon
 ```
+
+Search cached entries by tag or content keyword when you don't know the exact topic/tag to filter
+on — ranks page-level entries by a query matched against topic, tags, summary, and compressed
+content:
+
+```bash
+npx @taurgis/bonsai search --query "suspense boundary" --toon
+```
+
+Both default `--limit` to 10 so a broad query never floods your context. A truncated result's
+envelope carries `summary.truncated` and `summary.nextCommand` — a ready-to-run command that
+reproduces your filters with a raised `--limit` — so raise it deliberately only when you actually
+need more, instead of requesting a large `--limit` up front.
 
 Preview pruning before deleting:
 
 ```bash
-npx @taurgis/bonsai prune --older-than 90d --dry-run
-npx @taurgis/bonsai prune --older-than 90d --yes
+npx @taurgis/bonsai prune --older-than 90d --dry-run --toon
+npx @taurgis/bonsai prune --older-than 90d --yes --toon
 ```
 
 ## Read-only / Plan Mode

@@ -4,41 +4,44 @@ import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
+import type { ResearchArtifactMetadata } from '../lib/research/schema.js';
 import {
-  ARTIFACT_TYPES,
-  CAPTURE_METHODS,
-  type ResearchArtifactMetadata,
-} from '../lib/research/schema.js';
-import {
-  NO_TOPIC_LABEL,
   collapseHomeDir,
   formatTip,
   resultListHeading,
-  sanitizeForTerminal,
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
-import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
+import { countByFreshness, toListRow } from '../lib/research/list-row.js';
+import { emptyUrlFilterError } from '../lib/research/url.js';
 import {
-  matchesTopicFilter,
-  matchesTagsFilter,
+  matchesCommonMetadataFilters,
+  hasActiveMetadataFilters,
   emptyTopicFilterError,
   emptyTagsFilterError,
+  type CommonMetadataFilterFlags,
 } from '../lib/research/metadata-filters.js';
+import { commonMetadataFilterFlags } from '../lib/common-metadata-filter-flags.js';
+import { buildNextLimitCommand } from '../lib/next-command.js';
 import { colors, FRESHNESS_COLOR } from '../lib/color.js';
-import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
+import {
+  CLI_FLAG_DESCRIPTIONS,
+  formatResultRowHeader,
+  formatResultRowSourceUrls,
+  formatResultRowTokens,
+} from '../lib/cli-presentation.js';
 import type { ListRow, ListRowMinimal, ListSummary } from '../lib/cli-result-types.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at this value.
 const LIST_DEFAULT_MAX_LIMIT = 100;
+// A small default keeps an unfiltered `list` from flooding an agent's context with everything ever
+// cached; `summary.truncated`/`nextCommand` (and the human-mode tip) make raising --limit an
+// explicit, deliberate next step rather than a silent, unbounded dump.
+const LIST_DEFAULT_LIMIT = 10;
 const LIST_LABELS: ResultListLabels = {
   noun: 'cached research',
   order: 'first',
 };
-
-// `list` answers "what pages/notes do I have?" and deliberately omits section children (see
-// scanCacheDirForList), so `section` is not an offered filter — every other artifact type can appear.
-const LISTABLE_ARTIFACT_TYPES = ARTIFACT_TYPES.filter((type) => type !== 'section');
 
 /** Project a full row down to the default minimal shape (see {@link ListRowMinimal}). */
 function toMinimalListRow(row: ListRow): ListRowMinimal {
@@ -48,13 +51,6 @@ function toMinimalListRow(row: ListRow): ListRowMinimal {
     freshness: row.freshness,
     tokenEstimate: row.tokenEstimate,
   };
-}
-
-/** Count matched rows per freshness tier for the envelope's `summary.byFreshness`. */
-function countByFreshness(rows: readonly ListRow[]): ListSummary['byFreshness'] {
-  const counts: ListSummary['byFreshness'] = { fresh: 0, stale_grace: 0, stale_expired: 0 };
-  for (const row of rows) counts[row.freshness]++;
-  return counts;
 }
 
 /** List cached research artifacts by metadata filters. */
@@ -96,31 +92,12 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   ];
 
   static flags = {
-    topic: Flags.string({
-      char: 't',
-      description: CLI_FLAG_DESCRIPTIONS.filterTopic,
-    }),
-    tags: Flags.string({
-      char: 'g',
-      description: CLI_FLAG_DESCRIPTIONS.filterTags,
-      multiple: true,
-    }),
-    url: Flags.string({
-      description: CLI_FLAG_DESCRIPTIONS.sourceUrlGlob,
-    }),
-    freshness: Flags.option({
-      description: 'freshness state',
-      options: ['fresh', 'stale_grace', 'stale_expired'] as const,
-    })(),
-    'artifact-type': Flags.option({
-      description: CLI_FLAG_DESCRIPTIONS.listArtifactType,
-      options: LISTABLE_ARTIFACT_TYPES,
-    })(),
-    'capture-method': Flags.option({
-      description: 'capture method',
-      options: CAPTURE_METHODS,
-    })(),
-    limit: limitFlag(LIST_DEFAULT_MAX_LIMIT, 50, `result count (max ${LIST_DEFAULT_MAX_LIMIT})`),
+    ...commonMetadataFilterFlags(CLI_FLAG_DESCRIPTIONS.listArtifactType),
+    limit: limitFlag(
+      LIST_DEFAULT_MAX_LIMIT,
+      LIST_DEFAULT_LIMIT,
+      `result count (max ${LIST_DEFAULT_MAX_LIMIT}, default ${LIST_DEFAULT_LIMIT})`
+    ),
     full: Flags.boolean({
       default: false,
       description: CLI_FLAG_DESCRIPTIONS.listFull,
@@ -132,26 +109,20 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static stdoutIsPrimaryData = true;
 
+  /** The shared filter flags as `matchesCommonMetadataFilters`/`hasActiveMetadataFilters` expect them. */
+  private metadataFilterFlags(): CommonMetadataFilterFlags {
+    return {
+      topic: this.flags.topic,
+      tags: this.flags.tags,
+      url: this.flags.url,
+      artifactType: this.flags['artifact-type'],
+      captureMethod: this.flags['capture-method'],
+      freshness: this.flags.freshness,
+    };
+  }
+
   private matchesFilters(meta: ResearchArtifactMetadata, freshness: ListRow['freshness']): boolean {
-    if (!matchesTopicFilter(meta, this.flags.topic)) {
-      return false;
-    }
-    if (!matchesTagsFilter(meta, this.flags.tags)) {
-      return false;
-    }
-    if (this.flags.url && !artifactMatchesUrlFilter(meta, this.flags.url)) {
-      return false;
-    }
-    if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
-      return false;
-    }
-    if (this.flags['capture-method'] && meta.capture_method !== this.flags['capture-method']) {
-      return false;
-    }
-    if (this.flags.freshness && freshness !== this.flags.freshness) {
-      return false;
-    }
-    return true;
+    return matchesCommonMetadataFilters(meta, freshness, this.metadataFilterFlags());
   }
 
   private scanCacheDirForList(readRoots: string[], currentTime: Date): ListRow[] {
@@ -164,38 +135,14 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
         // listing (one page yields dozens) and aren't in the documented source/research_note contract.
         // They stay discoverable through `inspect` (which lists a page's sections). `list` answers "what pages/notes do I have?", so keep it page-level. This
         // unconditional guard owns the exclusion (the default no-filter case relies on it);
-        // LISTABLE_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
+        // PAGE_LEVEL_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
         // type list can never return. Keep both in sync if section handling ever changes.
         if (artifact.metadata.artifact_type === 'section') return null;
         const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
         if (!this.matchesFilters(artifact.metadata, freshness)) return null;
-        return {
-          cacheKey: artifact.metadata.cache_key,
-          path: filePath,
-          artifactType: artifact.metadata.artifact_type,
-          sourceUrls: artifact.metadata.source_urls,
-          topic: artifact.metadata.topic,
-          tags: artifact.metadata.tags,
-          freshness,
-          captureMethod: artifact.metadata.capture_method,
-          tokenEstimate: artifact.metadata.token_estimate,
-          qualityNotes: artifact.metadata.quality_notes,
-          fetchedAt: artifact.metadata.fetched_at,
-          validatedAt: artifact.metadata.validated_at,
-        };
+        return toListRow(artifact, filePath, freshness);
       },
       { persistIndex: !this.readOnly }
-    );
-  }
-
-  private hasActiveFilters(): boolean {
-    return Boolean(
-      this.flags.topic ||
-      (this.flags.tags && this.flags.tags.length > 0) ||
-      this.flags.freshness ||
-      this.flags['artifact-type'] ||
-      this.flags['capture-method'] ||
-      this.flags.url
     );
   }
 
@@ -212,7 +159,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     this.log(`description: ${this.config.pjson.description ?? this.config.bin}\n`);
   }
 
-  private logListResults(finalResults: ListRow[], totalMatched: number): void {
+  private logListResults(
+    finalResults: ListRow[],
+    totalMatched: number,
+    nextCommand: string | null
+  ): void {
     if (finalResults.length === 0) {
       this.emitEmptyListGuidance();
       return;
@@ -220,20 +171,15 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     if (this.jsonEnabled()) return;
     this.log(`${resultListHeading(totalMatched, finalResults.length, LIST_LABELS)}\n`);
     finalResults.forEach((res, index) => {
-      const topicStr = res.topic
-        ? colors.cyan(sanitizeForTerminal(res.topic))
-        : colors.gray(NO_TOPIC_LABEL);
-      const keyStr = colors.bold(res.cacheKey);
-      this.log(`${index + 1}. [${topicStr}] Key: ${keyStr}`);
+      this.log(formatResultRowHeader(index, res.topic, res.cacheKey));
 
       const freshnessStr = FRESHNESS_COLOR[res.freshness](res.freshness);
 
       this.log(`   Type: ${colors.bold(res.artifactType)} | Freshness: ${freshnessStr}`);
-      this.log(
-        `   Tokens: compressed=${colors.bold(String(res.tokenEstimate?.compressed || 0))}, detailed=${colors.bold(String(res.tokenEstimate?.detailed || 0))}`
-      );
-      this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
+      this.log(formatResultRowTokens(res.tokenEstimate));
+      this.log(formatResultRowSourceUrls(res.sourceUrls));
     });
+    this.tipNextCommand(nextCommand);
   }
 
   /**
@@ -242,7 +188,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
    */
   private emitEmptyListGuidance(): void {
     if (this.jsonEnabled()) return;
-    const filtered = this.hasActiveFilters();
+    const filtered = hasActiveMetadataFilters(this.metadataFilterFlags());
     const headline = filtered
       ? 'No cached research entries match the given filters.'
       : 'No cached research entries found.';
@@ -284,6 +230,17 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
 
     const finalResults = results.slice(0, this.flags.limit);
+    const truncated = results.length > finalResults.length;
+    // Suggest exactly enough to see every match, capped at the command's own max — a caller who
+    // truncated at the default can raise --limit once and be done, rather than guessing a value.
+    const nextCommand = truncated
+      ? buildNextLimitCommand(
+          this.config.bin,
+          'list',
+          this.argv,
+          Math.min(results.length, LIST_DEFAULT_MAX_LIMIT)
+        )
+      : null;
 
     // Human heading carries truncation inline; --json/--toon get the same counts (plus a freshness
     // breakdown and an explicit `empty` flag) as an always-present envelope `summary` object.
@@ -291,11 +248,12 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       total: results.length,
       shown: finalResults.length,
       limit: this.flags.limit,
-      truncated: results.length > finalResults.length,
+      truncated,
       empty: results.length === 0,
       byFreshness: countByFreshness(results),
+      nextCommand,
     };
-    this.logListResults(finalResults, results.length);
+    this.logListResults(finalResults, results.length, nextCommand);
 
     return this.flags.full ? finalResults : finalResults.map(toMinimalListRow);
   }

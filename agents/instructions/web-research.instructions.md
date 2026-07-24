@@ -4,7 +4,7 @@ applyTo: '**'
 skills:
   - web-research
 metadata:
-  version: '4.1.0'
+  version: '4.2.0'
 ---
 
 # Web Research Requirement
@@ -24,7 +24,7 @@ metadata:
 
 ## Shared Cache
 
-- **Invocation**: Run Bonsai as `npx @taurgis/bonsai ...`.
+- **Invocation**: Run Bonsai as `npx @taurgis/bonsai ...`. Default to `--toon` for structured output (same envelope as `--json`, fewer tokens); use `--json` only when a caller specifically needs real JSON.
 - **URL discovery**: When you do not yet know the official URL, discover it with your native web/search tools, then fetch the page through Bonsai so it is cached for future agents.
 - If Bonsai is configured for project storage and `.bonsai/research/` is not ignored by git, treat those cache artifacts as intentional shared project files. It is OK to check them in, and agents must not delete them as incidental generated output without an explicit request.
 - Re-running on a recent topic is cheap — research the topic rather than skipping it to "save" a fetch.

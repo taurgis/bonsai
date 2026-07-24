@@ -114,15 +114,15 @@ export function createHarness() {
 
   /**
    * Reconstruct a human-printed error/warning body for substring assertions. oclif wraps long
-   * lines to the terminal width and re-prefixes every continuation line with " ›  ", which
-   * would otherwise split a checked phrase across a line break. Strips that prefix per line, then
-   * rejoins and collapses whitespace so a phrase reads as one run of text regardless of where it
-   * happened to wrap.
+   * lines to the terminal width and re-prefixes every continuation line with a bullet (" ›  " on
+   * most terminals, " »  " observed on Windows), which would otherwise split a checked phrase
+   * across a line break. Strips either prefix per line, then rejoins and collapses whitespace so a
+   * phrase reads as one run of text regardless of where it happened to wrap.
    */
   function dewrapCliMessage(text) {
     return text
       .split('\n')
-      .map((line) => line.replace(/^\s*›\s*/, '').trimEnd())
+      .map((line) => line.replace(/^\s*[›»]\s*/, '').trimEnd())
       .join(' ')
       .replace(/\s+/g, ' ')
       .trim();

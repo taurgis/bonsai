@@ -9,6 +9,7 @@ import ImportCommand from './commands/import.js';
 import InspectCommand from './commands/inspect.js';
 import ListCommand from './commands/list.js';
 import PruneCommand from './commands/prune.js';
+import SearchCommand from './commands/search.js';
 import SetupCommand from './commands/setup.js';
 import StatusCommand from './commands/status.js';
 
@@ -19,6 +20,7 @@ export const commands = {
   inspect: InspectCommand,
   list: ListCommand,
   prune: PruneCommand,
+  search: SearchCommand,
   setup: SetupCommand,
   status: StatusCommand,
   config: ConfigIndex,

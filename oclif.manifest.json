@@ -521,9 +521,9 @@
           "type": "option"
         },
         "limit": {
-          "description": "result count (max 100)",
+          "description": "result count (max 100, default 10)",
           "name": "limit",
-          "default": 50,
+          "default": 10,
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -669,6 +669,152 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Prune cached research artifacts",
+      "enableJsonFlag": true,
+      "stdoutIsPrimaryData": true
+    },
+    "search": {
+      "aliases": [],
+      "args": {},
+      "description": "Rank cached page-level artifacts by a --query matched against topic, tags, summary, and compressed content, plus the same metadata filters as `list` (topic, tags, URL, freshness, artifact type, capture method). Reads only the token-cheap indexed summary/compressed text, never the full detailed body, so ranking a large cache stays fast. Pass --full for every metadata field.",
+      "examples": [
+        {
+          "description": "search content and tags for a keyword",
+          "command": "<%= config.bin %> search --query \"suspense boundary\""
+        },
+        {
+          "description": "match any of several terms instead of requiring all",
+          "command": "<%= config.bin %> search --query \"suspense streaming\" --match-any"
+        },
+        {
+          "description": "combine a query with metadata filters",
+          "command": "<%= config.bin %> search --query cache --tags react --freshness fresh"
+        },
+        {
+          "description": "filter by tags/topic alone, ranked like list (no --query)",
+          "command": "<%= config.bin %> search --tags node --json"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "query": {
+          "char": "q",
+          "description": "keyword(s) to search across topic, tags, summary, and compressed content (case-insensitive); every term must match somewhere unless --match-any is set",
+          "name": "query",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "match-any": {
+          "description": "match any query term instead of requiring all of them (OR instead of AND)",
+          "name": "match-any",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "topic": {
+          "char": "t",
+          "description": "exact topic (case-insensitive)",
+          "name": "topic",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "tags": {
+          "char": "g",
+          "description": "tags to require (must match all)",
+          "name": "tags",
+          "hasDynamicHelp": false,
+          "multiple": true,
+          "type": "option"
+        },
+        "url": {
+          "description": "source URL glob (case-insensitive, supports * wildcard)",
+          "name": "url",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "freshness": {
+          "description": "freshness state",
+          "name": "freshness",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "fresh",
+            "stale_grace",
+            "stale_expired"
+          ],
+          "type": "option"
+        },
+        "artifact-type": {
+          "description": "artifact type; section children are omitted from search - use inspect to see them",
+          "name": "artifact-type",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "source",
+            "research_note",
+            "index"
+          ],
+          "type": "option"
+        },
+        "capture-method": {
+          "description": "capture method",
+          "name": "capture-method",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "static_fetch",
+            "browser_fallback",
+            "agent_supplied",
+            "route_markdown",
+            "github_source"
+          ],
+          "type": "option"
+        },
+        "limit": {
+          "description": "result count (max 100, default 10)",
+          "name": "limit",
+          "default": 10,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "full": {
+          "description": "include every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps) alongside score/matchedFields/snippet; default output is a minimal row (source URLs, topic, freshness, token estimate, score, matchedFields, snippet)",
+          "name": "full",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "search",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Search cached research artifacts by tags and content",
       "enableJsonFlag": true,
       "stdoutIsPrimaryData": true
     },

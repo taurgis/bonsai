@@ -364,6 +364,90 @@ describe('list command unit tests', () => {
     }
   });
 
+  it('defaults --limit to 10 (not 50), so an unfiltered list never floods the caller', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Default Limit Fixture\nBody.');
+    for (let i = 0; i < 12; i++) {
+      await ResearchImport.run([
+        `https://example.com/default-limit-${i}`,
+        '--stdin',
+        '--topic',
+        `DefaultLimit${i}`,
+        '--tags',
+        'default-limit-tag',
+      ]);
+    }
+    readSpy.mockRestore();
+
+    const rows = (await ResearchList.run(['--tags', 'default-limit-tag'])) as any[];
+    expect(rows.length).toBe(10);
+  });
+
+  it('surfaces a copy-pasteable nextCommand (human tip and JSON summary) when truncated', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Next Command Fixture\nBody.');
+    for (let i = 0; i < 3; i++) {
+      await ResearchImport.run([
+        `https://example.com/next-command-${i}`,
+        '--stdin',
+        '--topic',
+        `NextCommand${i}`,
+        '--tags',
+        'next-command-tag',
+      ]);
+    }
+    readSpy.mockRestore();
+
+    // Human mode: the tip is a stderr side effect (this.tip -> this.warn -> console.error), never
+    // stdout. The bin name in the suggestion varies by harness (real CLI vs. this in-process
+    // Command.run), so match everything after it rather than pinning an exact bin string.
+    const stderrChunks: string[] = [];
+    const errSpy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      stderrChunks.push(args.map(String).join(' '));
+    });
+    try {
+      await ResearchList.run(['--tags', 'next-command-tag', '--limit', '2']);
+      // oclif word-wraps long warning lines with a continuation-bullet prefix (`›` on most
+      // terminals, `»` observed on Windows CI); collapse either before matching so the assertion
+      // doesn't depend on terminal width or platform.
+      const flattened = stderrChunks.join(' ').replace(/[›»]/g, '').replace(/\s+/g, ' ');
+      expect(flattened).toMatch(/see the rest: \S+ list --tags next-command-tag --limit 3/);
+    } finally {
+      errSpy.mockRestore();
+    }
+
+    // JSON mode: the same suggestion lives in summary.nextCommand, and process stderr stays clean.
+    const logged: string[] = [];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logged.push(args.map(String).join(' '));
+    });
+    try {
+      await ResearchList.run(['--tags', 'next-command-tag', '--limit', '2', '--json']);
+      const envelope = JSON.parse(logged.join(''));
+      expect(envelope.summary.nextCommand).toMatch(
+        / list --tags next-command-tag --json --limit 3$/
+      );
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
+  it('nextCommand is null when nothing was truncated', async () => {
+    const logged: string[] = [];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logged.push(args.map(String).join(' '));
+    });
+    try {
+      await ResearchList.run(['--json']);
+      const envelope = JSON.parse(logged.join(''));
+      expect(envelope.summary.nextCommand).toBeNull();
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
   it('does not warn under --json when results are truncated (envelope data is the capped list)', async () => {
     const readSpy = vi
       .spyOn(ResearchImport.prototype as any, 'readStdin')
