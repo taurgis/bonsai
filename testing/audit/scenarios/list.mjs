@@ -235,8 +235,10 @@ export default function register(harness, fixtures) {
 
     const human = run(['list', '--tags', 'audit-default-limit-tag'], { cwd: ws.cwd, xdg: ws.xdg });
     expect(human.exitCode === 0, `human exit ${human.exitCode}`);
-    // The tip is a stderr side effect (this.tip -> this.warn), never stdout.
-    const flattened = human.stderr.replace(/›/g, '').replace(/\s+/g, ' ');
+    // The tip is a stderr side effect (this.tip -> this.warn), never stdout. oclif word-wraps long
+    // lines with a continuation-bullet prefix (`›` on most terminals, `»` observed on Windows);
+    // collapse either before matching so the assertion doesn't depend on terminal width/platform.
+    const flattened = human.stderr.replace(/[›»]/g, '').replace(/\s+/g, ' ');
     expect(
       /see the rest: \S+ list --tags audit-default-limit-tag --limit 12/.test(flattened),
       `human tip missing nextCommand: ${human.stderr.slice(0, 400)}`

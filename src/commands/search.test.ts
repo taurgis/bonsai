@@ -219,9 +219,10 @@ describe('search command unit tests', () => {
     });
     try {
       await ResearchSearch.run(['--tags', 'search-next-command-tag', '--limit', '2']);
-      // oclif word-wraps long warning lines with a `›` continuation prefix; collapse that before
-      // matching so the assertion doesn't depend on terminal width.
-      const flattened = stderrChunks.join(' ').replace(/›/g, '').replace(/\s+/g, ' ');
+      // oclif word-wraps long warning lines with a continuation-bullet prefix (`›` on most
+      // terminals, `»` observed on Windows CI); collapse either before matching so the assertion
+      // doesn't depend on terminal width or platform.
+      const flattened = stderrChunks.join(' ').replace(/[›»]/g, '').replace(/\s+/g, ' ');
       expect(flattened).toMatch(
         /see the rest: \S+ search --tags search-next-command-tag --limit 3/
       );
