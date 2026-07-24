@@ -1,5 +1,59 @@
 # @taurgis/bonsai
 
+## 4.1.0
+
+### Minor Changes
+
+- c0f2147: Closes the biggest remaining gap from the [AXI](https://github.com/kunchenguid/axi) agent-experience
+  audit: **ambient context via session integrations**. `bonsai setup <agent>` (`claude-code` or
+  `codex`) installs (and idempotently repairs) a `SessionStart` hook that runs the new `bonsai
+context` command at the start of every session, so an agent sees the cache's current state —
+  total entries, a freshness breakdown, and the most recently touched pages — before doing anything.
+  Project-scoped by default (shareable via version control); pass `--global` for a user-level,
+  machine-only install. OpenCode isn't supported yet: its plugin docs don't confirm a hook signature
+  for this, and `setup` says so rather than guessing.
+
+  Also closes the **content-truncation** follow-up: a `compressed` fetch's JSON envelope now includes
+  `detailedTokenEstimate` alongside `tokenEstimate`, so an agent can see exactly how much bigger
+  `--format detailed` would be without a second round trip. A human-mode tip only appears when
+  something was actually truncated.
+
+  Finally, documents (no behavior change) the one intentional AXI divergence: errors are already on
+  stdout under `--json`/`--toon`, but stay on stderr in human/text mode, following clig.dev's
+  stdout-is-data/stderr-is-diagnostics convention for interactive and piped terminal use.
+
+- 4dae8b2: Closes another gap from the [AXI](https://github.com/kunchenguid/axi) agent-experience audit
+  (following `--toon`/next-step tips and the content-first/aggregates follow-up): **consistent way to
+  get help**. Running `bonsai` with no arguments at all (the "home view") now prints a two-line
+  identity header — `bin: <path>` and `description: <one sentence>` — before the live list data, so
+  an agent orients on what it is looking at without a separate `--help` call. The header is
+  human-mode only, appears only on the true bare invocation (not on an explicit `bonsai list`), and
+  never appears under `--json`/`--toon`.
+- 2e75db4: `list` and `search` now default `--limit` to 10 (previously 50 and 20 respectively), so an
+  unfiltered or broad call never floods an agent's context with more results than it actually asked
+  for. When a result is truncated, the envelope now also carries `summary.nextCommand` — a
+  ready-to-run invocation that reproduces every filter you passed with `--limit` raised to show
+  everything matched (capped at 100) — surfaced as a human-mode tip and in the `--json`/`--toon`
+  envelope alike, so raising the limit is a deliberate, copy-pasteable next step instead of a guess.
+
+  The bundled agent kit (`agents/skills/web-research`, the Salesforce research instructions, and both
+  docs-researcher subagents) now shows `--toon` in its `list`/`search` examples and documents this
+  default-limit/`nextCommand` behavior, and the subagents check the cache via `search --query` before
+  starting new research.
+
+- d696ccb: Adds `bonsai search`, closing the "no way to filter by tags/content" gap in `list`. `--query`
+  ranks cached page-level artifacts by keyword across topic, tags, `summary`, and `compressed`
+  content (case-insensitive, every term must match unless `--match-any` is set), reusing the same
+  `--topic`/`--tags`/`--url`/`--freshness`/`--artifact-type`/`--capture-method` filters as `list`.
+  Each row adds a relevance `score`, the fields a match came from (`matchedFields`), and a short
+  excerpt around the first content match (`snippet`) — an agent can judge relevance from that alone
+  before deciding to `inspect` or re-fetch. Following the existing token-optimization conventions
+  (TOON, minimal-by-default rows, pre-computed `summary` aggregates), `search` reads only the
+  already-indexed `summary`/`compressed` text (never the larger `detailed` body) so ranking a large
+  cache stays fast, and defaults `--limit` to 20 (lower than `list`'s 50) since a ranked row carries
+  more payload per entry. Omitting `--query` behaves like `list`: every row scores `0`, sorted
+  newest-first, so `search` is a strict superset of `list`'s filtering.
+
 ## 4.0.0
 
 ### Major Changes
