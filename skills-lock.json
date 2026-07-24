@@ -132,7 +132,7 @@
     "fallow": {
       "source": "fallow-rs/fallow-skills",
       "sourceType": "github",
-      "computedHash": "30a163242f240078ce8f2f4c7ca18f061465d17e298ab1442a00332adc9f9baf",
+      "computedHash": "ace15efe300b8c6c7f255d172159baea1bee4e3f3b13eb8c58ed7af45bd439f7",
       "agents": [
         "claude-code",
         "codex",
@@ -141,12 +141,10 @@
       ],
       "repoPath": "fallow/skills/fallow/SKILL.md",
       "installPath": ".agents/skills/fallow",
-      "installHash": "c2cd356f8c0d33f2001be4817b0b78d016017a0918346490642169381a26d546",
-      "sourceHash": "30a163242f240078ce8f2f4c7ca18f061465d17e298ab1442a00332adc9f9baf",
+      "installHash": "a5c4a17a9af782b174bf6ec5b3688e551263462ae36d4d58a5d6da7b63186b78",
+      "sourceHash": "ace15efe300b8c6c7f255d172159baea1bee4e3f3b13eb8c58ed7af45bd439f7",
       "versionPolicy": "minor",
-      "includePrerelease": false,
-      "sourceVersion": "1.0.0",
-      "installVersion": "1.0.0"
+      "includePrerelease": false
     },
     "grill-me": {
       "source": "mattpocock/skills",
@@ -440,7 +438,7 @@
     "to-tickets": {
       "source": "mattpocock/skills",
       "sourceType": "github",
-      "computedHash": "02abb0ab4b12ffeec9b6ca10400e3fc99343d2f68476abc45401335d80b0823f",
+      "computedHash": "06368bedd3f7e609987a0d2f4822b2e16a3015d8fdb7f7eae6d68f8fdb79850b",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -450,8 +448,8 @@
       ],
       "repoPath": "skills/engineering/to-tickets/SKILL.md",
       "installPath": ".agents/skills/to-tickets",
-      "installHash": "5d79577541b5cf6dade61c69844432ea20ce7b12527cdda1dd4d6fe8d59a135d",
-      "sourceHash": "02abb0ab4b12ffeec9b6ca10400e3fc99343d2f68476abc45401335d80b0823f",
+      "installHash": "0349eee265e7005e667b4543de849672106c46d545e998f37d3319300bb07751",
+      "sourceHash": "06368bedd3f7e609987a0d2f4822b2e16a3015d8fdb7f7eae6d68f8fdb79850b",
       "versionPolicy": "minor",
       "includePrerelease": false
     },
@@ -494,7 +492,7 @@
     "web-research": {
       "source": "/home/user/bonsai",
       "sourceType": "local",
-      "computedHash": "df53565f3d0759abab3ac2e1f160da2629171571ec749f32f569d9ec5d26bff0",
+      "computedHash": "d036fd800f61a612936418f5875454cffbf4800c341fff32bd1c61bcb440fdf1",
       "agents": [
         "github-copilot",
         "claude-code",
@@ -504,12 +502,12 @@
       ],
       "repoPath": ".agents/skills/web-research/SKILL.md",
       "installPath": ".agents/skills/web-research",
-      "installHash": "039773fb324f98d3293e21ddde6506f2d78075ffe3e2bcf15aefdecef993081b",
-      "sourceHash": "df53565f3d0759abab3ac2e1f160da2629171571ec749f32f569d9ec5d26bff0",
+      "installHash": "e826488b32b4657c193079867fd64560710c5efe4bba6a304e96a9e1a9cb2b00",
+      "sourceHash": "d036fd800f61a612936418f5875454cffbf4800c341fff32bd1c61bcb440fdf1",
       "versionPolicy": "minor",
       "includePrerelease": false,
-      "sourceVersion": "3.1.0",
-      "installVersion": "3.1.0"
+      "sourceVersion": "3.2.0",
+      "installVersion": "3.2.0"
     },
     "writing-great-skills": {
       "source": "mattpocock/skills",
@@ -709,7 +707,7 @@
       "sourceType": "local",
       "repoPath": ".github/agents/official-docs-researcher.agent.md",
       "installPath": ".github/agents/official-docs-researcher.agent.md",
-      "computedHash": "5bfda89d2ea73a5524659112b55819dbb1ffe555ad6df0af1f09c3708fcd74a8",
+      "computedHash": "612f271084282da28ef1d52304f6b15a3ca089f39b0a98e7ebaf9ec96364114d",
       "agents": [
         "claude-code",
         "codex",
@@ -717,12 +715,12 @@
         "cursor",
         "antigravity"
       ],
-      "installHash": "5bfda89d2ea73a5524659112b55819dbb1ffe555ad6df0af1f09c3708fcd74a8",
-      "sourceHash": "db8acda6dd6a06bf5a2f4f08d9eef70e24919f1a998d536a40a5d07f598b7985",
+      "installHash": "612f271084282da28ef1d52304f6b15a3ca089f39b0a98e7ebaf9ec96364114d",
+      "sourceHash": "7005c0a930c98278e6429b81c5fb4058dd70e3f2f27458b78334c4d862bb63d9",
       "versionPolicy": "minor",
       "includePrerelease": false,
-      "sourceVersion": "4.1.0",
-      "installVersion": "4.1.0"
+      "sourceVersion": "4.2.0",
+      "installVersion": "4.2.0"
     },
     ".github/agents/senior-code-reviewer.agent.md": {
       "source": "/home/user/bonsai",

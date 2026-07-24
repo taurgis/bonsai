@@ -3,6 +3,7 @@ name: senior-technical-writer
 description: "Audits, revises, and writes documentation across a codebase, including inline docstrings, generated docs, READMEs, onboarding material, and CLI copy."
 model: sonnet
 tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
+skills: beginner-technical-writing, anti-ai-writing, human-prose-editing
 ---
 
 <!-- GENERATED: forward-nexus ide-sync -->
