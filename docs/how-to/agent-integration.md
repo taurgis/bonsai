@@ -116,13 +116,14 @@ data[1]:
 summary:
   total: 1
   shown: 1
-  limit: 50
+  limit: 10
   truncated: false
   empty: false
   byFreshness:
     fresh: 1
     stale_grace: 0
     stale_expired: 0
+  nextCommand: null
 ```
 
 TOON's tabular `data[N]{field,...}:` header form only applies to arrays of

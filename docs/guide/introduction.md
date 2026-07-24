@@ -83,6 +83,7 @@ or when a documentation host has already failed a generic fetch.
 | **Browser fallback** | Uses `--rendered` for pages that need client-side JavaScript | Capturing SPA documentation when static HTML is incomplete |
 | **[Manual import](/how-to/importing-synthesis)** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
 | **[List](/reference/commands#list)** | Filters cached entries by topic, tags, freshness, and metadata | Seeing what is already cached without reading full content |
+| **[Search](/reference/commands#search)** | Ranks cached entries by a keyword matched against tags, summary, and compressed content | Finding what's already cached on a topic without an exact topic/tag match |
 | **[Ambient session context](/how-to/agent-integration#ambient-session-context)** | `bonsai setup` installs a startup hook that shows a live cache summary (`bonsai context`) at the start of every agent session | Starting a new chat already knowing what's cached, without asking |
 
 ## Safe by default

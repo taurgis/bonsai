@@ -521,9 +521,9 @@
           "type": "option"
         },
         "limit": {
-          "description": "result count (max 100)",
+          "description": "result count (max 100, default 10)",
           "name": "limit",
-          "default": 50,
+          "default": 10,
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"
@@ -793,9 +793,9 @@
           "type": "option"
         },
         "limit": {
-          "description": "result count (max 100)",
+          "description": "result count (max 100, default 10)",
           "name": "limit",
-          "default": 20,
+          "default": 10,
           "hasDynamicHelp": false,
           "multiple": false,
           "type": "option"

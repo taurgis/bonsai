@@ -175,6 +175,75 @@ describe('search command unit tests', () => {
     expect(rows.every((r) => r.score === 0 && r.matchedFields.length === 0)).toBe(true);
   });
 
+  it('defaults --limit to 10 (not 20), matching list', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Search Default Limit Fixture\nBody.');
+    for (let i = 0; i < 12; i++) {
+      await ResearchImport.run([
+        `https://example.com/search-default-limit-${i}`,
+        '--stdin',
+        '--topic',
+        `SearchDefaultLimit${i}`,
+        '--tags',
+        'search-default-limit-tag',
+      ]);
+    }
+    readSpy.mockRestore();
+
+    const rows = (await ResearchSearch.run(['--tags', 'search-default-limit-tag'])) as any[];
+    expect(rows.length).toBe(10);
+  });
+
+  it('surfaces a copy-pasteable nextCommand (human tip and JSON summary) when truncated', async () => {
+    const readSpy = vi
+      .spyOn(ResearchImport.prototype as any, 'readStdin')
+      .mockResolvedValue('# Search Next Command Fixture\nBody.');
+    for (let i = 0; i < 3; i++) {
+      await ResearchImport.run([
+        `https://example.com/search-next-command-${i}`,
+        '--stdin',
+        '--topic',
+        `SearchNextCommand${i}`,
+        '--tags',
+        'search-next-command-tag',
+      ]);
+    }
+    readSpy.mockRestore();
+
+    // The bin name in the suggestion varies by harness (real CLI vs. this in-process Command.run),
+    // so match everything after it rather than pinning an exact bin string.
+    const stderrChunks: string[] = [];
+    const errSpy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      stderrChunks.push(args.map(String).join(' '));
+    });
+    try {
+      await ResearchSearch.run(['--tags', 'search-next-command-tag', '--limit', '2']);
+      // oclif word-wraps long warning lines with a `›` continuation prefix; collapse that before
+      // matching so the assertion doesn't depend on terminal width.
+      const flattened = stderrChunks.join(' ').replace(/›/g, '').replace(/\s+/g, ' ');
+      expect(flattened).toMatch(
+        /see the rest: \S+ search --tags search-next-command-tag --limit 3/
+      );
+    } finally {
+      errSpy.mockRestore();
+    }
+
+    const logged: string[] = [];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logged.push(args.map(String).join(' '));
+    });
+    try {
+      await ResearchSearch.run(['--tags', 'search-next-command-tag', '--limit', '2', '--json']);
+      const envelope = JSON.parse(logged.join(''));
+      expect(envelope.summary.nextCommand).toMatch(
+        / search --tags search-next-command-tag --json --limit 3$/
+      );
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
   it('rejects a whitespace-only --query instead of silently matching nothing', async () => {
     await expect(ResearchSearch.run(['--query', '   '])).rejects.toThrow(
       /--query must be a non-empty value/

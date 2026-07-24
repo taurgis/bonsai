@@ -21,6 +21,7 @@ import {
   type CommonMetadataFilterFlags,
 } from '../lib/research/metadata-filters.js';
 import { commonMetadataFilterFlags } from '../lib/common-metadata-filter-flags.js';
+import { buildNextLimitCommand } from '../lib/next-command.js';
 import {
   tokenizeSearchQuery,
   emptySearchQueryError,
@@ -32,12 +33,11 @@ import { colors, FRESHNESS_COLOR } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS, formatResultRowHeader } from '../lib/cli-presentation.js';
 import type { SearchRow, SearchRowMinimal, SearchSummary } from '../lib/cli-result-types.js';
 
-// Ranked search rows carry more per-row payload (score/matchedFields/snippet) than a plain list row,
-// so the default limit is deliberately smaller than `list`'s 50 — an agent asking "what matches?"
-// rarely needs more than the top handful, and a smaller default keeps token spend down without
-// giving up the ability to raise --limit for a broader sweep.
 const SEARCH_DEFAULT_MAX_LIMIT = 100;
-const SEARCH_DEFAULT_LIMIT = 20;
+// A small default (matching `list`'s) keeps a broad query from flooding an agent's context;
+// `summary.truncated`/`nextCommand` (and the human-mode tip) make raising --limit an explicit,
+// deliberate next step rather than a silent, unbounded dump.
+const SEARCH_DEFAULT_LIMIT = 10;
 
 const NO_MATCH_SCORE: SearchMatch = { score: 0, matchedFields: [] };
 
@@ -100,7 +100,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     limit: limitFlag(
       SEARCH_DEFAULT_MAX_LIMIT,
       SEARCH_DEFAULT_LIMIT,
-      `result count (max ${SEARCH_DEFAULT_MAX_LIMIT})`
+      `result count (max ${SEARCH_DEFAULT_MAX_LIMIT}, default ${SEARCH_DEFAULT_LIMIT})`
     ),
     full: Flags.boolean({
       default: false,
@@ -196,7 +196,8 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   private logSearchResults(
     finalResults: SearchRow[],
     totalMatched: number,
-    queried: boolean
+    queried: boolean,
+    nextCommand: string | null
   ): void {
     if (finalResults.length === 0) {
       this.emitEmptySearchGuidance();
@@ -227,6 +228,9 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       );
       this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
     });
+    if (nextCommand) {
+      this.tip(`see the rest: ${colors.cyan(nextCommand)}`);
+    }
   }
 
   /**
@@ -268,17 +272,29 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     this.sortResults(results, queried);
 
     const finalResults = results.slice(0, this.flags.limit);
+    const truncated = results.length > finalResults.length;
+    // Suggest exactly enough to see every match, capped at the command's own max — a caller who
+    // truncated at the default can raise --limit once and be done, rather than guessing a value.
+    const nextCommand = truncated
+      ? buildNextLimitCommand(
+          this.config.bin,
+          'search',
+          this.argv,
+          Math.min(results.length, SEARCH_DEFAULT_MAX_LIMIT)
+        )
+      : null;
 
     this.jsonSummary = {
       total: results.length,
       shown: finalResults.length,
       limit: this.flags.limit,
-      truncated: results.length > finalResults.length,
+      truncated,
       empty: results.length === 0,
       byFreshness: countByFreshness(results),
       queried,
+      nextCommand,
     };
-    this.logSearchResults(finalResults, results.length, queried);
+    this.logSearchResults(finalResults, results.length, queried, nextCommand);
 
     return this.flags.full ? finalResults : finalResults.map(toMinimalSearchRow);
   }

@@ -23,10 +23,11 @@ Bonsai keeps a few asymmetries because they match agent workflows:
   includes `section` so agents can clean up every cached artifact type.
   `search --artifact-type` follows `list`'s rule, since `search` is
   page-level too.
-- `search`'s default `--limit` (20) is lower than `list`'s (50): a ranked
-  search row carries a `snippet` and match diagnostics that a plain list row
-  doesn't, so a smaller default keeps token spend down for the common
-  "what matches?" case while `--limit` can still raise it to 100.
+- `list` and `search` both default `--limit` to 10 (max 100), so a broad,
+  unfiltered call never floods an agent's context. A truncated result carries
+  `summary.truncated` and `summary.nextCommand` — a ready-to-run command that
+  reproduces the same filters with a raised `--limit` — so raising it is a
+  deliberate next step, not a silent guess.
 - Short flags are command-local. For example, `-f` means fetch `--format` but
   import `--file`, and `-g` means tags on cache commands but `--global` on
   config commands. Check each command's help before reusing short flags.
@@ -345,7 +346,7 @@ flood the listing — find them with `inspect` (which lists a page's sections).
 | `--artifact-type`  | —     | choice  | —       | Artifact type: `source`, `research_note`, or `index`. Section children are omitted from `list`; use `inspect` to see them. |
 | `--capture-method` | —     | choice  | —       | Capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`.                |
 | `--url`            | —     | glob    | —       | Source URL glob (case-insensitive, supports `*`).                                                                          |
-| `--limit`          | —     | integer | `50`    | Cap the result count (1–100).                                                                                              |
+| `--limit`          | —     | integer | `10`    | Cap the result count (1–100).                                                                                              |
 | `--full`           | —     | boolean | `false` | Return every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps) instead of the minimal default row. |
 | `--read-only`      | —     | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY` / `BONSAI_PLAN_MODE`. |
 | `--toon`           | —     | boolean | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                      |
@@ -413,7 +414,8 @@ matched entry (before `--limit`):
     "limit": 2,
     "truncated": true,
     "empty": false,
-    "byFreshness": { "fresh": 9, "stale_grace": 2, "stale_expired": 1 }
+    "byFreshness": { "fresh": 9, "stale_grace": 2, "stale_expired": 1 },
+    "nextCommand": "bonsai list --limit 12"
   }
 }
 ```
@@ -421,7 +423,10 @@ matched entry (before `--limit`):
 `empty: true` (with `total`/`shown` both `0`) is the definitive signal for "no
 matches" — never infer it from an empty `data` array alone. Under `--json`,
 none of this is ever mirrored as a process-stderr tip — the
-envelope field is the stable agent signal.
+envelope field is the stable agent signal. `nextCommand` is `null` unless
+`truncated` is `true`; when set, it reproduces every filter you actually
+passed with `--limit` raised to show everything matched (capped at 100), so
+raising it is copy-paste rather than guesswork.
 
 ---
 
@@ -456,7 +461,7 @@ bonsai search --query "<keywords>" [flags]
 | `--artifact-type`  | —     | choice  | —       | Artifact type: `source`, `research_note`, or `index`. Section children are omitted from `search` — use `inspect`.          |
 | `--capture-method` | —     | choice  | —       | Capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`.                |
 | `--url`            | —     | glob    | —       | Source URL glob (case-insensitive, supports `*`).                                                                          |
-| `--limit`          | —     | integer | `20`    | Cap the result count (1–100). Deliberately lower than `list`'s default of 50: ranked rows carry a `snippet` and extra fields, so a smaller default keeps token spend down. |
+| `--limit`          | —     | integer | `10`    | Cap the result count (1–100), same default as `list`.                                                                     |
 | `--full`           | —     | boolean | `false` | Return every metadata field (as `list --full`) alongside `score`/`matchedFields`/`snippet` instead of the minimal default row. |
 | `--read-only`      | —     | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE`. |
 | `--toon`           | —     | boolean | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                      |
@@ -518,6 +523,7 @@ plus one additional flag:
     "truncated": true,
     "empty": false,
     "byFreshness": { "fresh": 9, "stale_grace": 2, "stale_expired": 1 },
+    "nextCommand": "bonsai search --query cache --limit 12",
     "queried": true
   }
 }
@@ -525,7 +531,8 @@ plus one additional flag:
 
 `queried: false` means `--query` was omitted — every row scored `0` and the sort fell back to
 `list`'s newest-first order, so a caller can tell "no query was run" apart from "the query matched
-nothing" (`empty: true`).
+nothing" (`empty: true`). `nextCommand` follows the same contract as `list`'s: `null` unless
+`truncated` is `true`, otherwise the same invocation (including `--query`) with `--limit` raised.
 
 ---
 

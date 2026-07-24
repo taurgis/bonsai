@@ -82,6 +82,12 @@ export interface ListSummary {
   /** Explicit signal for `total === 0`, so an empty `data: []` is never ambiguous. */
   empty: boolean;
   byFreshness: Record<ListFreshness, number>;
+  /**
+   * A copy-pasteable next invocation that reproduces the caller's own filters with a raised
+   * `--limit`, so a truncated result never leaves an agent to guess the syntax for "show me more."
+   * `null` when `truncated` is false.
+   */
+  nextCommand: string | null;
 }
 
 /** One row in `search --json` output when `--full` is passed. */

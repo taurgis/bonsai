@@ -205,6 +205,72 @@ export default function register(harness, fixtures) {
     expect(searched.stderr === '', `process stderr should stay clean under --json: ${searched.stderr}`);
   });
 
+  check('search defaults --limit to 10 (matching list) and suggests a nextCommand when truncated', () => {
+    const ws = createWorkspace();
+    for (let i = 0; i < 12; i++) {
+      const imported = run(
+        [
+          'import',
+          `https://example.com/audit-search-default-limit-${i}`,
+          '--stdin',
+          '--topic',
+          `Audit Search Default Limit ${i}`,
+          '--tags',
+          'audit-search-default-limit-tag',
+          '--json',
+        ],
+        {
+          cwd: ws.cwd,
+          xdg: ws.xdg,
+          input: `# Audit Search Default Limit ${i}\n\nDefault limit fixture.\n`,
+        }
+      );
+      expect(imported.exitCode === 0, `import ${i} exit ${imported.exitCode}`);
+    }
+
+    const searched = run(['search', '--tags', 'audit-search-default-limit-tag', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const env = parseJson(searched.stdout);
+    expect(searched.exitCode === 0, `search exit ${searched.exitCode}`);
+    expect(env?.data?.length === 10, `data length ${env?.data?.length}`);
+    expect(
+      env?.summary?.total === 12 && env.summary.shown === 10 && env.summary.limit === 10 && env.summary.truncated === true,
+      `summary ${JSON.stringify(env?.summary)}`
+    );
+    expect(
+      /search --tags audit-search-default-limit-tag --json --limit 12$/.test(env?.summary?.nextCommand ?? ''),
+      `nextCommand ${env?.summary?.nextCommand}`
+    );
+  });
+
+  check('search --json summary.nextCommand is null when nothing was truncated', () => {
+    const ws = createWorkspace();
+    const imported = run(
+      [
+        'import',
+        'https://example.com/audit-search-no-truncation',
+        '--stdin',
+        '--topic',
+        'SearchNoTruncation',
+        '--json',
+      ],
+      { cwd: ws.cwd, xdg: ws.xdg, input: '# Search No Truncation\n\nFixture.\n' }
+    );
+    expect(imported.exitCode === 0, `import exit ${imported.exitCode}`);
+
+    const searched = run(['search', '--topic', 'SearchNoTruncation', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+    });
+    const env = parseJson(searched.stdout);
+    expect(
+      env?.summary?.nextCommand === null,
+      `nextCommand ${JSON.stringify(env?.summary?.nextCommand)}`
+    );
+  });
+
   check('search human mode renders score, matched fields, and a snippet when queried', () => {
     const ws = createWorkspace();
     const url = 'https://example.com/audit-search-human-render';

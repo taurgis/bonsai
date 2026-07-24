@@ -22,12 +22,17 @@ import {
   type CommonMetadataFilterFlags,
 } from '../lib/research/metadata-filters.js';
 import { commonMetadataFilterFlags } from '../lib/common-metadata-filter-flags.js';
+import { buildNextLimitCommand } from '../lib/next-command.js';
 import { colors, FRESHNESS_COLOR } from '../lib/color.js';
 import { CLI_FLAG_DESCRIPTIONS, formatResultRowHeader } from '../lib/cli-presentation.js';
 import type { ListRow, ListRowMinimal, ListSummary } from '../lib/cli-result-types.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at this value.
 const LIST_DEFAULT_MAX_LIMIT = 100;
+// A small default keeps an unfiltered `list` from flooding an agent's context with everything ever
+// cached; `summary.truncated`/`nextCommand` (and the human-mode tip) make raising --limit an
+// explicit, deliberate next step rather than a silent, unbounded dump.
+const LIST_DEFAULT_LIMIT = 10;
 const LIST_LABELS: ResultListLabels = {
   noun: 'cached research',
   order: 'first',
@@ -83,7 +88,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static flags = {
     ...commonMetadataFilterFlags(CLI_FLAG_DESCRIPTIONS.listArtifactType),
-    limit: limitFlag(LIST_DEFAULT_MAX_LIMIT, 50, `result count (max ${LIST_DEFAULT_MAX_LIMIT})`),
+    limit: limitFlag(
+      LIST_DEFAULT_MAX_LIMIT,
+      LIST_DEFAULT_LIMIT,
+      `result count (max ${LIST_DEFAULT_MAX_LIMIT}, default ${LIST_DEFAULT_LIMIT})`
+    ),
     full: Flags.boolean({
       default: false,
       description: CLI_FLAG_DESCRIPTIONS.listFull,
@@ -145,7 +154,11 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     this.log(`description: ${this.config.pjson.description ?? this.config.bin}\n`);
   }
 
-  private logListResults(finalResults: ListRow[], totalMatched: number): void {
+  private logListResults(
+    finalResults: ListRow[],
+    totalMatched: number,
+    nextCommand: string | null
+  ): void {
     if (finalResults.length === 0) {
       this.emitEmptyListGuidance();
       return;
@@ -163,6 +176,9 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       );
       this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
     });
+    if (nextCommand) {
+      this.tip(`see the rest: ${colors.cyan(nextCommand)}`);
+    }
   }
 
   /**
@@ -213,6 +229,17 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     });
 
     const finalResults = results.slice(0, this.flags.limit);
+    const truncated = results.length > finalResults.length;
+    // Suggest exactly enough to see every match, capped at the command's own max — a caller who
+    // truncated at the default can raise --limit once and be done, rather than guessing a value.
+    const nextCommand = truncated
+      ? buildNextLimitCommand(
+          this.config.bin,
+          'list',
+          this.argv,
+          Math.min(results.length, LIST_DEFAULT_MAX_LIMIT)
+        )
+      : null;
 
     // Human heading carries truncation inline; --json/--toon get the same counts (plus a freshness
     // breakdown and an explicit `empty` flag) as an always-present envelope `summary` object.
@@ -220,11 +247,12 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       total: results.length,
       shown: finalResults.length,
       limit: this.flags.limit,
-      truncated: results.length > finalResults.length,
+      truncated,
       empty: results.length === 0,
       byFreshness: countByFreshness(results),
+      nextCommand,
     };
-    this.logListResults(finalResults, results.length);
+    this.logListResults(finalResults, results.length, nextCommand);
 
     return this.flags.full ? finalResults : finalResults.map(toMinimalListRow);
   }

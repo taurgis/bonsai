@@ -148,7 +148,7 @@ npx @taurgis/bonsai inspect <url>
 
 ### `list`
 
-List cached artifacts by metadata filters (`--topic`, `--tags`, `--url`, `--freshness`, `--artifact-type`, `--capture-method`, `--limit`), newest first, without printing content. The default `--json`/`--toon` row is a minimal 4-field shape (`sourceUrls`, `topic`, `freshness`, `tokenEstimate`); pass `--full` for every metadata field. Running `bonsai` with no arguments at all is shorthand for `bonsai list`, preceded by a `bin:`/`description:` identity header (human mode only, that bare invocation only).
+List cached artifacts by metadata filters (`--topic`, `--tags`, `--url`, `--freshness`, `--artifact-type`, `--capture-method`, `--limit`), newest first, without printing content. The default `--json`/`--toon` row is a minimal 4-field shape (`sourceUrls`, `topic`, `freshness`, `tokenEstimate`); pass `--full` for every metadata field. `--limit` defaults to 10 so an unfiltered call never floods the caller's context; a truncated result's `summary.nextCommand` gives a ready-to-run command with `--limit` raised. Running `bonsai` with no arguments at all is shorthand for `bonsai list`, preceded by a `bin:`/`description:` identity header (human mode only, that bare invocation only).
 
 ```bash
 npx @taurgis/bonsai list [flags]
@@ -163,8 +163,8 @@ somewhere unless `--match-any` is set. Every other filter (`--topic`, `--tags`, 
 relevance `score`, which fields matched (`matchedFields`), and a short excerpt around the first
 content match (`snippet`) — reading only the token-cheap indexed `summary`/`compressed` text, never
 the full `detailed` body, so ranking a large cache stays fast and never balloons context. Omitting
-`--query` behaves like `list`: every row scores `0`, sorted newest-first. `--limit` defaults to 20
-(lower than `list`'s 50) since a ranked row carries more payload per entry.
+`--query` behaves like `list`: every row scores `0`, sorted newest-first. `--limit` defaults to 10,
+same as `list`.
 
 ```bash
 npx @taurgis/bonsai search --query "suspense boundary" --tags react
