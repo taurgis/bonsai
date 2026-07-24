@@ -11,12 +11,14 @@ import {
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
-import { toListRow } from '../lib/research/list-row.js';
+import { countByFreshness, toListRow } from '../lib/research/list-row.js';
 import { emptyUrlFilterError } from '../lib/research/url.js';
 import {
   matchesCommonMetadataFilters,
+  hasActiveMetadataFilters,
   emptyTopicFilterError,
   emptyTagsFilterError,
+  type CommonMetadataFilterFlags,
 } from '../lib/research/metadata-filters.js';
 import { commonMetadataFilterFlags } from '../lib/common-metadata-filter-flags.js';
 import {
@@ -50,13 +52,6 @@ function toMinimalSearchRow(row: SearchRow): SearchRowMinimal {
     matchedFields: row.matchedFields,
     snippet: row.snippet,
   };
-}
-
-/** Count matched rows per freshness tier for the envelope's `summary.byFreshness`. */
-function countByFreshness(rows: readonly SearchRow[]): SearchSummary['byFreshness'] {
-  const counts: SearchSummary['byFreshness'] = { fresh: 0, stale_grace: 0, stale_expired: 0 };
-  for (const row of rows) counts[row.freshness]++;
-  return counts;
 }
 
 /** Search cached research artifacts by tag/content keywords and metadata filters. */
@@ -115,18 +110,23 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
 
   static stdoutIsPrimaryData = true;
 
-  private matchesMetadataFilters(
-    meta: ResearchArtifactMetadata,
-    freshness: SearchRow['freshness']
-  ): boolean {
-    return matchesCommonMetadataFilters(meta, freshness, {
+  /** The shared filter flags as `matchesCommonMetadataFilters`/`hasActiveMetadataFilters` expect them. */
+  private metadataFilterFlags(): CommonMetadataFilterFlags {
+    return {
       topic: this.flags.topic,
       tags: this.flags.tags,
       url: this.flags.url,
       artifactType: this.flags['artifact-type'],
       captureMethod: this.flags['capture-method'],
       freshness: this.flags.freshness,
-    });
+    };
+  }
+
+  private matchesMetadataFilters(
+    meta: ResearchArtifactMetadata,
+    freshness: SearchRow['freshness']
+  ): boolean {
+    return matchesCommonMetadataFilters(meta, freshness, this.metadataFilterFlags());
   }
 
   private scanCacheDirForSearch(
@@ -190,15 +190,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
   }
 
   private hasActiveFilters(): boolean {
-    return Boolean(
-      this.flags.query ||
-      this.flags.topic ||
-      (this.flags.tags && this.flags.tags.length > 0) ||
-      this.flags.freshness ||
-      this.flags['artifact-type'] ||
-      this.flags['capture-method'] ||
-      this.flags.url
-    );
+    return Boolean(this.flags.query) || hasActiveMetadataFilters(this.metadataFilterFlags());
   }
 
   private logSearchResults(

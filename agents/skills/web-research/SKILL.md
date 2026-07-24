@@ -1,10 +1,10 @@
 ---
 name: web-research
-description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when listing/pruning the local research cache, or when importing manually gathered notes.'
+description: 'Bonsai-backed official documentation and web research workflow. Use before technical changes that depend on platform behavior, when fetching documentation or web pages, when listing/searching/pruning the local research cache, or when importing manually gathered notes.'
 license: Forward Proprietary
 compatibility: VS Code 1.x+, GitHub Copilot
 metadata:
-  version: '3.2.0'
+  version: '3.3.0'
 ---
 
 # Web Research Skill
@@ -103,6 +103,14 @@ List cached entries by metadata:
 
 ```bash
 npx @taurgis/bonsai list --tags node
+```
+
+Search cached entries by tag or content keyword when you don't know the exact topic/tag to filter
+on — ranks page-level entries by a query matched against topic, tags, summary, and compressed
+content:
+
+```bash
+npx @taurgis/bonsai search --query "suspense boundary"
 ```
 
 Preview pruning before deleting:

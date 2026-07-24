@@ -1,4 +1,4 @@
-import type { ListRow } from '../cli-result-types.js';
+import type { ListFreshness, ListRow } from '../cli-result-types.js';
 import type { ResearchArtifact } from './schema.js';
 
 /**
@@ -25,4 +25,16 @@ export function toListRow(
     fetchedAt: artifact.metadata.fetched_at,
     validatedAt: artifact.metadata.validated_at,
   };
+}
+
+/**
+ * Counts rows per freshness tier for the `list`/`search` envelope's `summary.byFreshness` — single
+ * source of truth so the two commands' aggregate always agree on the shape and the counting logic.
+ */
+export function countByFreshness(
+  rows: readonly { freshness: ListFreshness }[]
+): Record<ListFreshness, number> {
+  const counts: Record<ListFreshness, number> = { fresh: 0, stale_grace: 0, stale_expired: 0 };
+  for (const row of rows) counts[row.freshness]++;
+  return counts;
 }

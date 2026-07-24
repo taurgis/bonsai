@@ -72,3 +72,19 @@ export function matchesCommonMetadataFilters(
   if (flags.freshness && freshness !== flags.freshness) return false;
   return true;
 }
+
+/**
+ * Whether any of the shared metadata filter flags was passed — used to pick empty-result guidance
+ * ("no matches for your filters" vs. "the cache is empty"). `search` combines this with its own
+ * `--query` check; `list` has no filters beyond these, so it uses the result directly.
+ */
+export function hasActiveMetadataFilters(flags: CommonMetadataFilterFlags): boolean {
+  return Boolean(
+    flags.topic ||
+    (flags.tags && flags.tags.length > 0) ||
+    flags.freshness ||
+    flags.artifactType ||
+    flags.captureMethod ||
+    flags.url
+  );
+}

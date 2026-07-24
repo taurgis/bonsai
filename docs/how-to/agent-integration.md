@@ -74,7 +74,7 @@ adds a `score`, `matchedFields`, and a short `snippet` to each row so an agent
 can judge relevance without a second `inspect` round trip. `search` reads
 only the already-indexed `summary`/`compressed` text, never the larger
 `detailed` body, so it stays cheap even against a large cache; see
-[Command Reference](/reference/commands#6-search) for the full flag/JSON
+[Command Reference](/reference/commands#search) for the full flag/JSON
 contract.
 
 Running `bonsai` with no arguments at all shows live cache data (equivalent to

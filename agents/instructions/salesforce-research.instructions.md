@@ -4,7 +4,7 @@ applyTo: '**'
 skills:
   - web-research
 metadata:
-  version: '2.1.0'
+  version: '2.2.0'
 ---
 
 # Web Research Requirement (Salesforce)
@@ -27,6 +27,7 @@ metadata:
 - **Invocation**: Run Bonsai as `npx @taurgis/bonsai ...`.
 - **URL discovery**: When you do not yet know the official URL, discover it with your native web/search tools, then fetch the page through Bonsai so it is cached for future agents.
 - **Browse cached entries**: Use `npx @taurgis/bonsai list` when you need to see what is already cached by topic, tags, or freshness.
+- **Search cached entries**: Use `npx @taurgis/bonsai search --query "<keywords>"` when you don't know the exact topic/tag to filter on — it ranks cached entries by a query matched against topic, tags, and page content.
 - If Bonsai is configured for project storage and `.bonsai/research/` is not ignored by git, treat those cache artifacts as intentional shared project files. It is OK to check them in, and agents must not delete them as incidental generated output without an explicit request.
 - Re-running on a recent topic is cheap — research the topic rather than skipping it to "save" a fetch.
 - If you are operating under a read-only/plan-mode harness, add `--read-only` (alias `--plan`) to Bonsai calls, or rely on `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE` if the harness sets it — fetches still run, but nothing is persisted to the local cache or config; `config set` / `config unset` preview with `would_set` / `would_unset`.

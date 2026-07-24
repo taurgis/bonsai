@@ -12,12 +12,14 @@ import {
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
-import { toListRow } from '../lib/research/list-row.js';
+import { countByFreshness, toListRow } from '../lib/research/list-row.js';
 import { emptyUrlFilterError } from '../lib/research/url.js';
 import {
   matchesCommonMetadataFilters,
+  hasActiveMetadataFilters,
   emptyTopicFilterError,
   emptyTagsFilterError,
+  type CommonMetadataFilterFlags,
 } from '../lib/research/metadata-filters.js';
 import { commonMetadataFilterFlags } from '../lib/common-metadata-filter-flags.js';
 import { colors, FRESHNESS_COLOR } from '../lib/color.js';
@@ -39,13 +41,6 @@ function toMinimalListRow(row: ListRow): ListRowMinimal {
     freshness: row.freshness,
     tokenEstimate: row.tokenEstimate,
   };
-}
-
-/** Count matched rows per freshness tier for the envelope's `summary.byFreshness`. */
-function countByFreshness(rows: readonly ListRow[]): ListSummary['byFreshness'] {
-  const counts: ListSummary['byFreshness'] = { fresh: 0, stale_grace: 0, stale_expired: 0 };
-  for (const row of rows) counts[row.freshness]++;
-  return counts;
 }
 
 /** List cached research artifacts by metadata filters. */
@@ -100,15 +95,20 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
 
   static stdoutIsPrimaryData = true;
 
-  private matchesFilters(meta: ResearchArtifactMetadata, freshness: ListRow['freshness']): boolean {
-    return matchesCommonMetadataFilters(meta, freshness, {
+  /** The shared filter flags as `matchesCommonMetadataFilters`/`hasActiveMetadataFilters` expect them. */
+  private metadataFilterFlags(): CommonMetadataFilterFlags {
+    return {
       topic: this.flags.topic,
       tags: this.flags.tags,
       url: this.flags.url,
       artifactType: this.flags['artifact-type'],
       captureMethod: this.flags['capture-method'],
       freshness: this.flags.freshness,
-    });
+    };
+  }
+
+  private matchesFilters(meta: ResearchArtifactMetadata, freshness: ListRow['freshness']): boolean {
+    return matchesCommonMetadataFilters(meta, freshness, this.metadataFilterFlags());
   }
 
   private scanCacheDirForList(readRoots: string[], currentTime: Date): ListRow[] {
@@ -129,17 +129,6 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
         return toListRow(artifact, filePath, freshness);
       },
       { persistIndex: !this.readOnly }
-    );
-  }
-
-  private hasActiveFilters(): boolean {
-    return Boolean(
-      this.flags.topic ||
-      (this.flags.tags && this.flags.tags.length > 0) ||
-      this.flags.freshness ||
-      this.flags['artifact-type'] ||
-      this.flags['capture-method'] ||
-      this.flags.url
     );
   }
 
@@ -182,7 +171,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
    */
   private emitEmptyListGuidance(): void {
     if (this.jsonEnabled()) return;
-    const filtered = this.hasActiveFilters();
+    const filtered = hasActiveMetadataFilters(this.metadataFilterFlags());
     const headline = filtered
       ? 'No cached research entries match the given filters.'
       : 'No cached research entries found.';

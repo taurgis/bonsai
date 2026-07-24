@@ -5,7 +5,7 @@ model: 'Auto'
 tools: ['vscode/askQuestions', 'execute', 'read', 'search', 'web', 'vscode/memory']
 argument-hint: 'What topic should I research in official docs?'
 metadata:
-  version: '4.2.0'
+  version: '4.3.0'
 ---
 
 # Official Docs Researcher Agent
@@ -27,20 +27,27 @@ If you are operating in a read-only/plan mode (no filesystem writes allowed), ad
 ## Default Workflow
 
 1. Identify the product, version, edition, and source authority needed for the request.
-2. Locate official source URLs. Prefer vendor docs, standards bodies, API references, and official release notes. Use your native web/search tools when you do not yet know the URL.
-3. Capture each source through Bonsai:
+2. Check whether relevant research is already cached before starting new fetches:
+
+   ```bash
+   npx @taurgis/bonsai search --query "<topic keywords>"
+   ```
+
+   A hit still needs a freshness check (see below) before you trust it as current.
+3. Locate official source URLs for anything not already cached. Prefer vendor docs, standards bodies, API references, and official release notes. Use your native web/search tools when you do not yet know the URL.
+4. Capture each source through Bonsai:
 
    ```bash
    npx @taurgis/bonsai <official-url> --format detailed
    ```
 
-4. Use `--rendered` for SPAs or pages where static extraction is incomplete:
+5. Use `--rendered` for SPAs or pages where static extraction is incomplete:
 
    ```bash
    npx @taurgis/bonsai <official-url> --rendered --format detailed
    ```
 
-5. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
+6. Summarize only what the official sources support. Include source URLs, validation time when available, version notes, and any important limitations.
 
 For structured output:
 
