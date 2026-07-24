@@ -6,6 +6,7 @@ import type {
   ResearchArtifactMetadata,
   TokenEstimate,
 } from './research/schema.js';
+import type { SearchMatchField } from './research/search-match.js';
 
 /** Result of `config set` / `config unset` for the JSON envelope. */
 export interface ConfigWriteResult {
@@ -81,6 +82,33 @@ export interface ListSummary {
   /** Explicit signal for `total === 0`, so an empty `data: []` is never ambiguous. */
   empty: boolean;
   byFreshness: Record<ListFreshness, number>;
+}
+
+/** One row in `search --json` output when `--full` is passed. */
+export interface SearchRow extends ListRow {
+  /** Relevance score (0 when `--query` was omitted); see `search-match.ts` for the weighting. */
+  score: number;
+  /** Fields the query matched against; empty when `--query` was omitted. */
+  matchedFields: SearchMatchField[];
+  /** Excerpt around the first content match, or `null` when only topic/tags matched (or no query). */
+  snippet: string | null;
+}
+
+/**
+ * Default `search --json`/`--toon` row: enough to judge relevance (score, which fields matched, a
+ * short content excerpt) without the full metadata dump. Pass `--full` for every field on
+ * {@link SearchRow}.
+ */
+export interface SearchRowMinimal extends ListRowMinimal {
+  score: number;
+  matchedFields: SearchMatchField[];
+  snippet: string | null;
+}
+
+/** Aggregate counts attached to `search`'s envelope so agents skip extra round trips. */
+export interface SearchSummary extends ListSummary {
+  /** Whether `--query` was passed; when false every row scores 0 and results are recency-sorted. */
+  queried: boolean;
 }
 
 /** Section child summary nested under an inspect hit. */

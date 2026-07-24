@@ -138,6 +138,7 @@ Agents working in this codebase or utilizing Bonsai must run the compiled CLI co
 - **Status Checklist**: `node bin/cli.mjs status <url> [--json]`
 - **Inspect Metadata**: `node bin/cli.mjs inspect <url> [--json]`
 - **List Database**: `node bin/cli.mjs list [filters] [--json]`
+- **Search Database (tags/content)**: `node bin/cli.mjs search --query "<keywords>" [filters] [--json]`
 - **Prune Database**: `node bin/cli.mjs prune [filters] --yes [--json]`
 - **Ambient Session Context**: `node bin/cli.mjs context [--json]`
 - **Install Session-Start Hook**: `node bin/cli.mjs setup <claude-code|codex> [--global] [--dry-run] [--json]`

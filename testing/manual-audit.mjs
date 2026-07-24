@@ -11,6 +11,7 @@ import registerJsonEnvelope from './audit/scenarios/json-envelope.mjs';
 import registerFetch from './audit/scenarios/fetch.mjs';
 import registerInspectStatus from './audit/scenarios/inspect-status.mjs';
 import registerList from './audit/scenarios/list.mjs';
+import registerSearch from './audit/scenarios/search.mjs';
 import registerPrune from './audit/scenarios/prune.mjs';
 import registerImport from './audit/scenarios/import.mjs';
 import registerConfig from './audit/scenarios/config.mjs';
@@ -34,6 +35,7 @@ const scenarios = [
   registerFetch,
   registerInspectStatus,
   registerList,
+  registerSearch,
   registerPrune,
   registerImport,
   registerConfig,

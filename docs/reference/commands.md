@@ -21,6 +21,12 @@ Bonsai keeps a few asymmetries because they match agent workflows:
 - `list --artifact-type` omits `section` because `list` reports page-level
   artifacts (`source`, `research_note`, and `index`). `prune --artifact-type`
   includes `section` so agents can clean up every cached artifact type.
+  `search --artifact-type` follows `list`'s rule, since `search` is
+  page-level too.
+- `search`'s default `--limit` (20) is lower than `list`'s (50): a ranked
+  search row carries a `snippet` and match diagnostics that a plain list row
+  doesn't, so a smaller default keeps token spend down for the common
+  "what matches?" case while `--limit` can still raise it to 100.
 - Short flags are command-local. For example, `-f` means fetch `--format` but
   import `--file`, and `-g` means tags on cache commands but `--global` on
   config commands. Check each command's help before reusing short flags.
@@ -419,7 +425,111 @@ envelope field is the stable agent signal.
 
 ---
 
-## 6. `prune`
+## 6. `search`
+
+Rank cached page-level artifacts by keyword — the content/tag search `list` doesn't do. `--query`
+matches (case-insensitive) against topic, tags, `summary`, and `compressed`; every other filter
+(`--topic`, `--tags`, `--url`, `--freshness`, `--artifact-type`, `--capture-method`) works exactly
+like `list`'s. `search` reads only the token-cheap indexed `summary`/`compressed` text — never the
+full `detailed` body — so ranking a large cache stays fast and never balloons context. Omitting
+`--query` behaves like `list`: every row scores `0` and results sort newest-first instead of by
+relevance.
+
+### Usage
+
+```bash
+bonsai search --query "<keywords>" [flags]
+```
+
+`search`, like `list`, reports page-level artifacts only (`source`, `research_note`, `index`) —
+`section` children are omitted; use `inspect` to see them.
+
+### Command-Line Flags
+
+| Flag               | Short | Type    | Default | Description                                                                                                                |
+| ------------------ | ----- | ------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `--query`          | `-q`  | string  | —       | Keyword(s) to search across topic, tags, summary, and compressed content. Every term must match somewhere unless `--match-any` is set. |
+| `--match-any`      | —     | boolean | `false` | Match any query term instead of requiring all of them (OR instead of AND).                                                |
+| `--topic`          | `-t`  | string  | —       | Exact topic (case-insensitive), same matching as `list --topic`.                                                          |
+| `--tags`           | `-g`  | string  | —       | Tags to require; all repeated tags must match, same matching as `list --tags`.                                            |
+| `--freshness`      | —     | choice  | —       | Freshness state: `fresh`, `stale_grace`, or `stale_expired`.                                                               |
+| `--artifact-type`  | —     | choice  | —       | Artifact type: `source`, `research_note`, or `index`. Section children are omitted from `search` — use `inspect`.          |
+| `--capture-method` | —     | choice  | —       | Capture method: `static_fetch`, `browser_fallback`, `agent_supplied`, `route_markdown`, or `github_source`.                |
+| `--url`            | —     | glob    | —       | Source URL glob (case-insensitive, supports `*`).                                                                          |
+| `--limit`          | —     | integer | `20`    | Cap the result count (1–100). Deliberately lower than `list`'s default of 50: ranked rows carry a `snippet` and extra fields, so a smaller default keeps token spend down. |
+| `--full`           | —     | boolean | `false` | Return every metadata field (as `list --full`) alongside `score`/`matchedFields`/`snippet` instead of the minimal default row. |
+| `--read-only`      | —     | boolean | `false` | Block filesystem writes/deletes for this invocation (alias `--plan`). Also honored via `BONSAI_READ_ONLY`/`BONSAI_PLAN_MODE`. |
+| `--toon`           | —     | boolean | `false` | Emit the same envelope as `--json`, encoded as TOON (fewer tokens). Mutually exclusive with `--json`.                      |
+| `--json`           | —     | boolean | `false` | Return the machine-readable envelope.                                                                                      |
+
+A whitespace-only `--query`/`--topic`/`--tags`/`--url` value is rejected as `INVALID_FLAG_VALUE`
+rather than silently matching everything or nothing — almost always a shell-quoting mistake.
+
+### Ranking
+
+Each query term is checked against topic, tags, `summary`, and `compressed`; a matched field
+contributes a fixed score weight (topic scores highest, then tags, then summary, then compressed),
+with repeated occurrences in `summary`/`compressed` capped so one long, repetitive page cannot
+out-rank a genuine topic/tag match. Results are sorted by score (descending) when `--query` is
+given, tie-broken by `validated_at` then cache key for deterministic output; without `--query`,
+results sort newest-first exactly like `list`.
+
+### JSON Output envelope `data` block
+
+By default each row is the minimal shape an agent needs to judge relevance without a second
+round trip — the same fields as `list`'s minimal row, plus the score, which fields matched, and a
+short excerpt around the first content match:
+
+```json
+[
+  {
+    "sourceUrls": ["https://example.com"],
+    "topic": "example",
+    "freshness": "fresh" | "stale_grace" | "stale_expired",
+    "tokenEstimate": { "compressed": 29, "detailed": 65 },
+    "score": 112,
+    "matchedFields": ["topic", "compressed"],
+    "snippet": "…the surrounding sentence containing the matched keyword…"
+  }
+]
+```
+
+`matchedFields` lists only `"topic"`, `"tags"`, `"summary"`, `"compressed"` — whichever fields a
+query term actually matched — in that priority order. `snippet` is `null` when `--query` was
+omitted, or when a match came only from `topic`/`tags` (no content excerpt to show). Pass `--full`
+for every metadata field, same as `list --full`.
+
+The envelope always includes a top-level `summary` object alongside `data`, matching `list`'s shape
+plus one additional flag:
+
+```json
+{
+  "schemaVersion": 1,
+  "command": "search",
+  "ok": true,
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "",
+  "data": [ /* at most --limit rows */ ],
+  "summary": {
+    "total": 12,
+    "shown": 2,
+    "limit": 2,
+    "truncated": true,
+    "empty": false,
+    "byFreshness": { "fresh": 9, "stale_grace": 2, "stale_expired": 1 },
+    "queried": true
+  }
+}
+```
+
+`queried: false` means `--query` was omitted — every row scored `0` and the sort fell back to
+`list`'s newest-first order, so a caller can tell "no query was run" apart from "the query matched
+nothing" (`empty: true`).
+
+---
+
+## 7. `prune`
 
 Delete cached entries by age, inactivity, or type to reclaim disk space. Pruning
 spans **every read root** (project and global), so a key present in both is
@@ -479,7 +589,7 @@ would delete. On a real run, `prunedCount` is the number actually removed.
 
 ---
 
-## 7. `config`
+## 8. `config`
 
 Manage where the research cache is stored. Configuration is layered, resolved in
 precedence order: per-command `--storage` flag > `BONSAI_STORAGE` env var >
@@ -555,7 +665,7 @@ semantics per key (same array-as-`data` shape as `list`).
 
 ---
 
-## 8. `context`
+## 9. `context`
 
 Compact, directory-scoped cache dashboard — total entries, a freshness breakdown, and the most
 recently touched pages. This is what `setup`-installed `SessionStart` hooks pipe into an agent's
@@ -594,7 +704,7 @@ not an ambiguous empty list.
 
 ---
 
-## 9. `setup`
+## 10. `setup`
 
 Installs or repairs a `SessionStart` hook that runs `bonsai context` at the start of every agent
 session. See [Ambient session context](/how-to/agent-integration#ambient-session-context) for the

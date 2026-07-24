@@ -5,8 +5,8 @@ import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
 import {
-  ARTIFACT_TYPES,
   CAPTURE_METHODS,
+  PAGE_LEVEL_ARTIFACT_TYPES,
   type ResearchArtifactMetadata,
 } from '../lib/research/schema.js';
 import {
@@ -18,10 +18,10 @@ import {
   type ResultListLabels,
 } from '../lib/text.js';
 import { limitFlag } from '../lib/limit-flag.js';
-import { artifactMatchesUrlFilter, emptyUrlFilterError } from '../lib/research/url.js';
+import { toListRow } from '../lib/research/list-row.js';
+import { emptyUrlFilterError } from '../lib/research/url.js';
 import {
-  matchesTopicFilter,
-  matchesTagsFilter,
+  matchesCommonMetadataFilters,
   emptyTopicFilterError,
   emptyTagsFilterError,
 } from '../lib/research/metadata-filters.js';
@@ -35,10 +35,6 @@ const LIST_LABELS: ResultListLabels = {
   noun: 'cached research',
   order: 'first',
 };
-
-// `list` answers "what pages/notes do I have?" and deliberately omits section children (see
-// scanCacheDirForList), so `section` is not an offered filter — every other artifact type can appear.
-const LISTABLE_ARTIFACT_TYPES = ARTIFACT_TYPES.filter((type) => type !== 'section');
 
 /** Project a full row down to the default minimal shape (see {@link ListRowMinimal}). */
 function toMinimalListRow(row: ListRow): ListRowMinimal {
@@ -114,7 +110,7 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
     })(),
     'artifact-type': Flags.option({
       description: CLI_FLAG_DESCRIPTIONS.listArtifactType,
-      options: LISTABLE_ARTIFACT_TYPES,
+      options: PAGE_LEVEL_ARTIFACT_TYPES,
     })(),
     'capture-method': Flags.option({
       description: 'capture method',
@@ -133,25 +129,14 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
   static stdoutIsPrimaryData = true;
 
   private matchesFilters(meta: ResearchArtifactMetadata, freshness: ListRow['freshness']): boolean {
-    if (!matchesTopicFilter(meta, this.flags.topic)) {
-      return false;
-    }
-    if (!matchesTagsFilter(meta, this.flags.tags)) {
-      return false;
-    }
-    if (this.flags.url && !artifactMatchesUrlFilter(meta, this.flags.url)) {
-      return false;
-    }
-    if (this.flags['artifact-type'] && meta.artifact_type !== this.flags['artifact-type']) {
-      return false;
-    }
-    if (this.flags['capture-method'] && meta.capture_method !== this.flags['capture-method']) {
-      return false;
-    }
-    if (this.flags.freshness && freshness !== this.flags.freshness) {
-      return false;
-    }
-    return true;
+    return matchesCommonMetadataFilters(meta, freshness, {
+      topic: this.flags.topic,
+      tags: this.flags.tags,
+      url: this.flags.url,
+      artifactType: this.flags['artifact-type'],
+      captureMethod: this.flags['capture-method'],
+      freshness: this.flags.freshness,
+    });
   }
 
   private scanCacheDirForList(readRoots: string[], currentTime: Date): ListRow[] {
@@ -164,25 +149,12 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
         // listing (one page yields dozens) and aren't in the documented source/research_note contract.
         // They stay discoverable through `inspect` (which lists a page's sections). `list` answers "what pages/notes do I have?", so keep it page-level. This
         // unconditional guard owns the exclusion (the default no-filter case relies on it);
-        // LISTABLE_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
+        // PAGE_LEVEL_ARTIFACT_TYPES just hides `section` from --artifact-type so no one filters for a
         // type list can never return. Keep both in sync if section handling ever changes.
         if (artifact.metadata.artifact_type === 'section') return null;
         const freshness = evaluateFreshness(artifact.metadata, currentTime, null);
         if (!this.matchesFilters(artifact.metadata, freshness)) return null;
-        return {
-          cacheKey: artifact.metadata.cache_key,
-          path: filePath,
-          artifactType: artifact.metadata.artifact_type,
-          sourceUrls: artifact.metadata.source_urls,
-          topic: artifact.metadata.topic,
-          tags: artifact.metadata.tags,
-          freshness,
-          captureMethod: artifact.metadata.capture_method,
-          tokenEstimate: artifact.metadata.token_estimate,
-          qualityNotes: artifact.metadata.quality_notes,
-          fetchedAt: artifact.metadata.fetched_at,
-          validatedAt: artifact.metadata.validated_at,
-        };
+        return toListRow(artifact, filePath, freshness);
       },
       { persistIndex: !this.readOnly }
     );

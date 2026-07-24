@@ -24,6 +24,11 @@ export const ARTIFACT_TYPES = ['source', 'research_note', 'index', 'section'] as
 /** Classification of a research artifact's role. */
 export type ArtifactType = (typeof ARTIFACT_TYPES)[number];
 
+// Shared by `list` and `search`: both report pages, never the `section` chunks a page is split
+// into (a single fetch can yield dozens) — `inspect` is where a page's sections are discoverable.
+/** Artifact types `list`/`search` report: every type except the heading-level `section` child. */
+export const PAGE_LEVEL_ARTIFACT_TYPES = ARTIFACT_TYPES.filter((type) => type !== 'section');
+
 /** Full metadata block stored alongside every cached research artifact. */
 export interface ResearchArtifactMetadata {
   schema_version: number;

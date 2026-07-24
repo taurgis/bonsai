@@ -21,6 +21,7 @@ The package is published as `@taurgis/bonsai` and installs a `bonsai` binary.
 | **Browser fallback** | Uses `--rendered` for pages that need client-side JavaScript | Capturing SPA documentation when static HTML is incomplete |
 | **Manual import** | Stores agent-supplied Markdown from stdin or files | Caching synthesized notes, private docs, or manually extracted pages |
 | **List** | Filters cached entries by topic, tags, freshness, and metadata | Seeing what is already cached without reading full content |
+| **Search** | Ranks cached entries by keyword across tags, summary, and compressed content | Finding what's already cached on a topic without an exact topic/tag match |
 
 ---
 
@@ -88,6 +89,12 @@ echo "# Synthesized React Cache Guide" | npx @taurgis/bonsai import --stdin --to
 npx @taurgis/bonsai list --tags node
 ```
 
+### 6. Search cached entries by keyword
+
+```bash
+npx @taurgis/bonsai search --query "url parsing"
+```
+
 ---
 
 ## Command Reference
@@ -145,6 +152,22 @@ List cached artifacts by metadata filters (`--topic`, `--tags`, `--url`, `--fres
 
 ```bash
 npx @taurgis/bonsai list [flags]
+```
+
+### `search`
+
+Rank cached artifacts by keyword — the content/tag search `list` doesn't do. `--query` matches
+(case-insensitive) against topic, tags, `summary`, and `compressed` content; every term must match
+somewhere unless `--match-any` is set. Every other filter (`--topic`, `--tags`, `--url`,
+`--freshness`, `--artifact-type`, `--capture-method`) works exactly like `list`'s. Each row adds a
+relevance `score`, which fields matched (`matchedFields`), and a short excerpt around the first
+content match (`snippet`) — reading only the token-cheap indexed `summary`/`compressed` text, never
+the full `detailed` body, so ranking a large cache stays fast and never balloons context. Omitting
+`--query` behaves like `list`: every row scores `0`, sorted newest-first. `--limit` defaults to 20
+(lower than `list`'s 50) since a ranked row carries more payload per entry.
+
+```bash
+npx @taurgis/bonsai search --query "suspense boundary" --tags react
 ```
 
 ### `prune`

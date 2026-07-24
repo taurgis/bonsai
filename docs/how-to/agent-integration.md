@@ -66,6 +66,17 @@ stderr for a truncation tip; process stderr stays empty under `--json`.
 act next. Pass `--full` for every metadata field (cache key, path, artifact
 type, tags, capture method, quality notes, timestamps).
 
+`list` filters by exact metadata (`--topic`, `--tags`, `--url`, `--freshness`,
+`--artifact-type`, `--capture-method`); reach for `bonsai search --query "…"`
+when the lookup is by keyword instead — it ranks the same page-level cache by
+a query matched against topic, tags, `summary`, and `compressed` content, and
+adds a `score`, `matchedFields`, and a short `snippet` to each row so an agent
+can judge relevance without a second `inspect` round trip. `search` reads
+only the already-indexed `summary`/`compressed` text, never the larger
+`detailed` body, so it stays cheap even against a large cache; see
+[Command Reference](/reference/commands#6-search) for the full flag/JSON
+contract.
+
 Running `bonsai` with no arguments at all shows live cache data (equivalent to
 `bonsai list`) instead of the root help text — the CLI answers "what do I
 have?" by default. That bare invocation also prints a two-line identity

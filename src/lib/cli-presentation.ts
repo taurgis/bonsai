@@ -34,6 +34,13 @@ export const CLI_FLAG_DESCRIPTIONS = {
   pruneArtifactType: 'artifact type to prune, including section children',
   listFull:
     'include every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps); default output is a minimal row (source URLs, topic, freshness, token estimate)',
+  searchQuery:
+    'keyword(s) to search across topic, tags, summary, and compressed content (case-insensitive); every term must match somewhere unless --match-any is set',
+  searchMatchAny: 'match any query term instead of requiring all of them (OR instead of AND)',
+  searchArtifactType:
+    'artifact type; section children are omitted from search - use inspect to see them',
+  searchFull:
+    'include every metadata field (cache key, path, artifact type, tags, capture method, quality notes, timestamps) alongside score/matchedFields/snippet; default output is a minimal row (source URLs, topic, freshness, token estimate, score, matchedFields, snippet)',
 } as const;
 
 /** One human-readable label/value pair for CLI stdout. */
