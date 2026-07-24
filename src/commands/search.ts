@@ -3,13 +3,8 @@ import { BaseCommand } from '../base-command.js';
 import { scanCacheDirs } from '../lib/research/storage.js';
 import { loadStoreRoots } from '../lib/research/store-roots.js';
 import { evaluateFreshness } from '../lib/research/freshness.js';
+import type { ResearchArtifactMetadata } from '../lib/research/schema.js';
 import {
-  CAPTURE_METHODS,
-  PAGE_LEVEL_ARTIFACT_TYPES,
-  type ResearchArtifactMetadata,
-} from '../lib/research/schema.js';
-import {
-  NO_TOPIC_LABEL,
   formatTip,
   resultListHeading,
   sanitizeForTerminal,
@@ -23,6 +18,7 @@ import {
   emptyTopicFilterError,
   emptyTagsFilterError,
 } from '../lib/research/metadata-filters.js';
+import { commonMetadataFilterFlags } from '../lib/common-metadata-filter-flags.js';
 import {
   tokenizeSearchQuery,
   emptySearchQueryError,
@@ -31,7 +27,7 @@ import {
   type SearchMatch,
 } from '../lib/research/search-match.js';
 import { colors, FRESHNESS_COLOR } from '../lib/color.js';
-import { CLI_FLAG_DESCRIPTIONS } from '../lib/cli-presentation.js';
+import { CLI_FLAG_DESCRIPTIONS, formatResultRowHeader } from '../lib/cli-presentation.js';
 import type { SearchRow, SearchRowMinimal, SearchSummary } from '../lib/cli-result-types.js';
 
 // Ranked search rows carry more per-row payload (score/matchedFields/snippet) than a plain list row,
@@ -105,30 +101,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       default: false,
       description: CLI_FLAG_DESCRIPTIONS.searchMatchAny,
     }),
-    topic: Flags.string({
-      char: 't',
-      description: CLI_FLAG_DESCRIPTIONS.filterTopic,
-    }),
-    tags: Flags.string({
-      char: 'g',
-      description: CLI_FLAG_DESCRIPTIONS.filterTags,
-      multiple: true,
-    }),
-    url: Flags.string({
-      description: CLI_FLAG_DESCRIPTIONS.sourceUrlGlob,
-    }),
-    freshness: Flags.option({
-      description: 'freshness state',
-      options: ['fresh', 'stale_grace', 'stale_expired'] as const,
-    })(),
-    'artifact-type': Flags.option({
-      description: CLI_FLAG_DESCRIPTIONS.searchArtifactType,
-      options: PAGE_LEVEL_ARTIFACT_TYPES,
-    })(),
-    'capture-method': Flags.option({
-      description: 'capture method',
-      options: CAPTURE_METHODS,
-    })(),
+    ...commonMetadataFilterFlags(CLI_FLAG_DESCRIPTIONS.searchArtifactType),
     limit: limitFlag(
       SEARCH_DEFAULT_MAX_LIMIT,
       SEARCH_DEFAULT_LIMIT,
@@ -245,11 +218,7 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
     this.log(`${resultListHeading(totalMatched, finalResults.length, labels)}\n`);
 
     finalResults.forEach((res, index) => {
-      const topicStr = res.topic
-        ? colors.cyan(sanitizeForTerminal(res.topic))
-        : colors.gray(NO_TOPIC_LABEL);
-      const keyStr = colors.bold(res.cacheKey);
-      this.log(`${index + 1}. [${topicStr}] Key: ${keyStr}`);
+      this.log(formatResultRowHeader(index, res.topic, res.cacheKey));
 
       const freshnessStr = FRESHNESS_COLOR[res.freshness](res.freshness);
       const scoreStr = queried ? ` | Score: ${colors.bold(String(res.score))}` : '';

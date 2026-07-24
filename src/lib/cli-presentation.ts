@@ -1,5 +1,6 @@
 import { colors } from './color.js';
 import { MAX_TAG_LENGTH, MAX_TOPIC_LENGTH } from './research/metadata-flags.js';
+import { NO_TOPIC_LABEL, sanitizeForTerminal } from './text.js';
 
 const HUMAN_LABEL_WIDTH = 25;
 
@@ -70,4 +71,23 @@ export function formatHumanField(label: string, value: string): string {
  */
 export function formatHumanFields(fields: readonly HumanField[]): string[] {
   return fields.map(([label, value]) => formatHumanField(label, value));
+}
+
+/**
+ * The "N. [Topic] Key: <key>" header line shared by `list`/`search` human-mode row rendering —
+ * same topic coloring, ANSI-sanitization, and "(no topic)" fallback either way.
+ *
+ * @param index - Zero-based row index; displayed as `index + 1`.
+ * @param topic - The row's topic, or `null` to show {@link NO_TOPIC_LABEL}.
+ * @param cacheKey - The row's cache key.
+ * @returns A single formatted line.
+ */
+export function formatResultRowHeader(
+  index: number,
+  topic: string | null,
+  cacheKey: string
+): string {
+  const topicStr = topic ? colors.cyan(sanitizeForTerminal(topic)) : colors.gray(NO_TOPIC_LABEL);
+  const keyStr = colors.bold(cacheKey);
+  return `${index + 1}. [${topicStr}] Key: ${keyStr}`;
 }

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { CLI_FLAG_DESCRIPTIONS, formatHumanField, formatHumanFields } from './cli-presentation.js';
+import {
+  CLI_FLAG_DESCRIPTIONS,
+  formatHumanField,
+  formatHumanFields,
+  formatResultRowHeader,
+} from './cli-presentation.js';
 
 describe('CLI presentation helpers', () => {
   it('keeps shared flag descriptions centralized', () => {
@@ -71,5 +76,25 @@ describe('CLI presentation helpers', () => {
     expect(formatHumanField('very_long_frontmatter_key', 'value')).toBe(
       'very_long_frontmatter_key: value'
     );
+  });
+
+  describe('formatResultRowHeader', () => {
+    it('formats a numbered row with a topic', () => {
+      const line = formatResultRowHeader(0, 'React Suspense', 'abc123');
+      expect(line).toContain('1. [');
+      expect(line).toContain('React Suspense');
+      expect(line).toContain('Key: abc123');
+    });
+
+    it('falls back to the "(no topic)" label when topic is null', () => {
+      expect(formatResultRowHeader(2, null, 'abc123')).toContain('(no topic)');
+    });
+
+    it('strips ANSI escape codes from an untrusted topic before printing it', () => {
+      const esc = String.fromCharCode(27);
+      const line = formatResultRowHeader(0, `${esc}[31mRED${esc}[0m`, 'abc123');
+      expect(line).not.toContain(esc);
+      expect(line).toContain('[31mRED[0m');
+    });
   });
 });
