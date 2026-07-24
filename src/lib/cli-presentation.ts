@@ -1,5 +1,6 @@
 import { colors } from './color.js';
 import { MAX_TAG_LENGTH, MAX_TOPIC_LENGTH } from './research/metadata-flags.js';
+import type { TokenEstimate } from './research/schema.js';
 import { NO_TOPIC_LABEL, sanitizeForTerminal } from './text.js';
 
 const HUMAN_LABEL_WIDTH = 25;
@@ -90,4 +91,14 @@ export function formatResultRowHeader(
   const topicStr = topic ? colors.cyan(sanitizeForTerminal(topic)) : colors.gray(NO_TOPIC_LABEL);
   const keyStr = colors.bold(cacheKey);
   return `${index + 1}. [${topicStr}] Key: ${keyStr}`;
+}
+
+/** The "Tokens: compressed=N, detailed=N" line shared by `list`/`search` human-mode row rendering. */
+export function formatResultRowTokens(tokenEstimate: TokenEstimate): string {
+  return `   Tokens: compressed=${colors.bold(String(tokenEstimate?.compressed || 0))}, detailed=${colors.bold(String(tokenEstimate?.detailed || 0))}`;
+}
+
+/** The "Source URLs: ..." line shared by `list`/`search` human-mode row rendering. */
+export function formatResultRowSourceUrls(sourceUrls: readonly string[]): string {
+  return `   Source URLs: ${colors.gray(sourceUrls.join(', '))}\n`;
 }

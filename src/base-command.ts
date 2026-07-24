@@ -6,6 +6,7 @@ import {
   resolveReadOnly,
 } from './lib/config/index.js';
 import { CLI_FLAG_DESCRIPTIONS } from './lib/cli-presentation.js';
+import { colors } from './lib/color.js';
 import { formatTip, sanitizeForTerminal } from './lib/text.js';
 import {
   enrichErrorForDisplay,
@@ -194,6 +195,14 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   protected tip(message: string): void {
     if (this.jsonEnabled()) return;
     this.warn(formatTip(message));
+  }
+
+  /**
+   * Human-mode tip for a truncated `list`/`search` result: the copy-pasteable command that raises
+   * `--limit` (see `next-command.ts`). A no-op when nothing was truncated (`nextCommand` is `null`).
+   */
+  protected tipNextCommand(nextCommand: string | null): void {
+    if (nextCommand) this.tip(`see the rest: ${colors.cyan(nextCommand)}`);
   }
 
   /** Whether read-only/plan mode is active for this invocation (flag OR either env var). */

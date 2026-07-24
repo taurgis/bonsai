@@ -4,6 +4,8 @@ import {
   formatHumanField,
   formatHumanFields,
   formatResultRowHeader,
+  formatResultRowSourceUrls,
+  formatResultRowTokens,
 } from './cli-presentation.js';
 
 describe('CLI presentation helpers', () => {
@@ -95,6 +97,26 @@ describe('CLI presentation helpers', () => {
       const line = formatResultRowHeader(0, `${esc}[31mRED${esc}[0m`, 'abc123');
       expect(line).not.toContain(esc);
       expect(line).toContain('[31mRED[0m');
+    });
+  });
+
+  describe('formatResultRowTokens', () => {
+    it('formats compressed/detailed token counts', () => {
+      expect(formatResultRowTokens({ compressed: 29, detailed: 65 })).toContain(
+        'Tokens: compressed=29, detailed=65'
+      );
+    });
+
+    it('falls back to 0 for a missing token estimate', () => {
+      expect(formatResultRowTokens(null as any)).toContain('Tokens: compressed=0, detailed=0');
+    });
+  });
+
+  describe('formatResultRowSourceUrls', () => {
+    it('joins multiple source URLs with a comma', () => {
+      expect(
+        formatResultRowSourceUrls(['https://a.example.com', 'https://b.example.com'])
+      ).toContain('Source URLs: https://a.example.com, https://b.example.com');
     });
   });
 });

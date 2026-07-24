@@ -24,7 +24,12 @@ import {
 import { commonMetadataFilterFlags } from '../lib/common-metadata-filter-flags.js';
 import { buildNextLimitCommand } from '../lib/next-command.js';
 import { colors, FRESHNESS_COLOR } from '../lib/color.js';
-import { CLI_FLAG_DESCRIPTIONS, formatResultRowHeader } from '../lib/cli-presentation.js';
+import {
+  CLI_FLAG_DESCRIPTIONS,
+  formatResultRowHeader,
+  formatResultRowSourceUrls,
+  formatResultRowTokens,
+} from '../lib/cli-presentation.js';
 import type { ListRow, ListRowMinimal, ListSummary } from '../lib/cli-result-types.js';
 
 // Listings are ordered newest-first, so the truncation word is "first"; --limit caps at this value.
@@ -171,14 +176,10 @@ export default class ResearchList extends BaseCommand<typeof ResearchList> {
       const freshnessStr = FRESHNESS_COLOR[res.freshness](res.freshness);
 
       this.log(`   Type: ${colors.bold(res.artifactType)} | Freshness: ${freshnessStr}`);
-      this.log(
-        `   Tokens: compressed=${colors.bold(String(res.tokenEstimate?.compressed || 0))}, detailed=${colors.bold(String(res.tokenEstimate?.detailed || 0))}`
-      );
-      this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
+      this.log(formatResultRowTokens(res.tokenEstimate));
+      this.log(formatResultRowSourceUrls(res.sourceUrls));
     });
-    if (nextCommand) {
-      this.tip(`see the rest: ${colors.cyan(nextCommand)}`);
-    }
+    this.tipNextCommand(nextCommand);
   }
 
   /**

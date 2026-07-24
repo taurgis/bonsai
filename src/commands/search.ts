@@ -30,7 +30,12 @@ import {
   type SearchMatch,
 } from '../lib/research/search-match.js';
 import { colors, FRESHNESS_COLOR } from '../lib/color.js';
-import { CLI_FLAG_DESCRIPTIONS, formatResultRowHeader } from '../lib/cli-presentation.js';
+import {
+  CLI_FLAG_DESCRIPTIONS,
+  formatResultRowHeader,
+  formatResultRowSourceUrls,
+  formatResultRowTokens,
+} from '../lib/cli-presentation.js';
 import type { SearchRow, SearchRowMinimal, SearchSummary } from '../lib/cli-result-types.js';
 
 const SEARCH_DEFAULT_MAX_LIMIT = 100;
@@ -223,14 +228,10 @@ export default class ResearchSearch extends BaseCommand<typeof ResearchSearch> {
       if (res.snippet) {
         this.log(`   Snippet: ${colors.gray(sanitizeForTerminal(res.snippet))}`);
       }
-      this.log(
-        `   Tokens: compressed=${colors.bold(String(res.tokenEstimate?.compressed || 0))}, detailed=${colors.bold(String(res.tokenEstimate?.detailed || 0))}`
-      );
-      this.log(`   Source URLs: ${colors.gray(res.sourceUrls.join(', '))}\n`);
+      this.log(formatResultRowTokens(res.tokenEstimate));
+      this.log(formatResultRowSourceUrls(res.sourceUrls));
     });
-    if (nextCommand) {
-      this.tip(`see the rest: ${colors.cyan(nextCommand)}`);
-    }
+    this.tipNextCommand(nextCommand);
   }
 
   /**
