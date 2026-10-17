@@ -90,6 +90,20 @@ export function buildPriorityContainerPickBlock(
       }
     }
     ${containerVar} = ${containerVar} || document.body || document.documentElement;
+    // A Redoc hash (#tag/…/operation/…) names one operation inside the reference.
+    // getElementById stops at the shadow boundary, so match the id while walking.
+    try {
+      const hashId = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+      if (hashId) {
+        let hashBest = null, hashLen = 0;
+        for (const el of deepElements(document)) {
+          if (el.id !== hashId) continue;
+          const len = textLenFor(el);
+          if (len > hashLen) { hashBest = el; hashLen = len; }
+        }
+        if (hashBest && hashLen >= MIN_CHARS) ${containerVar} = hashBest;
+      }
+    } catch (e) {}
   `;
 }
 

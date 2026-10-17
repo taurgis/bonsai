@@ -317,6 +317,15 @@
     ]
   },
   {
+    "id": "dev-connect-rest-patch-checkout",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/platform/connect-rest-api/references/connect-rest-api-commerce#tag/Commerce-B2B-Resources/operation/patchCheckoutV2",
+    "focus": [
+      "redoc-operation",
+      "request-body"
+    ]
+  },
+  {
     "id": "dev-atlas-apex-casting",
     "site": "salesforce-developer",
     "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_casting.htm",

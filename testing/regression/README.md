@@ -41,7 +41,7 @@ Strict mode also fails when capture duration regresses more than **15%** vs the 
 
 ## Coverage
 
-- **Custom integrations**: Salesforce Help + Salesforce Developer (LWR shadow-DOM, API references, atlas Markdown twins, and an Apex atlas page that still renders in the browser).
+- **Custom integrations**: Salesforce Help + Salesforce Developer (LWR shadow-DOM, API references, atlas Markdown twins, an Apex atlas page that still renders in the browser, and a Connect REST Redoc operation selected by the URL hash).
 - **Generic pipeline** (popular libraries + every docs engine): VitePress (Vue, Vite — route/source
   Markdown), GitHub source (Node `path`, **Node `fs`** huge reference, MDN `Array.map`/`Promise`,
   TanStack `useQuery`/`useQueries`, Docusaurus/Jest, Next.js, Docsy/Kubernetes — these expose an
