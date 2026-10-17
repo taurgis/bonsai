@@ -4,6 +4,7 @@ import {
   stripBoilerplate,
   parseDocsApiPayload,
   preferRicherMarkdown,
+  sameSalesforceArticle,
 } from './salesforce-doc-fetch.js';
 
 // Mock the browser + DNS boundaries so fetchSalesforceDoc never spawns Chrome or hits the network.
@@ -30,12 +31,21 @@ vi.mock('./salesforce-dom-probe.js', async (importOriginal) => {
 });
 vi.mock('../lib/research/fetcher.js', () => ({
   checkDnsSafety: vi.fn().mockResolvedValue(undefined),
+  fetchText: vi.fn().mockResolvedValue({
+    status: 200,
+    contentType: 'text/html',
+    etag: null,
+    lastModified: null,
+    finalUrl: 'https://help.salesforce.com/',
+    responseSize: 0,
+    content: '<html></html>',
+  }),
 }));
 
 import { fetchSalesforceDoc } from './salesforce-doc-fetch.js';
 import { openCdpPage } from '../lib/research/browser.js';
 import { pollSalesforceContentReady } from './salesforce-dom-probe.js';
-import { checkDnsSafety } from '../lib/research/fetcher.js';
+import { checkDnsSafety, fetchText } from '../lib/research/fetcher.js';
 
 const DOC_OPTIONS = {
   allowedHost: 'help.salesforce.com',
@@ -51,7 +61,8 @@ const DOC_OPTIONS = {
 function fakePage(
   captures: Array<{ html: string; title: string } | null>,
   navResult: { errorText?: string } = {},
-  blockedNavigationError: Error | null = null
+  blockedNavigationError: Error | null = null,
+  finalHref?: string
 ) {
   let captureCalls = 0;
   const close = vi.fn().mockResolvedValue(undefined);
@@ -65,6 +76,9 @@ function fakePage(
     send: vi.fn(async (method: string, params?: { expression?: string }) => {
       if (method === 'Page.navigate') {
         return navResult;
+      }
+      if (method === 'Runtime.evaluate' && params?.expression === 'location.href') {
+        return { result: { value: finalHref } };
       }
       if (method === 'Runtime.evaluate' && params?.expression?.includes('deepElements')) {
         const value = captures[Math.min(captureCalls, captures.length - 1)];
@@ -86,11 +100,49 @@ function fakePage(
 
 beforeEach(() => {
   vi.mocked(checkDnsSafety).mockResolvedValue(undefined);
+  vi.mocked(fetchText).mockResolvedValue({
+    status: 200,
+    contentType: 'text/html',
+    etag: null,
+    lastModified: null,
+    finalUrl: 'https://help.salesforce.com/',
+    responseSize: 0,
+    content: '<html></html>',
+  });
   vi.mocked(pollSalesforceContentReady).mockResolvedValue(undefined);
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+describe('sameSalesforceArticle', () => {
+  it('treats underscore and hyphen slugs as the same article', () => {
+    expect(
+      sameSalesforceArticle(
+        'https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm',
+        'https://developer.salesforce.com/docs/platform/api-rest/guide/intro-what-is-rest-api.html'
+      )
+    ).toBe(true);
+  });
+
+  it('treats a Help language redirect as the same article id', () => {
+    expect(
+      sameSalesforceArticle(
+        'https://help.salesforce.com/s/articleView?id=sf.admin_overview.htm&type=5',
+        'https://help.salesforce.com/s/articleView?language=en_US&id=sf.admin_overview.htm&type=5'
+      )
+    ).toBe(true);
+  });
+
+  it('rejects a book-home swap', () => {
+    expect(
+      sameSalesforceArticle(
+        'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_qs_hello.htm',
+        'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_dev_guide.htm'
+      )
+    ).toBe(false);
+  });
 });
 
 describe('parseDocsApiPayload', () => {
@@ -222,6 +274,7 @@ describe('salesforce doc error detection', () => {
     expect(looksLikeSalesforceError("We couldn't find what you were looking for")).toBe(true);
     expect(looksLikeSalesforceError('We looked high and low...')).toBe(true);
     expect(looksLikeSalesforceError('Loading… Sorry to interrupt')).toBe(true);
+    expect(looksLikeSalesforceError('Head back to the space station')).toBe(true);
   });
 
   it('passes real documentation content through', () => {
@@ -329,7 +382,55 @@ describe('fetchSalesforceDoc', () => {
 
     await expect(
       fetchSalesforceDoc('https://help.salesforce.com/s/articleView?id=sf.gone.htm', DOC_OPTIONS)
-    ).rejects.toThrow(/no readable content/);
+    ).rejects.toThrow(/Salesforce doc not found/);
+  });
+
+  it('skips Chrome when the document URL is HTTP 404', async () => {
+    vi.mocked(openCdpPage).mockClear();
+    vi.mocked(fetchText).mockRejectedValueOnce(new Error('Fetch failed with status 404'));
+
+    await expect(
+      fetchSalesforceDoc(
+        'https://developer.salesforce.com/docs/commerce/sfra/guide/b2c-sfra-overview.html',
+        { ...DOC_OPTIONS, allowedHost: 'developer.salesforce.com' }
+      )
+    ).rejects.toThrow(/Salesforce doc not found/);
+    expect(openCdpPage).not.toHaveBeenCalled();
+  });
+
+  it('rejects a client redirect onto a different article', async () => {
+    const page = fakePage(
+      [{ html: RICH_HTML, title: 'Apex Developer Guide' }],
+      {},
+      null,
+      'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_dev_guide.htm'
+    );
+    vi.mocked(openCdpPage).mockResolvedValue(page as never);
+
+    await expect(
+      fetchSalesforceDoc(
+        'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_qs_hello.htm',
+        { ...DOC_OPTIONS, allowedHost: 'developer.salesforce.com' }
+      )
+    ).rejects.toThrow(/redirected to a different article/);
+    expect(page.close).toHaveBeenCalledOnce();
+  });
+
+  it('keeps a capture when the redirect only hyphenates the same article slug', async () => {
+    const page = fakePage(
+      [{ html: RICH_HTML, title: 'REST' }],
+      {},
+      null,
+      'https://developer.salesforce.com/docs/platform/api-rest/guide/intro-what-is-rest-api.html'
+    );
+    vi.mocked(openCdpPage).mockResolvedValue(page as never);
+
+    const result = await fetchSalesforceDoc(
+      'https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm',
+      { ...DOC_OPTIONS, allowedHost: 'developer.salesforce.com' }
+    );
+    expect(result.extraction.title).toBe('REST');
+    expect(result.extraction.detailedMarkdown).toContain('# Search Categories');
   });
 
   it("throws on a failed navigation instead of capturing Chrome's own error interstitial as content", async () => {

@@ -40,4 +40,22 @@ describe('pollSalesforceContentReady', () => {
     await pollSalesforceContentReady(page, ['.content'], 10, 5000);
     expect(callCount).toBeGreaterThanOrEqual(3);
   });
+
+  it('returns on the first sample when the page is a not-found shell', async () => {
+    let callCount = 0;
+    const client = {
+      on: vi.fn(),
+      send: vi.fn(async (method) => {
+        if (method === 'Runtime.evaluate') {
+          callCount++;
+          return { result: { value: { has: true, len: 80, error: true } } };
+        }
+        return {};
+      }),
+    };
+    const page = { client, sessionId: 'S', close: vi.fn() } as unknown as CdpPage;
+
+    await pollSalesforceContentReady(page, ['.content'], 10, 5000);
+    expect(callCount).toBe(1);
+  });
 });

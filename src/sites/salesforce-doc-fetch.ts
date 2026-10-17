@@ -5,7 +5,7 @@ import {
   describeNavigationFailure,
   type CdpPage,
 } from '../lib/research/browser.js';
-import { checkDnsSafety } from '../lib/research/fetcher.js';
+import { checkDnsSafety, fetchText } from '../lib/research/fetcher.js';
 import { htmlToMarkdown } from '../lib/research/markdown.js';
 import { sanitizePromptInjection } from '../lib/research/prompt-injection.js';
 import { contentMetrics, contentRicherThan } from '../lib/research/regression.js';
@@ -15,7 +15,10 @@ import {
   SALESFORCE_SHADOW_DOM_HELPERS,
   buildPriorityContainerPickBlock,
   pollSalesforceContentReady,
+  looksLikeSalesforceError,
 } from './salesforce-dom-probe.js';
+
+export { looksLikeSalesforceError };
 
 // Both help.salesforce.com and developer.salesforce.com are LWR sites that render doc content
 // client-side inside web components (shadow DOM). document.documentElement.outerHTML captures
@@ -36,21 +39,11 @@ const DOCS_API_GRACE_MS = 500;
 const ACCEPT_CONSENT_EXPRESSION =
   "(() => { const b = document.querySelector('#onetrust-accept-btn-handler'); if (b) b.click(); })()";
 
-const ERROR_PATTERNS = [
-  /page\s*(not\s*found|doesn'?t\s*exist|can'?t\s*be\s*found)/i,
-  /we\s*couldn'?t\s*find/i,
-  /we looked high and low/i,
-  /sorry to interrupt/i,
-];
-
-/** True when the extracted text is an error/not-found/loading shell rather than real content.
- *
- * @param text - Extracted Markdown text to check.
- * @returns True when the text matches a Salesforce error/not-found pattern.
- */
-export function looksLikeSalesforceError(text: string): boolean {
-  return ERROR_PATTERNS.some((re) => re.test(text));
-}
+// Salesforce's WAF answers 403 unless the User-Agent leads with a recognized HTTP-tool token.
+// Same token the Markdown probe sends, so a missing-doc check sees the real status.
+const DOC_PROBE_HEADERS = {
+  'user-agent': 'curl/8.7.1 bonsai-research-cache (+https://bonsai.rhino-inquisitor.com)',
+};
 
 // Chrome present on every LWR doc page; stripped before serialization. Per-site noise (e.g.
 // Help's article-feedback widget) is appended via SalesforceDocOptions.removeSelectors.
@@ -344,6 +337,64 @@ interface CaptureAttemptResult {
   usedDocsApi: boolean;
 }
 
+/** Article identity for a Salesforce doc URL: Help `id`, otherwise the last path segment.
+ * Underscores and hyphens match so a REST rename (`intro_what_is_rest_api` →
+ * `intro-what-is-rest-api`) stays the same article.
+ *
+ * @param url - Requested or post-navigation URL.
+ * @returns Normalized article key, or null when the URL has no article identity.
+ */
+export function salesforceArticleKey(url: string): string | null {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return null;
+  }
+  const id = parsed.searchParams.get('id');
+  const raw = (id ?? parsed.pathname.replace(/\/+$/, '').split('/').pop() ?? '').trim();
+  const stripped = raw.replace(/\.(html?|md)$/i, '');
+  if (!stripped) return null;
+  return stripped.toLowerCase().replace(/_/g, '-');
+}
+
+/** True when both URLs name the same Salesforce article, or either key can't be read.
+ *
+ * @param requested - URL the caller asked for.
+ * @param finalUrl - URL the browser landed on.
+ * @returns False only when both keys exist and differ.
+ */
+export function sameSalesforceArticle(requested: string, finalUrl: string): boolean {
+  const requestedKey = salesforceArticleKey(requested);
+  const finalKey = salesforceArticleKey(finalUrl);
+  if (!requestedKey || !finalKey) return true;
+  return requestedKey === finalKey;
+}
+
+async function assertSalesforceDocumentExists(url: string): Promise<void> {
+  try {
+    await fetchText(url, { headers: DOC_PROBE_HEADERS, timeoutMs: 8_000 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : '';
+    // Any other failure (WAF 403, timeout) still goes to the browser. Only a real
+    // not-found status is enough to skip Chrome.
+    if (/\bstatus (404|410)\b/.test(message)) {
+      throw new Error(`Salesforce doc not found: ${url}`);
+    }
+  }
+}
+
+async function assertLandedOnRequestedArticle(page: CdpPage, url: string): Promise<void> {
+  const result = await page.client
+    .send('Runtime.evaluate', { expression: 'location.href', returnByValue: true }, page.sessionId)
+    .catch(() => null);
+  const finalHref = result?.result?.value;
+  if (typeof finalHref !== 'string' || !finalHref) return;
+  if (!sameSalesforceArticle(url, finalHref)) {
+    throw new Error(`Salesforce doc ${url} redirected to a different article (${finalHref}).`);
+  }
+}
+
 function parseSalesforceDocUrl(url: string, allowedHost: string): URL {
   let parsed: URL;
   try {
@@ -358,7 +409,10 @@ function parseSalesforceDocUrl(url: string, allowedHost: string): URL {
 }
 
 function assertReadableSalesforceContent(detailedMarkdown: string, url: string): void {
-  if (detailedMarkdown.length < MIN_CONTAINER_CHARS || looksLikeSalesforceError(detailedMarkdown)) {
+  if (looksLikeSalesforceError(detailedMarkdown)) {
+    throw new Error(`Salesforce doc not found: ${url}`);
+  }
+  if (detailedMarkdown.length < MIN_CONTAINER_CHARS) {
     throw new Error(
       `Salesforce returned no readable content for ${url} (page may be missing, gated, or still loading).`
     );
@@ -427,6 +481,9 @@ async function captureSalesforceAttempt(
   }
   let detailedMarkdown = stripBoilerplate(htmlToMarkdown(html));
   let usedDocsApi = false;
+  // Retired atlas leaves (apex_qs_hello.htm) stay HTTP 200, then the SPA swaps in the book
+  // home. Storing that home under the requested URL would cache the wrong article.
+  await assertLandedOnRequestedArticle(page, url);
 
   if (docsApiHtml) {
     const picked = preferRicherMarkdown(detailedMarkdown, docsApiHtml, title, docsApiTitle);
@@ -479,8 +536,9 @@ function buildSalesforceFetchResult(
  * @param options - Allowed host, priority content selectors, and optional per-site remove selectors.
  * @returns Extracted Markdown, fetch metadata, and browser-capture provenance.
  * @throws {Error} When the URL is invalid, the host is not the allowed host, DNS is unsafe,
- *   Chrome/CDP navigation or evaluation fails, the response body exceeds the size limit,
- *   or the captured content is too short / looks like an error page.
+ *   the document itself is HTTP 404/410, Chrome/CDP navigation or evaluation fails, the page
+ *   redirects to a different article, the response body exceeds the size limit, or the captured
+ *   content is too short / looks like an error page.
  */
 export async function fetchSalesforceDoc(
   url: string,
@@ -488,6 +546,7 @@ export async function fetchSalesforceDoc(
 ): Promise<SiteFetchResult> {
   const parsed = parseSalesforceDocUrl(url, allowedHost);
   await checkDnsSafety(parsed.hostname);
+  await assertSalesforceDocumentExists(url);
 
   const captureScript = buildCaptureScript(contentSelectors, removeSelectors);
   const page = await openCdpPage();

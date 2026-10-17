@@ -36,6 +36,25 @@ const textLenFor = (el) =>
   Math.max((el.innerText || '').trim().length, deepText(el).trim().length);
 `;
 
+// Shells Salesforce renders for a missing article. Shared with the readiness probe so a
+// not-found page ends the wait instead of burning the full content timeout.
+const SALESFORCE_ERROR_PATTERNS = [
+  /page\s*(not\s*found|doesn'?t\s*exist|can'?t\s*be\s*found)/i,
+  /we\s*couldn'?t\s*find/i,
+  /we looked high and low/i,
+  /sorry to interrupt/i,
+  /head back to the space station/i,
+];
+
+/** True when extracted text is a Salesforce not-found or error shell rather than an article.
+ *
+ * @param text - Extracted Markdown or visible page text.
+ * @returns True when the text matches a Salesforce error/not-found pattern.
+ */
+export function looksLikeSalesforceError(text: string): boolean {
+  return SALESFORCE_ERROR_PATTERNS.some((re) => re.test(text));
+}
+
 /**
  * In-page block: pick the highest-priority content container that exists on the page.
  * Does not fall through to lower-priority selectors when a higher-priority host is present
@@ -83,8 +102,14 @@ export function buildPriorityContainerPickBlock(
  * @returns A self-invoking JS expression string that evaluates to `{ has: boolean, len: number }`.
  */
 export function buildContentReadyProbeExpression(selectors: string[], minChars: number): string {
+  const errorSource = SALESFORCE_ERROR_PATTERNS.map((re) => re.source).join('|');
   return `(() => {
     ${SALESFORCE_SHADOW_DOM_HELPERS}
+    const errorRe = new RegExp(${JSON.stringify(errorSource)}, 'i');
+    const pageText = deepText(document.body || document.documentElement);
+    if (errorRe.test(pageText)) {
+      return { has: true, len: pageText.length, error: true };
+    }
     const SELS = ${JSON.stringify(selectors)};
     const MIN = ${minChars};
     let has = false;
@@ -133,6 +158,8 @@ export async function pollSalesforceContentReady(
       .send('Runtime.evaluate', { expression, returnByValue: true }, page.sessionId)
       .catch(() => null);
     const value = rawResult?.result?.value;
+    // A not-found shell is ready now; waiting for it to "settle" only delays the failure.
+    if (value?.error) return;
     if (value?.has) {
       const grew =
         Math.abs((value.len || 0) - previousLength) > Math.max(40, previousLength * 0.02);
