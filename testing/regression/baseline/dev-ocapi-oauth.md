@@ -1,6 +1,6 @@
 # OCAPI OAuth 2.0
 
-The OAuth 2.0 protocol is used for authentication and authorization where the shopping customer context provided by [JWT](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/jwt.html) doesn’t fit. When using the Data API in a server-to-server scenario, OAuth is used to authenticate requests in the context of a client ID, also known as a *Client Credentials Grant*. When using the Shop API or Data API in a scenario in which a *Business Manager user* interacts with the system, OAuth is used to authenticate requests in the context of the user.
+The OAuth 2.0 protocol is used for authentication and authorization where the shopping customer context provided by [JWT](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/jwt.md) doesn’t fit. When using the Data API in a server-to-server scenario, OAuth is used to authenticate requests in the context of a client ID, also known as a *Client Credentials Grant*. When using the Shop API or Data API in a scenario in which a *Business Manager user* interacts with the system, OAuth is used to authenticate requests in the context of the user.
 
 :::note
 This topic assumes that you’re familiar with OAuth 2.0. For more information, see the [OAuth 2.0 Authorization Framework](http://tools.ietf.org/html/rfc6749) IETF specification.
@@ -9,7 +9,7 @@ This topic assumes that you’re familiar with OAuth 2.0. For more information, 
 ## Supported Grant Types
 
 - In a *server-to-server scenario*, one system, such as a CRM (Customer Relationship Management) application, interacts directly with the Data API: no end user interaction is required. In this scenario, the system requesting access functions as the OAuth 2.0 client application. This client application must be able to keep its client password secure. The OAuth 2.0 specification describes several authorization grant types. The server-to-server scenario makes use of the *client credentials grant*, used when the client application needs to access resources that aren’t owned by a specific resource owner or user. For more information, see the [Client Credentials Grant](http://tools.ietf.org/html/rfc6749#section-4.4) section in the IETF specification.
-- In other scenarios, requests must be authenticated for a *Business Manager user*, for which OCAPI supports a *Business Manager user grant*. This grant type is used by the Shop API for use cases in which a user does something on behalf of a shopping customer, for example the creation and submission of a basket. The Shop API allows such a user to do more than a customer authenticated with [JWT](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/jwt.html), such as adding price adjustments to the basket. This grant type can also be used to authenticate requests to the Data API. The authenticated user needs to be authorized by assigning permissions in the Business Manager permissions module. Additionally the OAuth 2.0 Authorization Code Grant can be used for this scenario. For more information, see the [Authorization Code Grant](http://tools.ietf.org/html/rfc6749#section-1.3.1) section in the IETF specification.
+- In other scenarios, requests must be authenticated for a *Business Manager user*, for which OCAPI supports a *Business Manager user grant*. This grant type is used by the Shop API for use cases in which a user does something on behalf of a shopping customer, for example the creation and submission of a basket. The Shop API allows such a user to do more than a customer authenticated with [JWT](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/jwt.md), such as adding price adjustments to the basket. This grant type can also be used to authenticate requests to the Data API. The authenticated user needs to be authorized by assigning permissions in the Business Manager permissions module. Additionally the OAuth 2.0 Authorization Code Grant can be used for this scenario. For more information, see the [Authorization Code Grant](http://tools.ietf.org/html/rfc6749#section-1.3.1) section in the IETF specification.
 
 ## Basic Steps for Authentication and Authorization
 
@@ -40,7 +40,7 @@ After registration, you can construct a request for the access token. Your clien
 When the access token expires, the client application repeats the process.
 
 :::note
-In addition to obtaining the access token, you must configure [client permissions](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/ocapisettings.html) in order to grant your client application access to the Open Commerce APIs. When using a Business Manager user grant the user will also be checked against the Business Manager permissions set.
+In addition to obtaining the access token, you must configure [client permissions](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/ocapisettings.md) in order to grant your client application access to the Open Commerce APIs. When using a Business Manager user grant the user will also be checked against the Business Manager permissions set.
 :::
 
 As described in the OAuth 2.0 specification, any access token request is an HTTP POST using transport layer security and the body is URL encoded.

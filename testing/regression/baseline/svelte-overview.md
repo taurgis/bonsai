@@ -2,7 +2,19 @@ Svelte is a framework for building user interfaces on the web. It uses a compile
 
 ```svelte
 <!--- file: App.svelte --->
+<script>
+	function greet() {
+		alert('Welcome to Svelte!');
+	}
+</script>
 
+<button onclick={greet}>click me</button>
+
+<style>
+	button {
+		font-size: 2em;
+	}
+</style>
 ```
 
 ...into lean, tightly optimized JavaScript.

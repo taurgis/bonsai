@@ -181,7 +181,9 @@ export default function App() {
           <option value="music">music</option>
         </select>
       </label>
-
+      <button onClick={() => setShow(!show)}>
+        {show ? 'Close chat' : 'Open chat'}
+      </button>
       {show && <hr />}
       {show && <ChatRoom roomId={roomId} />}
     </>
@@ -303,7 +305,9 @@ export default function App() {
   const [show, setShow] = useState(false);
   return (
     <>
-
+      <button onClick={() => setShow(!show)}>
+        {show ? 'Remove' : 'Show'}
+      </button>
       <hr />
       {show && <Welcome />}
     </>
@@ -372,11 +376,15 @@ export default function App() {
   const [show, setShow] = useState(false);
   return (
     <>
-
+      <button onClick={() => setShow(true)}>
+        Open dialog
+      </button>
       <ModalDialog isOpen={show}>
         Hello there!
         <br />
-
+        <button onClick={() => {
+          setShow(false);
+        }}>Close</button>
       </ModalDialog>
     </>
   );
@@ -577,7 +585,9 @@ export default function App() {
           <option value="music">music</option>
         </select>
       </label>
-
+      <button onClick={() => setShow(!show)}>
+        {show ? 'Close chat' : 'Open chat'}
+      </button>
       {show && <hr />}
       {show && <ChatRoom roomId={roomId} />}
     </>
@@ -807,7 +817,8 @@ export default function App() {
   return (
     <>
       Zoom level: {zoomLevel}x
-
+      <button onClick={() => setZoomLevel(zoomLevel + 1)}>+</button>
+      <button onClick={() => setZoomLevel(zoomLevel - 1)}>-</button>
       <hr />
       <Map zoomLevel={zoomLevel} />
     </>
@@ -1191,7 +1202,9 @@ export default function App() {
           <option value="travel">travel</option>
           <option value="music">music</option>
         </select>
-
+        <button onClick={() => setShow(!show)}>
+          {show ? 'Close chat' : 'Open chat'}
+        </button>
       </label>
       {show && <hr />}
       {show && <ChatRoom roomId={roomId}/>}
@@ -1270,7 +1283,9 @@ export default function App() {
   const [show, setShow] = useState(false);
   return (
     <>
-
+      <button onClick={() => setShow(!show)}>
+        {show ? 'Close chat' : 'Open chat'}
+      </button>
       {show && <hr />}
       {show && <ChatRoom />}
     </>
@@ -1359,7 +1374,9 @@ export default function App() {
           <option value="travel">travel</option>
           <option value="music">music</option>
         </select>
-
+        <button onClick={() => setShow(!show)}>
+          {show ? 'Close chat' : 'Open chat'}
+        </button>
       </label>
       {show && <hr />}
       {show && <ChatRoom roomId={roomId}/>}

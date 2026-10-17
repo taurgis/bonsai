@@ -36,7 +36,7 @@ The available types are as follows:
 | Type | Description | Basic Examples |
 | --- | --- | --- |
 | button | A push button with no default behavior displaying the value of the value attribute, empty by default. |  |
-| checkbox | A check box allowing single values to be selected/deselected. |  |
+| checkbox | A checkbox allowing single values to be selected/deselected. |  |
 | color | A control for specifying a color; opening a color picker when active in supporting browsers. |  |
 | date | A control for entering a date (year, month, and day, with no time). Opens a date picker or numeric wheels for year, month, day when active in supporting browsers. |  |
 | datetime-local | A control for entering a date and time, with no time zone. Opens a date picker or numeric wheels for date- and time-components when active in supporting browsers. |  |
@@ -356,6 +356,12 @@ A few additional non-standard attributes are listed following the descriptions o
 - `value`
   - : The input control's value. When specified in the HTML, this is the initial value, and from then on it can be altered or retrieved at any time using JavaScript to access the respective HTMLInputElement object's `value` property. The `value` attribute is always optional, though should be considered mandatory for `checkbox`, `radio`, and `hidden`.
 
+- `webkitdirectory`
+  - : The Boolean `webkitdirectory` attribute, if present, indicates that only directories should be available to be selected by the user in the file picker interface. See HTMLInputElement.webkitdirectory for additional details and examples.
+
+    > [!NOTE]
+    > `webkitdirectory` is defined in the [File and Directory Entries API](/en-US/docs/Web/API/File_and_Directory_Entries_API). It's named `webkitdirectory` because of its origins as a Chrome-specific API. It is now available in all browsers.
+
 - `width`
   - : Valid for the `image` input button only, the `width` is the width of the image file to display to represent the graphical submit button. See the image input type.
 
@@ -369,7 +375,6 @@ The following non-standard attributes are also available on some browsers. As a 
 | mozactionhint (deprecated) | A string indicating the type of action that will be taken when the user presses the Enter or Return key while editing the field; this is used to determine an appropriate label for that key on a virtual keyboard. Since this attribute is deprecated, use enterkeyhint instead. |
 | orient | Sets the orientation of the range slider. Firefox only. |
 | results | The maximum number of items that should be displayed in the drop-down list of previous search queries. Safari only. |
-| webkitdirectory | A Boolean indicating whether to only allow the user to choose a directory (or directories, if multiple is also present) |
 
 - `incremental` (non-standard)
   - : The Boolean attribute `incremental` is a WebKit and Blink extension (so supported by Safari, Opera, Chrome, etc.) which, if present, tells the user agent to process the input as a live search. As the user edits the value of the field, the user agent sends search events to the HTMLInputElement object representing the search box. This allows your code to update the search results in real time as the user edits the search.
@@ -385,11 +390,6 @@ The following non-standard attributes are also available on some browsers. As a 
   - : The `results` attribute—supported only by Safari—is a numeric value that lets you override the maximum number of entries to be displayed in the `<input>` element's natively-provided drop-down menu of previous search queries.
 
     The value must be a non-negative decimal number. If not provided, or an invalid value is given, the browser's default maximum number of entries is used.
-
-- `webkitdirectory` (non-standard)
-  - : The Boolean `webkitdirectory` attribute, if present, indicates that only directories should be available to be selected by the user in the file picker interface. See HTMLInputElement.webkitdirectory for additional details and examples.
-
-    Though originally implemented only for WebKit-based browsers, `webkitdirectory` is also usable in Microsoft Edge as well as Firefox 50 and later. However, even though it has relatively broad support, it is still not standard and should not be used unless you have no alternative.
 
 ## Methods
 
@@ -652,6 +652,12 @@ If you want to present a custom error message when a field fails to validate, yo
 </form>
 ```
 
+```js hidden
+document.querySelector("form").addEventListener("submit", (event) => {
+  event.preventDefault();
+});
+```
+
 The basic HTML form validation features will cause this to produce a default error message if you try to submit the form with either no valid filled in, or a value that does not match the `pattern`.
 
 If you wanted to instead display custom error messages, you could use JavaScript like the following:
@@ -682,7 +688,7 @@ In brief:
 - We check the valid state of the input element every time its value is changed by running the `checkValidity()` method via the `input` event handler.
 - If the value is invalid, an `invalid` event is raised, and the `invalid` event handler function is run. Inside this function we work out whether the value is invalid because it is empty, or because it doesn't match the pattern, using an `if ()` block, and set a custom validity error message.
 - As a result, if the input value is invalid when the submit button is pressed, one of the custom error messages will be shown.
-- If it is valid, it will submit as you'd expect. For this to happen, the custom validity has to be cancelled, by invoking `setCustomValidity()` with an empty string value. We therefore do this every time the `input` event is raised. If you don't do this, and a custom validity was previously set, the input will register as invalid, even if it currently contains a valid value on submission.
+- If it is valid, it will submit as you'd expect. For this to happen, the custom validity has to be canceled, by invoking `setCustomValidity()` with an empty string value. We therefore do this every time the `input` event is raised. If you don't do this, and a custom validity was previously set, the input will register as invalid, even if it currently contains a valid value on submission.
 
 > [!NOTE]
 > Always validate input constraints both client side and server side. Constraint validation doesn't remove the need for validation on the _server side_. Invalid values can still be sent by older browsers or by bad actors.

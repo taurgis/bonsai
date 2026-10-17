@@ -1,20 +1,27 @@
 import TurndownService from 'turndown';
 
+// linkedom/Turndown hand us DOM nodes. lib is ESNext, so name only the fields this rule reads.
+interface TableElement {
+  textContent: string | null;
+  children: ArrayLike<TableElement>;
+  tagName: string;
+}
+
 // Cell text must survive as a single Markdown table cell: collapse internal whitespace (newlines
 // from block children would split the row) and escape pipes (an unescaped `|` adds phantom columns).
-function tableCellText(node: Node): string {
+function tableCellText(node: TableElement): string {
   return (node.textContent || '').replace(/\s+/g, ' ').trim().replace(/\|/g, '\\|');
 }
 
-function rowCells(tr: Element): string[] {
+function rowCells(tr: TableElement): string[] {
   return Array.from(tr.children).map(tableCellText);
 }
 
 // A table's own rows are direct <tr> children or rows inside its direct <thead>/<tbody>/<tfoot>.
 // Walking the structure (rather than querySelectorAll('tr')) excludes rows of tables nested inside
 // a cell, which would otherwise be absorbed as phantom rows of the outer table.
-function ownRows(table: Element): Element[] {
-  const rows: Element[] = [];
+function ownRows(table: TableElement): TableElement[] {
+  const rows: TableElement[] = [];
   for (const child of Array.from(table.children)) {
     const tag = child.tagName.toLowerCase();
     if (tag === 'tr') rows.push(child);
@@ -34,7 +41,7 @@ function addGfmTableRule(service: TurndownService): void {
   service.addRule('gfmTable', {
     filter: 'table',
     replacement: (_content, node) => {
-      const matrix = ownRows(node as Element)
+      const matrix = ownRows(node as TableElement)
         .map(rowCells)
         .filter((cells) => cells.length > 0);
       const [header, ...body] = matrix;

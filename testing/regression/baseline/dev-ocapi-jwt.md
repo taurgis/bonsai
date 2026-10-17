@@ -14,7 +14,7 @@ Before you can use JWTs for authentication, you must register your client applic
 
 Account Manager provides you with a client ID that is known to both B2C Commerce and your client application. The client ID is required when you request an authentication token. On sandboxes, for testing, you can use the demo client ID: \[your_own_client_id].
 
-In addition to obtaining the authentication token, you must configure [Open Commerce API Settings](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/ocapisettings.html) to grant your client application access to the Open Commerce APIs.
+In addition to obtaining the authentication token, you must configure [Open Commerce API Settings](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/ocapisettings.md) to grant your client application access to the Open Commerce APIs.
 
 ## Authentication Steps
 

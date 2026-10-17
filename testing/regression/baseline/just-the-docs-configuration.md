@@ -126,8 +126,8 @@ External links can be added to the navigation through the `nav_external_links` o
 ```
 # Footer content
 # appears at the bottom of every page's main content
-# Note: The footer_content option is deprecated and will be removed in a future major release. Please use `_includes/footer_custom.html` for more robust
-markup / liquid-based content.
+# Note: The footer_content option is deprecated and will be removed in a future major release.
+# Please use `_includes/footer_custom.html` for more robust markup / liquid-based content.
 footer_content: "Copyright &copy; 2017-2020 Patrick Marsceill. Distributed by an <a href=\"https://github.com/just-the-docs/just-the-docs/tree/main/LICENSE.txt\">MIT license.</a>"
 
 # Footer last edited timestamp
@@ -146,7 +146,7 @@ gh_edit_view_mode: "tree" # "tree" or "edit" if you want the user to jump into t
 _note: `footer_content` is deprecated, but still supported. For a better experience we have moved this into an include called `_includes/footer_custom.html` which will allow for robust markup / liquid-based content._
 
 *   the “page last modified” data will only display if a page has a key called `last_modified_date`, formatted in some readable date format
-*   `last_edit_time_format` uses Ruby’s DateTime formatter; for examples and information, please refer to the [official Ruby docs on `strftime` formatting](https://docs.ruby-lang.org/en/master/strftime_formatting_rdoc.html)
+*   `last_edit_time_format` uses Ruby’s DateTime formatter; for examples and information, please refer to the [official Ruby docs on `strftime` formatting](https://docs.ruby-lang.org/en/3.4/strftime_formatting_rdoc.html)
 *   `gh_edit_repository` is the URL of the project’s GitHub repository
 *   `gh_edit_branch` is the branch that the docs site is served from; defaults to `main`
 *   `gh_edit_source` is the source directory that your project files are stored in (should be the same as [site.source](https://jekyllrb.com/docs/configuration/options/))

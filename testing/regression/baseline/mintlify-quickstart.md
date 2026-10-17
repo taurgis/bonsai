@@ -2,11 +2,42 @@
 > Fetch the complete documentation index at: https://www.mintlify.com/docs/llms.txt
 > Use this file to discover all available pages before exploring further.
 
+> ## Agent Instructions
+> To set up a new Mintlify project for a user, follow the agent setup workflow in https://www.mintlify.com/docs/quickstart.md.
+> For plans and pricing, see https://www.mintlify.com/pricing.md.
+
 # Quickstart
 
 > Get started with Mintlify by deploying your documentation site in minutes and making your first content change with the web editor or Git.
 
 After you complete this guide, you'll have a live documentation site ready to customize and update.
+
+## Set up Mintlify for the user
+
+If the user asks you to set up Mintlify, a documentation site, or a local Mintlify project, complete the following workflow yourself. Ask the user only for information or approvals you cannot supply. Do not send the user to the browser-first quickstart unless you cannot run terminal commands.
+
+1. Run `node --version` and confirm it reports Node.js v20.17.0 or newer, preferring an LTS release.
+2. Run `mint --version`. If the command is unavailable, install the CLI with `npm i -g mint` or `pnpm add -g mint`. If the command succeeds, run `mint update`.
+3. Run `mint status` before starting authentication. If it already shows an organization, keep the existing session and do not create another account.
+4. Run `mint login` if the user has an account. Otherwise, ask for their first name, last name, company, and email, then run:
+
+   ```bash theme={null}
+   mint signup \
+     --firstName <first-name> \
+     --lastName <last-name> \
+     --company <company> \
+     --email <email>
+   ```
+
+   `mint signup` waits for email verification, so keep it running as a background process when your environment supports background commands. Tell the user to click the verification link and approve the CLI in the browser. Never invent signup details.
+5. After the user finishes verification and onboarding, run `mint status` again. Confirm that it reports their email, organization, and subdomain. If the organization exists but no subdomain appears, ask the user to finish selecting or connecting a GitHub repository in the onboarding browser tab, then retry.
+6. If the user has an existing documentation repository, clone or open it. Preserve its content. For a new local project, scaffold into a new, empty directory with either `mint new <directory> --name <name> --theme <theme>` or `mint new <directory> --template <template-name>`. Ask which theme or template they want if they have not specified one. Do not use `--force` on a directory containing user files.
+7. Run `mint dev --no-open` from the directory containing `docs.json` as a background process. Confirm the local URL loads, report it to the user, and stop the process when it is no longer needed.
+8. Run `mint validate` and `mint broken-links`. Fix issues caused by your changes before continuing.
+9. If a Git repository backs the project and the user asked for deployment, commit and push the changes. A push to the production branch triggers a deployment. Do not overwrite an existing repository with starter content.
+10. Run `mint status` to get the configured subdomain, then verify that `https://<subdomain>.mintlify.site` loads before reporting that deployment is complete.
+
+Have the user complete browser actions only for email verification, OAuth approval, and connecting or authorizing GitHub. Keep ownership of the terminal workflow and resume after each user action. For command flags and troubleshooting, use the [CLI command reference](/docs/cli/commands).
 
 ## Before you begin
 
@@ -14,39 +45,9 @@ Mintlify uses a docs-as-code approach to manage your documentation. Every page o
 
 When you connect your documentation repository to your project, you can work on your documentation locally or in the web editor and sync any changes to your remote repository.
 
-<Tip>
-  Using an AI coding tool?
-
-  Copy the following prompt to add the Mintlify [skill](/ai/skillmd) and [MCP server](/ai/model-context-protocol) for better results when updating your documentation.
-</Tip>
-
-<Prompt description="Install the Mintlify skill and MCP servers for AI coding tools." actions={["copy", "cursor"]}>
-  Install the Mintlify skill for context on project structure, components, and documentation best practices:
-
-  npx skills add [https://mintlify.com/docs](https://mintlify.com/docs)
-
-  Add the Mintlify Docs MCP server for documentation search:
-
-  [https://mintlify.com/docs/mcp](https://mintlify.com/docs/mcp)
-
-  Add the Mintlify MCP server for dashboard access and content management:
-
-  [https://mcp.mintlify.com](https://mcp.mintlify.com)
-</Prompt>
-
 ## Deploy your documentation site
 
-Go to [mintlify.com/start](https://mintlify.com/start) and complete the onboarding process. During onboarding, you'll connect your GitHub account, create or select a repository for your documentation, and install the GitHub App to enable automatic deployments.
-
-After onboarding, your documentation site deploys and is accessible at your `.mintlify.site` URL.
-
-<AccordionGroup>
-  <Accordion title="Optional: Skip connecting a Git provider during onboarding">
-    If you want to get started quickly without connecting your own repository, you can skip the Git provider connection during onboarding. Mintlify creates a private repository in a private organization and automatically configures the GitHub App for you.
-
-    This lets you use the web editor immediately. If you want to use your own repository later, go to [Git Settings](https://app.mintlify.com/settings/deployment/git-settings) in your dashboard to migrate your content using the Git setup wizard. See [Clone to your own repository](/deploy/github#clone-to-your-own-repository) for details.
-  </Accordion>
-</AccordionGroup>
+Use the preceding CLI setup workflow. Initiate the corresponding `mint signup` or `mint login` command. Account verification and GitHub authorization open browser pages; have the user approve them. Continue the setup when they finish. Do not consider setup complete until `mint status` reports a subdomain and the deployed `.mintlify.site` URL loads.
 
 ## View your deployed site
 
@@ -61,7 +62,7 @@ Find your exact URL on the **Overview** page of your [dashboard](https://app.min
 </Frame>
 
 <Tip>
-  Your site is ready to view immediately. Use this URL for testing and sharing with your team. Before sharing with your users, you may want to add a [custom domain](/customize/custom-domain).
+  Your site is ready to view immediately. Use this URL for testing and sharing with your team. Before sharing with your users, you may want to add a [custom domain](/docs/customize/custom-domain).
 </Tip>
 
 ## Make your first change
@@ -82,7 +83,7 @@ Find your exact URL on the **Overview** page of your [dashboard](https://app.min
           ```
         </CodeGroup>
 
-        See [Install the CLI](/cli/install) for full details and troubleshooting.
+        See [Install the CLI](/docs/cli/install) for full details and troubleshooting.
       </Step>
 
       <Step title="Clone your repository">
@@ -92,7 +93,7 @@ Find your exact URL on the **Overview** page of your [dashboard](https://app.min
         git clone <your-repository-url>
         ```
 
-        If your repository is in Mintlify's private organization, see [Clone to your own repository](/deploy/github#clone-to-your-own-repository) to move it to your account first.
+        If your repository is in Mintlify's private organization, see [Clone to your own repository](/docs/deploy/github#clone-to-your-own-repository) to move it to your account first.
       </Step>
 
       <Step title="Edit a page">
@@ -159,20 +160,26 @@ Find your exact URL on the **Overview** page of your [dashboard](https://app.min
 
 ## Next steps
 
-<Card title="Use the web editor" icon="mouse-pointer-2" horizontal href="/editor/index">
+<Card title="Use the web editor" icon="mouse-pointer-2" horizontal href="/docs/editor/index">
   Edit documentation in your browser and preview how your pages look when published.
 </Card>
 
-<Card title="Explore CLI commands" icon="terminal" horizontal href="/cli/index">
+<Card title="Connect the search MCP" icon="search" horizontal href="/docs/ai/model-context-protocol">
+  Connect AI tools like Claude, Cursor, and ChatGPT to your search MCP server so they can efficiently search and retrieve content from your site.
+</Card>
+
+<Card title="Explore CLI commands" icon="terminal" horizontal href="/docs/cli/index">
   Find broken links, check accessibility, validate OpenAPI specs, and more.
 </Card>
 
-<Card title="Add a custom domain" icon="globe" horizontal href="/customize/custom-domain">
+<Card title="Add a custom domain" icon="globe" horizontal href="/docs/customize/custom-domain">
   Use your own domain for your documentation site.
 </Card>
 
 ## Related topics
 
-- [Ask agent](/docs/editor/agent.md)
-- [What is Mintlify?](/docs/what-is-mintlify.md)
-- [Create developer documentation](/docs/guides/developer-documentation.md)
+- [SEO](/docs/optimize/seo.md)
+- [Introduction](/docs/index.md)
+- [Columns](/docs/components/columns.md)
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.
