@@ -30,7 +30,7 @@ To specify the behavior of subrequests and to define the mapping between request
 
 ## CORS Support
 
-Batch requests are supporting [CORS](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/cors.html). Allowed expose headers and origins are mentioned in OCAPI settings for each client ID. To access them, it’s mandatory to send a batch request for a specific client in a context, either of a specific site or global. There are several possibilities to pass a [client identification](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/clientapplicationidentification.html):
+Batch requests are supporting [CORS](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/cors.md). Allowed expose headers and origins are mentioned in OCAPI settings for each client ID. To access them, it’s mandatory to send a batch request for a specific client in a context, either of a specific site or global. There are several possibilities to pass a [client identification](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/clientapplicationidentification.md):
 
 1. Client ID as query parameter
 2. Client ID as *x-dw-client-id* header

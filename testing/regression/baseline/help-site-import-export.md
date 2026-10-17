@@ -1,84 +1,82 @@
 # Site Import/Export in B2C Commerce
 
-The site.xsd schema file describes the structure of data that is exported from an instance to a zip file, or imported from a .zip file. The site.xsd file describes all site-related data and global, non-site-related data (that is, organization-level data, such as shipping methods). This topic applies to B2C Commerce.
+_The site.xsd schema file describes the structure of data that is exported from an instance to a zip file, or imported from a .zip file. The site.xsd file describes all site-related data and global, non-site-related data (that is, organization-level data, such as shipping methods)._
 
-![Note](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/icon_note.png)
-
-Note Don't use special characters, such as umlauts, in file names—including names of image files—because doing so causes site import/export to fail.
+> **Note:** Don't use special characters, such as umlauts, in file names—including names of image files—because doing so causes site import/export to fail.
 
 Site export exports certain objects (including database objects and static files) and stores them in a single .zip file, which is available for download. You can upload the zip file to another instance and import it there. Site import is possible only if there’s no custom site in the instance.
 
-![Note](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/icon_note.png)
+> **Note:** Code (cartridges) isn't part of the Site import/export and requires separate handling.
 
-Note Code (cartridges) isn't part of the Site import/export and requires separate handling.
-
-To access Site Import Export, click App Launcher ![App Launcher](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/appLauncher.png), and then select **Administration** | **Site Development** | **Site Import & Export**.
+To access Site Import Export, click App Launcher _(image: App Launcher)_, and then select **Administration  >  Site Development >  Site Import & Export**.
 
 Use Site Import/Export as follows:
 
 | Mode | Purpose | Included Data |
 | --- | --- | --- |
-| Import | Initial Instance Setup. You can "clone" an instance. This approach is most helpful during development to initialize a developer's instance or a testing instance. (Use Site Import to set up an initial "staging" instance, but then the import won’t be used again in a primary instance group.) | Initial global data (site independent) such as:Global preferences as locales, instance time zonesGlobal custom objectsSchedulesSystem object attribute extensionsCustom object typesCustom preference type definitionsCatalogs and price booksSite data including business objects as:Custom objectsContent library, assets, and imagesCustomer groupsCustomer listsShipping, tax and payment configurationInventoryStoresSite preferencesSearch configurationSource CodesSite relations data such as Catalog-Site assignments |
+| Import | Initial Instance Setup. You can "clone" an instance. This approach is most helpful during development to initialize a developer's instance or a testing instance. (Use Site Import to set up an initial "staging" instance, but then the import won’t be used again in a primary instance group.) | Initial global data (site independent) such as:  Global preferences as locales, instance time zones Global custom objects Schedules System object attribute extensions Custom object types Custom preference type definitions Catalogs and price books  Site data including business objects as:  Custom objects Content library, assets, and images Customer groups Customer lists Shipping, tax and payment configuration Inventory Stores Site preferences Search configuration Source Codes  Site relations data such as Catalog-Site assignments |
 | Export | Archiving Instance Data | All instance data comprising all sites and corresponding business objects and global data is exported. |
-| Export | Particular Instance Data | Selective site and instance data:Sites (including individual types of site-specific data to export)Libraries / Library Static ResourcesCatalogs / Catalog Static ResourcesPrice BooksInventory ListsCustomer ListsGlobal data (Custom Objects, Attribute Definitions, Custom Preferences, Schedules, Custom Quota Settings) |
-| Export/ import | Copying an entire Instance | B2C Commerce customization projects often involve several development teams working in parallel on different development instances. The Site import/export lets them share instance configurations and data across multiple instances.Site import/export lets them save a snapshot (configuration and data) of an instance and restore it on the same or another instance. This feature can also be used for instance configuration versioning. |
+| Export | Particular Instance Data | Selective site and instance data:  Sites (including individual types of site-specific data to export) Libraries / Library Static Resources Catalogs / Catalog Static Resources Price Books Inventory Lists Customer Lists Global data (Custom Objects, Attribute Definitions, Custom Preferences, Schedules, Custom Quota Settings) |
+| Export/ import | Copying an entire Instance | B2C Commerce customization projects often involve several development teams working in parallel on different development instances. The Site import/export lets them share instance configurations and data across multiple instances. Site import/export lets them save a snapshot (configuration and data) of an instance and restore it on the same or another instance. This feature can also be used for instance configuration versioning. |
 | Export/ import | Copying specific site data for testing | When testing new code or troubleshooting a problem, it can be necessary to export data from a production instance to import it on a developer sandbox. However, it isn't desirable to import all of the site's data, either because of the size of the site or because of privacy concerns around customer data. In this case use the export feature to export only the site-specific data you want and import it into your sandbox. |
 
-_Granularity:_ selected sites.
+*Granularity:* selected sites.
 
 Other information you must know about Site Import/Export:
 
-*   The Site Import/Export function in the Business Manager uses standard Business Manager imports/exports for some of its object types; so some XML files use the same schema within Site Export .zip files.
-*   Site Export also supports some object types excluded from the standard import/export functionality (for example, schedules and site preferences).
-*   It isn't possible to trigger a Site Import programmatically.
-*   A catalog and a site can be exported without the static content being included in the resulting archive file. This behavior allows users more granular control over the export process. This behavior is also important because the size of the archive files rapidly exceeds the WebDAV file size limitation when images are included.
-*   Compatibility of the import/export format is ensured for the same B2C Commerce version only.
-*   The list of custom cartridges used for Business Manager is supported in the site import/export. The file preferences.xml, which contains global preferences, includes the additional preference identified by the key "CustomCartridges".
-*   Use the site export function in Business Manager to export a catalog and a site without the static content being included in the resulting archive file. This change provides more granular control over the export process. This change is also important because the size of the archive files rapidly exceeds the WebDAV file size limitation when images are included.
+- The Site Import/Export function in the Business Manager uses standard Business Manager imports/exports for some of its object types; so some XML files use the same schema within Site Export .zip files.
+- Site Export also supports some object types excluded from the standard import/export functionality (for example, schedules and site preferences).
+- It isn't possible to trigger a Site Import programmatically.
+- A catalog and a site can be exported without the static content being included in the resulting archive file. This behavior allows users more granular control over the export process. This behavior is also important because the size of the archive files rapidly exceeds the WebDAV file size limitation when images are included.
+- Compatibility of the import/export format is ensured for the same B2C Commerce version only.
+- The list of custom cartridges used for Business Manager is supported in the site import/export. The file preferences.xml, which contains global preferences, includes the additional preference identified by the key "CustomCartridges".
+- Use the site export function in Business Manager to export a catalog and a site without the static content being included in the resulting archive file. This change provides more granular control over the export process. This change is also important because the size of the archive files rapidly exceeds the WebDAV file size limitation when images are included.
 
-## Business Manager Import Location
+### Business Manager Import Location
 
-**Administration** | **Site Development** | **Site Import & Export**.
+**Administration  >  Site Development  >  Site Import & Export**.
 
-## Initial Instance Setup
+### Initial Instance Setup
 
 Configure:
 
-*   Initial organization data (site independent) such as:
-    *   Global preferences, such as locales and instance time zones
-    *   Global custom objects
-    *   Schedules
-    *   System object attribute extensions
-    *   Custom object types
-    *   Custom preference type definitions
-*   Catalogs, price books, and inventory lists
-*   Site-specific data including business objects, such as:
-    *   Custom objects
-    *   Content library, assets, and images
-    *   Customers and customer groups
-    *   Shipping, tax and payment configuration
-    *   Stores
-    *   Site preferences
-    *   Search configuration
-    *   Source Codes
-    *   Catalog price book and inventory list site assignments
+- Initial organization data (site independent) such as:
 
-## Archiving Data of an Instance
+   - Global preferences, such as locales and instance time zones
+   - Global custom objects
+   - Schedules
+   - System object attribute extensions
+   - Custom object types
+   - Custom preference type definitions
+- Catalogs, price books, and inventory lists
+- Site-specific data including business objects, such as:
+
+   - Custom objects
+   - Content library, assets, and images
+   - Customers and customer groups
+   - Shipping, tax and payment configuration
+   - Stores
+   - Site preferences
+   - Search configuration
+   - Source Codes
+   - Catalog price book and inventory list site assignments
+
+### Archiving Data of an Instance
 
 Use Site export to export instance data that consists of all sites and corresponding business objects and global data (except carts, wish lists, and orders).
 
-## Pipelets
+### Pipelets
 
 N/A
 
 ## Site Export File Consistency in B2C Commerce
 
-The Catalog, Customers, Inventory, and Access Roles site export files are created consistently, exported in sorted order. This behavior makes sure that a diff of XML feeds is guaranteed to reveal data changes and differences. Developers work in a collaborative environment, working with and changing a common site import definition. Thus, exports provide the only way to compare the content of two instances. This topic applies to B2C Commerce.
+_The Catalog, Customers, Inventory, and Access Roles site export files are created consistently, exported in sorted order. This behavior makes sure that a diff of XML feeds is guaranteed to reveal data changes and differences. Developers work in a collaborative environment, working with and changing a common site import definition. Thus, exports provide the only way to compare the content of two instances._
 
-*   The customer file is sorted by address ID in ascending alphabetical order
-*   The access roles file is sorted in ascending alphabetical order based on the _resource path_ of an access control element. If the resource paths of two access control elements are the same, it then sorts by the permission.
-*   The Inventory file is sorted in ascending alphabetical order based on product ID.
-*   The catalog file is sorted by the following rules (in the following order):
+- The customer file is sorted by address ID in ascending alphabetical order
+- The access roles file is sorted in ascending alphabetical order based on the *resource path* of an access control element. If the resource paths of two access control elements are the same, it then sorts by the permission.
+- The Inventory file is sorted in ascending alphabetical order based on product ID.
+- The catalog file is sorted by the following rules (in the following order):
 
 | Element | Sort order |
 | --- | --- |
@@ -106,17 +104,17 @@ The Catalog, Customers, Inventory, and Access Roles site export files are create
 
 ## Site Export Archive Structure
 
-Description of the structure on which the .zip file is based. The export process creates this directory structure within the archive. If a selective export with a subset of data is started, a fragmented structure according to the data units selected is created. A site import parses the archive and expects the exact same structure. This topic applies to B2C Commerce.
+_Description of the structure on which the .zip file is based. The B2C Commerce export process creates this directory structure within the archive. If a selective export with a subset of data is started, a fragmented structure according to the data units selected is created. A site import parses the archive and expects the exact same structure._
 
-### Preferences.xml
+#### Preferences.xml
 
 Organization-specific preferences.
 
-### Schedules.xml
+#### Schedules.xml
 
 All schedules.
 
-### Meta/
+#### Meta/
 
 | First level | Second level | Third level | Description |
 | --- | --- | --- | --- |
@@ -124,11 +122,11 @@ All schedules.
 | custom-objecttype-extensions.xml |  |  |  |
 | custom-objecttype-extensions.xml |  |  |  |
 
-### Custom-Objects/
+#### Custom-Objects/
 
 Import processes all import files in this directory; Export generates a file per object type.
 
-### Catalogs/
+#### Catalogs/
 
 Root directory for all catalog data files.
 
@@ -140,7 +138,7 @@ Root directory for all catalog data files.
 |  | catalog.xml |  |  |
 |  | static/ |  |  |
 
-### Inventory-Lists/
+#### Inventory-Lists/
 
 Root directory for all inventory lists.
 
@@ -149,18 +147,18 @@ Root directory for all inventory lists.
 | inventory_list_A.xml |  |  |  |
 | inventory_list_B.xml |  |  |  |
 
-### Price Books/
+#### Price Books/
 
 | First Level | Second Level | Third Level | Description |
 | --- | --- | --- | --- |
 | my_pricebook_1.xml |  |  |  |
 | my_pricebook_2.xml |  |  |  |
 
-### Static/
+#### Static/
 
 Directory contains all organization static files
 
-### Sites/
+#### Sites/
 
 All site directories
 
@@ -169,7 +167,7 @@ All site directories
 | my_site_1/ |  |  |  |
 |  | site.xml |  | Site definition |
 |  | preferences.xml |  | Site settings |
-|  | promotions.xml |  | Campaign and promotions. See Promotion and Campaign Object Import and Export in B2C Commerce for more information. |
+|  | promotions.xml |  | Campaign and promotions. See [b2c_promotion_and_campaign_object_import_export.xml](https://help.salesforce.com/s/articleView?id=cc.b2c_promotion_and_campaign_object_import_export.htm&type=5) for more information. |
 |  | tax.xml |  | Site tax table |
 |  | shipping.xml |  | Site shopping methods and costs |
 |  | custom-objects/ |  | Import processes all import files in this directory. Export generates a file per object type. |
@@ -186,49 +184,38 @@ All site directories
 
 ## Use Site Import/Export to Import Reference Application Demo Sites in B2C Commerce
 
-Import B2C Commerce reference application demo sites into a sandbox. Demo sites are prebuilt and enable you to explore storefront functionality. Unlike custom sites, demo sites don’t need to be exported from other instances. They can be immediately imported into sandboxes. This topic applies to B2C Commerce.
+_Import B2C Commerce reference application demo sites into a sandbox. Demo sites are prebuilt and enable you to explore storefront functionality. Unlike custom sites, demo sites don’t need to be exported from other instances. They can be immediately imported into sandboxes._
 
 There are two demo sites:
 
-*   Storefront Reference Architecture (SFRA) Demo Sites: When you import an SFRA demo site, Business Manager shows a list of available demo configurations. Each demo configuration is a combination of site data and feature code that you can import into the sandbox. To select the demo configuration that you want, read the descriptions provided in the list. When you import a demo configuration, Business Manager:
-    *   Imports the configuration's site data into your sandbox.
-    *   Uploads the configuration’s cartridges and code into a unique code version directory.
-    *   Automatically activates the code version directory. (Each configuration has its own unique code version directory.)
-    *   Search indexes are automatically updated.
-*   SiteGenesis (SGJC) Demo Site: When you import the SGJC demo site, Business Manager imports the site data only. You upload code separately. Search indexes aren’t automatically updated.
+- Storefront Reference Architecture (SFRA) Demo Sites: When you import an SFRA demo site, Business Manager shows a list of available demo configurations. Each demo configuration is a combination of site data and feature code that you can import into the sandbox. To select the demo configuration that you want, read the descriptions provided in the list. When you import a demo configuration, Business Manager:
 
-![Note](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/icon_note.png)
+   - Imports the configuration's site data into your sandbox.
+   - Uploads the configuration’s cartridges and code into a unique code version directory.
+   - Automatically activates the code version directory. (Each configuration has its own unique code version directory.)
+   - Search indexes are automatically updated.
+- SiteGenesis (SGJC) Demo Site: When you import the SGJC demo site, Business Manager imports the site data only. You upload code separately. Search indexes aren’t automatically updated.
 
-Note When you import a demo site, you import data (and code) that can be older than the data and code in the associated git repositories.
+> **Note:** When you import a demo site, you import data (and code) that can be older than the data and code in the associated git repositories.
 
 ### Import the Storefront Reference Architecture (SFRA) Demo Site
 
-You can import the SFRA demo site using Business Manager.
+_You can import the B2C Commerce SFRA demo site using Business Manager._
 
-### Required Editions
-
-| Available in: B2C Commerce |
-| --- |
-
-1.  Log in to Business Manager with an account that has import/export privileges for the site. Administrators can check account privileges by clicking App Launcher ![App Launcher](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/appLauncher.png), and then selecting **Administration** | **Organization** | **Roles and Permissions**.
-2.  Click App Launcher ![App Launcher](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/appLauncher.png), and then select **Administration** | **Site Development** | **Site Import** | **Export**.
-3.  Select Storefront Reference Architecture Demo Sites.
-4.  Click **Import**.
-5.  Select a demo configuration and click **Deploy**.
-6.  To see the progress of the import process, click **Refresh** in the Status section.
+1. Log in to Business Manager with an account that has import/export privileges for the site. Administrators can check account privileges by clicking App Launcher _(image: App Launcher)_, and then selecting **Administration > Organization > Roles and Permissions**.
+2. Click App Launcher _(image: App Launcher)_, and then select **Administration > Site Development > Site Import > Export**.
+3. Select Storefront Reference Architecture Demo Sites.
+4. Click **Import**.
+5. Select a demo configuration and click **Deploy**.
+6. To see the progress of the import process, click **Refresh** in the Status section.
 
 ### Import the SiteGenesis JavaScript Controllers (SGJC) Demo Site
 
-Import the SGJC demo site using Business Manager.
+_Import the B2C Commerce SGJC demo site using Business Manager._
 
-### Required Editions
-
-| Available in: B2C Commerce |
-| --- |
-
-1.  Log in to Business Manager with an account that has import/export privileges for the site. To check account privileges, administrators can click App Launcher ![App Launcher](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/appLauncher.png), and then select **Administration** | **Organization** | **Roles and Permissions**.
-2.  Click App Launcher ![App Launcher](https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-b2c_merchandiser_administrator-2-production-enus/__asset_version__/images/appLauncher.png), and then select **Administration** | **Site Development** | **Site Import & Export**.
-3.  Select SiteGenesis Demo Site.
-4.  Click **Import**. A message asks you to confirm that you want to import the demo site.
-5.  To confirm, click **OK**.
-6.  To see the progress of the import process, click **Refresh** in the Status section.
+1. Log in to Business Manager with an account that has import/export privileges for the site. To check account privileges, administrators can click App Launcher _(image: App Launcher)_, and then select **Administration > Organization > Roles and Permissions**.
+2. Click App Launcher _(image: App Launcher)_, and then select **Administration > Site Development > Site Import & Export**.
+3. Select SiteGenesis Demo Site.
+4. Click **Import**. A message asks you to confirm that you want to import the demo site.
+5. To confirm, click **OK**.
+6. To see the progress of the import process, click **Refresh** in the Status section.

@@ -28,6 +28,7 @@ describe('fetchDeveloperPage', () => {
     expect(options.allowedHost).toBe('developer.salesforce.com');
     expect(options.contentSelectors).toContain('doc-content-layout');
     expect(options.contentSelectors).toContain('doc-amf-reference');
+    expect(options.contentSelectors).toContain('doc-redoc-reference');
     expect(options.removeSelectors).toBeUndefined(); // dev relies on the base chrome removals only
   });
 

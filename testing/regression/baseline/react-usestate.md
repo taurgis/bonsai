@@ -155,7 +155,9 @@ export default function Counter() {
   }
 
   return (
-
+    <button onClick={handleClick}>
+      You pressed me {count} times
+    </button>
   );
 }
 ```
@@ -184,7 +186,9 @@ export default function MyInput() {
     <>
       <input value={text} onChange={handleChange} />
       <p>You typed: {text}</p>
-
+      <button onClick={() => setText('hello')}>
+        Reset
+      </button>
     </>
   );
 }
@@ -249,7 +253,9 @@ export default function Form() {
         value={name}
         onChange={e => setName(e.target.value)}
       />
-
+      <button onClick={() => setAge(age + 1)}>
+        Increment age
+      </button>
       <p>Hello, {name}. You are {age}.</p>
     </>
   );
@@ -341,7 +347,14 @@ export default function Counter() {
   return (
     <>
       <h1>Your age: {age}</h1>
-
+      <button onClick={() => {
+        increment();
+        increment();
+        increment();
+      }}>+3</button>
+      <button onClick={() => {
+        increment();
+      }}>+1</button>
     </>
   );
 }
@@ -375,7 +388,14 @@ export default function Counter() {
   return (
     <>
       <h1>Your age: {age}</h1>
-
+      <button onClick={() => {
+        increment();
+        increment();
+        increment();
+      }}>+3</button>
+      <button onClick={() => {
+        increment();
+      }}>+1</button>
     </>
   );
 }
@@ -677,7 +697,10 @@ export default function AddTodo({ onAddTodo }) {
         value={title}
         onChange={e => setTitle(e.target.value)}
       />
-
+      <button onClick={() => {
+        setTitle('');
+        onAddTodo(title);
+      }}>Add</button>
     </>
   )
 }
@@ -720,14 +743,18 @@ function Task({ todo, onChange, onDelete }) {
               title: e.target.value
             });
           }} />
-
+        <button onClick={() => setIsEditing(false)}>
+          Save
+        </button>
       </>
     );
   } else {
     todoContent = (
       <>
         {todo.title}
-
+        <button onClick={() => setIsEditing(true)}>
+          Edit
+        </button>
       </>
     );
   }
@@ -744,7 +771,9 @@ function Task({ todo, onChange, onDelete }) {
         }}
       />
       {todoContent}
-
+      <button onClick={() => onDelete(todo.id)}>
+        Delete
+      </button>
     </label>
   );
 }
@@ -907,7 +936,13 @@ export default function TodoList() {
         value={text}
         onChange={e => setText(e.target.value)}
       />
-
+      <button onClick={() => {
+        setText('');
+        setTodos([{
+          id: todos.length,
+          text: text
+        }, ...todos]);
+      }}>Add</button>
       <ul>
         {todos.map(item => (
           <li key={item.id}>
@@ -954,7 +989,13 @@ export default function TodoList() {
         value={text}
         onChange={e => setText(e.target.value)}
       />
-
+      <button onClick={() => {
+        setText('');
+        setTodos([{
+          id: todos.length,
+          text: text
+        }, ...todos]);
+      }}>Add</button>
       <ul>
         {todos.map(item => (
           <li key={item.id}>
@@ -997,7 +1038,7 @@ export default function App() {
 
   return (
     <>
-
+      <button onClick={handleReset}>Reset</button>
       <Form key={version} />
     </>
   );
@@ -1058,7 +1099,12 @@ export default function App() {
   const [count, setCount] = useState(0);
   return (
     <>
-
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+      <button onClick={() => setCount(count - 1)}>
+        Decrement
+      </button>
       <CountLabel count={count} />
     </>
   );
@@ -1156,13 +1202,13 @@ You might get an error that says: `Too many re-renders. React limits the number 
 
 ```js {1-2}
 // 🚩 Wrong: calls the handler during render
-return
+return <button onClick={handleClick()}>Click me</button>
 
 // ✅ Correct: passes down the event handler
-return
+return <button onClick={handleClick}>Click me</button>
 
 // ✅ Correct: passes down an inline function
-return
+return <button onClick={(e) => handleClick(e)}>Click me</button>
 ```
 
 If you can't find the cause of this error, click on the arrow next to the error in the console and look through the JavaScript stack to find the specific `set` function call responsible for the error.

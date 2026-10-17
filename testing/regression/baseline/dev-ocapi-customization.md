@@ -4,7 +4,7 @@ You can customize Shop API resources that perform a modification on the server s
 
 Each customizable resource provides `before`, `after`, and `modifyResponse` hooks. Use the `before` and `after` hooks to execute custom code before or after the server performs its processing. Use the `modifyResponse` hook to apply changes to the response document. In addition, convenience hooks allow you to perform actions like basket calculations or checkout steps. These convenience hooks let you place your basket-calculation code in a single place, instead of including duplicate code in multiple `after` hooks.
 
-For information on hooks and supported resources, see [OCAPI Hooks for Data API](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-data.html) and [OCAPI Hooks for Shop API](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-shop.html).
+For information on hooks and supported resources, see [OCAPI Hooks for Data API](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-data.md) and [OCAPI Hooks for Shop API](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-shop.md).
 
 ## Customization Processing
 
@@ -152,7 +152,7 @@ exports.modifyPOSTResponse = function (basket, basketResponse, paymentInstrument
 
 ## Hook Circuit Breaker
 
-The Hook Circuit Breaker protects the system from excessive hook execution failures. For more information, see [Hook Circuit Breaker](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hookcircuitbreaker.html).
+The Hook Circuit Breaker protects the system from excessive hook execution failures. For more information, see [Hook Circuit Breaker](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hookcircuitbreaker.md).
 
 ## Calculate Hook
 

@@ -346,3 +346,30 @@ export async function fetchStaticHtml(
 export async function fetchText(url: string, options: FetchOptions = {}): Promise<FetchResult> {
   return fetchWithRedirects(url, options, processTextResponse);
 }
+
+/**
+ * Same DNS, redirect, and status checks as {@link fetchText}, but the body is cancelled once the
+ * status line is known. Use this to reject HTTP 404 before a browser render without downloading
+ * the document.
+ *
+ * @param url - Absolute URL to probe.
+ * @param options - Optional timeout, redirect cap, and headers.
+ * @returns The final HTTP status.
+ * @throws {Error} On unsafe DNS, HTTP failure, or redirect limits.
+ */
+export async function fetchStatus(url: string, options: FetchOptions = {}): Promise<number> {
+  const result = await fetchWithRedirects(url, options, async (res, _limit, currentUrl) => {
+    await res.body?.cancel().catch(() => {});
+    assertOk(res);
+    return {
+      status: res.status,
+      contentType: null,
+      etag: null,
+      lastModified: null,
+      finalUrl: currentUrl,
+      responseSize: 0,
+      content: '',
+    };
+  });
+  return result.status;
+}

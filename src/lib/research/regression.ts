@@ -153,7 +153,12 @@ const LEAKAGE_PATTERNS: Array<{ label: string; re: RegExp }> = [
   { label: 'base64-image', re: /data:image\/[a-z]+;base64,/i },
   { label: 'skip-to-content', re: /skip to (?:main )?content/i },
   { label: 'on-this-page', re: /^on this page$/im },
-  { label: 'theme-toggle', re: /(?:toggle|switch to) (?:dark|light|the)? ?(?:mode|theme)/i },
+  // "dark"/"light" or the word "theme" is required. An optional group also matched
+  // "switch to mode" after inline code was stripped from "switch to `history` mode".
+  {
+    label: 'theme-toggle',
+    re: /(?:toggle|switch to) (?:the )?(?:dark|light)(?: mode)?|(?:toggle|switch to) (?:the )?theme/i,
+  },
   {
     label: 'cookie-consent',
     re: /(?:accept all cookies|we use cookies|cookie (?:policy|preferences|settings))/i,

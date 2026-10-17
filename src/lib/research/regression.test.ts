@@ -161,6 +161,9 @@ describe('leakageSignals', () => {
     expect(leakageSignals('Skip to content\n\n# Title')).toContain('skip-to-content');
     expect(leakageSignals('On this page\n\n# Title')).toContain('on-this-page');
     expect(leakageSignals('Toggle dark mode')).toContain('theme-toggle');
+    expect(leakageSignals('then switch to `history` mode for a better experience')).not.toContain(
+      'theme-toggle'
+    );
     expect(leakageSignals('We use cookies to improve your experience.')).toContain(
       'cookie-consent'
     );

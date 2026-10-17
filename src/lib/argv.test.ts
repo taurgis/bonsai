@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
+import { BaseCommand } from '../base-command.js';
+import { commands } from '../commands.js';
 import { normalizeArgv, positionalArgvTokens } from './argv.js';
 import { VALUE_TAKING_FLAG_TOKENS, KNOWN_COMMAND_ROOT_TOKENS } from './cli-flag-manifest.js';
+import { valueTakingFlagTokensFromCommands } from './value-flags.js';
 
 describe('normalizeArgv', () => {
   const cases = [
@@ -505,9 +508,13 @@ describe('normalizeArgv', () => {
 });
 
 describe('VALUE_TAKING_FLAG_TOKENS', () => {
-  it('is derived from command metadata (includes known value-taking flags)', () => {
-    // Derived at module load from command classes — assert the contract agents rely on,
-    // not a hand-maintained duplicate list.
+  it('matches the tokens derived from command classes', () => {
+    expect(VALUE_TAKING_FLAG_TOKENS).toEqual(
+      valueTakingFlagTokensFromCommands(commands, BaseCommand.baseFlags)
+    );
+  });
+
+  it('includes the value-taking flags agents rely on', () => {
     expect(VALUE_TAKING_FLAG_TOKENS.has('--topic')).toBe(true);
     expect(VALUE_TAKING_FLAG_TOKENS.has('-t')).toBe(true);
     expect(VALUE_TAKING_FLAG_TOKENS.has('--format')).toBe(true);

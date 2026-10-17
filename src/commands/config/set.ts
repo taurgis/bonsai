@@ -1,5 +1,5 @@
 import { Args, Flags } from '@oclif/core';
-import { ConfigCommand, configScopeFlags } from './base.js';
+import { ConfigCommand, configScopeFlags } from '../../lib/config-command.js';
 import { KEY_META, keyValuesHint } from '../../lib/config/index.js';
 import type { ConfigValues } from '../../lib/config/index.js';
 import { persistConfigPatch } from '../../lib/config-persist.js';

@@ -1,12 +1,15 @@
 import { Command, toConfiguredId } from '@oclif/core';
-import { BaseCommand } from '../../base-command.js';
-import { isKnownKey, suggestKey, validKeysHint } from '../../lib/config/index.js';
-import type { ConfigKey, ConfigScope } from '../../lib/config/index.js';
-import { assertScopeFlagsExclusive, scopeFlags } from '../../lib/scope-flags.js';
+import { BaseCommand } from '../base-command.js';
+import { isKnownKey, suggestKey, validKeysHint } from './config/index.js';
+import type { ConfigKey, ConfigScope } from './config/index.js';
+import { assertScopeFlagsExclusive, scopeFlags } from './scope-flags.js';
 
 /**
  * Shared base for the four `config` subcommands: the mutually-exclusive
  * scope-flag guard, the binary write-scope helper, and known-key validation.
+ *
+ * Lives outside `src/commands` so oclif's file-based command discovery does not
+ * publish it as `config base`.
  */
 export abstract class ConfigCommand<T extends typeof Command> extends BaseCommand<T> {
   protected assertScopeFlagsExclusive(global?: boolean, local?: boolean): void {

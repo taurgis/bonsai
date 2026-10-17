@@ -1,4 +1,4 @@
-import { ConfigCommand, configScopeFlags } from './base.js';
+import { ConfigCommand, configScopeFlags } from '../../lib/config-command.js';
 import { formatConfigEntry, resolveConfigEntries, keyValuesHint } from '../../lib/config/index.js';
 
 export default class ConfigList extends ConfigCommand<typeof ConfigList> {

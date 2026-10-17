@@ -10,7 +10,7 @@ Calling this resource triggers a background job and retrieves a response documen
 
 The job ID always starts with `sfcc-`. This prefix is a namespace specific to B2C Commerce System Jobs. You can’t use it in custom job IDs.
 
-Currently available system jobs can be found in [Global Jobs](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/globaljobs.html).
+Currently available system jobs can be found in [Global Jobs](/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/globaljobs.md).
 
 A System Job request looks like a basic OCAPI Data API request, but can have its own request document. An example is shown here for the site archive import job:
 

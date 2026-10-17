@@ -63,6 +63,8 @@ display: flex;
 display: inline-flex;
 display: grid;
 display: inline-grid;
+display: grid-lanes;
+display: inline-grid-lanes;
 display: table;
 display: inline-table;
 
@@ -77,6 +79,8 @@ display: block flex;
 display: inline flex;
 display: block grid;
 display: inline grid;
+display: block grid-lanes;
+display: inline grid-lanes;
 display: block table;
 display: inline table;
 
@@ -152,6 +156,10 @@ The element behaves like a block-level element and lays out its content accordin
 [`grid`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#grid)
 
 The element behaves like a block-level element and lays out its content according to the [grid model](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Basic_concepts).
+
+[`grid-lanes`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#grid-lanes)
+
+The element behaves like a block-level element and lays out its content using grid lanes layout. Columns are defined by [`grid-template-columns`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns) and behave like a strict grid, while items are packed in the block direction to fill gaps between items of different sizes. See [Grid lanes layout](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Grid_lanes) for details.
 
 [`ruby`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#ruby)
 
@@ -269,6 +277,12 @@ The element behaves like an inline-level element and lays out its content accord
 
 It is equivalent to `inline grid`.
 
+[`inline-grid-lanes`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#inline-grid-lanes)
+
+The element behaves like an inline-level element and lays out its content using grid lanes layout. Rows are defined by [`grid-template-rows`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-rows) and behave like a strict grid, while items are packed in the inline direction to fill gaps between items of different sizes. See [Grid lanes layout](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Grid_lanes) for details.
+
+It is equivalent to `inline grid-lanes`.
+
 ### [Which syntax should you use?](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#which_syntax_should_you_use)
 
 The [CSS display module](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Display) describes a multi-keyword syntax for values you can use with the `display` property to explicitly define **outer** and **inner** display. The single keyword values (precomposed `<display-legacy>` values) are supported for backward-compatibility.
@@ -333,6 +347,7 @@ The individual pages for the different types of value that `display` can have se
 *   [Grids, logical values and writing modes](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Logical_values_and_writing_modes)
 *   [CSS grid layout and accessibility](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Accessibility)
 *   [Realizing common layouts using grids](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Common_grid_layouts)
+*   [Grid lanes layout](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Grid_lanes)
 
 ### [Animating display](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display#animating_display)
 
@@ -400,12 +415,12 @@ display =
   inline-grid-lanes                                 [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   <display-outside> [||](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#double_bar "Double bar: one or several of the entities must be present, in any order") [\ <display-inside> [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present") math [\]](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#brackets "Brackets: enclose several entities, combinators, and multipliers to transform them as a single component")
 
-<display-outside> =
+[<display-outside>](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/display-outside) =
   block   [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   inline  [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   run-in
 
-<display-inside> =
+[<display-inside>](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/display-inside) =
   flow       [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   flow-root  [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   table      [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
@@ -413,12 +428,12 @@ display =
   grid       [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   ruby
 
-<display-listitem> =
+[<display-listitem>](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/display-listitem) =
   <display-outside>[?](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#question_mark "Question mark: the entity is optional")     [&&](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#double_ampersand "Double ampersand: all of the entities must be present, in any order")
   [\ flow [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present") flow-root [\]](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#brackets "Brackets: enclose several entities, combinators, and multipliers to transform them as a single component")[?](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#question_mark "Question mark: the entity is optional")  [&&](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#double_ampersand "Double ampersand: all of the entities must be present, in any order")
   list-item
 
-<display-internal> =
+[<display-internal>](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/display-internal) =
   table-row-group      [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   table-header-group   [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   table-footer-group   [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
@@ -432,11 +447,11 @@ display =
   ruby-base-container  [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   ruby-text-container
 
-<display-box> =
+[<display-box>](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/display-box) =
   contents  [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   none
 
-<display-legacy> =
+[<display-legacy>](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/display-legacy) =
   inline-block  [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   inline-table  [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
   inline-flex   [|](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Values_and_units/Value_definition_syntax#single_bar "Single bar: exactly one of the entities must be present")
@@ -483,6 +498,8 @@ html
     <option>block flex</option>
     <option>grid</option>
     <option>block grid</option>
+    <option>grid-lanes</option>
+    <option>block grid-lanes</option>
     <option>list-item</option>
     <option>block flow list-item</option>
     <option>inline flow list-item</option>
@@ -498,6 +515,8 @@ html
     <option>inline flex</option>
     <option>inline-grid</option>
     <option>inline grid</option>
+    <option>inline-grid-lanes</option>
+    <option>inline grid-lanes</option>
   </select>
 </div>
 ```
@@ -590,9 +609,10 @@ You can find more examples in the pages for each separate display type under [Gr
 *   SVG [`display`](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/display) attribute
 *   [Block and inline layout in normal flow](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Display/Block_and_inline_layout)
 *   [Introduction to formatting contexts](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Display/Formatting_contexts)
+*   [Grid lanes layout](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Grid_lanes)
 
 ## Help improve MDN
 
 [Learn how to contribute](https://developer.mozilla.org/en-US/docs/MDN/Community/Getting_started)
 
-This page was last modified on Jul 8, 2026 by [MDN contributors](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display/contributors.txt).
+This page was last modified on Sep 21, 2026 by [MDN contributors](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display/contributors.txt).

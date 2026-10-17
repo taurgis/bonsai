@@ -10,16 +10,6 @@
     ]
   },
   {
-    "id": "help-agentforce-enable",
-    "site": "salesforce",
-    "url": "https://help.salesforce.com/s/articleView?id=cc.b2c_shopping_agent_enable_agentforce.htm&type=5&release=2.0.1&language=en_us",
-    "focus": [
-      "step-guide",
-      "images",
-      "inline-formatting"
-    ]
-  },
-  {
     "id": "help-agentforce-b2b-create",
     "site": "salesforce",
     "url": "https://help.salesforce.com/s/articleView?id=commerce.comm_agent_guided_shopping_create_agent.htm&type=5&release=260.0.0&language=en_us",
@@ -305,6 +295,44 @@
       "route-markdown",
       "extensionless-url",
       "code-blocks"
+    ]
+  },
+  {
+    "id": "dev-atlas-rest-intro",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm",
+    "focus": [
+      "atlas-markdown-twin",
+      "article-body"
+    ]
+  },
+  {
+    "id": "dev-atlas-soql",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql.htm",
+    "focus": [
+      "atlas-markdown-twin",
+      "headings",
+      "prose"
+    ]
+  },
+  {
+    "id": "dev-connect-rest-patch-checkout",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/platform/connect-rest-api/references/connect-rest-api-commerce#tag/Commerce-B2B-Resources/operation/patchCheckoutV2",
+    "focus": [
+      "redoc-operation",
+      "request-body"
+    ]
+  },
+  {
+    "id": "dev-atlas-apex-casting",
+    "site": "salesforce-developer",
+    "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_casting.htm",
+    "focus": [
+      "atlas-browser-fallback",
+      "article-body",
+      "code"
     ]
   },
   {

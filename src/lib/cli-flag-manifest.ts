@@ -1,14 +1,35 @@
-import { BaseCommand } from '../base-command.js';
-import { commands } from '../commands.js';
-import { valueTakingFlagTokensFromCommands } from './value-flags.js';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { valueTakingFlagTokensFromFlagMaps } from './value-flags.js';
+
+type ManifestFlag = {
+  type?: string;
+  char?: string;
+  aliases?: string[] | string;
+  charAliases?: string[];
+};
+
+type OclifManifest = {
+  commands: Record<string, { flags?: Record<string, ManifestFlag> }>;
+};
+
+// Startup reads the generated manifest instead of importing every command class. Importing the
+// registry pulls the fetch stack (Readability, Turndown, the browser fallback) into --help.
+function readOclifManifest(): OclifManifest {
+  const manifestPath = join(dirname(fileURLToPath(import.meta.url)), '../../oclif.manifest.json');
+  return JSON.parse(readFileSync(manifestPath, 'utf8')) as OclifManifest;
+}
+
+const manifest = readOclifManifest();
 
 /**
- * Composition-root flag manifest: every CLI token that consumes a following argv value.
- * Built from command class metadata so argv normalization stays free of command imports.
+ * Every CLI token that consumes a following argv value, from the shipped oclif manifest.
+ * Argv normalization stays off the command-class import graph.
  */
-export const VALUE_TAKING_FLAG_TOKENS: ReadonlySet<string> = valueTakingFlagTokensFromCommands(
-  commands,
-  BaseCommand.baseFlags
+export const VALUE_TAKING_FLAG_TOKENS: ReadonlySet<string> = valueTakingFlagTokensFromFlagMaps(
+  Object.values(manifest.commands).map((command) => command.flags)
 );
 
 /**
@@ -18,5 +39,5 @@ export const VALUE_TAKING_FLAG_TOKENS: ReadonlySet<string> = valueTakingFlagToke
  * `word:` is a URL scheme.
  */
 export const KNOWN_COMMAND_ROOT_TOKENS: ReadonlySet<string> = new Set(
-  Object.keys(commands).map((id) => id.split(':')[0]!)
+  Object.keys(manifest.commands).map((id) => id.split(':')[0]!)
 );

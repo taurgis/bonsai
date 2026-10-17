@@ -47,7 +47,13 @@
       "strict": true,
       "summary": "Show a compact cache dashboard for ambient session context",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "context.js"
+      ]
     },
     "fetch": {
       "aliases": [],
@@ -199,7 +205,13 @@
       "strict": false,
       "summary": "Fetch and cache URL research Markdown",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "fetch.js"
+      ]
     },
     "import": {
       "aliases": [],
@@ -349,7 +361,13 @@
       "strict": true,
       "summary": "Import agent-supplied Markdown into cache",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "import.js"
+      ]
     },
     "inspect": {
       "aliases": [],
@@ -408,7 +426,13 @@
       "strict": false,
       "summary": "Inspect cached research metadata for a URL",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "inspect.js"
+      ]
     },
     "list": {
       "aliases": [],
@@ -550,7 +574,13 @@
       "strict": true,
       "summary": "List cached research artifacts by metadata",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "list.js"
+      ]
     },
     "prune": {
       "aliases": [],
@@ -670,7 +700,13 @@
       "strict": true,
       "summary": "Prune cached research artifacts",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "prune.js"
+      ]
     },
     "search": {
       "aliases": [],
@@ -816,7 +852,13 @@
       "strict": true,
       "summary": "Search cached research artifacts by tags and content",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "search.js"
+      ]
     },
     "setup": {
       "aliases": [],
@@ -900,7 +942,13 @@
       "strict": true,
       "summary": "Install a SessionStart hook that shows live cache context",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "setup.js"
+      ]
     },
     "status": {
       "aliases": [],
@@ -986,56 +1034,13 @@
       "strict": false,
       "summary": "Check cache status without fetching or writing",
       "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
-    },
-    "config": {
-      "aliases": [],
-      "args": {},
-      "description": "Show config subcommands for reading and writing Bonsai research cache configuration.",
-      "examples": [
-        {
-          "description": "get a configuration value",
-          "command": "<%= config.bin %> <%= command.id %> get storage"
-        },
-        {
-          "description": "set project storage mode",
-          "command": "<%= config.bin %> <%= command.id %> set storage project --local"
-        }
-      ],
-      "flags": {
-        "json": {
-          "description": "Format output as json.",
-          "helpGroup": "GLOBAL",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "read-only": {
-          "aliases": [
-            "plan"
-          ],
-          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
-          "name": "read-only",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "toon": {
-          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
-          "name": "toon",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "config",
-      "pluginAlias": "@taurgis/bonsai",
-      "pluginName": "@taurgis/bonsai",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Manage research cache configuration",
-      "enableJsonFlag": true,
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "status.js"
+      ]
     },
     "config:get": {
       "aliases": [],
@@ -1108,7 +1113,70 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Get a research configuration value",
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "config",
+        "get.js"
+      ]
+    },
+    "config": {
+      "aliases": [],
+      "args": {},
+      "description": "Show config subcommands for reading and writing Bonsai research cache configuration.",
+      "examples": [
+        {
+          "description": "get a configuration value",
+          "command": "<%= config.bin %> <%= command.id %> get storage"
+        },
+        {
+          "description": "set project storage mode",
+          "command": "<%= config.bin %> <%= command.id %> set storage project --local"
+        }
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "read-only": {
+          "aliases": [
+            "plan"
+          ],
+          "description": "(alias: --plan) block filesystem writes/deletes; network fetches still run; also honored via BONSAI_READ_ONLY/BONSAI_PLAN_MODE",
+          "name": "read-only",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "toon": {
+          "description": "emit the same envelope as --json, encoded as TOON (fewer tokens); cannot be combined with --json",
+          "name": "toon",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "config",
+      "pluginAlias": "@taurgis/bonsai",
+      "pluginName": "@taurgis/bonsai",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Manage research cache configuration",
+      "enableJsonFlag": true,
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "config",
+        "index.js"
+      ]
     },
     "config:list": {
       "aliases": [],
@@ -1175,7 +1243,14 @@
       "pluginType": "core",
       "strict": true,
       "summary": "List research configuration values",
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "config",
+        "list.js"
+      ]
     },
     "config:set": {
       "aliases": [],
@@ -1259,7 +1334,14 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Set a research configuration key",
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "config",
+        "set.js"
+      ]
     },
     "config:unset": {
       "aliases": [],
@@ -1338,8 +1420,15 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Remove a research configuration key",
-      "stdoutIsPrimaryData": true
+      "stdoutIsPrimaryData": true,
+      "isESM": true,
+      "relativePath": [
+        "dist",
+        "commands",
+        "config",
+        "unset.js"
+      ]
     }
   },
-  "version": "4.0.0"
+  "version": "4.1.0"
 }

@@ -1,19 +1,20 @@
-> For an index of all Next.js documentation, see [/docs/llms.txt](/docs/llms.txt).
+> For an index of all documentation, see [/docs/llms.txt](/docs/llms.txt).
+
 Next.js uses **file-system based routing**, meaning you can use folders and files to define routes. This page will guide you through how to create layouts and pages, and link between them.
 
 ## Creating a page
 
 A **page** is UI that is rendered on a specific route. To create a page, add a [`page` file](/docs/app/api-reference/file-conventions/page) inside the `app` directory and default export a React component. For example, to create an index page (`/`):
 
-![page.js special file](https://h8DxKfmAPhn8O0p3.public.blob.vercel-storage.com/docs/light/page-special-file.png)
+![page.js special file](/docs/light/page-special-file.png)
 
-```tsx filename="app/page.tsx" switcher
+```tsx title="app/page.tsx"
 export default function Page() {
   return <h1>Hello Next.js!</h1>
 }
 ```
 
-```jsx filename="app/page.js" switcher
+```jsx title="app/page.js"
 export default function Page() {
   return <h1>Hello Next.js!</h1>
 }
@@ -27,9 +28,9 @@ You can define a layout by default exporting a React component from a [`layout` 
 
 For example, to create a layout that accepts your index page as child, add a `layout` file inside the `app` directory:
 
-![layout.js special file](https://h8DxKfmAPhn8O0p3.public.blob.vercel-storage.com/docs/light/layout-special-file.png)
+![layout.js special file](/docs/light/layout-special-file.png)
 
-```tsx filename="app/layout.tsx" switcher
+```tsx title="app/layout.tsx"
 export default function DashboardLayout({
   children,
 }: {
@@ -47,7 +48,7 @@ export default function DashboardLayout({
 }
 ```
 
-```jsx filename="app/layout.js" switcher
+```jsx title="app/layout.js"
 export default function DashboardLayout({ children }) {
   return (
     <html lang="en">
@@ -67,20 +68,20 @@ The layout above is called a [root layout](/docs/app/api-reference/file-conventi
 
 A nested route is a route composed of multiple URL segments. For example, the `/blog/[slug]` route is composed of three segments:
 
-* `/` (Root Segment)
-* `blog` (Segment)
-* `[slug]` (Leaf Segment)
+- `/` (Root Segment)
+- `blog` (Segment)
+- `[slug]` (Leaf Segment)
 
 In Next.js:
 
-* **Folders** are used to define the route segments that map to URL segments.
-* **Files** (like `page` and `layout`) are used to create UI that is shown for a segment.
+- **Folders** are used to define the route segments that map to URL segments.
+- **Files** (like `page` and `layout`) are used to create UI that is shown for a segment.
 
 To create nested routes, you can nest folders inside each other. For example, to add a route for `/blog`, create a folder called `blog` in the `app` directory. Then, to make `/blog` publicly accessible, add a `page.tsx` file:
 
-![File hierarchy showing blog folder and a page.js file](https://h8DxKfmAPhn8O0p3.public.blob.vercel-storage.com/docs/light/blog-nested-route.png)
+![File hierarchy showing blog folder and a page.js file](/docs/light/blog-nested-route.png)
 
-```tsx filename="app/blog/page.tsx" switcher
+```tsx title="app/blog/page.tsx"
 // Dummy imports
 import { getPosts } from '@/lib/posts'
 import { Post } from '@/ui/post'
@@ -98,7 +99,7 @@ export default async function Page() {
 }
 ```
 
-```jsx filename="app/blog/page.js" switcher
+```jsx title="app/blog/page.js"
 // Dummy imports
 import { getPosts } from '@/lib/posts'
 import { Post } from '@/ui/post'
@@ -118,18 +119,18 @@ export default async function Page() {
 
 You can continue nesting folders to create nested routes. For example, to create a route for a specific blog post, create a new `[slug]` folder inside `blog` and add a `page` file:
 
-![File hierarchy showing blog folder with a nested slug folder and a page.js file](https://h8DxKfmAPhn8O0p3.public.blob.vercel-storage.com/docs/light/blog-post-nested-route.png)
+![File hierarchy showing blog folder with a nested slug folder and a page.js file](/docs/light/blog-post-nested-route.png)
 
-```tsx filename="app/blog/[slug]/page.tsx" switcher
-function generateStaticParams() {}
+```tsx title="app/blog/[slug]/page.tsx"
+export function generateStaticParams() {}
 
 export default function Page() {
   return <h1>Hello, Blog Post Page!</h1>
 }
 ```
 
-```jsx filename="app/blog/[slug]/page.js" switcher
-function generateStaticParams() {}
+```jsx title="app/blog/[slug]/page.js"
+export function generateStaticParams() {}
 
 export default function Page() {
   return <h1>Hello, Blog Post Page!</h1>
@@ -144,9 +145,9 @@ By default, layouts in the folder hierarchy are also nested, which means they wr
 
 For example, to create a layout for the `/blog` route, add a new `layout` file inside the `blog` folder.
 
-![File hierarchy showing root layout wrapping the blog layout](https://h8DxKfmAPhn8O0p3.public.blob.vercel-storage.com/docs/light/nested-layouts.png)
+![File hierarchy showing root layout wrapping the blog layout](/docs/light/nested-layouts.png)
 
-```tsx filename="app/blog/layout.tsx" switcher
+```tsx title="app/blog/layout.tsx"
 export default function BlogLayout({
   children,
 }: {
@@ -156,7 +157,7 @@ export default function BlogLayout({
 }
 ```
 
-```jsx filename="app/blog/layout.js" switcher
+```jsx title="app/blog/layout.js"
 export default function BlogLayout({ children }) {
   return <section>{children}</section>
 }
@@ -170,7 +171,7 @@ If you were to combine the two layouts above, the root layout (`app/layout.js`) 
 
 To create a dynamic segment, wrap the segment (folder) name in square brackets: `[segmentName]`. For example, in the `app/blog/[slug]/page.tsx` route, the `[slug]` is the dynamic segment.
 
-```tsx filename="app/blog/[slug]/page.tsx" switcher
+```tsx title="app/blog/[slug]/page.tsx"
 export default async function BlogPostPage({
   params,
 }: {
@@ -188,7 +189,7 @@ export default async function BlogPostPage({
 }
 ```
 
-```jsx filename="app/blog/[slug]/page.js" switcher
+```jsx title="app/blog/[slug]/page.js"
 export default async function BlogPostPage({ params }) {
   const { slug } = await params
   const post = await getPost(slug)
@@ -204,13 +205,13 @@ export default async function BlogPostPage({ params }) {
 
 Learn more about [Dynamic Segments](/docs/app/api-reference/file-conventions/dynamic-routes) and the [`params`](/docs/app/api-reference/file-conventions/page#params-optional) props.
 
-Nested [layouts within Dynamic Segments](/docs/app/api-reference/file-conventions/layout#params-optional), can also access the `params` props.
+Nested [layouts within Dynamic Segments](/docs/app/api-reference/file-conventions/layout#params-optional) can also access the `params` props.
 
 ## Rendering with search params
 
 In a Server Component **page**, you can access search parameters using the [`searchParams`](/docs/app/api-reference/file-conventions/page#searchparams-optional) prop:
 
-```tsx filename="app/page.tsx" switcher
+```tsx title="app/page.tsx"
 export default async function Page({
   searchParams,
 }: {
@@ -220,7 +221,7 @@ export default async function Page({
 }
 ```
 
-```jsx filename="app/page.jsx" switcher
+```jsx title="app/page.jsx"
 export default async function Page({ searchParams }) {
   const filters = (await searchParams).filters
 }
@@ -234,9 +235,9 @@ Learn more about `useSearchParams` in [prerendered](/docs/app/api-reference/func
 
 ### What to use and when
 
-* Use the `searchParams` prop when you need search parameters to **load data for the page** (e.g. pagination, filtering from a database).
-* Use `useSearchParams` when search parameters are used **only on the client** (e.g. filtering a list already loaded via props).
-* As a small optimization, you can use `new URLSearchParams(window.location.search)` in **callbacks or event handlers** to read search params without triggering re-renders.
+- Use the `searchParams` prop when you need search parameters to **load data for the page** (e.g. pagination, filtering from a database).
+- Use `useSearchParams` when search parameters are used **only on the client** (e.g. filtering a list already loaded via props).
+- As a small optimization, you can use `new URLSearchParams(window.location.search)` in **callbacks or event handlers** to read search params without triggering re-renders.
 
 ## Linking between pages
 
@@ -244,7 +245,7 @@ You can use the [`<Link>` component](/docs/app/api-reference/components/link) to
 
 For example, to generate a list of blog posts, import `<Link>` from `next/link` and pass a `href` prop to the component:
 
-```tsx filename="app/ui/post.tsx" highlight={1,2,11} switcher
+```tsx highlight={1,2,11} title="app/ui/post.tsx"
 import Link from 'next/link'
 import { getPosts } from '@/lib/posts'
 
@@ -263,7 +264,7 @@ export default async function Posts() {
 }
 ```
 
-```jsx filename="app/ui/post.js" highlight={1,2,11} switcher
+```jsx highlight={1,2,11} title="app/ui/post.js"
 import Link from 'next/link'
 import { getPosts } from '@/lib/posts'
 
@@ -282,25 +283,27 @@ export default async function Posts() {
 }
 ```
 
-> **Good to know**: `<Link>` is the primary way to navigate between routes in Next.js. You can also use the [`useRouter` hook](/docs/app/api-reference/functions/use-router) for more advanced navigation.
+> **Good to know:**
+>
+> `<Link>` is the primary way to navigate between routes in Next.js. You can also use the [`useRouter` hook](/docs/app/api-reference/functions/use-router) for more advanced navigation.
 
 ## Route Props Helpers
 
 Next.js exposes utility types that infer `params` and named slots from your route structure:
 
-* [**PageProps**](/docs/app/api-reference/file-conventions/page#page-props-helper): Props for `page` components, including `params` and `searchParams`.
-* [**LayoutProps**](/docs/app/api-reference/file-conventions/layout#layout-props-helper): Props for `layout` components, including `children` and any named slots (e.g. folders like `@analytics`).
+- [**PageProps**](/docs/app/api-reference/file-conventions/page#page-props-helper): Props for `page` components, including `params` and `searchParams`.
+- [**LayoutProps**](/docs/app/api-reference/file-conventions/layout#layout-props-helper): Props for `layout` components, including `children` and any named slots (e.g. folders like `@analytics`).
 
 These are globally available helpers, generated when running either `next dev`, `next build` or [`next typegen`](/docs/app/api-reference/cli/next#next-typegen-options).
 
-```tsx filename="app/blog/[slug]/page.tsx"
+```tsx title="app/blog/[slug]/page.tsx"
 export default async function Page(props: PageProps<'/blog/[slug]'>) {
   const { slug } = await props.params
   return <h1>Blog post: {slug}</h1>
 }
 ```
 
-```tsx filename="app/dashboard/layout.tsx"
+```tsx title="app/dashboard/layout.tsx"
 export default function Layout(props: LayoutProps<'/dashboard'>) {
   return (
     <section>
@@ -312,28 +315,24 @@ export default function Layout(props: LayoutProps<'/dashboard'>) {
 }
 ```
 
-> **Good to know**
+> **Good to know:**
 >
-> * Static routes resolve `params` to `{}`.
-> * `PageProps`, `LayoutProps` are global helpers — no imports required.
-> * Types are generated during `next dev`, `next build` or `next typegen`.
+> - Static routes resolve `params` to `{}`.
+> - `PageProps`, `LayoutProps` are global helpers — no imports required.
+> - Types are generated during `next dev`, `next build` or `next typegen`.
+
 ## API Reference
 
 Learn more about the features mentioned in this page by reading the API Reference.
 
-- [Linking and Navigating](/docs/app/getting-started/linking-and-navigating)
-  - Learn how the built-in navigation optimizations work, including prefetching, prerendering, and client-side navigation, and how to optimize navigation for dynamic routes and slow networks.
-- [layout.js](/docs/app/api-reference/file-conventions/layout)
-  - API reference for the layout.js file.
-- [page.js](/docs/app/api-reference/file-conventions/page)
-  - API reference for the page.js file.
-- [Link Component](/docs/app/api-reference/components/link)
-  - Enable fast client-side navigation with the built-in `next/link` component.
-- [Dynamic Segments](/docs/app/api-reference/file-conventions/dynamic-routes)
-  - Use Dynamic Segments to read URL path params and generate routes from dynamic data.
+- [Linking and Navigating](/docs/app/getting-started/linking-and-navigating): Learn how the built-in navigation optimizations work, including prefetching, prerendering, and client-side navigation, and how to optimize navigation for dynamic routes and slow networks.
+- [layout.js](/docs/app/api-reference/file-conventions/layout): API reference for the layout.js file.
+- [page.js](/docs/app/api-reference/file-conventions/page): API reference for the page.js file.
+- [Link Component](/docs/app/api-reference/components/link): Enable fast client-side navigation with the built-in \`next/link\` component.
+- [Dynamic Segments](/docs/app/api-reference/file-conventions/dynamic-routes): Use Dynamic Segments to read URL path params and generate routes from dynamic data.
 
 ---
 
-For a semantic overview of all documentation, see [/docs/sitemap.md](/docs/sitemap.md)
+For a semantic overview of all documentation, see [/sitemap.md](/sitemap.md)
 
 For an index of all available documentation, see [/docs/llms.txt](/docs/llms.txt)

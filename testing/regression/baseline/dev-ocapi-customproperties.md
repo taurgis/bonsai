@@ -49,7 +49,7 @@ The value types **HTML** and **Image** are only supported as output, but not as 
 ## Document Types Supporting Custom Properties
 
 The tables below lists the document types that support custom properties in OCAPI SHOP and DATA APIs. OCAPI `modify...` hooks that used the referenced document types can
-add custom properties using the `c_` prefix. See [Customization With Hooks](https://developer.salesforce.com/docs/commerce/commerce-api/guide/extensibility_via_hooks.html), [Hooks for SHOP API](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-shop.html), and [Hooks for DATA API](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-data.html) for more information.
+add custom properties using the `c_` prefix. See [Customization With Hooks](https://developer.salesforce.com/docs/commerce/commerce-api/guide/extensibility_via_hooks.md), [Hooks for SHOP API](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-shop.md), and [Hooks for DATA API](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/hooks-data.md) for more information.
 
 ### SHOP API
 

@@ -28,7 +28,7 @@ The interpreter acts as a simple calculator: you can type an expression into it 
 \>>> 8 / 5  \# division always returns a floating-point number
 1.6
 
-The integer numbers (e.g. `2`, `4`, `20`) have type [`int`](https://docs.python.org/3/library/functions.html#int "int"), the ones with a fractional part (e.g. `5.0`, `1.6`) have type [`float`](https://docs.python.org/3/library/functions.html#float "float"). We will see more about numeric types later in the tutorial.
+The integer numbers (e.g. `2`, `4`, `20`) have type [`int`](https://docs.python.org/3/builtins/functions.html#int "int"), the ones with a fractional part (e.g. `5.0`, `1.6`) have type [`float`](https://docs.python.org/3/builtins/functions.html#float "float"). We will see more about numeric types later in the tutorial.
 
 Division (`/`) always returns a float. To do [floor division](https://docs.python.org/3/glossary.html#term-floor-division) and get an integer result you can use the `//` operator; to calculate the remainder you can use `%`:
 
@@ -78,11 +78,11 @@ In interactive mode, the last printed expression is assigned to the variable `_`
 
 This variable should be treated as read-only by the user. Don’t explicitly assign a value to it — you would create an independent local variable with the same name masking the built-in variable with its magic behavior.
 
-In addition to [`int`](https://docs.python.org/3/library/functions.html#int "int") and [`float`](https://docs.python.org/3/library/functions.html#float "float"), Python supports other types of numbers, such as [`Decimal`](https://docs.python.org/3/library/decimal.html#decimal.Decimal "decimal.Decimal") and [`Fraction`](https://docs.python.org/3/library/fractions.html#fractions.Fraction "fractions.Fraction"). Python also has built-in support for [complex numbers](https://docs.python.org/3/library/stdtypes.html#typesnumeric), and uses the `j` or `J` suffix to indicate the imaginary part (e.g. `3+5j`).
+In addition to [`int`](https://docs.python.org/3/builtins/functions.html#int "int") and [`float`](https://docs.python.org/3/builtins/functions.html#float "float"), Python supports other types of numbers, such as [`Decimal`](https://docs.python.org/3/library/decimal.html#decimal.Decimal "decimal.Decimal") and [`Fraction`](https://docs.python.org/3/library/fractions.html#fractions.Fraction "fractions.Fraction"). Python also has built-in support for [complex numbers](https://docs.python.org/3/builtins/stdtypes.html#typesnumeric), and uses the `j` or `J` suffix to indicate the imaginary part (e.g. `3+5j`).
 
 ### 3.1.2. Text[¶](https://docs.python.org/3/tutorial/introduction.html#text "Link to this heading")
 
-Python can manipulate text (represented by type [`str`](https://docs.python.org/3/library/stdtypes.html#str "str"), so-called “strings”) as well as numbers. This includes characters “`!`”, words “`rabbit`”, names “`Paris`”, sentences “`Got your back.`”, etc. “`Yay! :)`”. They can be enclosed in single quotes (`'...'`) or double quotes (`"..."`) with the same result [\[2\]](https://docs.python.org/3/tutorial/introduction.html#id4).
+Python can manipulate text (represented by type [`str`](https://docs.python.org/3/builtins/stdtypes.html#str "str"), so-called “strings”) as well as numbers. This includes characters “`!`”, words “`rabbit`”, names “`Paris`”, sentences “`Got your back.`”, etc. “`Yay! :)`”. They can be enclosed in single quotes (`'...'`) or double quotes (`"..."`) with the same result [\[2\]](https://docs.python.org/3/tutorial/introduction.html#id4).
 
 \>>> 'spam eggs'  \# single quotes
 'spam eggs'
@@ -104,7 +104,7 @@ To quote a quote, we need to “escape” it, by preceding it with `\`. Alternat
 \>>> '"Isn\\'t," they said.'
 '"Isn\\'t," they said.'
 
-In the Python shell, the string definition and output string can look different. The [`print()`](https://docs.python.org/3/library/functions.html#print "print") function produces a more readable output, by omitting the enclosing quotes and by printing escaped and special characters:
+In the Python shell, the string definition and output string can look different. The [`print()`](https://docs.python.org/3/builtins/functions.html#print "print") function produces a more readable output, by omitting the enclosing quotes and by printing escaped and special characters:
 
 \>>> s \= 'First line.\\nSecond line.'  \# \\n means newline
 \>>> s  \# without print(), special characters are included in the string
@@ -256,7 +256,7 @@ If you need a different string, you should create a new one:
 \>>> word\[:2\] + 'py'
 'Pypy'
 
-The built-in function [`len()`](https://docs.python.org/3/library/functions.html#len "len") returns the length of a string:
+The built-in function [`len()`](https://docs.python.org/3/builtins/functions.html#len "len") returns the length of a string:
 
 \>>> s \= 'supercalifragilisticexpialidocious'
 \>>> len(s)
@@ -293,7 +293,7 @@ Unlike strings, which are [immutable](https://docs.python.org/3/glossary.html#te
 \>>> cubes
 \[1, 8, 27, 64, 125\]
 
-You can also add new items at the end of the list, by using the [`list.append()`](https://docs.python.org/3/library/stdtypes.html#list.append "list.append") _method_ (we will see more about methods later):
+You can also add new items at the end of the list, by using the [`list.append()`](https://docs.python.org/3/builtins/stdtypes.html#list.append "list.append") _method_ (we will see more about methods later):
 
 \>>> cubes.append(216)  \# add the cube of 6
 \>>> cubes.append(7 \*\* 3)  \# and the cube of 7
@@ -337,7 +337,7 @@ Assignment to slices is also possible, and this can even change the size of the 
 \>>> letters
 \[\]
 
-The built-in function [`len()`](https://docs.python.org/3/library/functions.html#len "len") also applies to lists:
+The built-in function [`len()`](https://docs.python.org/3/builtins/functions.html#len "len") also applies to lists:
 
 \>>> letters \= \['a', 'b', 'c', 'd'\]
 \>>> len(letters)
@@ -382,7 +382,7 @@ This example introduces several new features.
 
 *   The _body_ of the loop is _indented_: indentation is Python’s way of grouping statements. At the interactive prompt, you have to type a tab or space(s) for each indented line. In practice you will prepare more complicated input for Python with a text editor; all decent text editors have an auto-indent facility. When a compound statement is entered interactively, it must be followed by a blank line to indicate completion (since the parser cannot guess when you have typed the last line). Note that each line within a basic block must be indented by the same amount.
 
-*   The [`print()`](https://docs.python.org/3/library/functions.html#print "print") function writes the value of the argument(s) it is given. It differs from just writing the expression you want to write (as we did earlier in the calculator examples) in the way it handles multiple arguments, floating-point quantities, and strings. Strings are printed without quotes, and a space is inserted between items, so you can format things nicely, like this:
+*   The [`print()`](https://docs.python.org/3/builtins/functions.html#print "print") function writes the value of the argument(s) it is given. It differs from just writing the expression you want to write (as we did earlier in the calculator examples) in the way it handles multiple arguments, floating-point quantities, and strings. Strings are printed without quotes, and a space is inserted between items, so you can format things nicely, like this:
 
     \>>> i \= 256\*256
     \>>> print('The value of i is', i)

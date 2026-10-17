@@ -9,9 +9,10 @@ import type { SiteFetchResult } from '../types.js';
 // shadow-DOM render and returns the article's actual source (code fences, admonitions intact).
 //
 // Coverage is rolling out per doc set, so the probe result is only a candidate (T-19/T-24):
-// unsupported articles 404, and atlas.* books answer the .md route with an HTTP 200 HTML SPA
-// shell — which makes the strict content-type + body validation in probeMarkdownTwin
-// load-bearing, not defensive garnish.
+// unsupported articles 404, and some atlas.* books still answer the .md route with an HTTP 200
+// HTML SPA shell. Others (REST API, Bulk API's successor) now redirect that same .md route to a
+// real text/markdown article under /docs/platform. Content-type validation rejects the shells;
+// skipping atlas.* up front would miss the books that moved.
 
 const DEVELOPER_HOST = 'developer.salesforce.com';
 
@@ -25,8 +26,9 @@ const PROBE_HEADERS = {
 
 /**
  * Derives the candidate `.md` route for a developer.salesforce.com doc URL, or null when the URL
- * can't serve one (wrong host, not under /docs/, or an atlas.* book — verified to answer `.md`
- * with an HTML shell, never Markdown). Query/hash are view state and are dropped.
+ * can't serve one (wrong host, or not under /docs/). Atlas books are included: a shell is
+ * rejected later by content-type, and a redirect to Markdown is kept. Query/hash are view
+ * state and are dropped.
  *
  * @param url - A developer.salesforce.com doc URL (or any URL; non-matching returns null).
  * @returns The derived `.md` URL, or null when no `.md` route exists for this URL.
@@ -40,7 +42,7 @@ export function deriveMarkdownUrl(url: string): string | null {
   }
   if (parsed.hostname.toLowerCase() !== DEVELOPER_HOST) return null;
   let path = parsed.pathname.replace(/\/+$/, '');
-  if (!path.startsWith('/docs/') || path.startsWith('/docs/atlas.')) return null;
+  if (!path.startsWith('/docs/')) return null;
   if (path.endsWith('.md')) return `https://${DEVELOPER_HOST}${path}`;
   path = path.replace(/\.html?$/i, '');
   return `https://${DEVELOPER_HOST}${path}.md`;

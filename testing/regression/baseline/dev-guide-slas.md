@@ -1,6 +1,6 @@
 # Shopper Login and API Access Service (SLAS) Overview
 
-The Shopper Login and API Access Service (SLAS) enables secure access to the Shopper APIs of the B2C Commerce API and the [Open Commerce API](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/get-started-with-ocapi.html) (OCAPI).
+The Shopper Login and API Access Service (SLAS) enables secure access to the Shopper APIs of the B2C Commerce API and the [Open Commerce API](https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/get-started-with-ocapi.md) (OCAPI).
 
 Two admin tools are available for setting up SLAS: the [SLAS Admin API](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=slas-admin\:Summary) and the SLAS Admin UI. Both admin tools use Account Manager for access control, and they both require that you have the **SLAS Organization Administrator** role and the correct filters applied for your B2C Commerce instances.
 
@@ -10,7 +10,7 @@ To access the SLAS Admin UI, replace `{short-code}` in the following URL with th
 https://{short-code}.api.commercecloud.salesforce.com/shopper/auth-admin/v1/ui/
 ```
 
-To learn more about short codes, see the [Base URL and Request Formation](/docs/commerce/b2c-commerce/guide/base-url.html) guide.
+To learn more about short codes, see the [Base URL and Request Formation](/docs/commerce/b2c-commerce/guide/base-url.md) guide.
 
 For advice on how to use SLAS under high-volume situations, see this article on the Salesforce Developers blog: [Shopper Login API: Techniques and Tricks to Get the Most Out of High-Volume Holidays](https://developer.salesforce.com/blogs/2022/11/shopper-login-api-techniques-and-tricks-to-get-the-most-out-of-high-volume-holidays).
 
@@ -37,6 +37,8 @@ The following table summarizes which client types are used by the most common ty
 - The previous actions cause token bloat and do not work as expected.
 :::
 
+To create, inspect, or update clients from your terminal, see [Manage SLAS Clients with the B2C CLI](/docs/commerce/b2c-commerce/guide/authorization-for-shopper-apis.md#slas-admin-ui-create-a-slas-client). The CLI can append scopes, channels, and redirect URIs while preserving existing values.
+
 ## Grant Types and Token Types
 
 The SLAS API is based on grant types defined by the [OAuth 2.1](https://oauth.net/2.1/) standard.
@@ -53,21 +55,21 @@ To get a SLAS token for a B2C Commerce session, use the [getSessionBridgeAccessT
 
 The following table summarizes the different grant types and token types used by each type of SLAS client and user authentication method.
 
-| SLAS Client | Authentication Method                   | Method                                                                                                                         | Grant Type              | Token       |
-| ----------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------- | ----------- |
-| Public      | None (guest user)                       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.html)                    | authorization_code_pkce | Shopper     |
-| Public      | Registered user (federated login)       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.html)                    | authorization_code_pkce | Shopper     |
-| Public      | Registered user (B2C Commerce login)    | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.html)                    | authorization_code_pkce | Shopper     |
-| Private     | None (guest user)                       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.html)                   | client_credentials      | Shopper     |
-| Private     | Registered user (federated login)       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.html)                   | authorization_code      | Shopper     |
-| Private     | Registered user (B2C Commerce login)    | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.html)                   | authorization_code      | Shopper     |
-| Private     | Registered user (B2C Commerce login)    | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.html)                   | authorization_code_pkce | Shopper     |
-| Private     | Trusted system on behalf of (TSOB) user | [getTrustedSystemAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-trusted-system.html)      | client_credentials      | ShopperTsob |
-| Public      | Session Bridge (guest user)             | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.html) | session_bridge          | ShopperSesb |
-| Public      | Session Bridge (B2C Commerce login)     | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.html) | session_bridge          | ShopperSesb |
-| Private     | Session Bridge (guest user)             | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.html) | client_credentials      | ShopperSesb |
-| Private     | Session Bridge (B2C Commerce login)     | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.html) | client_credentials      | ShopperSesb |
-| Private     | Trusted agent on behalf of (TAOB)       | [getTrustedAgentAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-trusted-agent.html)        | client_credentials      | ShopperTaob |
+| SLAS Client | Authentication Method                   | Method                                                                                                                       | Grant Type              | Token       |
+| ----------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ----------- |
+| Public      | None (guest user)                       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.md)                    | authorization_code_pkce | Shopper     |
+| Public      | Registered user (federated login)       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.md)                    | authorization_code_pkce | Shopper     |
+| Public      | Registered user (B2C Commerce login)    | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.md)                    | authorization_code_pkce | Shopper     |
+| Private     | None (guest user)                       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.md)                   | client_credentials      | Shopper     |
+| Private     | Registered user (federated login)       | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.md)                   | authorization_code      | Shopper     |
+| Private     | Registered user (B2C Commerce login)    | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.md)                   | authorization_code      | Shopper     |
+| Private     | Registered user (B2C Commerce login)    | [getAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.md)                   | authorization_code_pkce | Shopper     |
+| Private     | Trusted system on behalf of (TSOB) user | [getTrustedSystemAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-trusted-system.md)      | client_credentials      | ShopperTsob |
+| Public      | Session Bridge (guest user)             | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.md) | session_bridge          | ShopperSesb |
+| Public      | Session Bridge (B2C Commerce login)     | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.md) | session_bridge          | ShopperSesb |
+| Private     | Session Bridge (guest user)             | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.md) | client_credentials      | ShopperSesb |
+| Private     | Session Bridge (B2C Commerce login)     | [getSessionBridgeAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-session-bridge-auth.md) | client_credentials      | ShopperSesb |
+| Private     | Trusted agent on behalf of (TAOB)       | [getTrustedAgentAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-trusted-agent.md)        | client_credentials      | ShopperTaob |
 
 ## Access Tokens and Refresh Tokens
 
@@ -99,7 +101,7 @@ To initialize an Agentforce session, obtain a SLAS shopper access token that inc
 To prevent unauthorized access across different storefronts, the `channel_id` (site) parameter is required when requesting a guest access token with a `grant_type` of `client_credentials` or `authorization_code_pkce`. If this parameter is missing, your request receives a 400 invalid refresh token error.
 
 :::important
-Following a tiered rollout, the `channel_id` parameter requirement started being enforced for all production tenants on 9/9/25. For details, see the [SLAS Release Notes](https://developer.salesforce.com/docs/commerce/commerce-api/references/about-commerce-api/about.html#03182025).
+Following a tiered rollout, the `channel_id` parameter requirement started being enforced for all production tenants on 3/25/25. For details, see the [SLAS Release Notes](https://developer.salesforce.com/docs/commerce/commerce-api/references/about-commerce-api/about.md#03182025).
 Existing customers must update their implementation to include the `channel_id` parameter in their guest access token requests.
 :::
 
@@ -187,7 +189,7 @@ You can view token details in the decoded access token, such as token lifespan o
 
 - `scp`: Scopes in the token. Unless specific scopes are requests, this will be the scopes of the SLAS client.
 - `sub`: Contains the client_id, tenant_id, and usid.
-- `dnt`: Shopper tracking preferences. For details, see [Manage Shopper Tracking Preferences](/docs/commerce/b2c-commerce/guide/slas-tracking-preferences.html).
+- `dnt`: Shopper tracking preferences. For details, see [Manage Shopper Tracking Preferences](/docs/commerce/b2c-commerce/guide/slas-tracking-preferences.md).
 - `isb`: Contains IDP origin, shopper information, guest id, registered shopper id, token type and channel id.
 
 ## Verify the SLAS Password Action Callback
@@ -317,7 +319,7 @@ public boolean isSignatureValid(String callbackJwt) {
 
 You can incorporate shopper tracking preferences into your applications. When you get a SLAS token using `getAccessToken`, you specify a tracking preference. The tracking preference is respected for all requests using that token. After the B2C Commerce 24.4 release, the Shopper Login API will include a boolean `dnt` parameter to set `Do Not Track` for the session. If not defined, the `dnt` value defaults to `false`.
 
-For details, see: [Manage Shopper Tracking Preferences.](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-tracking-preferences.html)
+For details, see: [Manage Shopper Tracking Preferences.](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-tracking-preferences.md)
 
 ## View SLAS Error Logs in Log Center
 
@@ -325,7 +327,7 @@ SLAS 4xx and 5xx error logs are available in Log Center, which provides multiple
 
 To access SLAS 4xx and 5xx error logs:
 
-1. If you built your site using Progressive Web App (PWA) Kit, first complete the prerequisites described in [Debug Using Log Center](/docs/commerce/b2c-commerce/guide/debugging.html#debug-using-log-center).
+1. If you built your site using Progressive Web App (PWA) Kit, first complete the prerequisites described in [Debug Using Log Center](/docs/commerce/b2c-commerce/guide/debugging.md#debug-using-log-center).
 2. [Start Log Center](https://help.salesforce.com/s/articleView?id=cc.b2c_start_log_center.htm\&type=5).
 3. Select a Region.
 4. Select a [Realm](https://help.salesforce.com/s/articleView?id=cc.b2c_platform_overview.htm\&type=5). If you don’t know your realm ID, ask your Account Executive (AE) or Customer Success Manager (CSM).
@@ -338,7 +340,7 @@ To access SLAS 4xx and 5xx error logs:
 
 ## SLAS Rate Limits
 
-For SLAS rate limits, troubleshooting guidance, and best practices, see [Load Shedding and Rate Limiting](/docs/commerce/b2c-commerce/guide/throttle-rates.html#shopper-login-and-api-access-service-slas).
+For SLAS rate limits, troubleshooting guidance, and best practices, see [Load Shedding and Rate Limiting](/docs/commerce/b2c-commerce/guide/throttle-rates.md#shopper-login-and-api-access-service-slas).
 
 ## Constraints
 
@@ -346,7 +348,7 @@ For SLAS rate limits, troubleshooting guidance, and best practices, see [Load Sh
 
 - Some SLAS endpoints, including [authenticateCustomer](https://developer.salesforce.com/docs/commerce/commerce-api/references/auth?meta=authenticateCustomer), communicate with the associated B2C Commerce instance. If the instance is unavailable, calls to these endpoints will fail.
 
-- [SCAPI hooks](/docs/commerce/b2c-commerce/guide/extensibility_via_hooks.html) including hooks on `dw.ocapi.shop.customer.auth.*` can conflict with SLAS calls. If SLAS calls are unexpectedly failing, check your B2C Commerce logs for hook invocation errors.
+- [SCAPI hooks](/docs/commerce/b2c-commerce/guide/extensibility_via_hooks.md) including hooks on `dw.ocapi.shop.customer.auth.*` can conflict with SLAS calls. If SLAS calls are unexpectedly failing, check your B2C Commerce logs for hook invocation errors.
 
 - If a shopper account associated with an access token is disabled or deleted, any subsequent requests made with that access token will fail.
 
@@ -360,13 +362,13 @@ For SLAS rate limits, troubleshooting guidance, and best practices, see [Load Sh
 
 ## Next Steps
 
-If you haven’t already, set up your public SLAS clients or private SLAS clients by following the instructions in [Authorization for Shopper APIs](/docs/commerce/b2c-commerce/guide/authorization-for-shopper-apis.html) in the Get Started guides.
+If you haven’t already, set up your public SLAS clients or private SLAS clients by following the instructions in [Authorization for Shopper APIs](/docs/commerce/b2c-commerce/guide/authorization-for-shopper-apis.md) in the Get Started guides.
 
 After setting up your SLAS clients, see the SLAS guides that cover how to use both the main SLAS API and the SLAS Admin API:
 
-- [Public SLAS Client Use Cases](/docs/commerce/b2c-commerce/guide/slas-public-client.html) (main SLAS API)
-- [Private SLAS Client Use Cases](/docs/commerce/b2c-commerce/guide/slas-private-client.html) (main SLAS API)
-- [SLAS Identity Providers](/docs/commerce/b2c-commerce/guide/slas-identity-providers.html) (SLAS Admin API)
+- [Public SLAS Client Use Cases](/docs/commerce/b2c-commerce/guide/slas-public-client.md) (main SLAS API)
+- [Private SLAS Client Use Cases](/docs/commerce/b2c-commerce/guide/slas-private-client.md) (main SLAS API)
+- [SLAS Identity Providers](/docs/commerce/b2c-commerce/guide/slas-identity-providers.md) (SLAS Admin API)
 
 For more technical details on the capabilities of the SLAS APIs, explore the API specifications in the Reference section:
 
