@@ -31,21 +31,13 @@ vi.mock('./salesforce-dom-probe.js', async (importOriginal) => {
 });
 vi.mock('../lib/research/fetcher.js', () => ({
   checkDnsSafety: vi.fn().mockResolvedValue(undefined),
-  fetchText: vi.fn().mockResolvedValue({
-    status: 200,
-    contentType: 'text/html',
-    etag: null,
-    lastModified: null,
-    finalUrl: 'https://help.salesforce.com/',
-    responseSize: 0,
-    content: '<html></html>',
-  }),
+  fetchStatus: vi.fn().mockResolvedValue(200),
 }));
 
 import { fetchSalesforceDoc } from './salesforce-doc-fetch.js';
 import { openCdpPage } from '../lib/research/browser.js';
 import { pollSalesforceContentReady } from './salesforce-dom-probe.js';
-import { checkDnsSafety, fetchText } from '../lib/research/fetcher.js';
+import { checkDnsSafety, fetchStatus } from '../lib/research/fetcher.js';
 
 const DOC_OPTIONS = {
   allowedHost: 'help.salesforce.com',
@@ -100,15 +92,7 @@ function fakePage(
 
 beforeEach(() => {
   vi.mocked(checkDnsSafety).mockResolvedValue(undefined);
-  vi.mocked(fetchText).mockResolvedValue({
-    status: 200,
-    contentType: 'text/html',
-    etag: null,
-    lastModified: null,
-    finalUrl: 'https://help.salesforce.com/',
-    responseSize: 0,
-    content: '<html></html>',
-  });
+  vi.mocked(fetchStatus).mockResolvedValue(200);
   vi.mocked(pollSalesforceContentReady).mockResolvedValue(undefined);
 });
 
@@ -387,7 +371,7 @@ describe('fetchSalesforceDoc', () => {
 
   it('skips Chrome when the document URL is HTTP 404', async () => {
     vi.mocked(openCdpPage).mockClear();
-    vi.mocked(fetchText).mockRejectedValueOnce(new Error('Fetch failed with status 404'));
+    vi.mocked(fetchStatus).mockRejectedValueOnce(new Error('Fetch failed with status 404'));
 
     await expect(
       fetchSalesforceDoc(

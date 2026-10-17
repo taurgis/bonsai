@@ -5,7 +5,7 @@ import {
   describeNavigationFailure,
   type CdpPage,
 } from '../lib/research/browser.js';
-import { checkDnsSafety, fetchText } from '../lib/research/fetcher.js';
+import { checkDnsSafety, fetchStatus } from '../lib/research/fetcher.js';
 import { htmlToMarkdown } from '../lib/research/markdown.js';
 import { sanitizePromptInjection } from '../lib/research/prompt-injection.js';
 import { contentMetrics, contentRicherThan } from '../lib/research/regression.js';
@@ -373,7 +373,7 @@ export function sameSalesforceArticle(requested: string, finalUrl: string): bool
 
 async function assertSalesforceDocumentExists(url: string): Promise<void> {
   try {
-    await fetchText(url, { headers: DOC_PROBE_HEADERS, timeoutMs: 8_000 });
+    await fetchStatus(url, { headers: DOC_PROBE_HEADERS, timeoutMs: 8_000 });
   } catch (err) {
     const message = err instanceof Error ? err.message : '';
     // Any other failure (WAF 403, timeout) still goes to the browser. Only a real

@@ -31,10 +31,21 @@ export function valueTakingFlagTokensFromCommands(
   commands: Record<string, typeof Command>,
   extraBaseFlags: Record<string, FlagDef> = {}
 ): Set<string> {
+  const maps = (Object.values(commands) as CommandClass[]).map((command) => ({
+    ...extraBaseFlags,
+    ...command.baseFlags,
+    ...command.flags,
+  }));
+  return valueTakingFlagTokensFromFlagMaps(maps);
+}
+
+/** Same token set, read from a generated oclif manifest instead of command classes. */
+export function valueTakingFlagTokensFromFlagMaps(
+  flagMaps: Array<Record<string, FlagDef> | undefined>
+): Set<string> {
   const tokens = new Set<string>();
-  for (const command of Object.values(commands) as CommandClass[]) {
-    const flags = { ...extraBaseFlags, ...command.baseFlags, ...command.flags };
-    for (const [name, flag] of Object.entries(flags)) {
+  for (const flags of flagMaps) {
+    for (const [name, flag] of Object.entries(flags ?? {})) {
       if (!flag || flag.type === 'boolean') continue;
       for (const token of flagTokens(name, flag)) tokens.add(token);
     }

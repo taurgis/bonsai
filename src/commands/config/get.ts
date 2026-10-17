@@ -1,5 +1,5 @@
 import { Args } from '@oclif/core';
-import { ConfigCommand, configScopeFlags } from './base.js';
+import { ConfigCommand, configScopeFlags } from '../../lib/config-command.js';
 import { formatConfigEntry, resolveConfigEntry, keyValuesHint } from '../../lib/config/index.js';
 
 export default class ConfigGet extends ConfigCommand<typeof ConfigGet> {

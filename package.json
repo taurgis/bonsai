@@ -107,9 +107,8 @@
       "@oclif/plugin-autocomplete"
     ],
     "commands": {
-      "strategy": "explicit",
-      "target": "./dist/commands.js",
-      "identifier": "commands"
+      "strategy": "pattern",
+      "target": "./dist/commands"
     },
     "topicSeparator": " ",
     "hooks": {
