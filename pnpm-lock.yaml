@@ -12,11 +12,11 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       '@oclif/core':
-        specifier: ^4.14.0
-        version: 4.14.0
+        specifier: ^5.1.8
+        version: 5.1.8
       '@oclif/plugin-autocomplete':
-        specifier: ^3.2.52
-        version: 3.2.52
+        specifier: ^4.0.4
+        version: 4.0.4
       '@toon-format/toon':
         specifier: ^4.0.0
         version: 4.0.0
@@ -55,8 +55,8 @@ importers:
         specifier: ^16.2.7
         version: 16.4.0
       oclif:
-        specifier: ^4.24.0
-        version: 4.24.0(@types/node@22.20.0)
+        specifier: ^6.0.8
+        version: 6.0.8(@types/node@22.20.0)
       prettier:
         specifier: ^3.8.1
         version: 3.8.4
@@ -862,25 +862,25 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@oclif/core@4.14.0':
-    resolution: {integrity: sha512-QCJIZoVJxV7jywgVAUlsQwl3dr3Sa21kfi5z9KrYolbexWJUtFSEtMoNiBWojD05mYycLnB50gp/VxlGdaOCRA==}
-    engines: {node: '>=18.0.0'}
+  '@oclif/core@5.1.8':
+    resolution: {integrity: sha512-K1b3zdmbwANV9Jk+QN8aFvnXY/IhfWRnmhWn/V57h7alzbtck2je2DVVf0EkA01FokreF7Tpe+7hiGS87q30SA==}
+    engines: {node: '>=22.0.0'}
 
-  '@oclif/plugin-autocomplete@3.2.52':
-    resolution: {integrity: sha512-SZaTawQ5ekM4KZCHNxZ0aUNcZ81q4+zyMFKnWeKqpXOIL1ypqvFwRNdxP3Rj3YGEXYoLxrNNW+XOuoqriaBRTg==}
-    engines: {node: '>=18.0.0'}
+  '@oclif/plugin-autocomplete@4.0.4':
+    resolution: {integrity: sha512-EBdHkB+UE2E7YEM60LiVAK+ZVNRT+1epCkez1LIAJIfCMazhGJCzTNt75hOZHLfH0cZP48zs6FrZ45yzwfZbFw==}
+    engines: {node: '>=22.0.0'}
 
-  '@oclif/plugin-help@6.3.0':
-    resolution: {integrity: sha512-cpSRv7tyHHFPv39HrV22eNmu8ylrwjmPvqdlNo3URp79+p5319p+a8PI/3ez6A6GZmjwBj1EWUdVz1aPUAsSmw==}
-    engines: {node: '>=18.0.0'}
+  '@oclif/plugin-help@7.0.4':
+    resolution: {integrity: sha512-i3AKiJrHF8y/Hj/1QfNBVaE4N9sOlodA/CFq8Lv998BZAHe/uBwgqL94FvaZenj/3REyl01stptAUp/AQjpfOw==}
+    engines: {node: '>=22.0.0'}
 
-  '@oclif/plugin-not-found@3.3.0':
-    resolution: {integrity: sha512-GbdWJOmmBO3xmrVjDXeWG7tXl4vzeGZ+af9ztCfAmhOPEkd/+eeAAadzQPeZoygedqCvsdux3QLq9/MAxusPKg==}
-    engines: {node: '>=18.0.0'}
+  '@oclif/plugin-not-found@4.0.4':
+    resolution: {integrity: sha512-fPtsm8xrKTotTl4yQn5pem74iHXbXM6XYPCtU9bMPQEKuyUD//gllE1eGLX5OOOKTV8XJIf3MwAbGtTqCAAPdw==}
+    engines: {node: '>=22.0.0'}
 
-  '@oclif/plugin-warn-if-update-available@3.2.0':
-    resolution: {integrity: sha512-E7l+/NTjddOi32Q9G1CWzEtuh0EwNylVHfTRlFxlZD50v1oBqBpziWh+Dzz6oAIe4ee5U7EUc7lP22aLxpW3vA==}
-    engines: {node: '>=18.0.0'}
+  '@oclif/plugin-warn-if-update-available@4.0.3':
+    resolution: {integrity: sha512-M11GUdHKOoSAguv7eBBgtgUVuvaH5nlIlZA1kvOmSIpjrDQEvZwWBjKcyXb0icNnxdGbpaItILAOkKqVHz/ptw==}
+    engines: {node: '>=22.0.0'}
 
   '@oxc-project/types@0.137.0':
     resolution: {integrity: sha512-WT+Gb24i8hmvo85AIv2oEYouEXkRlKAlT9WaCa3TfLgNCN+GhrJOGZuIlMouAh38Qe4QOx26eUOVsq70qXrywA==}
@@ -2457,9 +2457,9 @@ packages:
     resolution: {integrity: sha512-9miFgM2OFba7hB+pRgvtV84pYTBaoTHohvmIgiRt6dRIzbwEOIaNaP+dIlGs2fNFoB0SeISs0Jz5WFVRid6Xyg==}
     engines: {node: '>=12.20.0'}
 
-  oclif@4.24.0:
-    resolution: {integrity: sha512-qBSOMDV7T9G7QkJM1XXeC08jVnGjXK/EQaol6MpkXN1ELEOzi/9SeuwElH3zQuCRVEE+MlJLME6nQzNlwN5zVw==}
-    engines: {node: '>=18.0.0'}
+  oclif@6.0.8:
+    resolution: {integrity: sha512-AAyS71vbahR1cnjpqV977nRHfVZAW3g0nEYbZNeRn22g+pZ4lJ7ATCJbF3/e8GOpU0tK5ubxdo5g8zFxnUOyGg==}
+    engines: {node: '>=22.0.0'}
     hasBin: true
 
   onetime@7.0.0:
@@ -4160,7 +4160,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@oclif/core@4.14.0':
+  '@oclif/core@5.1.8':
     dependencies:
       ansi-escapes: 4.3.2
       ansis: 3.17.0
@@ -4181,31 +4181,31 @@ snapshots:
       wrap-ansi: 7.0.0
       wsl-utils: 0.4.0
 
-  '@oclif/plugin-autocomplete@3.2.52':
+  '@oclif/plugin-autocomplete@4.0.4':
     dependencies:
-      '@oclif/core': 4.14.0
+      '@oclif/core': 5.1.8
       ansis: 3.17.0
       debug: 4.4.3(supports-color@8.1.1)
       ejs: 3.1.10
     transitivePeerDependencies:
       - supports-color
 
-  '@oclif/plugin-help@6.3.0':
+  '@oclif/plugin-help@7.0.4':
     dependencies:
-      '@oclif/core': 4.14.0
+      '@oclif/core': 5.1.8
 
-  '@oclif/plugin-not-found@3.3.0(@types/node@22.20.0)':
+  '@oclif/plugin-not-found@4.0.4(@types/node@22.20.0)':
     dependencies:
       '@inquirer/prompts': 7.10.1(@types/node@22.20.0)
-      '@oclif/core': 4.14.0
+      '@oclif/core': 5.1.8
       ansis: 3.17.0
       fast-levenshtein: 3.0.0
     transitivePeerDependencies:
       - '@types/node'
 
-  '@oclif/plugin-warn-if-update-available@3.2.0':
+  '@oclif/plugin-warn-if-update-available@4.0.3':
     dependencies:
-      '@oclif/core': 4.14.0
+      '@oclif/core': 5.1.8
       ansis: 3.17.0
       debug: 4.4.3(supports-color@8.1.1)
       http-call: 5.3.0
@@ -5804,17 +5804,17 @@ snapshots:
 
   obug@2.1.3: {}
 
-  oclif@4.24.0(@types/node@22.20.0):
+  oclif@6.0.8(@types/node@22.20.0):
     dependencies:
       '@aws-sdk/client-cloudfront': 3.1152.0
       '@aws-sdk/client-s3': 3.1152.0
       '@inquirer/confirm': 3.2.0
       '@inquirer/input': 2.3.0
       '@inquirer/select': 2.5.0
-      '@oclif/core': 4.14.0
-      '@oclif/plugin-help': 6.3.0
-      '@oclif/plugin-not-found': 3.3.0(@types/node@22.20.0)
-      '@oclif/plugin-warn-if-update-available': 3.2.0
+      '@oclif/core': 5.1.8
+      '@oclif/plugin-help': 7.0.4
+      '@oclif/plugin-not-found': 4.0.4(@types/node@22.20.0)
+      '@oclif/plugin-warn-if-update-available': 4.0.3
       ansis: 3.17.0
       async-retry: 1.3.3
       change-case: 4.1.2
