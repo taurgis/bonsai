@@ -1,5 +1,14 @@
 # @taurgis/bonsai
 
+## 4.1.1
+
+### Patch Changes
+
+- 03a9280: CLI startup reads the command manifest instead of loading every command, so `--help` and `--version` no longer pull in the fetch stack or print a manifest-version warning. A missing Salesforce document is rejected from the HTTP status without downloading the page.
+- 0516006: A Connect REST reference URL whose hash names one operation, such as `#tag/Commerce-B2B-Resources/operation/patchCheckoutV2`, stores that operation instead of the whole API reference.
+- 3fb9e54: Startup no longer checks npm for a newer release, so `--help` and ordinary commands do not pay for that lookup. `NO_UPDATE_NOTIFIER` has no effect; use `npm outdated @taurgis/bonsai` when you want the check.
+- 8700568: Salesforce doc fetches follow atlas Markdown twins, including REST API books that now redirect under `/docs/platform`. Browser captures drop the release switcher and the "Open in ChatGPT" toolbar so the article is what gets stored. A document URL that is HTTP 404 fails immediately, and a page that swaps in a different article (such as a retired Apex topic landing on the book home) is rejected instead of stored under the requested URL.
+
 ## 4.1.0
 
 ### Minor Changes
