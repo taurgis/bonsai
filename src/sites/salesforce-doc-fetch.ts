@@ -90,29 +90,35 @@ function confidenceFor(length: number): ExtractionResult['confidence'] {
 const BOILERPLATE_LINE =
   /(did this article solve your issue|let us know so we can improve|share your feedback)/i;
 
-// Toolbar of the "View as Markdown" feature on Developer articles. When the .md route probe
-// succeeds the browser never runs, but rollout/network asymmetries can still land such a page
-// here, and the toolbar labels serialize as bare paragraph lines.
-const MARKDOWN_TOOLBAR_LINE = /^(copy as markdown|view as markdown|copy url to markdown)$/i;
+// Toolbar labels that serialize as their own paragraph: "View as Markdown" on articles that
+// missed the .md probe, and the llms.txt / "Open in ChatGPT" cluster on the newer guide chrome.
+const DOC_CHROME_LINE =
+  /^(copy as markdown|view as markdown|copy url to markdown|view llms\.txt|copy url to llms\.txt|open in chatgpt|open in claude|open in perplexity|this page|all documentation|more actions)$/i;
 
 // A link with empty anchor text — e.g. an icon-only "home" logo link. It carries no readable
 // content and renders as a bare `[](url)`. (Images `![](url)` are intentionally not matched.)
 const EMPTY_LINK_LINE = /^\[\]\([^)]*\)$/;
 
+// Atlas books render a release switcher as one link per season. Turndown splits the anchor
+// text across lines, so the link is not a single line. Drop the whole link; the article follows.
+const VERSION_PICKER_LINK =
+  /\[\s*(?:Spring|Summer|Winter|Fall)\s+'\d{2}\s+\(API version\s+[\d.]+\)\s*\]\([^)\n]*\)/gi;
+
 /**
- * Removes known boilerplate lines from converted Salesforce Markdown: the feedback widget text,
- * "View as Markdown" toolbar labels, and empty icon-anchor lines.
+ * Removes known boilerplate from converted Salesforce Markdown: the feedback widget, doc-chrome
+ * toolbar labels, the atlas release switcher, and empty icon-anchor lines.
  *
  * @param markdown - Markdown output from the DOM or content API conversion.
- * @returns Markdown with boilerplate lines stripped and excess blank lines collapsed.
+ * @returns Markdown with boilerplate stripped and excess blank lines collapsed.
  */
 export function stripBoilerplate(markdown: string): string {
   return markdown
+    .replace(VERSION_PICKER_LINK, '')
     .split('\n')
     .filter(
       (line) =>
         !BOILERPLATE_LINE.test(line) &&
-        !MARKDOWN_TOOLBAR_LINE.test(line.trim()) &&
+        !DOC_CHROME_LINE.test(line.trim()) &&
         !EMPTY_LINK_LINE.test(line.trim())
     )
     .join('\n')

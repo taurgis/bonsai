@@ -172,6 +172,35 @@ describe('stripBoilerplate', () => {
     expect(out).toContain('You can also view this article as Markdown from the toolbar.');
   });
 
+  it('drops the atlas release switcher and the llms.txt toolbar, keeping the article', () => {
+    const md = [
+      '[',
+      '',
+      "Winter '27 (API version 68.0)",
+      '',
+      '](/docs/atlas.en-us.apexcode.meta/apexcode/apex_intro.htm)[',
+      '',
+      "Summer '26 (API version 67.0)",
+      '',
+      '](/docs/atlas.en-us.262.0.apexcode.meta/apexcode/apex_intro.htm)',
+      '',
+      'View llms.txt',
+      'Open in ChatGPT',
+      'This Page',
+      '',
+      '# Introducing Apex',
+      '',
+      'Apex code runs on the platform.',
+    ].join('\n');
+    const out = stripBoilerplate(md);
+    expect(out).not.toMatch(/API version/);
+    expect(out).not.toMatch(/view llms\.txt/i);
+    expect(out).not.toMatch(/open in chatgpt/i);
+    expect(out).not.toMatch(/^this page$/im);
+    expect(out).toContain('# Introducing Apex');
+    expect(out).toContain('Apex code runs on the platform.');
+  });
+
   it('drops empty-anchor links but keeps real links and images', () => {
     const md = [
       '# Title',

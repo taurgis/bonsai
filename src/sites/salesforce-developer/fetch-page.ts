@@ -7,7 +7,9 @@ import { fetchDeveloperRouteMarkdown } from './route-markdown.js';
 const CONTENT_SELECTORS = [
   // API-reference pages: doc-amf-reference holds the method/type tables. doc-content-layout only
   // carries the shared deprecation banner and must not win selector priority on those pages.
+  // doc-redoc-reference is the Connect REST (B2B Commerce and platform) three-panel host.
   'doc-amf-reference',
+  'doc-redoc-reference',
   'doc-content-layout',
   '.markdown-content',
   'main article',
@@ -19,7 +21,7 @@ const CONTENT_SELECTORS = [
  * Fetches a developer.salesforce.com doc page. Supported articles publish a Markdown twin at the
  * derived `.md` route ("View as Markdown"), which is preferred: one static request instead of a
  * browser render, and it returns the article's source. Pages without a validated twin (API
- * reference, atlas.* books, landing pages) fall back to the shared Lightning Web Runtime (LWR)
+ * reference, atlas books whose `.md` route is still an HTML shell, landing pages) fall back to the shared Lightning Web Runtime (LWR)
  * shadow-DOM fetcher.
  *
  * @param url - The developer.salesforce.com doc page URL.

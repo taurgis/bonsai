@@ -43,12 +43,14 @@ describe('deriveMarkdownUrl', () => {
     expect(deriveMarkdownUrl(`${DOC_URL}/?meta=Summary#step-1`)).toBe(MD_URL);
   });
 
-  it('rejects atlas.* books — their .md route answers with an HTML shell, never Markdown', () => {
+  it('derives a .md route for atlas books so moved REST docs can redirect to Markdown', () => {
     expect(
       deriveMarkdownUrl(
-        'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_dev_guide.htm'
+        'https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm'
       )
-    ).toBeNull();
+    ).toBe(
+      'https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.md'
+    );
   });
 
   it('rejects other hosts and non-/docs/ paths', () => {
@@ -108,14 +110,41 @@ describe('fetchDeveloperRouteMarkdown', () => {
     expect(out!.extraction.qualityNotes?.join(' ')).toMatch(/::include directive/);
   });
 
-  it('returns null without fetching when no candidate can be derived (atlas book)', async () => {
-    const fetcher = vi.fn();
-    const out = await fetchDeveloperRouteMarkdown(
-      'https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ref_guide.htm',
-      fetcher
+  it('probes an atlas book and keeps a Markdown redirect onto the developer host', async () => {
+    const atlas =
+      'https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm';
+    const finalUrl =
+      'https://developer.salesforce.com/docs/platform/api-rest/guide/intro-what-is-rest-api.md';
+    const fetcher = vi.fn().mockResolvedValue(
+      markdownResponse({
+        finalUrl,
+        content:
+          '# About REST API\n\nREST API is one of several web interfaces that you can use to access your Salesforce data without the Salesforce user interface.\n',
+      })
     );
-    expect(out).toBeNull();
-    expect(fetcher).not.toHaveBeenCalled();
+    const out = await fetchDeveloperRouteMarkdown(atlas, fetcher);
+    expect(fetcher).toHaveBeenCalledWith(
+      'https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.md',
+      expect.anything()
+    );
+    expect(out!.captureMethod).toBe('route_markdown');
+    expect(out!.sourceDocUrl).toBe(finalUrl);
+    expect(out!.extraction.detailedMarkdown).toContain('web interfaces');
+  });
+
+  it('rejects an atlas book whose .md route is still an HTML shell', async () => {
+    const fetcher = vi.fn().mockResolvedValue(
+      markdownResponse({
+        contentType: 'text/html; charset=utf-8',
+        content: '<!DOCTYPE html><html><body>app shell</body></html>',
+      })
+    );
+    expect(
+      await fetchDeveloperRouteMarkdown(
+        'https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ref_guide.htm',
+        fetcher
+      )
+    ).toBeNull();
   });
 
   it('returns null when the route 404s (fetcher throws)', async () => {
