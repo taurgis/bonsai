@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { parseHTML } from 'linkedom';
-import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
 
 const fixtures = {
@@ -38,17 +37,6 @@ const fixtures = {
       </body>
     </html>
   `,
-  relativeLinks: `
-    <!DOCTYPE html>
-    <html>
-      <body>
-        <main>
-          <h1>Links Page</h1>
-          <p>Check the <a href="/docs/api">API docs</a> or the <a href="../contact">contact page</a>.</p>
-        </main>
-      </body>
-    </html>
-  `,
   codeBlocks: `
     <!DOCTYPE html>
     <html>
@@ -58,25 +46,6 @@ const fixtures = {
           <p>Here is some TypeScript code:</p>
           <pre><code>const a = 1;
 console.log(a);</code></pre>
-        </main>
-      </body>
-    </html>
-  `,
-  tables: `
-    <!DOCTYPE html>
-    <html>
-      <body>
-        <main>
-          <h1>Data Table</h1>
-          <table>
-            <thead>
-              <tr><th>Name</th><th>Value</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>React</td><td>High</td></tr>
-              <tr><td>Vite</td><td>Very High</td></tr>
-            </tbody>
-          </table>
         </main>
       </body>
     </html>
@@ -96,70 +65,33 @@ console.log(a);</code></pre>
   `,
 };
 
-describe('extraction spike: linkedom vs jsdom with readability', () => {
-  it('extracts technical doc successfully on both', () => {
-    // Linkedom
-    const { document: lDoc } = parseHTML(fixtures.staticDoc);
-    const lReader = new Readability(lDoc as any);
-    const lArticle = lReader.parse();
-    expect(lArticle?.title).toBe('Technical Doc');
-    expect(lArticle?.textContent).toContain('This is the official documentation');
-
-    // JSDOM
-    const jDoc = new JSDOM(fixtures.staticDoc).window.document;
-    const jReader = new Readability(jDoc);
-    const jArticle = jReader.parse();
-    expect(jArticle?.title).toBe('Technical Doc');
-    expect(jArticle?.textContent).toContain('This is the official documentation');
+describe('extraction spike: linkedom with readability', () => {
+  it('extracts a technical doc', () => {
+    const { document } = parseHTML(fixtures.staticDoc);
+    const article = new Readability(document as any).parse();
+    expect(article?.title).toBe('Technical Doc');
+    expect(article?.textContent).toContain('This is the official documentation');
   });
 
   it('prunes navigation and footer boilerplate', () => {
-    // Linkedom
-    const { document: lDoc } = parseHTML(fixtures.articleWithBoilerplate);
-    const lReader = new Readability(lDoc as any);
-    const lArticle = lReader.parse();
-    expect(lArticle?.textContent).not.toContain('Home');
-    expect(lArticle?.textContent).not.toContain('About');
-    expect(lArticle?.textContent).not.toContain('2026 Forward NV');
-    expect(lArticle?.textContent).toContain('Autonomous agents are changing');
-
-    // JSDOM
-    const jDoc = new JSDOM(fixtures.articleWithBoilerplate).window.document;
-    const jReader = new Readability(jDoc);
-    const jArticle = jReader.parse();
-    expect(jArticle?.textContent).not.toContain('Home');
-    expect(jArticle?.textContent).not.toContain('About');
-    expect(jArticle?.textContent).not.toContain('2026 Forward NV');
-    expect(jArticle?.textContent).toContain('Autonomous agents are changing');
+    const { document } = parseHTML(fixtures.articleWithBoilerplate);
+    const article = new Readability(document as any).parse();
+    expect(article?.textContent).not.toContain('Home');
+    expect(article?.textContent).not.toContain('About');
+    expect(article?.textContent).not.toContain('2026 Forward NV');
+    expect(article?.textContent).toContain('Autonomous agents are changing');
   });
 
-  it('handles relative links and code blocks on both', () => {
-    // Linkedom Link & Code
-    const { document: lDoc } = parseHTML(fixtures.codeBlocks);
-    const lReader = new Readability(lDoc as any);
-    const lArticle = lReader.parse();
-    expect(lArticle?.content).toContain('<code>const a = 1;');
-
-    // JSDOM Link & Code
-    const jDoc = new JSDOM(fixtures.codeBlocks).window.document;
-    const jReader = new Readability(jDoc);
-    const jArticle = jReader.parse();
-    expect(jArticle?.content).toContain('<code>const a = 1;');
+  it('keeps fenced code', () => {
+    const { document } = parseHTML(fixtures.codeBlocks);
+    const article = new Readability(document as any).parse();
+    expect(article?.content).toContain('<code>const a = 1;');
   });
 
-  it('handles tables and malformed HTML on both', () => {
-    // Linkedom Malformed
-    const { document: lDoc } = parseHTML(fixtures.malformedHtml);
-    const lReader = new Readability(lDoc as any);
-    const lArticle = lReader.parse();
-    expect(lArticle?.title).toBe('Malformed Page');
-    expect(lArticle?.textContent).toContain('This paragraph is never closed');
-
-    // JSDOM Malformed
-    const jDoc = new JSDOM(fixtures.malformedHtml).window.document;
-    const jReader = new Readability(jDoc);
-    const jArticle = jReader.parse();
-    expect(jArticle?.title).toBe('Malformed Page');
-    expect(jArticle?.textContent).toContain('This paragraph is never closed');
+  it('parses unclosed tags', () => {
+    const { document } = parseHTML(fixtures.malformedHtml);
+    const article = new Readability(document as any).parse();
+    expect(article?.title).toBe('Malformed Page');
+    expect(article?.textContent).toContain('This paragraph is never closed');
   });
 });

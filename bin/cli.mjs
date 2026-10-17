@@ -3,17 +3,12 @@
 import { execute } from '@oclif/core';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import updateNotifier from 'update-notifier';
-import { createRequire } from 'node:module';
 
 import { normalizeArgv } from '../dist/lib/argv.js';
 import { VALUE_TAKING_FLAG_TOKENS, KNOWN_COMMAND_ROOT_TOKENS } from '../dist/lib/cli-flag-manifest.js';
 import { exitWithPreflight } from '../dist/lib/cli-emit.js';
 import { tryUnknownHelpOutput } from '../dist/lib/help-preflight.js';
 import { tryJsonMetaOutput } from '../dist/lib/json-meta.js';
-
-const req = createRequire(import.meta.url);
-const pkg = req('../package.json');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -41,12 +36,6 @@ if (unknownHelp) {
 const jsonMeta = await tryJsonMetaOutput(result.argv, root);
 if (jsonMeta) {
   exitWithPreflight({ ...jsonMeta, json: true });
-}
-
-// Only notify after the earlyExit fast-path so the notifier never fires before
-// a usage-error envelope exits. Also skip under --json/--toon so agent callers never see stderr noise.
-if (!process.argv.includes('--json') && !process.argv.includes('--toon')) {
-  updateNotifier({ pkg }).notify();
 }
 
 process.argv = [process.argv[0], process.argv[1], ...result.argv];
