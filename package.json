@@ -1,6 +1,6 @@
 {
   "name": "@taurgis/bonsai",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Bonsai is a standalone local research cache CLI for AI agents",
   "repository": {
     "type": "git",
