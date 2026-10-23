@@ -119,6 +119,24 @@ describe('sameSalesforceArticle', () => {
     ).toBe(true);
   });
 
+  it('treats a Help doc-set prefix move (sf. → platform./xcloud.) as the same article', () => {
+    expect(
+      sameSalesforceArticle(
+        'https://help.salesforce.com/s/articleView?id=sf.sso_about.htm&type=5',
+        'https://help.salesforce.com/s/articleView?id=xcloud.sso_about.htm&type=5'
+      )
+    ).toBe(true);
+  });
+
+  it('rejects a Help redirect to a different slug', () => {
+    expect(
+      sameSalesforceArticle(
+        'https://help.salesforce.com/s/articleView?id=sf.sso_about.htm&type=5',
+        'https://help.salesforce.com/s/articleView?id=platform.users_about.htm&type=5'
+      )
+    ).toBe(false);
+  });
+
   it('rejects a book-home swap', () => {
     expect(
       sameSalesforceArticle(

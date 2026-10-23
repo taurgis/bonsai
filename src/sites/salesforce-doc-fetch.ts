@@ -330,6 +330,9 @@ export interface SalesforceDocOptions {
   removeSelectors?: string[];
 }
 
+/** Leading Help doc-set segment of an article id (`sf.`, `platform.`, `xcloud.`, `cc.`). */
+const HELP_DOC_SET_PREFIX = /^[a-z0-9_-]+\.(?=.)/i;
+
 interface CaptureAttemptResult {
   html: string;
   title: string;
@@ -339,7 +342,9 @@ interface CaptureAttemptResult {
 
 /** Article identity for a Salesforce doc URL: Help `id`, otherwise the last path segment.
  * Underscores and hyphens match so a REST rename (`intro_what_is_rest_api` →
- * `intro-what-is-rest-api`) stays the same article.
+ * `intro-what-is-rest-api`) stays the same article. The Help doc-set prefix is dropped
+ * because Help moves articles between sets and redirects client-side
+ * (`sf.sso_about.htm` → `xcloud.sso_about.htm`).
  *
  * @param url - Requested or post-navigation URL.
  * @returns Normalized article key, or null when the URL has no article identity.
@@ -353,7 +358,8 @@ export function salesforceArticleKey(url: string): string | null {
   }
   const id = parsed.searchParams.get('id');
   const raw = (id ?? parsed.pathname.replace(/\/+$/, '').split('/').pop() ?? '').trim();
-  const stripped = raw.replace(/\.(html?|md)$/i, '');
+  const withoutExtension = raw.replace(/\.(html?|md)$/i, '');
+  const stripped = id ? withoutExtension.replace(HELP_DOC_SET_PREFIX, '') : withoutExtension;
   if (!stripped) return null;
   return stripped.toLowerCase().replace(/_/g, '-');
 }
