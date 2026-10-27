@@ -1,6 +1,7 @@
 /** URL shorthand fetch command (root bonsai <url>). */
 import {
   ageArtifact,
+  markArtifactFailed,
   seedUnrelatedCorruptSibling,
   hasArchivedCorruptSibling,
   flattenWhitespace,
@@ -338,6 +339,25 @@ export default function register(harness, fixtures) {
     ageArtifact(path, new Date(Date.now() - 40 * 24 * 3600 * 1000).toISOString());
     return ws;
   }
+
+  check('fetch re-fetches an error marker cached by an older release instead of replaying it', () => {
+    // A fresh `failed` marker used to come back as a cache hit with exit 0. It must now be treated
+    // as a miss: the .invalid host makes that re-fetch fail fast (DNS) with exit 1.
+    const ws = createWorkspace();
+    const url = 'https://this-domain-definitely-does-not-exist-xyz123.invalid/legacy-error-marker';
+    const imported = run(['import', url, '--stdin', '--json'], {
+      cwd: ws.cwd,
+      xdg: ws.xdg,
+      input: '# Legacy marker fixture\n\nStands in for a cached error marker.\n',
+    });
+    expect(imported.exitCode === 0, `seed import exit ${imported.exitCode}`);
+    markArtifactFailed(parseJson(imported.stdout)?.data?.cache?.path);
+
+    const r = run([url, '--json'], { cwd: ws.cwd, xdg: ws.xdg });
+    expect(r.exitCode === 1, `exit ${r.exitCode}`);
+    const env = parseJson(r.stdout);
+    expect(env?.ok === false && env?.code === 'FETCH_FAILED', `code ${env?.code}`);
+  });
 
   check('fetch of a stale_grace entry whose revalidation fails serves stale with exit 5', () => {
     const url = 'https://this-domain-definitely-does-not-exist-xyz123.invalid/stale-grace-exit5';

@@ -14,6 +14,12 @@ export function ageArtifact(path, isoTimestamp) {
   writeFileSync(path, aged, 'utf8');
 }
 
+/** Turn a cached artifact into the error marker older releases cached (`extraction_status: failed`). */
+export function markArtifactFailed(path) {
+  const content = readFileSync(path, 'utf8');
+  writeFileSync(path, content.replace(/^extraction_status: .*$/m, 'extraction_status: failed'), 'utf8');
+}
+
 /** Overwrite a cached artifact with content that fails frontmatter parsing (no `---` fences). */
 export function corruptArtifact(path) {
   writeFileSync(path, 'no frontmatter fence at all\njust garbage', 'utf8');

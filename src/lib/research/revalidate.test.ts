@@ -78,7 +78,7 @@ describe('freshness and revalidation engine', () => {
     };
     const currentTime = new Date('2026-06-25T00:00:00.000Z');
 
-    it('caches a compact error marker instead of the full error page', () => {
+    it('throws instead of caching an error page', () => {
       const errorExtraction = {
         title: 'Something went wrong',
         detailedMarkdown: '## Something went wrong\n\nAn error occurred while loading this page.',
@@ -86,26 +86,19 @@ describe('freshness and revalidation engine', () => {
         qualityNotes: ['warning: extracted content is very short (less than 500 characters)'],
       };
 
-      const artifact = createArtifactFromFetch({
-        url: 'https://docs.example.com/missing',
-        normalizedUrl: 'https://docs.example.com/missing',
-        cacheKey: 'abc123',
-        fetchResult,
-        extraction: errorExtraction,
-        tier: 'standard',
-        ttl: null,
-        currentTime,
-        summaryLevel: 'conservative',
-      });
-
-      expect(artifact.metadata.extraction_status).toBe('failed');
-      expect(artifact.metadata.extraction_confidence).toBeNull();
-      // Stays 'active' so the cache lookup still serves the marker on subsequent calls.
-      expect(artifact.metadata.status).toBe('active');
-      // The full error markdown is dropped; only a one-line marker is stored.
-      expect(artifact.detailed).not.toContain('An error occurred while loading');
-      expect(artifact.compressed).toBe(artifact.detailed);
-      expect(artifact.detailed).toContain('could not be cached');
+      expect(() =>
+        createArtifactFromFetch({
+          url: 'https://docs.example.com/missing',
+          normalizedUrl: 'https://docs.example.com/missing',
+          cacheKey: 'abc123',
+          fetchResult,
+          extraction: errorExtraction,
+          tier: 'standard',
+          ttl: null,
+          currentTime,
+          summaryLevel: 'conservative',
+        })
+      ).toThrow(/could not be cached — page reported an error or was not found/);
     });
 
     it('caches real content normally (no false positive)', () => {
@@ -236,6 +229,35 @@ describe('freshness and revalidation engine', () => {
       });
       expect(resB.status).toBe('stale');
       expect(resB.allowed).toBe(false);
+    });
+
+    it('keeps the stored note (served stale) when the refresh returns an error page', async () => {
+      const errorHtml =
+        '<!doctype html><html><body><h1>Page not found</h1><p>Nothing here.</p></body></html>';
+      vi.mocked(fetcher.fetchStaticHtml).mockResolvedValue({
+        status: 200,
+        contentType: 'text/html',
+        etag: null,
+        lastModified: null,
+        finalUrl: 'https://example.com/docs',
+        responseSize: errorHtml.length,
+        content: errorHtml,
+      });
+
+      const currentTime = new Date('2026-07-29T00:00:00.000Z'); // in grace
+      writeArtifact(tempDir, sampleArtifact.metadata.cache_key, sampleArtifact);
+
+      const result = await revalidateCache(tempDir, sampleArtifact, currentTime, {
+        allowStale: false,
+        summaryLevel: 'conservative',
+      });
+
+      expect(result.status).toBe('stale');
+      expect(result.artifact).toEqual(sampleArtifact);
+      expect(result.error).toContain('could not be cached');
+      expect(readArtifact(tempDir, sampleArtifact.metadata.cache_key).detailed).toBe(
+        sampleArtifact.detailed
+      );
     });
 
     it('fails when server is offline and cache is expired beyond grace period', async () => {
