@@ -135,6 +135,15 @@ describe('fetchFailureGuidance', () => {
     expect(g?.suggestions.every((s) => !/\bbonsai import\b/.test(s))).toBe(true);
   });
 
+  it('suggests checking the URL for error pages and missing Salesforce docs', () => {
+    for (const message of [
+      `${url} could not be cached — page reported an error or was not found.`,
+      `Salesforce doc not found: ${url}`,
+    ]) {
+      expect(fetchFailureGuidance(message, url)?.suggestions.join(' ')).toMatch(/correct/i);
+    }
+  });
+
   it('suggests checking the URL on a 404', () => {
     const g = fetchFailureGuidance('Fetch failed with status 404 Not Found', url);
     expect(g?.suggestions.join(' ')).toMatch(/correct/i);
