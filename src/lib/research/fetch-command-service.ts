@@ -271,7 +271,9 @@ async function resolveArtifact(
   run: FetchRun
 ): Promise<ResolvedFetchArtifact & { storageDir: string; redirectedToGlobal: boolean }> {
   const { cacheKey, located, normalizedUrl, roots } = target;
-  if (located) {
+  // Older releases cached an error marker (extraction_status `failed`); replaying it would report
+  // a fetch failure as a fresh hit, so re-fetch instead.
+  if (located && located.artifact.metadata.extraction_status !== 'failed') {
     // Revalidate where the entry already lives; on dry-run use the throwaway dir so the cache is
     // never mutated. Project-located entries reuse persistArtifact (secret-scan + redirect) so a
     // refresh that gains a credential cannot stay in the committable project cache (#90).

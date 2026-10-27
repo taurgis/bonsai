@@ -121,6 +121,13 @@ export function stripBoilerplate(markdown: string): string {
 
 const DOCS_CONTENT_API = '/docs/get_document_content/';
 
+// developer.salesforce.com API-reference explorers (OCAPI/SCAPI `doc-amf-reference` pages) render
+// from an AMF spec JSON (1-2 MB) fetched after load. Until it arrives the host holds only the
+// deprecation banner and nav, which already passes the readiness probe, so on a slow link the
+// capture would store the banner as the whole page. Wait for the spec on those pages.
+const AMF_SPEC_URL = /\.amf\.json(?:$|\?)/;
+const AMF_REFERENCE_PRESENT_EXPRESSION = "Boolean(document.querySelector('doc-amf-reference'))";
+
 /** Parses the Salesforce private content API JSON payload.
  *
  * @param raw - Raw JSON string from the `/docs/get_document_content/` network response.
@@ -425,6 +432,64 @@ function assertReadableSalesforceContent(detailedMarkdown: string, url: string):
   }
 }
 
+// Watches the explorer's spec request by its network events only: the body can be several MB,
+// more than Chrome keeps buffered for Network.getResponseBody, and only completion matters here.
+function watchAmfSpecRequest(page: CdpPage): (timeoutMs: number) => Promise<boolean> {
+  const { client, sessionId } = page;
+  const specRequestIds = new Set<string>();
+  let specStatus = 0;
+  let loaded: boolean | null = null;
+  let notify: ((ok: boolean) => void) | null = null;
+  const settle = (ok: boolean): void => {
+    loaded = ok;
+    notify?.(ok);
+  };
+  client.on(`${sessionId}:Network.requestWillBeSent`, (params) => {
+    if (AMF_SPEC_URL.test(params.request?.url ?? '')) specRequestIds.add(params.requestId);
+  });
+  client.on(`${sessionId}:Network.responseReceived`, (params) => {
+    if (specRequestIds.has(params.requestId)) specStatus = params.response?.status ?? 0;
+  });
+  client.on(`${sessionId}:Network.loadingFinished`, (params) => {
+    if (specRequestIds.has(params.requestId)) settle(specStatus >= 200 && specStatus < 400);
+  });
+  client.on(`${sessionId}:Network.loadingFailed`, (params) => {
+    if (specRequestIds.has(params.requestId)) settle(false);
+  });
+  return (timeoutMs) => {
+    if (loaded !== null) return Promise.resolve(loaded);
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => resolve(false), timeoutMs);
+      notify = (ok) => {
+        clearTimeout(timer);
+        resolve(ok);
+      };
+    });
+  };
+}
+
+async function waitForAmfSpecRender(
+  page: CdpPage,
+  amfSpecLoaded: (timeoutMs: number) => Promise<boolean>,
+  url: string,
+  contentSelectors: string[]
+): Promise<void> {
+  const probe = await page.client
+    .send(
+      'Runtime.evaluate',
+      { expression: AMF_REFERENCE_PRESENT_EXPRESSION, returnByValue: true },
+      page.sessionId
+    )
+    .catch(() => null);
+  if (probe?.result?.value !== true) return;
+  if (!(await amfSpecLoaded(TIMEOUT_MS))) {
+    throw new Error(
+      `Salesforce API reference spec did not load for ${url} (the page renders from it, so only its banner would be captured).`
+    );
+  }
+  await pollSalesforceContentReady(page, contentSelectors, MIN_CONTAINER_CHARS, TIMEOUT_MS);
+}
+
 async function captureSalesforceAttempt(
   page: CdpPage,
   url: string,
@@ -438,6 +503,7 @@ async function captureSalesforceAttempt(
       accept: (body) => parseDocsApiPayload(body) !== null,
     },
   ]);
+  const amfSpecLoaded = watchAmfSpecRequest(page);
 
   // A network-level failure (DNS, refused/closed connection, TLS, a proxy declining to tunnel) never
   // fires a load event and renders Chrome's own "site can't be reached" interstitial instead. Without
@@ -467,6 +533,7 @@ async function captureSalesforceAttempt(
     .send('Runtime.evaluate', { expression: ACCEPT_CONSENT_EXPRESSION }, page.sessionId)
     .catch(() => {});
   await pollSalesforceContentReady(page, contentSelectors, MIN_CONTAINER_CHARS, TIMEOUT_MS);
+  await waitForAmfSpecRender(page, amfSpecLoaded, url, contentSelectors);
   await new Promise((r) => setTimeout(r, SETTLE_MS));
   const docsPayload = parseDocsApiPayload(
     (await docsCapture.waitFor('docs-content', DOCS_API_GRACE_MS)) ?? ''

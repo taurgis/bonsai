@@ -549,4 +549,70 @@ describe('fetchSalesforceDoc', () => {
     );
     expect(result.extraction.detailedMarkdown).not.toContain('Ignore previous instructions');
   });
+
+  describe('API-reference explorer (doc-amf-reference)', () => {
+    const EXPLORER_URL =
+      'https://developer.salesforce.com/docs/commerce/b2c-commerce/references/ocapi-data-users?meta=Get%2BUser';
+    const DEV_OPTIONS = { ...DOC_OPTIONS, allowedHost: 'developer.salesforce.com' };
+
+    // Marks the page as an explorer and, when `specStatus` is set, replays the spec request's
+    // network events as the host probe runs (i.e. the spec finished before capture checked).
+    function explorerPage(specStatus: number | null) {
+      const page = fakePage([{ html: RICH_HTML, title: 'Get User' }]);
+      const handlers = new Map<string, Array<(params: unknown) => void>>();
+      page.client.on = (event: string, handler: (params: unknown) => void) => {
+        handlers.set(event, [...(handlers.get(event) ?? []), handler]);
+      };
+      const emit = (method: string, params: unknown) =>
+        (handlers.get(`s1:${method}`) ?? []).forEach((handler) => handler(params));
+      const send = page.client.send.getMockImplementation()!;
+      page.client.send.mockImplementation(async (method, params) => {
+        if (params?.expression?.includes("querySelector('doc-amf-reference')")) {
+          if (specStatus !== null) {
+            const spec = 'https://developer.salesforce.com/static/x/data-users.json.amf.json';
+            emit('Network.requestWillBeSent', { requestId: 'r1', request: { url: spec } });
+            emit('Network.responseReceived', { requestId: 'r1', response: { status: specStatus } });
+            emit('Network.loadingFinished', { requestId: 'r1' });
+          }
+          return { result: { value: true } };
+        }
+        return send(method, params);
+      });
+      return page;
+    }
+
+    it('waits for the spec to load, then re-polls readiness before capturing', async () => {
+      vi.mocked(openCdpPage).mockResolvedValue(explorerPage(200) as never);
+      vi.mocked(pollSalesforceContentReady).mockClear();
+
+      const result = await fetchSalesforceDoc(EXPLORER_URL, DEV_OPTIONS);
+
+      expect(result.extraction.title).toBe('Get User');
+      // Once for the shell, once more after the spec arrives so the operation can render.
+      expect(pollSalesforceContentReady).toHaveBeenCalledTimes(2);
+    });
+
+    it('fails instead of capturing the banner when the spec request errors', async () => {
+      const page = explorerPage(404);
+      vi.mocked(openCdpPage).mockResolvedValue(page as never);
+
+      await expect(fetchSalesforceDoc(EXPLORER_URL, DEV_OPTIONS)).rejects.toThrow(
+        /API reference spec did not load/
+      );
+      expect(page.close).toHaveBeenCalledOnce();
+    });
+
+    it('fails when the spec never finishes loading', async () => {
+      vi.useFakeTimers();
+      try {
+        vi.mocked(openCdpPage).mockResolvedValue(explorerPage(null) as never);
+        const pending = fetchSalesforceDoc(EXPLORER_URL, DEV_OPTIONS);
+        const assertion = expect(pending).rejects.toThrow(/API reference spec did not load/);
+        await vi.runAllTimersAsync();
+        await assertion;
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
 });

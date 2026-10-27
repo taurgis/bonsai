@@ -144,52 +144,6 @@ function buildMetadata(input: {
   };
 }
 
-// Builds a compact error marker instead of caching a full error page. Subsequent lookups serve this
-// tiny marker (a handful of tokens) instead of re-fetching, and revalidation re-checks it when stale
-// so a transient failure recovers into a real artifact.
-function buildErrorArtifact(input: {
-  url: string;
-  normalizedUrl: string;
-  cacheKey: string;
-  fetchResult: FetchedContent;
-  tier: 'stable' | 'standard' | 'volatile';
-  ttl: string | null;
-  currentTime: Date;
-  reason: string;
-}): ResearchArtifact {
-  const { url, normalizedUrl, cacheKey, fetchResult, tier, ttl, currentTime, reason } = input;
-  const marker =
-    `Error: ${url} could not be cached — ${reason}. ` +
-    'The page returned an error, so its content was not stored; it will be re-fetched when this entry goes stale.';
-  const extraction = {
-    title: `Error: ${reason}`,
-    detailedMarkdown: marker,
-    confidence: 'low' as const,
-    qualityNotes: [`error: ${reason}`],
-  };
-  const metadata = buildMetadata({
-    url,
-    normalizedUrl,
-    cacheKey,
-    fetchResult,
-    extraction,
-    tier,
-    ttl,
-    currentTime,
-    compressed: marker,
-  });
-  metadata.extraction_status = 'failed';
-  metadata.extraction_confidence = null;
-
-  return {
-    metadata,
-    summary: extraction.title,
-    compressed: marker,
-    detailed: marker,
-    provenance: `Fetched from ${url} on ${currentTime.toISOString()} (error page; content not cached)`,
-  };
-}
-
 interface CreateArtifactFromFetchInput {
   url: string;
   normalizedUrl: string;
@@ -203,10 +157,11 @@ interface CreateArtifactFromFetchInput {
 }
 
 /**
- * Construct a ResearchArtifact from a fresh HTML fetch (or error-page marker).
+ * Construct a ResearchArtifact from a fresh HTML fetch.
  *
  * @param input - URL, fetch result, extraction, tier/TTL, clock, and summary level.
  * @returns A ready-to-persist research artifact.
+ * @throws {Error} When the extracted content reads like an error or not-found page.
  */
 export function createArtifactFromFetch(input: CreateArtifactFromFetchInput): ResearchArtifact {
   const {
@@ -221,19 +176,10 @@ export function createArtifactFromFetch(input: CreateArtifactFromFetchInput): Re
     summaryLevel,
   } = input;
   // A managed platform / SPA can return HTTP 200 but render only a "not found" / "something went
-  // wrong" shell. Cache a compact marker for those instead of the full error markdown, so repeat
-  // lookups cost a few tokens and revalidation still re-checks the page when the entry goes stale.
+  // wrong" shell. Fail instead of caching it: a miss then exits non-zero with nothing stored, and a
+  // refresh falls back to the existing note (stale-grace) rather than overwriting it with an error.
   if (looksLikeErrorPage(extraction.detailedMarkdown)) {
-    return buildErrorArtifact({
-      url,
-      normalizedUrl,
-      cacheKey,
-      fetchResult,
-      tier,
-      ttl,
-      currentTime,
-      reason: 'page reported an error or was not found',
-    });
+    throw new Error(`${url} could not be cached — page reported an error or was not found.`);
   }
 
   const compressed = buildCompressed(extraction.detailedMarkdown, summaryLevel);

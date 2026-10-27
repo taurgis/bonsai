@@ -255,6 +255,39 @@ describe('fetch command branch coverage', () => {
     expect(result.content.length).toBeGreaterThan(0);
   });
 
+  it('cache MISS on an error page: exits 1 with FETCH_FAILED and caches nothing', async () => {
+    mocks.capturePage.mockResolvedValue(fakeCapture('# Page not found\n\nNothing here.'));
+
+    const { envelope } = await captureEnvelope(() => FetchCommand.run([TEST_URL, '--json']));
+
+    expect(envelope.ok).toBe(false);
+    expect(envelope.exitCode).toBe(1);
+    expect(envelope.code).toBe('FETCH_FAILED');
+    expect(envelope.stderr).toContain('could not be cached');
+    const cacheKey = deriveCacheKey(normalizeUrl(TEST_URL));
+    expect(existsSync(getArtifactPath(await globalDataDir(), cacheKey))).toBe(false);
+  });
+
+  it('a fresh error marker cached by an older release is re-fetched, not replayed as a hit', async () => {
+    const { cacheKey, artifact } = seedCachedArtifact(await globalDataDir(), new Date());
+    writeArtifact(await globalDataDir(), cacheKey, {
+      ...artifact,
+      metadata: { ...artifact.metadata, extraction_status: 'failed' },
+      detailed: 'Error: could not be cached',
+      compressed: 'Error: could not be cached',
+    });
+    mocks.capturePage.mockResolvedValue(fakeCapture(LONG_MARKDOWN));
+
+    const result: any = await FetchCommand.run([TEST_URL]);
+
+    expect(mocks.capturePage).toHaveBeenCalledOnce();
+    expect(result.cache.status).toBe('miss');
+    expect(result.source.extractionStatus).toBe('extracted');
+    expect(readArtifact(await globalDataDir(), cacheKey).metadata.extraction_status).toBe(
+      'extracted'
+    );
+  });
+
   it('--read-only: resolving the target does not archive an unrelated corrupt cache file', async () => {
     // findArtifact scans every file in the research dir while resolving the target's own cache key,
     // so an unrelated corrupt entry it happens to pass over must not be archived (a disk write)

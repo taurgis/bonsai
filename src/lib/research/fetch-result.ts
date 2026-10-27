@@ -197,7 +197,7 @@ export function fetchFailureGuidance(
       ref,
     };
   }
-  if (/failed with status 404\b/.test(message)) {
+  if (/failed with status 404\b|page reported an error or was not found/.test(message)) {
     return { suggestions: ['Check the URL is correct and the page still exists.'] };
   }
   if (/failed with status 5\d\d\b/.test(message)) {
